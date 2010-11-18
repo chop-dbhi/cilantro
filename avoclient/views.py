@@ -17,7 +17,7 @@ from django.template import RequestContext
 
 from avocado.contrib.server.api.handlers import (CategoryHandler,
     CriterionHandler, ColumnHandler)
-from avocado.contrib.client.utils import get_ip_address
+from avoclient.utils import get_ip_address
 
 MAX_LOGIN_ATTEMPTS = 10
 LOGIN_CACHE_TIMEOUT = 60 * 60 # 1 hour
