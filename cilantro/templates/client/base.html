@@ -10,14 +10,14 @@
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     
-        <link rel="stylesheet" href="{{ CLIENT_MEDIA_URL }}css/common.css">
-        {# <link rel="stylesheet" href="{{ CLIENT_MEDIA_URL }}css/iconic.css">         #}
+        <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/common.css">
+        {# <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/iconic.css">         #}
 
         {% block styles %}{% endblock %}
     
-        <script src="{{ CLIENT_JS_URL }}lib/modernizr.js"></script>
-        <script>var require={baseUrl:'{{ CLIENT_JS_URL }}'};</script>
-        <script src="{{ CLIENT_JS_URL }}lib/requirejs.jquery.js"></script>
+        <script src="{{ CILANTRO_JS_URL }}lib/modernizr.js"></script>
+        <script>var require={baseUrl:'{{ CILANTRO_JS_URL }}'};</script>
+        <script src="{{ CILANTRO_JS_URL }}lib/requirejs.jquery.js"></script>
 
         {% block scripts %}            
         {% endblock %}
