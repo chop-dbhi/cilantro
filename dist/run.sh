@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PACKAGE="avoclient"
+PACKAGE="cilantro"
 
 # defines the JS modules located in the JS_SRC_DIR that will be compiled
 # and written to the JS_MIN_DIR

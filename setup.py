@@ -5,7 +5,7 @@ from distutils.command.install import INSTALL_SCHEMES
 import os
 import sys
 
-BASE_PACKAGE = 'avoclient'
+BASE_PACKAGE = 'cilantro'
 
 class osx_install_data(install_data):
     # On MacOS, the platform-specific lib dir is /System/Library/Framework/Python/.../
@@ -72,10 +72,10 @@ version = __import__(BASE_PACKAGE).__version__
 
 setup(
     version = version.replace(' ', '-'),
-    name = 'django-avocado-client',
+    name = 'django-cilantro',
     author = 'Byron Ruth',
     author_email = 'ruthb@email.chop.edu',
-    description = 'A client for django-avocado-server',
+    description = 'A client implementation for Serrano',
     license = 'BSD',
     keywords = 'snippets tools utilities',
 
