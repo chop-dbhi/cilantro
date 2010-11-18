@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from avocado.contrib.server.api.handlers import (CategoryHandler,
+from serrano.api.handlers import (CategoryHandler,
     CriterionHandler, ColumnHandler)
 from cilantro.utils import get_ip_address
 
