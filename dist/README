@@ -1,0 +1,11 @@
+The files::
+    
+    build/
+    require/
+    require.js
+
+come from the RequireJS source files. These are needed to compile the
+source JavaScript files. The ``build/build.sh'' utilizes Closure Compiler
+which depends on Java 6.
+
+The script ``run.sh'' defines an array of JS modules to compile.
