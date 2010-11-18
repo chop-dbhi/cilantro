@@ -3,3 +3,7 @@ syntax: glob
 .DS_Store
 *.pyc
 *.css
+
+js/min/*.js
+js/min/define
+js/min/report
