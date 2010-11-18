@@ -372,7 +372,8 @@ require.def('define/form', [], {
                      case "checkbox": $element.attr("checked",element.value);
                                       break;
                      case "select-multiple" : $("option", $element).each(function(index,opt){
-                                                  var vals = $.map(element.value, function(val, index){
+                                                  var iterator = element.val instanceof Array ? element.val : [element.val];
+                                                  var vals = $.map(iterator, function(val, index){
                                                       return typeof val in {string:1,number:1}?val:String(val);
                                                   });
                                                   if ($.inArray(opt.value,vals)!=-1){
