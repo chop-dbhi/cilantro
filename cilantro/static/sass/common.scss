@@ -38,22 +38,19 @@ header {
 nav {
     @include anchors(#666, #333);
     
-    position: absolute;
-    width: 100%;
-    top: 40px;
-    left: 0;
-    
     ul {
         color: #666;
-        margin: 0;
-        padding: 10px;
+        padding: 0;
+        margin-bottom: 10px;
         list-style: none;
         font-size: 12px;
         text-shadow: $LIGHT_TEXT_SHADOW;
         
         li {
             display: inline;
-            margin-right: 12px;            
+            margin-right: 12px;
+            padding-left: 7px;
+            background: transparent url(../img/bc.gif) no-repeat 0 5px;
         }
     }
 }
