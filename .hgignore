@@ -1,7 +1,4 @@
 syntax: glob
 *.pyc
 .DS_Store
-
-syntax: regexp
-^docs/_build
 .sass-cache
