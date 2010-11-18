@@ -1,4 +1,5 @@
 syntax: glob
-*.pyc
-.DS_Store
 .sass-cache
+.DS_Store
+*.pyc
+*.css
