@@ -1,4 +1,7 @@
-require.def('define/search',
+define(
+    
+    'define/search',
+
     ['rest/datasource', 'rest/renderer', 'define/templates'],
 
     function(datasource, renderer, templates) {

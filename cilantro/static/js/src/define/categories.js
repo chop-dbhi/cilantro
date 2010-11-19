@@ -29,13 +29,36 @@ define(
 
     'define/categories',
 
-    ['rest/datasource', 'rest/renderer'],
+    ['rest/datasource'],
 
-    function(mod_datasource, mod_renderer) {
+    function(mod_datasource) {
 
-        var dom = {
-            content: $('#content'),
-            categories: $('#categories')
-        };
+        var tmpl = '<span id="tab-<%= this.name.toLowerCase() %>" ' +
+            'class="tab" data-search="<%= this.name %>">' +
+            '<div class="icon"></div><span><%= this.name %></span>' +
+            '</span>';
+
+        function init(content) {
+
+            var dom = {
+                content: content,
+                categories: $('#categories')
+            };
+
+            var src = {
+                categories: new mod_datasource.ajax({
+                    // TODO convert `data' method for jQuery 1.4.4
+                    uri: dom.categories.attr('data-uri'),
+                    cache: true,
+                    success: function(json) {
+                        dom.categories.jqotesub(tmpl, json);
+                    }
+                })
+            };
+
+            src.categories.get();
+        }; 
+
+        return {init: init};
     }
-)
+);
