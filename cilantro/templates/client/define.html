@@ -22,12 +22,13 @@
                 <form method="get" class="tab active" action="{% url api:criteria:read %}">
                     <input id="search" type="input" name="q" placeholder="Search..." autofocus>
                 </form>
+                <div id="categories" data-uri="{% url api:categories:read %}">
                 {% for category in categories %}
                     <span id="tab-{{ category.name|lower }}" class="tab" data-search="{{ category.name|lower }}">
                         <div class="icon"></div><span>{{ category.name }}</span>
                     </span>
                 {% endfor %}
-
+                </div>
                 {% endspaceless %}
             </div>
         
