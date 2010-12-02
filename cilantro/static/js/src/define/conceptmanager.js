@@ -1,9 +1,6 @@
 require.def(
-    
     'define/conceptmanager',
-        
     ['define/views'],
-    
     function(views) { 
         /**
           Sets up and manages the view sets for each criterion option.
@@ -138,6 +135,10 @@ require.def(
               @private
             */
             function getDataType(field_pk){
+                if (activeView.type === "custom"){
+                    return activeView.datatype;
+                }
+                
                 var elements = activeView.elements;
                 var datatype = null;
                 $.each(elements, function(index,element){
@@ -220,7 +221,7 @@ require.def(
                      if (!ds.hasOwnProperty(item)) continue;
                      m = opRe.exec(item);
                      
-                     // // For optional fields, we may have an operator, 
+                     // For optional fields, we may have an operator, 
                      // but the value may not exist, so don't use it,
                      // however if the operator contains null (null, -null)
                      // the operator does take anything, so thats all wee need
@@ -340,11 +341,12 @@ require.def(
                     server_query = nodes[0];
                 }else{
                     server_query = {
-                                         'type': 'and',
+                                         'type':  activeView.join_by || "and",
                                          'children': nodes,
                                          'concept_id':activeConcept
                                    };
                 }
+                //console.log(server_query);
                 return server_query;
             }
 
@@ -774,9 +776,12 @@ require.def(
                 if (deps.css){
                     loadCss(deps.css);
                 }
-
+             
                 if (deps.js) {
-                     require([deps.js], function () {
+                     require([deps.js], function (plugin) {
+                         if (plugin.hasOwnProperty("execute")){
+                            plugin.execute($contentBox, activeConcept, deps);
+                         }
                          cb(deps);
                      });
                 } else {
