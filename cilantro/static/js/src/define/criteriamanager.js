@@ -1,4 +1,4 @@
-require.def('define/criteriamanager', ['define/criteria', "define/templates","lib/json2"], function(criteria, templates) {
+require.def('define/criteriamanager', ['define/criteria', "define/templates"], function(criteria, templates) {
     
     var manager = function($panel){
         
