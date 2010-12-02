@@ -5,10 +5,10 @@ require(
     [
         'report/table',
         'report/columns',
-        'html5fix',
-        'ajaxsetup',
-        'extensions',
-        'sanitizer'       
+        'utils/html5fix',
+        'utils/ajaxsetup',
+        'utils/extensions',
+        'utils/sanitizer'       
     ],
 
     function(m_table, m_columns) {

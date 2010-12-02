@@ -5,10 +5,10 @@ require(
         'define/search',
         'define/conceptmanager',
         'define/criteriamanager',
-        'html5fix',
-        'ajaxsetup',
-        'extensions',
-        'sanitizer'
+        'utils/html5fix',
+        'utils/ajaxsetup',
+        'utils/extensions',
+        'utils/sanitizer'
     ],
     
     function(categories, search, conceptmanager, criteriamanager) {
