@@ -1,30 +1,43 @@
-require.def('rest/datasource', ['rest/basext'], function(BaseExt) {
+define(
+
+    'rest/datasource',
     
-    var DataSource = BaseExt.extend({});
+    ['rest/basext'],
+    
+    function(BaseExt) {
+    
+        var DataSource = BaseExt.extend({});
 
-    var AjaxDataSource = DataSource.extend({
-        get: function(params) {
-            params = params || this.params;
+        var AjaxDataSource = DataSource.extend({
 
-            var self = this;
-            this.xhr = $.ajax({
-                url: self.uri,
-                data: params,
-                success: self.success,
-                error: self.error
-            });
-            return this;
-        }
-    }, {
-        defargs: {
-            uri: window.location,
-            params: {},
-            success: function() {},
-            error: function() {}
-        }
-    });
+            get: function(params) {
+                params = params || this.params;
 
-    return {
-        ajax: AjaxDataSource
-    };
-});
+                var self = this;
+
+                this.xhr = $.ajax({
+                    url: self.uri,
+                    data: params,
+                    cache: self.cache,
+                    success: self.success,
+                    error: self.error
+                });
+
+                return this;
+            }
+        }, {
+            defargs: {
+                uri: window.location,
+                params: {},
+                success: function() {},
+                error: function() {},
+                cache: false 
+            }
+        });
+
+        return {
+            ajax: AjaxDataSource
+        };
+
+    }
+);
