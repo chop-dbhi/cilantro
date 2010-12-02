@@ -4,7 +4,7 @@
 
 define(
 
-    'login',
+    'login/main',
 
     function() {
         $(function() {
