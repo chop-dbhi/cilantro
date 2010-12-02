@@ -33,10 +33,12 @@ define(
 
     function(mod_datasource) {
 
-        var tmpl = '<span id="tab-<%= this.name.toLowerCase() %>" ' +
-            'class="tab" data-search="<%= this.name %>">' +
-            '<div class="icon"></div><span><%= this.name %></span>' +
-            '</span>';
+        var tmpl = [
+            '<span id="tab-<%= this.name.toLowerCase() %>" class="tab">',
+                '<div class="icon"></div>',
+                '<span><%= this.name %></span>',
+            '</span>'
+        ].join('');
 
         function init(content) {
 
@@ -47,8 +49,7 @@ define(
 
             var src = {
                 categories: new mod_datasource.ajax({
-                    // TODO convert `data' method for jQuery 1.4.4
-                    uri: dom.categories.attr('data-uri'),
+                    uri: dom.categories.data('uri'),
                     cache: true,
                     success: function(json) {
                         dom.categories.jqotesub(tmpl, json);
@@ -57,6 +58,18 @@ define(
             };
 
             src.categories.get();
+
+            dom.content.bind('activate.category', function(evt, id, obj) {
+                return false;
+            });
+
+            dom.categories.delegate('span.tab', 'click', function(evt) {
+                evt.preventDefault();
+                var target = $(evt.target).addClass('active')
+                    .siblings().removeClass('active');
+                dom.categories.trigger('activate.category',
+                    [target.data('id'), target]);
+            });
         }; 
 
         return {init: init};

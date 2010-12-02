@@ -21,7 +21,7 @@
                 {% spaceless %}
                 <div id="categories" data-uri="{% url api:categories:read %}"></div>
                 <form method="get" action="{% url api:criteria:read %}">
-                    <input id="search" type="input" name="q" placeholder="Search..." autofocus>
+                    <input id="search" type="text" name="q" placeholder="Search..." autofocus>
                 </form> 
                 {% endspaceless %}
             </div>

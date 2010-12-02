@@ -4,7 +4,7 @@ PACKAGE="cilantro"
 
 # defines the JS modules located in the JS_SRC_DIR that will be compiled
 # and written to the JS_MIN_DIR
-MODULES=("login" "define/main" "report/main")
+MODULES=("login/main" "define/main" "report/main")
 
 # absolute path where this script is located
 DIST_DIR=$(cd $(dirname "$0"); pwd)

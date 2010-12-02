@@ -42,5 +42,9 @@
 
         {# standard global footer #}        
         {% include "snippets/footer.html" %}      
+
+        <!--[if lte IE 7 ]>
+            <script src="{{ CILANTRO_JS_URL }}lib/json2.js"></script>
+        <![endif]-->
     </body>
 </html>

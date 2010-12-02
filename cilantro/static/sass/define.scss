@@ -305,16 +305,17 @@
         *display: inline;  
     } 
 
-    #tabs {
+    #categories {
         
         > * {
             padding-right: 11px;
             padding-left: 11px;
-        }
-        
-        form {
-            padding-right: 7px;
-            padding-left: 7px;
-        }
+        }        
     }
+
+    #tabs form {
+        padding-right: 7px;
+        padding-left: 7px;
+    }
+
 }

@@ -4,7 +4,7 @@ require.def(
     
     'report/columns',
 
-    ['rest/datasource', 'rest/renderer', 'report/templates', 'lib/jquery.ui', 'lib/json2'],
+    ['rest/datasource', 'rest/renderer', 'report/templates', 'lib/jquery.ui'],
 
     function(m_datasource, m_renderer, m_templates) {
 
