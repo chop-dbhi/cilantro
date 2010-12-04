@@ -364,3 +364,117 @@ if (!Array.prototype.map) {
     })();
     
 }(jQuery));
+
+/*
+ * jQuery BindProxy Plugin
+ *
+ * Author: Byron Ruth (2010)
+ * Licensed under the MIT license
+ *
+ * The 'bindproxy' plugin provides a way of forwarding an event trigger
+ * from anywhere in the DOM.
+ *
+ * The implications of having this method requires ensuring there are not
+ * recursive or circular loops. Proper care must be taken to stop propagation
+ * where appropriate.
+ *
+ * The need for this plugin arises when elements are not ancestors of the
+ * triggering element.
+ *
+ *      <h3>Suggestions</h3>
+ *
+ *      <ul id="suggestions">
+ *          <li>John Doe <a href="#" data-name="John Doe">Follow</a></li>
+ *          <li>Jane Doe <a href="#" data-name="Jane Doe">Follow</a></li>
+ *          <li>George Doe <a href="#" data-name="George Doe">Follow</a></li>
+ *          <li>Bo Doe <a href="#" data-name="Bo Doe">Follow</a></li>
+ *      </ul>
+ *
+ *      <h3>Following</h3>
+ *
+ *      <ul id="following">
+ *          <li>Nancy Doe <a href="#" data-name="Nancy Doe">Unfollow</a></li>
+ *      </ul>
+ *
+ * The span elements above are siblings, therefore under no circumstance will
+ * they ever implicitly communicate via event bubbling. If the two elements
+ * need to communicate, the typical solution is to bind an event handler onto
+ * the element of interest. Then the element that does triggering must
+ * explicitly call the trigger on that element.
+ *
+ *      $('#following').bind('follow', function(evt) {
+ *          // code here...
+ *      });
+ *
+ *      $('#suggestions').delegate('a', 'click', (function(evt) {
+ *          $('#following').trigger('follow');
+ *      });
+ *
+ * Having code riddled with explicit triggers like this reduces transparency
+ * of event delegation. Elements should be free to emit a "message" and
+ * whomever wants to "listen" for it will receive it.
+ *
+ * There essentially becomes a single definition of the events that are proxied
+ * and the listeners to send the event to. Thus we have a simple plugin:
+ *
+ *      $('body').bindproxy({
+ *          'follow': {
+ *              listeners: ['#following']
+ *          }
+ *      });
+ *
+ * In this cases, the example suggests that the event 'follow' was fired
+ * from somewhere and the elements that are listening for it are '#following'.
+ * The handlers for '#followers' may add the new follower.
+ *
+ */
+(function($) {
+
+    $.fn.bindproxy = function(hash) {
+        var self = this;
+        hash = hash || {};
+
+        for (var event in hash) {
+            // bind an event handler to ``this`` which takes an event trigger
+            // and forwards it to all selectors that are registered with that
+            // event type
+            var config = hash[event],
+                listeners = config.listeners,
+                sources = config.sources || [];
+
+            // no listeners, skip
+            if (!listeners.length)
+                throw new TypeError('No listeners defined');
+
+            listeners = $.map(listeners, function(e) { return $(e); });
+
+            (function() {
+                self.bind(event, function(evt) {
+                    // if any sources are defined, iterate over them until
+                    // at least one matches
+                    if (!!sources.length) {
+                        var pass = false;
+                        for (var i=sources.length; i--;) {
+                            if ($(evt.target).is(sources[i])) {
+                                pass = true;
+                                break;
+                            }
+                        }
+                        if (!pass) return;
+                    }
+
+                    // this stops circular bubbling
+                    evt.stopPropagation();
+                    // copy all arguments except for the event
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    $.map(listeners, function(e) { e.trigger(evt, args); });
+                    return false;
+                });
+            })();
+
+        }
+
+        return this;
+    };
+
+})(jQuery);
