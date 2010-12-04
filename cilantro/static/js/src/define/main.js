@@ -15,6 +15,18 @@ require(
    
         $(function() {
 
+            var body = $('body');
+            
+            body.bindproxy({
+                'activate.category': {
+                    listeners: ['#criteria'],
+                }
+            });
+            
+            body.ajaxComplete(function() {
+                OVERLAY.fadeOut();
+            });
+
             search.init();
 
             // The view manager needs to know where in the DOM to place certain things
@@ -28,13 +40,6 @@ require(
 
                 criteria = $('#criteria');
         
-
-            categories.init(content);
-
-            $('body').ajaxComplete(function() {
-                OVERLAY.fadeOut();
-            });
-
             // Create an instance of the conceptManager object. Only do this once.
             var conceptManager = conceptmanager.manager(pluginPanel, pluginTitle, pluginTabs, pluginDynamicContent,
                 pluginStaticContent);
@@ -122,7 +127,7 @@ require(
             var descriptionBox = $('<div id="description"></div>')
                 .appendTo('body');
 
-            $('#criteria').delegate('div > .info', 'mouseover', function() {
+            criteria.delegate('div > .info', 'mouseover', function() {
                 var target = $(this).parent(),
                     offset = target.offset(),
                     width = target.outerWidth(),
@@ -136,6 +141,7 @@ require(
             }).delegate('div > .info', 'mouseout', function() {
                 descriptionBox.hide();
             });
+
         });
     }
 );
