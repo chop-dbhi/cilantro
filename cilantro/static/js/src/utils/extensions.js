@@ -225,7 +225,7 @@ if (!Array.prototype.map) {
                 // if any `placeholder' is provided, test if the value matches it
                 if (placeholder !== null && value === placeholder)
                     value = '';
-
+                value = value || '';
                 // sanitize and strip useless stopwords and non-alphanumerics, and lowercase
                 value = SearchSanitizer.clean(value).toLowerCase();
                 

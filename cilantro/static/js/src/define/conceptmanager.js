@@ -198,13 +198,13 @@ require.def(
                         }
                         continue;
                     }
-                    m = binaryFieldRe.exec(item); // decimal
+                    m = binaryFieldRe.exec(item); // decimal oor date
                     if (m) {
                         if (fields.hasOwnProperty(m[2])) {
-                            fields[m[2]]['val'+m[3]] = Number(ds[item]);
+                            fields[m[2]]['val'+m[3]] = Number(ds[item]) || ds[item];
                         }else{
                             fields[m[2]] = {val0:undefined, val1:undefined, op:undefined};
-                            fields[m[2]]['val'+m[3]] = Number(ds[item]);
+                            fields[m[2]]['val'+m[3]] = Number(ds[item]) || ds[item];
                         }
                         continue;
                     }
