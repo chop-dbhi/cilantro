@@ -23,7 +23,9 @@ require.def('define/form', ["lib/jquery.ui"], {
           var freeTextOperatorsTmpl = ['<option selected value="iexact">is equal to</option>',
                                        '<option value="-iexact">is not equal to</option>',
                                        '<option value="in">is one of</option>',
-                                       '<option value="-in">is not one of</option>'].join('');
+                                       '<option value="-in">is not one of</option>',
+                                       '<option value="icontains">contains</option>',
+                                       '<option value="-icontains">does not contain</option>'].join('');
            
           // For most cases we use the name attribute to constuct a unique id for all inputs (see field_id in the template context 
           // object below). The format for it is <concept primary key>_<field primary key> with optional "_input[01]" to support datatypes that
