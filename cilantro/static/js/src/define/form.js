@@ -247,13 +247,13 @@ require.def('define/form', ["lib/jquery.ui"], {
                                                          // One of the convenience things we allows is the pasting of newline sepearate text so that
                                                          // for example, someone can paste in an excel column of patient aliases.
                                                          // If the user selects an IN operator, we switch the text input -> textarea and vice versa
-                                                         if (opt.value.search(/exact/) >=0 && $associated_inputs.attr("type") === "textarea"){
+                                                         if (opt.value.search(/exact/) >= 0 && $associated_inputs.attr("type") === "textarea"){
                                                              // The operator is of type exact, but the associated input is a text area, switch to text input
                                                              $associated_inputs.data("switch").data("switch", $associated_inputs);
                                                              $associated_inputs.before($associated_inputs.data("switch")).detach();
                                                              $associated_inputs.data("switch").keyup();
                                                              // Swap out textarea with text
-                                                         } else if (opt.value.search(/in/)>=0 && $associated_inputs.attr("type") === "text"){
+                                                         } else if (opt.value.search(/^-?in$/)>=0 && $associated_inputs.attr("type") === "text"){
                                                              // The operator is of type in, but the associated input is a text input, switch to textarea
                                                              if (!$associated_inputs.data("switch")){
                                                                 // We have not yet done a switch, otherwise we would have saved it, so we have to actually create the
