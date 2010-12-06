@@ -379,7 +379,7 @@ require.def(
                      // put there explicitly for the server.
                      field_prefix = parameter.concept_id+"_"+field_portion;
                      if (!parameter.operator.match(/null/)) { 
-                        if (parameter.datatype == "number") {
+                        if (parameter.datatype  in {number:1, date:1}) {
                             // make this an array either way, even if it was not a binary operator
                             var iterator = parameter.value instanceof Array ? parameter.value : [parameter.value];
                             for (var index=0; index < iterator.length; index++){

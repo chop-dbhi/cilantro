@@ -322,14 +322,24 @@ require.def('define/form', ["lib/jquery.ui"], {
                                 // is wrong with the field even if there is (because it doesn't matter)
                                 switch ($target.attr('data-validate')){
                                     case "number" :
-                                    case "decimal": 
+                                    case "decimal":
+                                    case "date"  : 
+                                                    var datatype = $target.attr('data-validate');
                                                     var $input1 = $("input[name="+name_prefix+"0]",$form);
                                                     var $input2 = $("input[name="+name_prefix+"1]",$form);
-                                                    var value1 = parseFloat($input1.val());
-                                                    var value2 = parseFloat($input2.val());
-                                                    if ($target.is(":visible") && isNaN(Number($target.val()))) {
+                                                    var input_evt;
+                                                    if (datatype === "date"){
+                                                        var value1 = new Date($input1.val());
+                                                        var value2 = new Date($input2.val());
+                                                    }
+                                                    else {
+                                                        var value1 = parseFloat($input1.val());
+                                                        var value2 = parseFloat($input2.val());
+                                                    }
+                                                   
+                                                    if (datatype !== "date" && $target.is(":visible") && isNaN(Number($target.val()))) {
                                                         // Field contains a non-number and is visible
-                                                        var input_evt = $.Event("InvalidInputEvent");
+                                                        input_evt = $.Event("InvalidInputEvent");
                                                         $target.trigger(input_evt);
                                                     }else if ($(evt.target).hasClass('invalid')){ //TODO Don't rely on this
                                                         // Field either contains a number or is not visible
