@@ -48,7 +48,7 @@ class DefaultViewSet(AbstractViewSet):
 
             # only specify a chart if the field is required and is able
             # to be charted
-            if len(cfield_0.field.choices) <= 15 and cfield_0.required and self._is_chartable(cfield_0.field):
+            if cfield_0.field.choices and len(cfield_0.field.choices) <= 15 and cfield_0.required and self._is_chartable(cfield_0.field):
                 cfield_0 = cfields.pop(0)
                 field = cfield_0.field
                 
