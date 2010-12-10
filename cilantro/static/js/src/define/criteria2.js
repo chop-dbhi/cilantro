@@ -52,8 +52,8 @@ define(
                         url: dom.criteria.data('uri'),
                         cache: true,
                         success: function(json, decoded) {
-                            $.each(decoded, function(k, v) {
-                                dom.criteria.append(v);
+                            $.each(json, function(i, e) {
+                                dom.criteria.append(decoded[e.id]);
                             });
                         }
                     }

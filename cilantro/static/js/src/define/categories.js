@@ -50,8 +50,8 @@ define(
                         url: dom.categories.data('uri'),
                         cache: true,
                         success: function(json, decoded) {
-                            $.each(decoded, function(k, v) {
-                                dom.categories.append(v);
+                            $.each(json, function(i, e) {
+                                dom.categories.append(decoded[e.id]);
                             });
                         }
                     }
