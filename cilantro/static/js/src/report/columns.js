@@ -121,12 +121,14 @@ require.def(
 
             var src = {
                 perspective: new m_datasource.ajax({
-                    uri: API_URLS.perspective,
-                    success: function(json) {
-                        if (json.store) {
-                            var rcols = json.store.columns;
-                            for (var i=0; i < rcols.length; i++)
-                                columnsdialog.trigger('add.column', [rcols[i]]);
+                    ajax: {
+                        url: API_URLS.perspective,
+                        success: function(json) {
+                            if (json.store) {
+                                var rcols = json.store.columns;
+                                for (var i=0; i < rcols.length; i++)
+                                    columnsdialog.trigger('add.column', [rcols[i]]);
+                            }
                         }
                     }
                 }) 

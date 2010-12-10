@@ -17,14 +17,20 @@
         <div class="title">{% block search_panel_title %}Search Available Conditions{% endblock %}</div>
 
         <div class="content">
+            {% spaceless %}
             <div id="tabs">
-                {% spaceless %}
                 <div id="categories" data-uri="{% url api:categories:read %}"></div>
                 <form method="get" action="{% url api:criteria:read %}">
-                    <input id="search" type="text" name="q" placeholder="Search..." autofocus>
+                    <input id="search" type="text" name="q" placeholder="Search...">
                 </form> 
-                {% endspaceless %}
             </div>
+ 
+            <div id="subcategories">
+                 <span class="active">All</span>
+                 <span>Sub-Category 1</span>
+                 <span>Sub-Category 2</span>
+             </div>
+            {% endspaceless %}
         
             <div id="center-pane" class="clearfix">
                 {# The "option-detail" panel displays information about a particular query option and the means #}
@@ -49,15 +55,8 @@
                     </div>
                 </div>
                 
-                <div id="criteria">
+                <div id="criteria" data-uri="{% url api:criteria:read %}">
                     <em id="no-results"></em>
-                    {% for criterion in criteria %}
-                        <div data-id="{{ criterion.id }}" data-model="criterion" data-uri="{{ criterion.uri }}">
-                            <span class="info">i</span>
-                            <span class="name">{{ criterion.name }}</span>
-                            <span class="description">{{ criterion.description|safe }}</span>
-                        </div>
-                    {% endfor %}
                 </div>
             </div>
         </div>

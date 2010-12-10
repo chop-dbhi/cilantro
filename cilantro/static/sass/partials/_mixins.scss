@@ -1,16 +1,16 @@
 /*
  * BOX SHADOW MIXINS
  */
-@mixin box-shadow($h, $v, $b, $c) {
-	-moz-box-shadow: $h $v $b $c;
-	-webkit-box-shadow: $h $v $b $c;
-	box-shadow: $h $v $b $c;    
+@mixin box-shadow($h, $v, $b, $s, $c) {
+	-moz-box-shadow: $h $v $b $s $c;
+	-webkit-box-shadow: $h $v $b $s $c;
+	box-shadow: $h $v $b $s $c;    
 }
 
-@mixin inset-box-shadow($h, $v, $b, $c) {
-	-moz-box-shadow: inset $h $v $b $c;
-	-webkit-box-shadow: inset $h $v $b $c;
-	box-shadow: inset $h $v $b $c;    
+@mixin inset-box-shadow($h, $v, $b, $s, $c) {
+	-moz-box-shadow: inset $h $v $b $s $c;
+	-webkit-box-shadow: inset $h $v $b $s $c;
+	box-shadow: inset $h $v $b $s $c;
 }
 
 @mixin no-box-shadow {
@@ -79,9 +79,17 @@
 
 @mixin search-box {
     @include border-radius(15px, 15px, 15px, 15px);
-    @include inset-box-shadow(2px, 2px, 3px, #ddd);
+    @include inset-box-shadow(2px, 2px, 3px, 0px, #ddd);
     
     background: #fff url(../img/icons/search.png) no-repeat 3px;
     padding: 2px 5px 2px 21px;
     border: 1px solid #999;
+}
+
+@mixin opacify($p) {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$p})";
+    filter: alpha(opacity=$p);
+    -moz-opacity: $p/100;
+    -khtml-opacity: $p/100;
+    opacity: $p/100;
 }

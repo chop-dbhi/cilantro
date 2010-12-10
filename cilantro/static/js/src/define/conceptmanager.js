@@ -48,7 +48,7 @@ require.def(
               @private
               @type string
             */
-            var add_query_tmpl = '<div class="inquery">Condition has been added.</div>';
+            var add_query_tmpl = '<div class="success">Condition has been added.</div>';
             add_query_tmpl += '<button id="add_to_query"></button>';
             /**
               Holds the currently viewable/active concept/criterionconcept    
@@ -105,7 +105,7 @@ require.def(
                     concepts_in_query.push(parseInt(evt.concept_id));
                     if (activeConcept === parseInt(evt.concept_id)){
                         $addQueryButton.html('<span class="iconic arrow-up"></span> Update Condition');
-                        $(".inquery", $staticBox).show();
+                        $(".success", $staticBox).show();
                     }
                 }
                 evt.stopPropagation();
@@ -121,7 +121,7 @@ require.def(
                     concepts_in_query.splice(index,1);
                     if (activeConcept === parseInt(evt.concept_id)){
                         $addQueryButton.html('<span class="iconic plus"></span> Add Condition');
-                          $(".inquery", $staticBox).hide();
+                          $(".success", $staticBox).hide();
                     }
                 }
                 evt.stopPropagation();
@@ -830,11 +830,11 @@ require.def(
                 // Make sure the button for this concept has the correct label
                 if ($.inArray(activeConcept, concepts_in_query) >= 0) {
                     $addQueryButton.html('<span class="iconic arrow-up"></span> Update Condition');
-                    $(".inquery",$staticBox).show();
+                    $(".success",$staticBox).show();
                     
                 }else{
                     $addQueryButton.html('<span class="iconic plus"></span> Add Condition');
-                     $(".inquery",$staticBox).hide();
+                     $(".success",$staticBox).hide();
                 }
                 // Regardless of whether the tabs are visible, load the first view
                 $tabsBar.children(':first').click();

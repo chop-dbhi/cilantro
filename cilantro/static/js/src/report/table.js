@@ -69,69 +69,75 @@ require.def(
              */
             var src = {
                 scope_info: new m_datasource.ajax({
-                    uri: API_URLS.scope,
-                    success: function(json) {
-                        if (json.text) { 
-                            var t = '';
-                            if (typeof json.text === 'string') {
-                                t = '<li>' + json.text + '</li>';
-                            } else {
-                                var conditions = json.text.conditions;
-                                for (var i=0; i < conditions.length; i++)
-                                    t += '<li>' + conditions[i] + '</li>';
+                    ajax: {
+                        url: API_URLS.scope,
+                        success: function(json) {
+                            if (json.text) { 
+                                var t = '';
+                                if (typeof json.text === 'string') {
+                                    t = '<li>' + json.text + '</li>';
+                                } else {
+                                    var conditions = json.text.conditions;
+                                    for (var i=0; i < conditions.length; i++)
+                                        t += '<li>' + conditions[i] + '</li>';
+                                }
+                                conditionsText.html('<ul>' + t + '</ul>');
                             }
-                            conditionsText.html('<ul>' + t + '</ul>');
                         }
                     }
                 }),
 
                 table_header: new m_datasource.ajax({
-                    uri: API_URLS.perspective,
-                    success: function(json) {
-//                        rnd.table_header.target.html('<th><input type="checkbox"></th>');
-                        rnd.table_header.render(json.header);
+                    ajax: {
+                        url: API_URLS.perspective,
+                        success: function(json) {
+    //                        rnd.table_header.target.html('<th><input type="checkbox"></th>');
+                            rnd.table_header.render(json.header);
+                        }
                     }
                 }),
 
                 table_rows: new m_datasource.ajax({
-                    uri: API_URLS.report,
-                    success: function(json) {
-                        if (json.rows.length === 0) {
-                            $('.content').html(EMPTY_RESULTS);
-                            return;
-                        }
+                    ajax: {
+                        url: API_URLS.report,
+                        success: function(json) {
+                            if (json.rows.length === 0) {
+                                $('.content').html(EMPTY_RESULTS);
+                                return;
+                            }
 
-                        rnd.table_rows.render(json.rows); 
+                            rnd.table_rows.render(json.rows); 
 
-                        if (json.pages) {
-                            rnd.pages.render(json.pages);
-                        } else {
-                            if (firstRequest)
-                                per_page.hide();
-                            rnd.pages.target.hide();
-                        }
+                            if (json.pages) {
+                                rnd.pages.render(json.pages);
+                            } else {
+                                if (firstRequest)
+                                    per_page.hide();
+                                rnd.pages.target.hide();
+                            }
 
-                        if (json.unique)
-                            unique.html(json.unique);
+                            if (json.unique)
+                                unique.html(json.unique);
 
-                        if (json.count)
-                            count.html(json.count);
-                        
-                        if (json.per_page)
-                            per_page.val(json.per_page);
+                            if (json.count)
+                                count.html(json.count);
+                            
+                            if (json.per_page)
+                                per_page.val(json.per_page);
 
-                        report.trigger('resize-report');
+                            report.trigger('resize-report');
 
-                        /*
-                         * Unhide necessary elements on first request.
-                         */
-                        if (firstRequest) {
-                            firstRequest = false;
-                            setTimeout(function() {
-                                info.show();
-                                toolbars.show();
-                                table.show();
-                            }, 500);
+                            /*
+                             * Unhide necessary elements on first request.
+                             */
+                            if (firstRequest) {
+                                firstRequest = false;
+                                setTimeout(function() {
+                                    info.show();
+                                    toolbars.show();
+                                    table.show();
+                                }, 500);
+                            }
                         }
                     }
                 })
@@ -182,8 +188,9 @@ require.def(
              /*
              * Define primary event that handles fetching data.
              */
-            body.bind('update.report', function(evt, params) {
-                src.table_rows.get(params);
+            body.bind('update.report', function(evt, data) {
+                var params = {data: data};
+                src.table_rows.get(params, true);
                 return false;
             });
 
@@ -191,7 +198,7 @@ require.def(
                 $.putJSON(API_URLS.perspective, JSON.stringify(params), function() {
                     body.trigger('update.report');
                     if ('columns' in params)
-                        src.table_header.get(); 
+                        src.table_header.get(null, true); 
                 });
                 return false;
             });

@@ -10,28 +10,67 @@ define(
 
         var AjaxDataSource = DataSource.extend({
 
-            get: function(params) {
-                params = params || this.params;
+            _poll: function(func, timeout, attempts) {
+                attempts = (attempts === undefined) ? 5 : attempts;
 
-                var self = this;
+                (function poll() {
+                    if (!attempts--)
+                        return;
 
-                this.xhr = $.ajax({
-                    url: self.uri,
-                    data: params,
-                    cache: self.cache,
-                    success: self.success,
-                    error: self.error
-                });
+                    var result = func();
+                    if (result === undefined)
+                        setTimeout(poll, timeout);
+                })();
+            },
 
-                return this;
+            _cache: undefined,
+
+            /*
+             * If local caching is enabled (not browser caching), then try
+             * returning the local cache. If either the local cache has not
+             * been populated or local cache is not enabled, make the AJAX
+             * request and then return it.
+             */
+            get: function(params, force) {
+                force = force || false;
+                params = params || {};
+
+                if (!force && this._cache)
+                    return this._cache;
+
+                // make copy to prevent reference issues
+                var self = this,
+                    ajax = $.extend({}, this.ajax, params),
+                    orig_success = ajax.success;
+
+                ajax.success = function(resp) {
+                    var decoded = self.decode(resp);
+                    self._cache = decoded;
+                    orig_success(resp, decoded);
+                };
+
+                // in progress, do not request again. poll locally
+                // until request is finished
+                if (!this.xhr || this.xhr.readyState == 4)
+                    this.xhr = $.ajax(ajax);
+
+                this._poll(function() {
+                    if (self._cache)
+                        return self._cache;
+                }, 15);
+
+                return this._cache;
             }
         }, {
             defargs: {
-                uri: window.location,
-                params: {},
-                success: function() {},
-                error: function() {},
-                cache: false 
+                ajax: {
+                    url: window.location,
+                    data: {},
+                    success: function() {},
+                    error: function() {},
+                    cache: false 
+                },
+                decode: function(resp) { return resp; }
             }
         });
 

@@ -19,7 +19,7 @@
 }
 
 .container {
-    @include box-shadow(0, 4px, 4px, #999);	
+    @include box-shadow(0, 4px, 4px, 0, #999);	
     @include border-radius($BORDER_RADIUS, $BORDER_RADIUS, 0, 0);
     
 	margin-bottom: 20px;
@@ -33,7 +33,7 @@
         button {
             @include container-title-gradient;            
             @include border-radius(3px, 3px, 3px, 3px);
-            @include box-shadow(0, 0, 1px, #fff);
+            @include box-shadow(0, 0, 1px, 0, #fff);
             
             color: #ddd;
             float: right;
@@ -43,7 +43,7 @@
             padding: 2px 3px;
             
             &:hover {
-                @include box-shadow(0, 0, 2px, #fff);
+                @include box-shadow(0, 0, 2px, 0, #fff);
                 color: #fff;
             }
             
@@ -110,7 +110,7 @@
     }
     
     > .info {
-        @include inset-box-shadow(0, -5px, 10px, #eee);
+        @include inset-box-shadow(0, -5px, 10px, 0, #eee);
         
         font-size: 0.85em;
         padding: 10px;
@@ -123,5 +123,14 @@
     > .content {
         background-color: #fff;
         padding: 10px;
+    }
+
+    // for good measure...
+    .container {
+        @include no-box-shadow;
+        @include border-radius(0, 0, 0, 0);
+
+        > .content {
+        }
     }
 }

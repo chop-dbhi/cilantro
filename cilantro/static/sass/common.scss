@@ -99,9 +99,10 @@ input[type=button], input[type=submit], button {
     }
 }
 
-.success { @include message(#002E24, #E3FFD8, #CDF0D5, success); }
+.success { @include message(#002E24, #DAFBC2, #BCE8BE, success); }
 .warning { @include message(#653400, #F8F7A9, #ECE678, warning); }
 .error { @include message(#500700, #FFD3D9, #EEB9C6, error); }
+.information { @include message(#000F3C, #CCDCFC, #AFC6E6, info); }
 
 #content {
     position: relative;

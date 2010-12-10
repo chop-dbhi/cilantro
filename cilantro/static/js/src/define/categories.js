@@ -29,15 +29,31 @@ define(
         $(function() {
 
             var dom = {
-                categories: $('#categories')
+                categories: $('#categories'),
+                subcategories: $('#subcategories')
             };
+            dom.categories.current = null;
+            dom.subcategories.current = null;
 
             var src = {
                 categories: new mod_datasource.ajax({
-                    uri: dom.categories.data('uri'),
-                    cache: true,
-                    success: function(json) {
-                        dom.categories.jqotesub(tmpl, json);
+                    decode: function(json) {
+                        var map = {};
+                        $.each(json, function(i, e) {
+                            var elem = jQuery($.jqote(tmpl, e)).data(e);
+                            map[e.id] = elem;
+                        });
+                        return map;
+                    },
+
+                    ajax: {
+                        url: dom.categories.data('uri'),
+                        cache: true,
+                        success: function(json, decoded) {
+                            $.each(decoded, function(k, v) {
+                                dom.categories.append(v);
+                            });
+                        }
                     }
                 })
             };
@@ -47,22 +63,54 @@ define(
             /*
              * Setup listeners for events.
              */
-            dom.categories.bind('activate.category', function(evt, id) {
-                var target = dom.categories.children('[data-id='+id+']');
-                // stop futher propagation since this category is already
-                // active
-                if (target.hasClass('active'))
+            dom.categories.bind({
+                /*
+                 * Handles doing the necessary processing for 'activating' the
+                 * defined category
+                 */
+                'activate-category': function(evt, id) {
+                    // test cache
+                    if (dom.categories.current === id)
+                        return false;
+                    dom.categories.current = id
+
+                    var target = src.categories.get()[id];
+                    target.addClass('active');
+                    target.siblings().removeClass('active');
+                    
+                    // check for associated criterion and trigger
+                    var state = target.data('_state');
+                    if (!!state && state.criterion)
+                        dom.categories.trigger('activate-criterion',
+                            [state.criterion]);
+                },
+
+                /*
+                 * When a criterion is activated, the id gets cached to be
+                 * associated with the current category.
+                 */
+                'sync-category': function(evt, id, criterion_id) {
+                    var category = src.categories.get()[id];
+                    // stored in a 'hidden' object to not be mistakingly
+                    // associated with the actual data of the object
+                    category.data('_state', {criterion: criterion_id});
+                    dom.categories.trigger('activate-category', [id]);
                     return false;
-                target.addClass('active');
-                target.siblings().removeClass('active');
+                }
             });
 
             /*
-             * Bind user-triggered events
+             * User-triggerable events
              */
             dom.categories.delegate('span.tab', 'click', function(evt) {
-                dom.categories.trigger('activate.category',
+                $(evt.currentTarget).trigger('activate-category',
                     [$(this).data('id')]);
+            });
+
+            dom.subcategories.delegate('span', 'click', function(evt) {
+                var target = $(this);
+                target.addClass('active').siblings().removeClass('active');
+                return false;
             });
         }); 
     }

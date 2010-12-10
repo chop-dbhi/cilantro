@@ -23,6 +23,7 @@
 .container {
     .info {
         display: none;
+        font-size: 0.9em;
         
         > * {
             vertical-align: top;
@@ -37,13 +38,13 @@
         }
 
         b {
-            background-color: #FFD2D6;
-            padding: 2px 4px;
             text-shadow: $LIGHT_TEXT_SHADOW;
         }
         
         ul {
             margin: 5px 0;
+            padding-left: 0;
+            list-style: none;
         }
     }
     
@@ -85,6 +86,7 @@
 #report-actions {
     float: right;
     text-align: right;
+    margin-right: 0;
     
     button {
         font-size: 1em;
@@ -218,7 +220,7 @@
 }
 
 #description {
-    @include box-shadow(0, 5px, 10px, #999);
+    @include box-shadow(0, 5px, 10px, 0, #999);
     @include border-radius(5px, 5px, 5px, 5px);
     
     padding: 10px;

@@ -1,7 +1,7 @@
 // jQuery UI components
 .ui-dialog {
     @extend .container;
-    @include box-shadow(0, 10px, 20px, #999);
+    @include box-shadow(0, 10px, 20px, 0, #999);
     
     position: absolute;
 

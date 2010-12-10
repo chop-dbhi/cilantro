@@ -1,107 +1,112 @@
-define(
-    
-    'define/search',
+/*
+ * The search interface performs a GET to the CriterionCollection
+ * resource with the ``q`` parameter, performing a filtering operation
+ * on the objects.
+ *
+ * The response is a list of criterion IDs which can be used to filter
+ * an existing list of criterion objects.
+ *
+ * On Load:
+ * - get all criterion objects from local datastore, render the results
+ *   box
+ *
+ * User Interactions:
+ * - on keyup, trigger the search-criterion
+ *
+ * All events are in the 'criterion' namespace.
+ */
 
-    ['rest/datasource', 'rest/renderer', 'define/templates'],
+define('define/search',
 
-    function(datasource, renderer, templates) {
+    ['define/criteria2', 'rest/datasource'],
 
-        function init() {
+    function(criteria, mod_datasource) {
 
-            var content = $('#content'),
-                tabs = $('#tabs'),
-                searchInput = $('#search'),
-                searchForm = $('#search-panel form'),
-                pluginPanel = $('#plugin-panel'),
-                criteria = $('#criteria').children('div'),
-                noResults = $('#no-results');
+        var tmpl = $.jqotec([
+            '<div data-id="<%= this.id %>">',
+                '<b><%= this.name %></b><br>',
+                '<span><%= this.category.name %></span>',
+            '</div>'
+        ].join(''));
 
-//            /*
-//             * Manages the tabs and keeps them in sync with the content area
-//             * based on the users interactions.
-//             */
-//            content.bind('activate-tab', function(evt) {
-//                var target = $(evt.target),
-//                    value = target.attr('data-search');
-//
-//                if (target.is('form'))
-//                    value = searchInput.val();
-//
-//                // activate target, deactivate other tabs
-//                target.addClass('active')
-//                    .siblings().removeClass('active');
-//
-//                content.activetab = target; 
-//                
-//                // check to see if a ``concept_id`` exists for this tab.
-//                // attempt to show the concept is so.
-//                var id = target.data('concept_id');
-//
-//                if (id) {
-//                    pluginPanel.show();
-//                    content.trigger('activate-criterion', [id]);
-//                } else {
-//                    pluginPanel.hide();
-//                }
-//
-//                // triggers a canned search based on the object's search
-//                // term is provides. the ``true`` tells the search to cache
-//                // the results
-//                searchInput.trigger('search-0', [value, true]);
-//
-//                return false;
-//            });
-//            
-//            /*
-//             * Bind the click event for tabs to activate them.
-//             */
-//            tabs.delegate('.tab', 'click', function(evt) {
-//                $(this).trigger('activate-tab');
-//                return false;
-//            });            
-//
-//            /*
-//             * Binds the focus event for the search input to handle
-//             * keyboard tabbing.
-//             */
-//            searchInput.bind('focus', function(evt) {
-//                searchForm.trigger('activate-tab');
-//            }).focus();
-//
-//            /*
-//             * Handles setting the criterion id currently in view for a
-//             * particular tab. This is to ensure once the user comes back
-//             * to the tab, the expected criterion will be shown.
-//             */
-//            content.bind('setid-tab', function(evt, id) {
-//                content.activetab && content.activetab.data('concept_id', parseInt(id));
-//                return false;
-//            });
-//
+        $(function() {
+
+            var cache = {},
+                initial = true;
+
+            var dom = {
+                search: $('#search'),
+                results: $('<div id="search-results"></div>').appendTo('body'),
+                noresults: $('<p style="font-style:italic">No Results Found</p>')
+            };
+
+            dom.results.delegate('div', 'click', function(evt) {
+                var target = $(this);
+                target.trigger('activate-criterion', [target.data('id')]);
+            });
+
             /*
-             * The search acts on all criteria that is present for the user.
-             * each search returns a list of ids that can be used to filter
-             * down the list of criteria. the server hit is necessary to
-             * utilize the database fulltext search, but it is uneccesary to
-             * re-render the criteria every time.
+             * executes the first time the search is used.
+             * this is mainly to ensure the DOM is ready prior to relying
+             * on the external components such as the criteria cache and
+             * position of the search input. secondarily, not everyone uses
+             * the search, so it prevents performing unnecessary operations
              */
-//            searchInput.autocomplete2({
-//                success: function(value, json) {
-//                    criteria.hide();
-//                    noResults.hide();
-//
-//                    if (json.length > 0) {
-//                        for (var i = 0; i < json.length; i++)
-//                            criteria.filter('[data-id='+json[i]+']').show();
-//                    } else {
-//                        noResults.html('No conditions found for "' + value + '".').show();
-//                    }
-//                    return false;
-//                }
-//            }, null, 50);
-//            
-//
-        }
+            function init() {
+                var src = criteria.src.criteria.get();
 
-        return {init: init};
-    });
+                var rWidth = dom.results.outerWidth(),
+                    sOffset = dom.search.offset(),
+                    sHeight = dom.search.outerHeight(),
+                    sWidth = dom.search.outerWidth();
+
+                dom.results.css({
+                    left: sOffset.left - (rWidth - sWidth) / 2.0,
+                    top: sOffset.top + sHeight + 5
+                });
+
+                var i, e, d;
+                for (i in src) {
+                    d = src[i].data();
+                    e = jQuery($.jqote(tmpl, d)).data(d);
+                    cache[i] = e;
+                    dom.results.append(e);
+                }
+                initial = false;
+            };
+
+
+            dom.search.autocomplete2({
+                success: function(value, json) {
+                    if (initial) init();
+
+                    dom.noresults.detach();
+                    // show div, but hide results up front
+                    dom.results.show().children().hide();
+
+                    if (json.length) {
+                        $.each(json, function() {
+                            if (cache[this])
+                                cache[this].show();
+                        });
+                    } else {
+                        dom.noresults.prependTo(dom.results);
+                    }
+                }
+            }, null, 50); 
+
+            dom.search.bind({
+                'blur': function(evt) {
+                    dom.results.fadeOut();
+                },
+                
+                'focus': function(evt) {
+                    var val = dom.search.val();
+                    if (val && val !== dom.search.attr('placeholder'))
+                        dom.results.fadeIn('fast');
+                }
+            });
+
+        });
+    }
+);

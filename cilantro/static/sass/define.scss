@@ -63,7 +63,7 @@
 } 
 
 #categories {
-    @include box-shadow(2px, -2px, 2px, #ddd);
+    @include box-shadow(2px, -2px, 2px, 0, #ddd);
 
     display: inline-block;
     font-size: 13px;
@@ -110,6 +110,39 @@
     }
 }
 
+#subcategories {
+    padding: 7px 0 7px 10px;
+    display: block;
+    background-color: #fff;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+    > span {
+        @include border-radius(3px, 3px, 3px, 3px);
+        font-size: 0.85em;
+        padding: 2px 5px;
+        margin: 0 10px 0px 0;
+        border: 1px solid #fff;
+        letter-spacing: 1px;
+
+        &:hover {
+            cursor: pointer;
+            background-color: #ddd;
+            border-color: #ddd;
+        }
+
+        &.active {
+            @include inset-box-shadow(0, 2px, 5px, 0, #555);
+            text-shadow: $DARK_TEXT_SHADOW;
+            background-color: #777;
+            color: #fff;
+            border-color: #444;
+            cursor: auto;
+        }
+    }
+}
+
 /*
  * List of criteria
  */
@@ -125,7 +158,7 @@
     text-shadow: $LIGHT_TEXT_SHADOW;
     
     > div {
-        @include inset-box-shadow(0, 0, 8px, #ccc);
+        @include inset-box-shadow(0, 0, 8px, 0, #ccc);
         @include border-radius(3px, 3px, 3px, 3px);
 
         margin-top: 1px;
@@ -135,12 +168,19 @@
         cursor: pointer;
         
         &.active {
-            @include no-box-shadow;
+            @include inset-box-shadow(0, 2px, 7px, 0, #444);
     
-            color: #fff;
-            background-color: #1A4C97;
-            text-shadow: $DARK_TEXT_SHADOW;
+            color: #000;
+            background-color: #999;
             border-color: transparent;
+
+            &:hover {
+                @include inset-box-shadow(0, 2px, 7px, 0, #444);
+            }
+
+            > .info {
+                @include opacify(50);
+            }
         }        
         
         &:first-child {
@@ -148,13 +188,20 @@
         }
         
         &:hover {
-            @include inset-box-shadow(0, 0, 10px, #0C264E);
+            @include no-box-shadow;
 
-            color: #fff;
-            background-color: #1A4C97;
-            text-shadow: $DARK_TEXT_SHADOW;
+            color: #000;
+            background-color: #999;
             border-color: transparent;
-        }        
+
+            > .info {
+                @include opacify(50);
+
+                &:hover {
+                    @include opacify(100);
+                }
+            }
+        }
     }    
     
     // contents gets extracted and put into #description
@@ -164,37 +211,67 @@
 
     // Information "i"
     .info {
-        color: #999;
-        font-weight: bold;
-        font-family: 'courier new', monospace;
-        font-size: 14px;
+        @include opacify(20);
+        height: 16px;
+        width: 16px;
+        background-image: url(../img/icons/info.png);
+        background-repeat: no-repeat;
         float: right;
-        padding: 0 5px;
-        margin-right: -5px; /* compensate for padding */        
-        
-        &:hover {
-            color: #fff;
-        };
+        margin-left: 5px;
+
+//        color: #999;
+//        font-weight: bold;
+//        font-family: 'courier new', monospace;
+//        font-size: 14px;
+//        float: right;
+//        padding: 0 5px;
+//        margin-right: -5px; /* compensate for padding */        
+//        
+//        &:hover {
+//            color: #fff;
+//        };
     }
 }
 
 /* Other standalone elements */
-#no-results {
-    display: none;
-}
-
-#description {
-    @include box-shadow(0, 5px, 10px, #999);
+#description, #search-results {
+    @include box-shadow(0, 15px, 10px, -10px, #999);
     @include border-radius(5px, 5px, 5px, 5px);
+    @include vertical-thin-scrollbar;
     
-    padding: 10px;
+    padding: 5px 10px;
     z-index: 1000;
     position: absolute;
     display: none;
     background-color: #fff;
     border: 3px solid #aaa;
     width: 300px;
+    max-height: 400px;
+    overflow: auto;
     white-space: pre-line;
+}
+
+#description {
+    max-height: 300px;
+
+    > p {
+        margin: 5px 0;
+    }
+}
+
+#search-results {
+    width: 200px;
+    padding: 5px 0px;
+
+    > * {
+        padding: 5px 10px;
+        margin: 0;
+    }
+
+    > div:hover {
+        background-color: yellow;
+        cursor: pointer;
+    }
 }
 
 #no-conditions {
@@ -270,7 +347,7 @@
     padding: 4px 5px;
     
     &:hover, &.selected {
-        @include box-shadow(0, 2px, 3px, #aaa);
+        @include box-shadow(0, 2px, 3px, 0, #aaa);
         
         border-color: #ECD41F;
         background-color: #FFFBB3;    
