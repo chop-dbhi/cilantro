@@ -1,4 +1,4 @@
-require.def('define/form', [], {
+require.def('define/form', ["lib/jquery.ui"], {
     
     Form : function(view, concept_pk){
           var s_to_primative_map = {"true":true, "false":false, "null":null};
@@ -23,7 +23,9 @@ require.def('define/form', [], {
           var freeTextOperatorsTmpl = ['<option selected value="iexact">is equal to</option>',
                                        '<option value="-iexact">is not equal to</option>',
                                        '<option value="in">is one of</option>',
-                                       '<option value="-in">is not one of</option>'].join('');
+                                       '<option value="-in">is not one of</option>',
+                                       '<option value="icontains">contains</option>',
+                                       '<option value="-icontains">does not contain</option>'].join('');
            
           // For most cases we use the name attribute to constuct a unique id for all inputs (see field_id in the template context 
           // object below). The format for it is <concept primary key>_<field primary key> with optional "_input[01]" to support datatypes that
@@ -70,15 +72,16 @@ require.def('define/form', [], {
                                               '<label for="<%=this.field_id%>"><%=this.label%></label>'];
                                  }
                                  break;
+                  case 'date'    : // drop through intentional
                   case 'number'  :input = ['<label for="<%=this.field_id%>"><%=this.label%></label>',
-                                            '<select id="<%=this.field_id%>_operator" name="<%=this.field_id%>_operator">',
-                                               decOperatorsTmpl,
-                                            '</select>',
-                                            '<span class="input_association" name="<%=this.field_id%>_input_assoc">',
-                                            '<input data-validate="decimal" id="<%=this.field_id%>_input0" type="text" name="<%=this.field_id%>_input0" size="5">',
-                                            '<label for="<%=this.field_id%>_input1">and</label>',
-                                            '<input data-validate="decimal" id="<%=this.field_id%>_input1" type="text" name="<%=this.field_id%>_input1" size="5">',
-                                            '</span>'];
+                                           '<select id="<%=this.field_id%>_operator" name="<%=this.field_id%>_operator">',
+                                              decOperatorsTmpl,
+                                           '</select>',
+                                           '<span class="input_association" name="<%=this.field_id%>_input_assoc">',
+                                           '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input0" type="text" name="<%=this.field_id%>_input0" size="5">',
+                                           '<label for="<%=this.field_id%>_input1">and</label>',
+                                           '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input1" type="text" name="<%=this.field_id%>_input1" size="5">',
+                                           '</span>'];
                                    break;
                  case 'string'    : input = [ '<% if (this.choices) {%>',
                                                     '<label for="<%=this.field_id%>"><%=this.label%></label>', // No defaults for this type, doesn't make sense
@@ -105,7 +108,7 @@ require.def('define/form', [], {
                                                   '<textarea data-optional="<%=this.optional%>" id="<%=this.field_id%>_text" name="<%=this.field_id%>" rows="8" cols="25"></textarea>'
                                                ];
                                       break;
-                                               
+                
                }
                
                
@@ -159,8 +162,8 @@ require.def('define/form', [], {
                     pkchoice_name_attribute = int_ids.join("OR");
                     name_attribute = concept_pk + "_" + pkchoice_name_attribute;
                 }
-                
-                var $row = $($.jqote(input.join(""), {"choices":element.choices,
+                var $row = $($.jqote(input.join(""), {"datatype":element.datatype,
+                                                      "choices":element.choices,
                                                       "field_id":name_attribute,
                                                       "label":element.name,
                                                       "pkchoices":element.pkchoices,
@@ -216,7 +219,8 @@ require.def('define/form', [], {
                                              $("option", $(evt.target)).each(function(index,opt){
                                                  if  (opt.selected) {
                                                     selected.push(opt.value);
-                                                    if ($associated_inputs && $associated_inputs.attr("data-validate")==="decimal"){
+                                                    var cont_types = {decimal:1, number:1, date:1};
+                                                    if ($associated_inputs && $associated_inputs.attr("data-validate") in cont_types){
                                                          // Do we need to show 1, 2, or no inputs?
                                                          if (opt.value.search(/range/) >= 0){
                                                              // two inputs
@@ -243,13 +247,13 @@ require.def('define/form', [], {
                                                          // One of the convenience things we allows is the pasting of newline sepearate text so that
                                                          // for example, someone can paste in an excel column of patient aliases.
                                                          // If the user selects an IN operator, we switch the text input -> textarea and vice versa
-                                                         if (opt.value.search(/exact/) >=0 && $associated_inputs.attr("type") === "textarea"){
+                                                         if (opt.value.search(/exact/) >= 0 && $associated_inputs.attr("type") === "textarea"){
                                                              // The operator is of type exact, but the associated input is a text area, switch to text input
                                                              $associated_inputs.data("switch").data("switch", $associated_inputs);
                                                              $associated_inputs.before($associated_inputs.data("switch")).detach();
                                                              $associated_inputs.data("switch").keyup();
                                                              // Swap out textarea with text
-                                                         } else if (opt.value.search(/in/)>=0 && $associated_inputs.attr("type") === "text"){
+                                                         } else if (opt.value.search(/^-?in$/)>=0 && $associated_inputs.attr("type") === "text"){
                                                              // The operator is of type in, but the associated input is a text input, switch to textarea
                                                              if (!$associated_inputs.data("switch")){
                                                                 // We have not yet done a switch, otherwise we would have saved it, so we have to actually create the
@@ -314,20 +318,30 @@ require.def('define/form', [], {
                                 
                                 var associated_operator = $(evt.target).closest("p").find("select").val();
                                 var name_prefix = evt.target.name.substr(0,evt.target.name.length-1);
-       
                                 // This one is a little tricky because it matters not just that the fields map to valid numbers
                                 // but that in the case of a range style operator, the two numbers are sequential, and finally
                                 // if fields have become hidden due to a change in operator, we no longer want to list that something
                                 // is wrong with the field even if there is (because it doesn't matter)
                                 switch ($target.attr('data-validate')){
-                                    case "decimal": 
+                                    case "number" :
+                                    case "decimal":
+                                    case "date"  : 
+                                                    var datatype = $target.attr('data-validate');
                                                     var $input1 = $("input[name="+name_prefix+"0]",$form);
                                                     var $input2 = $("input[name="+name_prefix+"1]",$form);
-                                                    var value1 = parseFloat($input1.val());
-                                                    var value2 = parseFloat($input2.val());
-                                                    if ($target.is(":visible") && isNaN(Number($target.val()))) {
+                                                    var input_evt;
+                                                    if (datatype === "date"){
+                                                        var value1 = new Date($input1.val());
+                                                        var value2 = new Date($input2.val());
+                                                    }
+                                                    else {
+                                                        var value1 = parseFloat($input1.val());
+                                                        var value2 = parseFloat($input2.val());
+                                                    }
+                                                   
+                                                    if (datatype !== "date" && $target.is(":visible") && isNaN(Number($target.val()))) {
                                                         // Field contains a non-number and is visible
-                                                        var input_evt = $.Event("InvalidInputEvent");
+                                                        input_evt = $.Event("InvalidInputEvent");
                                                         $target.trigger(input_evt);
                                                     }else if ($(evt.target).hasClass('invalid')){ //TODO Don't rely on this
                                                         // Field either contains a number or is not visible
@@ -362,7 +376,7 @@ require.def('define/form', [], {
                  // Note: Just because we are here doesn't mean we contain the element
                  // to be updated, it may reside on another view within this concept
                  
-                 // Also not that values that are not string or numbers needs to 
+                 // Also note that values that are not string or numbers needs to 
                  // be converted to a string before being displayed to the user
                  // For example, you cannot set the value of an option tag to a boolean or null
                  // it does not work
@@ -394,6 +408,13 @@ require.def('define/form', [], {
                  }
                  
          };
+         
+         // Add javascript date picker to date inputs
+         $('input[data-validate="date"]', $form ).datepicker({
+             changeMonth: true,
+             changeYear: true
+         });
+         
          
          $form.bind("UpdateElementEvent", updateElement);
          

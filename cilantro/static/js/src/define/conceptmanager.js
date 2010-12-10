@@ -198,13 +198,13 @@ require.def(
                         }
                         continue;
                     }
-                    m = binaryFieldRe.exec(item); // decimal
+                    m = binaryFieldRe.exec(item); // decimal oor date
                     if (m) {
                         if (fields.hasOwnProperty(m[2])) {
-                            fields[m[2]]['val'+m[3]] = Number(ds[item]);
+                            fields[m[2]]['val'+m[3]] = Number(ds[item]) || ds[item];
                         }else{
                             fields[m[2]] = {val0:undefined, val1:undefined, op:undefined};
-                            fields[m[2]]['val'+m[3]] = Number(ds[item]);
+                            fields[m[2]]['val'+m[3]] = Number(ds[item]) || ds[item];
                         }
                         continue;
                     }
@@ -379,7 +379,7 @@ require.def(
                      // put there explicitly for the server.
                      field_prefix = parameter.concept_id+"_"+field_portion;
                      if (!parameter.operator.match(/null/)) { 
-                        if (parameter.datatype == "number") {
+                        if (parameter.datatype  in {number:1, date:1}) {
                             // make this an array either way, even if it was not a binary operator
                             var iterator = parameter.value instanceof Array ? parameter.value : [parameter.value];
                             for (var index=0; index < iterator.length; index++){
