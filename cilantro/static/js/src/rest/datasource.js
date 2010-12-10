@@ -10,19 +10,6 @@ define(
 
         var AjaxDataSource = DataSource.extend({
 
-            _poll: function(func, timeout, attempts) {
-                attempts = (attempts === undefined) ? 5 : attempts;
-
-                (function poll() {
-                    if (!attempts--)
-                        return;
-
-                    var result = func();
-                    if (result === undefined)
-                        setTimeout(poll, timeout);
-                })();
-            },
-
             _cache: undefined,
 
             /*
@@ -49,16 +36,7 @@ define(
                     orig_success(resp, decoded);
                 };
 
-                // in progress, do not request again. poll locally
-                // until request is finished
-                if (!this.xhr || this.xhr.readyState == 4)
-                    this.xhr = $.ajax(ajax);
-
-                this._poll(function() {
-                    if (self._cache)
-                        return self._cache;
-                }, 15);
-
+                this.xhr = $.ajax(ajax);
                 return this._cache;
             }
         }, {
