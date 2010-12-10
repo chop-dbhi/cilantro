@@ -7,3 +7,4 @@ syntax: glob
 js/min/*.js
 js/min/define
 js/min/report
+js/min/login
