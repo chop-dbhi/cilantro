@@ -156,7 +156,7 @@ require.def(
                     tOuterWidth = table.outerWidth(true)+20; // padding is not usable
 
                 // do not grow past window width. take into account the padding
-                nInnerWidth = Math.min(tOuterWidth, window.innerWidth-30);
+                nInnerWidth = Math.min(tOuterWidth, $(window).width()-30);
                 nInnerWidth = Math.max(minWidth, nInnerWidth);
  
                 // determine the difference. half of it needs to be added
