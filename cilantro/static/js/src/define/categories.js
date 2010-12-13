@@ -53,6 +53,7 @@ define(
                             $.each(json, function(i, e) {
                                 dom.categories.append(decoded[e.id]);
                             });
+                            $(decoded[json[0].id]).click();
                         }
                     }
                 })
