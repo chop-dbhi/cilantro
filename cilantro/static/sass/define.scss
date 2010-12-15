@@ -260,8 +260,9 @@
 }
 
 #search-results {
-    width: 200px;
     padding: 5px 0px;
+    font-size: 0.9em;
+    width: 200px;
 
     > * {
         padding: 5px 10px;
@@ -282,7 +283,6 @@
 #plugin-panel {
     @include no-box-shadow;
     
-    display: none;
     float: right;
     width: 506px;
     min-height: 300px;
@@ -301,6 +301,7 @@
 }
 
 #add_to_query {
+    margin-top: 10px;
     float: right;
 }
 
@@ -345,6 +346,7 @@
     font-size: 12px;
     margin-bottom: 10px;
     padding: 4px 5px;
+    cursor: pointer;
     
     &:hover, &.selected {
         @include box-shadow(0, 2px, 3px, 0, #aaa);

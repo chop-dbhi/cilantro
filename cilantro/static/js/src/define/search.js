@@ -18,21 +18,20 @@
 
 define('define/search',
 
-    ['define/criteria2', 'rest/datasource'],
+    ['define/events', 'define/criteria2', 'rest/resource'],
 
-    function(criteria, mod_datasource) {
+    function(Events, CriterionCollection, Resource) {
 
-        var tmpl = $.jqotec([
+        var template = [
             '<div data-id="<%= this.id %>">',
                 '<b><%= this.name %></b><br>',
                 '<span><%= this.category.name %></span>',
             '</div>'
-        ].join(''));
+        ].join('');
+
+        var ResultCollection;
 
         $(function() {
-
-            var cache = {},
-                initial = true;
 
             var dom = {
                 search: $('#search'),
@@ -42,71 +41,101 @@ define('define/search',
 
             dom.results.delegate('div', 'click', function(evt) {
                 var target = $(this);
-                target.trigger('activate-criterion', [target.data('id')]);
+                target.trigger(Events.ACTIVATE_CRITERION, [target.data('id')]);
             });
 
-            /*
-             * executes the first time the search is used.
-             * this is mainly to ensure the DOM is ready prior to relying
-             * on the external components such as the criteria cache and
-             * position of the search input. secondarily, not everyone uses
-             * the search, so it prevents performing unnecessary operations
-             */
-            function init() {
-                var src = criteria.src.criteria.get();
+            // all this trouble of copying the original CriterionCollection
+            // to ensure there is no discrepancy between the search results
+            // and the available options. the scenario that would lead to
+            // confusion is if the server updated between the CriterionCollection
+            // being populated and the user searches.
+            CriterionCollection.ready(function() {
 
-                var rWidth = dom.results.outerWidth(),
-                    sOffset = dom.search.offset(),
-                    sHeight = dom.search.outerHeight(),
-                    sWidth = dom.search.outerWidth();
+                ResultCollection = new Resource({
 
-                dom.results.css({
-                    left: sOffset.left - (rWidth - sWidth) / 2.0,
-                    top: sOffset.top + sHeight + 5
+                    store: CriterionCollection._,
+                    template: template
+
+                }).ready(function() {
+
+                    dom.results.html(this.dom);
+
+                    /*
+                     * executes the first time the search is used.
+                     * this is mainly to ensure the DOM is ready prior to relying
+                     * on the external components such as the criteria cache and
+                     * position of the search input. secondarily, not everyone uses
+                     * the search, so it prevents performing unnecessary operations
+                     */
+
+                    var rWidth = dom.results.outerWidth(),
+                        sOffset = dom.search.offset(),
+                        sHeight = dom.search.outerHeight(),
+                        sWidth = dom.search.outerWidth();
+
+                    dom.results.css({
+                        left: sOffset.left - (rWidth - sWidth) / 2.0,
+                        top: sOffset.top + sHeight + 5
+                    });
+
                 });
 
-                var i, e, d;
-                for (i in src) {
-                    d = src[i].data();
-                    e = jQuery($.jqote(tmpl, d)).data(d);
-                    cache[i] = e;
-                    dom.results.append(e);
-                }
-                initial = false;
-            };
+                dom.search.autocomplete2({
+                    success: function(value, json) {
+                        dom.noresults.detach();
+                        // show div, but hide results up front
+                        dom.results.show().children().hide();
 
-
-            dom.search.autocomplete2({
-                success: function(value, json) {
-                    if (initial) init();
-
-                    dom.noresults.detach();
-                    // show div, but hide results up front
-                    dom.results.show().children().hide();
-
-                    if (json.length) {
-                        $.each(json, function() {
-                            if (cache[this])
-                                cache[this].show();
-                        });
-                    } else {
-                        dom.noresults.prependTo(dom.results);
+                        if (json.length) {
+                            $.each(json, function() {
+                                if (ResultCollection.store[this])
+                                    ResultCollection.store[this].show();
+                            });
+                        } else {
+                            dom.noresults.prependTo(dom.results);
+                        }
                     }
-                }
-            }, null, 50); 
+                }, null, 50);
 
+            });
+
+            dom.results.entered = false;
+
+            // this can be defined outside of the callback since nothing
+            // directly depends on the ResultCollection itself
             dom.search.bind({
+
                 'blur': function(evt) {
-                    dom.results.fadeOut();
+                    dom.search.focused = false;
+                    if (!dom.results.entered)
+                        dom.results.trigger('mouseout');
                 },
                 
                 'focus': function(evt) {
+                    dom.search.focused = true;
                     var val = dom.search.val();
                     if (val && val !== dom.search.attr('placeholder'))
                         dom.results.fadeIn('fast');
                 }
+
+            });
+
+            dom.results.bind({
+
+                'mouseenter': function(evt) {
+                    dom.results.entered = true;
+                },
+
+                'mouseleave': function(evt) {
+                    dom.results.entered = false;
+                    if (!dom.search.focused)
+                        dom.results.fadeOut('fast');
+                }
+
             });
 
         });
+
+        return ResultCollection;
     }
 );

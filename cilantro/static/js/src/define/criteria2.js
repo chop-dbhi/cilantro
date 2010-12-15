@@ -12,55 +12,39 @@
  * All events are in the 'criterion' namespace.
  */
 
-define(
+define('define/criteria2',
 
-    'define/criteria2',
+    ['define/events', 'rest/resource', 'define/conceptmanager',
+        'define/criteriamanager', 'define/description'],
 
-    ['rest/datasource'],
+    function(Events, Resource, ConceptManager, CriteriaManager) {
 
-    function(mod_datasource) {
-
-        var tmpl = $.jqotec([
+        var template = [
             '<div data-id="<%= this.id %>">',
                 '<div class="info"></div>',
                 '<span class="name"><%= this.name %></span>',
                 '<span class="description"><%= this.description %></span>',
             '</div>'
-        ].join(''));
+        ].join('');
 
-        var dom, src;
+        var CriterionCollection;
 
         $(function() {
 
-            dom = {
-                criteria: $('#criteria'),
-                description: $('<div id="description"></div>').appendTo('body')
+            var dom = {
+                criteria: $('#criteria')
             };
 
-            src = {
-                criteria: new mod_datasource.ajax({
-                    decode: function(json) {
-                        var map = {};
-                        $.each(json, function(i, e) {
-                            var elem = jQuery($.jqote(tmpl, e)).data(e);
-                            map[e.id] = elem;
-                        });
-                        return map;
-                    },
+            CriterionCollection = new Resource({
 
-                    ajax: {
-                        url: dom.criteria.data('uri'),
-                        cache: true,
-                        success: function(json, decoded) {
-                            $.each(json, function(i, e) {
-                                dom.criteria.append(decoded[e.id]);
-                            });
-                        }
-                    }
-                })
-            };
+                url: dom.criteria.data('uri'),
+                template: template
 
-            src.criteria.get();
+            }).ready(function() {
+
+                dom.criteria.html(this.dom);
+                
+            });
 
             /*
              * When a new category is activated, the list of available criteria
@@ -69,83 +53,90 @@ define(
 
             dom.criteria.current = null;
 
-            dom.criteria.bind({
-                'activate-category': function(evt, id) {
+            dom.criteria.bind(Events.ACTIVATE_CATEGORY,
+
+                function(evt, id) {
+
                     // find all criterion objects that are associated with the
                     // category and show them
-                    $.each(src.criteria.get(), function() {
-                        (this.data('category').id === id) ? this.show() : this.hide();
-                    });
-                },
+                    CriterionCollection.ready(function() {
 
-                'activate-criterion': function(evt, id) {
-                    // test cache
+                        $.each(this.store, function() {
+                            (this.data('category').id === id) ? this.show() : this.hide();
+                        });
+
+                    });
+                }
+            );
+
+            // temporary binding to ShowConceptEvent until internals are
+            // cleaned up
+            dom.criteria.bind(Events.ACTIVATE_CRITERION + ' ShowConceptEvent',
+                
+                function(evt, id) {
+
                     if (dom.criteria.current === id)
                         return false;
                     dom.criteria.current = id
 
-                    var target = src.criteria.get()[id];
-                    target.addClass('active');
-                    target.siblings().removeClass('active');
+                    CriterionCollection.ready(function() {
 
-                    var data = target.data();
-                    dom.criteria.trigger('sync-category', [data.category.id, id]);
+                        var target = this.store[id];
+                        target.addClass('active');
+                        target.siblings().removeClass('active');
+
+                        var data = target.data();
+                        dom.criteria.trigger(Events.SYNC_CATEGORY,
+                            [data.category.id, id]);
+
+                        var conditions = null;
+
+//                        CriteriaManager.
+
+                        // ideal API
+//                        ConceptManager.show(id);
+                        var conditions = CriteriaManager.retrieveCriteriaDS(id);
+
+                        if (ConceptManager.isConceptLoaded(id)) {
+                            ConceptManager.show({id: id}, conditions);
+                        } else {
+                            $.ajax({
+                                url: target.data('uri'),
+                                dataType:'json',
+                                success: function(json) {
+                                        ConceptManager.show(json, conditions);
+                                }
+                            });
+                        }
+                    });
                 }
+            );
+
+
+            /*
+             * Delegation for handling the mouse hovering the '.info' element.
+             * This must notify the description box of the event
+             */
+            dom.criteria.delegate('div > .info', 'mouseover', function() {
+                $(this).trigger(Events.ACTIVATE_DESCRIPTION, ['right']);
             });
 
-
-           /*
-            * User-triggerable events
-            */
-            dom.description.timeout = null;
-
-            dom.criteria.delegate('div > .info', 'mouseover', function() {
-                clearTimeout(dom.description.timeout);
-
-                var height, overflow,
-                    target = $(this).parent(),
-                    offset = target.offset(),
-                    width = target.outerWidth(),
-                    description = target.children('.description').html();
-
-                // refresh contents before getting height
-                dom.description.html(description);
-
-                height = dom.description.outerHeight();
-                overflow = $(window).height() - (height + offset.top);
-
-                dom.description.css({
-                    left: offset.left + width + 20,
-                    top: offset.top + (overflow < 0 ? overflow : 0)
-                }).show();
-
-            }).delegate('div > .info', 'mouseout', function() {
-                dom.description.timeout = setTimeout(function() {
-                    dom.description.fadeOut('fast');
-                }, 1000);
+            /*
+             * Delegation for handling the mouse leaving the '.info' element.
+             * This is necessary since the user may be going to interact with
+             * the description box.
+             */
+            dom.criteria.delegate('div > .info', 'mouseout', function() {
+                $(this).trigger(Events.DEACTIVATE_DESCRIPTION, [500]);
             });
 
             dom.criteria.delegate('div', 'click', function(evt) {
-                $(this).trigger('activate-criterion',
+                $(this).trigger(Events.ACTIVATE_CRITERION,
                     [$(this).data('id')]);
             });
 
-            dom.description.bind({
-                'mouseover': function() {
-                    clearTimeout(dom.description.timeout);
-                },
+        });
 
-                'mouseout': function() {
-                    dom.description.timeout = setTimeout(function() {
-                        dom.description.fadeOut('fast');
-                    }, 200);
-                }
-            });
-
-        }); 
-
-        return {
-            src: src
-        };
+        return CriterionCollection;
     }
 );

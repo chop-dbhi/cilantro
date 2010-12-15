@@ -45,6 +45,12 @@
 
         config = config || {};
 
+        if (typeof config == 'string') {
+            nconfig = {};
+            nconfig[arguments[0]] = arguments[1] || {}
+            config = nconfig;
+        }
+
         // for reference within closures
         var self = this;
 
@@ -111,3 +117,4 @@
     };
 
 })(jQuery);
+
