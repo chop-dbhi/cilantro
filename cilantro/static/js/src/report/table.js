@@ -9,8 +9,8 @@ require.def(
     function(m_datasource, m_renderer, m_templates) {
 
         // TODO remove hardcoded URL
-        var EMPTY_RESULTS = '<h1 class="ca info">No results match your conditions. ' +
-            '<a href="' + URLS.define + '">Refine your conditions</a>.</h1>';
+        var EMPTY_RESULTS = '<div style="text-align: center">No results match your conditions. ' +
+            '<a href="' + URLS.define + '">Refine your conditions</a>.</div>';
 
         function init() {
             var firstRequest = true;
