@@ -290,13 +290,13 @@ require.def('define/form', ["lib/jquery.ui"], {
                                              // Since this code executes for select choices boxes as well as operators (which should
                                              // never be plural), we make sure to send the correct type array, or single item
                                              if (evt.target.type === "select-multiple"){
-                                                 
                                                  var selected_prim = [];
-                                                 for (var index in selected) {
+                                                 var l  = selected.length;
+                                                 for (var index = 0; index < l; index++) {
                                                      var val = selected[index];
                                                      selected_prim.push(val in s_to_primative_map ? s_to_primative_map[val] : val);
                                                  }
-                                                 // If a select-multiple box is optional, and nothing is selected, send null so that it doesn't appear as empty in 
+                                                 // If a select-multiple box is optional, and nothing is selected, send undefined so that it doesn't appear as empty in 
                                                  // the datasource, eitherwise, we will throw an error if nothing is supplied;
                                                  if ($target.is('[data-optional=true]')) {
                                                     sendValue = selected_prim.length ? selected_prim : undefined;
