@@ -1,11 +1,9 @@
 /*
- * Utilizes modernizr is certain features are supported. These fixes provide
+ * Utilizes Modernizr is certain features are supported. These fixes provide
  * support of the feature's behavior using JavaScript rather than natively.
  */
 
-define(
-    'utils/html5fix',
-
+define('utils/html5fix',
     function() {
         $(function() {
             if (!Modernizr.input.placeholder)
