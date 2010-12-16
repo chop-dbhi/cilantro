@@ -35,7 +35,7 @@ require(
                 listeners: ['#description']
             };
 
-            config[Events.DECTIVATE_DESCRIPTION] = {
+            config[Events.DEACTIVATE_DESCRIPTION] = {
                 listeners: ['#description']
             };
 

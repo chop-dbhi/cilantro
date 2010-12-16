@@ -34,6 +34,16 @@ define('define/description',
                     top: offset.top + (overflow < 0 ? overflow : 0)
                 }).show();
 
+                return false;
+            });
+
+            dom.description.bind(Events.DEACTIVATE_DESCRIPTION, function(evt, timeout) {
+
+                dom.description.timeout = setTimeout(function() {
+                    dom.description.fadeOut('fast');
+                }, timeout);
+                return false;
+
             });
 
             dom.description.bind({
@@ -44,15 +54,6 @@ define('define/description',
                 'mouseout': function() {
                     dom.description.trigger(Events.DEACTIVATE_DESCRIPTION, [200]);
                 }
-            });
-
-            dom.description.bind(Events.DEACTIVATE_DESCRIPTION, function(evt, timeout) {
-
-                dom.description.timeout = setTimeout(function() {
-                    dom.description.fadeOut('fast');
-                }, timeout);
-                return false;
-
             });
 
         });
