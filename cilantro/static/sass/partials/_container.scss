@@ -9,13 +9,13 @@
 }
 
 @mixin container-title {
-        @include container-title-gradient;
-        @include border-radius($BORDER_RADIUS, $BORDER_RADIUS, 0, 0);
+    @include container-title-gradient;
+    @include border-radius($BORDER_RADIUS, $BORDER_RADIUS, 0, 0);
 
-        color: #eee;
-        padding: 5px 10px;
-    	text-shadow: $DARK_TEXT_SHADOW;
-    	font-weight: 500;    
+    color: #eee;
+    padding: 5px 10px;
+    text-shadow: $DARK_TEXT_SHADOW;
+    font-weight: 500;    
 }
 
 .container {
@@ -72,34 +72,6 @@
             }
         }
         
-        &.tabs {
-            padding-top: 8px;
-            padding-bottom: 4px;
-            
-            > .tab {
-                padding: 5px 10px;
-                border-top: 1px solid transparent;
-                border-right: 1px solid transparent;
-                border-left: 1px solid transparent;                
-
-                &.active {
-                    @include border-radius(4px, 4px, 0, 0);
-                    
-                    background-color: #fff;
-                    text-decoration: none;
-                    color: #444;
-                    border-top-color: #B5C7DF;
-                    border-right-color: #B5C7DF;
-                    border-left-color: #B5C7DF;
-                    cursor: default;
-                }
-                
-                &.disabled {
-                    color: #9BBBD4;
-                }
-            }
-        }
-        
         &.header {
             border-bottom: 1px dotted #B5C7DF;
         }
@@ -125,12 +97,51 @@
         padding: 10px;
     }
 
+    .tabs {
+        padding: 7px 0 7px 10px;
+        display: block;
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+
+        > .tab {
+            @include border-radius(15px, 15px, 15px, 15px);
+            background-color: #fff;
+            padding: 2px 10px;
+            margin-right: 5px;
+            border: 1px solid #fff;
+            color: #444;
+            text-shadow: $LIGHT_TEXT_SHADOW;
+            text-decoration: none;
+
+            &:hover {
+                cursor: pointer;
+                background-color: #ddd;
+                border-color: #ddd;
+            }
+
+            &.active {
+                @include inset-box-shadow(0, 2px, 5px, 0, #555);
+                text-shadow: $DARK_TEXT_SHADOW;
+                background-color: #777;
+                color: #fff;
+                border-color: #444;
+                cursor: auto;
+                text-decoration: none;
+                cursor: default;
+            }
+
+            &.disabled {
+                cursor: default;
+                color: #999;
+                border-color: #fff;
+                background-color: inherit;
+            }
+        }
+    }
+
     // for good measure...
     .container {
         @include no-box-shadow;
         @include border-radius(0, 0, 0, 0);
-
-        > .content {
-        }
     }
 }
