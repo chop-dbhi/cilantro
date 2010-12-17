@@ -23,7 +23,6 @@
 
 #center-pane {
     min-height: 400px;
-    max-height: 650px;
     padding: 10px 10px 8px 10px;
     border-right: 1px solid #ccc;    
     border-left: 1px solid #ccc;
@@ -111,36 +110,9 @@
 }
 
 #subcategories {
-    padding: 7px 0 7px 10px;
-    display: block;
-    background-color: #fff;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-
-    > span {
-        @include border-radius(3px, 3px, 3px, 3px);
-        font-size: 0.85em;
-        padding: 2px 5px;
-        margin: 0 10px 0px 0;
-        border: 1px solid #fff;
-        letter-spacing: 1px;
-
-        &:hover {
-            cursor: pointer;
-            background-color: #ddd;
-            border-color: #ddd;
-        }
-
-        &.active {
-            @include inset-box-shadow(0, 2px, 5px, 0, #555);
-            text-shadow: $DARK_TEXT_SHADOW;
-            background-color: #777;
-            color: #fff;
-            border-color: #444;
-            cursor: auto;
-        }
-    }
+    font-size: 0.9em;
 }
 
 /*
