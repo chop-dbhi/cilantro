@@ -1,5 +1,7 @@
 @import "partials/constants";
 @import "partials/mixins";
+@import "partials/icons";
+@import "partials/icons";
 @import "partials/overlay";
 
 /*
@@ -184,24 +186,12 @@
     // Information "i"
     .info {
         @include opacify(20);
-        height: 16px;
-        width: 16px;
-        background-image: url(../img/icons/info.png);
-        background-repeat: no-repeat;
         float: right;
         margin-left: 5px;
 
-//        color: #999;
-//        font-weight: bold;
-//        font-family: 'courier new', monospace;
-//        font-size: 14px;
-//        float: right;
-//        padding: 0 5px;
-//        margin-right: -5px; /* compensate for padding */        
-//        
-//        &:hover {
-//            color: #fff;
-//        };
+        &:hover {
+            background-position-y: -16px;
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 @import "partials/constants";
 @import "partials/mixins";
+@import "partials/icons";
 @import "partials/overlay";
 @import "partials/sortable";
 
@@ -193,15 +194,29 @@
         &:first-child {
             margin-top: 0;
         }
+
+        &:hover {
+            color: #444; 
+
+            .icon {
+                @include opacify(80);
+            }
+
+            .icon.x {
+                background-position-y: -16px;
+            }
+        }
+
     }
-    
-    :hover {
-        color: #333;
-    }    
-    
+
     .info {
         cursor: default;
-    }    
+    }
+    
+    .icon {
+        @include opacify(20);
+        margin-top: -2px;
+    }
 
     a {
         color: #999;

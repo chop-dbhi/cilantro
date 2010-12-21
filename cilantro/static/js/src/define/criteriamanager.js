@@ -4,7 +4,7 @@ define('define/criteriamanager',
     
     function(criteria) {
 
-        var template = '<button id="submit-query">Get Report</button>'; 
+        var template = '<button id="submit-query"><span class="icon arrow-r"/> <span>Get Report</span></button>'; 
         var Manager;
         
         $(function() {

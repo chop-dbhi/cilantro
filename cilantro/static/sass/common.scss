@@ -99,6 +99,19 @@ input[type=button], input[type=submit], button {
     }
 }
 
+button {
+    > * {
+        vertical-align: middle;
+    }
+
+    &:active {
+        // not sure how I feel about this being here...
+        .icon {
+            background-position-y: -16px;
+        }
+    }
+}
+
 .success { @include message(#002E24, #DAFBC2, #BCE8BE, success); }
 .warning { @include message(#653400, #F8F7A9, #ECE678, warning); }
 .error { @include message(#500700, #FFD3D9, #EEB9C6, error); }

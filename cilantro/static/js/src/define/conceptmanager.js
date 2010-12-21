@@ -124,7 +124,7 @@ define('define/conceptmanager',
                         concepts_in_query.push(parseInt(evt.concept_id));
                     
                         if (activeConcept === parseInt(evt.concept_id)) {
-                            $addQueryButton.html('Update Condition');
+                            $addQueryButton.html('<span class="icon refresh"/> <span>Update Condition</span>');
                             $(".success", $staticBox).show();
                         }
                     }
@@ -143,7 +143,7 @@ define('define/conceptmanager',
                     if (index >= 0 ){
                         concepts_in_query.splice(index,1);
                         if (activeConcept === parseInt(evt.concept_id)){
-                            $addQueryButton.html('Add Condition');
+                            $addQueryButton.html('<span class="icon plus"/> <span>Add Condition</span>');
                               $(".success", $staticBox).hide();
                         }
                     }
@@ -855,11 +855,11 @@ define('define/conceptmanager',
                     }
                     // Make sure the button for this concept has the correct label
                     if ($.inArray(activeConcept, concepts_in_query) >= 0) {
-                        $addQueryButton.html('<span class="iconic arrow-up"></span> Update Condition');
+                        $addQueryButton.html('<span class="icon refresh"/> <span>Update Condition</span>');
                         $(".success",$staticBox).show();
                         
                     }else{
-                        $addQueryButton.html('<span class="iconic plus"></span> Add Condition');
+                        $addQueryButton.html('<span class="icon plus"/> <span>Add Condition</span>');
                          $(".success",$staticBox).hide();
                     }
                     // Regardless of whether the tabs are visible, load the first view

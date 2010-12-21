@@ -21,7 +21,7 @@ define('define/criteria2',
 
         var template = [
             '<div data-id="<%= this.id %>">',
-                '<div class="info"></div>',
+                '<div class="icon info"></div>',
                 '<span class="name"><%= this.name %></span>',
                 '<span class="description"><%= this.description %></span>',
             '</div>'

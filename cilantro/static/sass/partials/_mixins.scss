@@ -87,8 +87,6 @@
 }
 
 @mixin opacify($p) {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$p})";
-    filter: alpha(opacity=$p);
     -moz-opacity: $p/100;
     -khtml-opacity: $p/100;
     opacity: $p/100;
