@@ -1,7 +1,4 @@
-define('define/conceptmanager',
-
-    ['define/views'],
-
+define( ['define/views'],
     function(views) { 
         /**
           Sets up and manages the view sets for each criterion option.
@@ -198,7 +195,7 @@ define('define/conceptmanager',
                     });
                     return datatype;
                 }
-         
+
                 /**
                   This function is a utility function, currently called by the AddQueryButtonHandler,
                   for concepts made of built-in views, the function will be responsible
@@ -674,7 +671,6 @@ define('define/conceptmanager',
                  code that sent it will prevent the action the error forbids.)
                  @private
                */
-
                 function badInputHandler(evt){
                     evt.reason = evt.reason ? "_"+ evt.reason : "";
                     var invalid_fields = cache[activeConcept].invalid_fields;
