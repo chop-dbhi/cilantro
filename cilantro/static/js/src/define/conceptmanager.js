@@ -1,5 +1,5 @@
-define( ['define/views'],
-    function(views) { 
+define( ['define/view'],
+    function(View) { 
         /**
           Sets up and manages the view sets for each criterion option.
 
@@ -369,7 +369,6 @@ define( ['define/views'],
                                              'concept_id':activeConcept
                                        };
                     }
-                    //console.log(server_query);
                     return server_query;
                 }
 
@@ -446,8 +445,8 @@ define( ['define/views'],
                   
                   @private
                 */
-                function viewReadyHandler(evt, $view) {
-                    activeView.contents = $view;
+                function viewReadyHandler(evt, view) {
+                    activeView.contents = view.dom();
                     // As of right now IE 7 and 8 cannot seem to properly handle
                     // creating VML rotated text in an object that is not in the DOM
                     // In those conditions, the chart plugin inserts the graph into the
@@ -456,7 +455,7 @@ define( ['define/views'],
                     // when we can do this outside the dom in all browsers, to be able to do 
                     // this in the existing framework
 
-                    $contentBox.append($view);
+                    $contentBox.append(activeView.contents);
                     activeView.contents.css("display","block");
                     
                     $(".chart", activeView.contents).css("display","block"); // Hack because of IE
@@ -467,10 +466,10 @@ define( ['define/views'],
                         // This will also prevent re-populating datasources when the
                         // user clicks on a criteria in the right panel but the concept 
                         // has been shown before.
-                        $view.children().trigger('UpdateDSEvent', [cache[activeConcept].ds]);
+                        $(view).trigger("UpdateDSEvent", [cache[activeConcept].ds]);
                     }
                     
-                    $view.children().trigger("GainedFocusEvent");
+                    $(view).trigger("GainedFocusEvent");
 
                     activeView.loaded = true;
                  }
@@ -491,9 +490,9 @@ define( ['define/views'],
                         activeView.contents.children().trigger("LostFocusEvent");
                         activeView.contents.detach();
                     }
-                    
+
                     activeView = cache[activeConcept].views[tabIndex];
-                
+
                     if (activeView.loaded) {
                         viewReadyHandler(null, activeView.contents);
                     } else {
@@ -503,7 +502,7 @@ define( ['define/views'],
                         var callback = null;
                         activeView.concept_id = activeConcept;
                         if (activeView.type !== 'custom'){// Show the view
-                            $container.trigger('ViewReadyEvent', [views.createView(activeView,cache[activeConcept].name)]);
+                            $container.trigger('ViewReadyEvent', [new View(activeView,cache[activeConcept].name)]);
                         }else{
                             // Load the custom view
                             loadDependencies(activeView, callback);
