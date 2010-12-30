@@ -1,18 +1,15 @@
-define(['define/chart','define/form', 'lib/base'], function(chart, form){
+define(['define/chart','define/form', 'lib/base'], function(chart, Form){
+     //  **View Class** is the base class for object that represents a tab within the main Cilantro screen. The base class
+     // supports construction of HTML forms as well as charts within those forms.
      var View = Base.extend({
             constructor: function(viewset, name){
                 // Save off the viewset 
                 this.viewset = viewset;
                 // DOM representation;
                 this.view = $('<div class="view"></div>');
+                
                 var $view = this.view;
                 var $this = $(this);
-                
-                // Views without a first element not a chart or custom 
-                // will require a title
-                if (!(viewset.elements[0].type in {chart:1,custom:1}) ){
-                       $view.append("<h2>"+name+"</h2>");
-                }
                 
                 // Notify a view that the datasource has changed.
                 // Note that proxy is used here to so that the callbacks will have reference
@@ -39,29 +36,34 @@ define(['define/chart','define/form', 'lib/base'], function(chart, form){
                 $(this).bind("UpdateQueryButtonClicked GainedFocusEvent UpdateQueryButtonClicked " +      
                              "HideDependentsEvent ShowDependentsEvent UpdateDSEvent", jQuery.proxy(this.eventPassThru,this));
                 
-                // Iterate over elements of this view and create them, appending them as we go.
-                $.each(viewset.elements, function(index, element) {
-                    switch (element.type) {
-                        case 'form':
-                            $view.append(form.Form(element,viewset.concept_id)); 
-                            break;
-                        case 'chart':
-                            var datatype = element.data.datatype;
-                            if (datatype === 'number') {
-                                $view.append(chart.getLineChart(element, viewset.concept_id)); 
-                            } else if (datatype === 'nullboolean' || datatype === 'boolean'){
-                                $view.append(chart.getPieChart(element,  viewset.concept_id));
-                            } else {
-                                $view.append(chart.getBarChart(element,  viewset.concept_id));
-                            }
-                            break;
-                        case 'custom':
-                            break;
-                        default:
-                            $view.append($('<p>Undefined View!</p>'));                
-                    }
-                });
+                this.render();
+               
             },
+            render: function(){  // Iterate over elements of this view and create them, appending them as we go.
+                var viewset = this.viewset;
+                var view = this.view;
+                $.each(this.viewset.elements, function(index, element) {
+                       switch (element.type) {
+                           case 'form':
+                               view.append(new Form(element,viewset.concept_id).dom()); 
+                               break;
+                           case 'chart':
+                               var datatype = element.data.datatype;
+                               if (datatype === 'number') {
+                                   view.append(chart.getLineChart(element, viewset.concept_id)); 
+                               } else if (datatype === 'nullboolean' || datatype === 'boolean'){
+                                   view.append(chart.getPieChart(element,  viewset.concept_id));
+                               } else {
+                                   view.append(chart.getBarChart(element,  viewset.concept_id));
+                               }
+                               break;
+                           case 'custom':
+                               break;
+                           default:
+                               view.append($('<p>Undefined View!</p>'));                
+                       }
+                   });
+            },  
             updateElement: function(evt){
                 this.view.children().each(function(){$(this).triggerHandler(evt);});
                 evt.stopPropagation();   
@@ -76,14 +78,15 @@ define(['define/chart','define/form', 'lib/base'], function(chart, form){
                 this.view.trigger("ConstructQueryEvent");
                 evt.stopPropagation();
             },
-            notifyChildren: function(evt){
-              this.view.children().each(function(){$(this).triggerHandler(evt);});
+            notifyChildren: function(evt,arg){
+              this.view.children().each(function(){$(this).triggerHandler(evt,arg);});
               evt.stopPropagation();
             },
-            eventPassThru: function(evt){
-                this.view.triggerHandler(evt);
+            eventPassThru: function(evt, arg){
+                this.view.triggerHandler(evt, arg);
+                evt.stopPropagation();
             },
-            dom: function(evt){
+            dom: function(){
                 return this.view;
             }
      });

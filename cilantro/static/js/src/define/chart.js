@@ -1,4 +1,4 @@
-require.def('define/chart', ['define/form', 'lib/highcharts'], function(form) {
+require.def(['define/form', 'lib/highcharts'], function(Form) {
      var UNSELECTED_COLOR     = "#C5C5C5";
      var SELECTED_COLOR       = "#99BDF1";
      var EXCLUDE_COLOR        = "#EE3A43";
@@ -33,10 +33,10 @@ require.def('define/chart', ['define/form', 'lib/highcharts'], function(form) {
          var unmap = map_display_to_data(view.data.choices);
          
          var negated = false;
-         var $range_form = form.Form({fields:[{ datatype: "string",
-                                                name: view.data.name,
-                                                choices:view.data.choices,
-                                                pk: view.data.pk}]}, concept_id);
+         var $range_form = new Form({fields:[{ datatype: "string",
+                                           name: view.data.name,
+                                           choices:view.data.choices,
+                                           pk: view.data.pk}]}, concept_id).dom;
          
          // The graph serves the purpose of multiple selector.
          $range_form.find('select[multiple]').hide();
@@ -233,11 +233,11 @@ require.def('define/chart', ['define/form', 'lib/highcharts'], function(form) {
          var unmap = map_display_to_data(view.data.choices);
    
          var negated = false;
-         var $range_form = form.Form({fields:[{ datatype: "string",
+         var $range_form = new Form({fields:[{ datatype: "string",
                                                 name: view.data.name,
                                                 choices:view.data.choices,
                                                 pk: view.data.pk}]}, concept_id);
-         
+         $range_form = $range_form.dom;
          // The graph serves the purpose of multiple selector.
          $range_form.find('select[multiple]').hide();
 
@@ -504,7 +504,7 @@ require.def('define/chart', ['define/form', 'lib/highcharts'], function(form) {
      };    
  
      var getLineChart = function(view, concept_id) {
-         var $range_form = form.Form({fields:[view.data]}, concept_id);
+         var $range_form = new Form({fields:[view.data]}, concept_id).dom;
 
          $range_form.find("input").css("margin","10px");
          var $chartDiv = $('<div class="chart"></div>');

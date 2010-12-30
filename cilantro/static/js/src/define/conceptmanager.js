@@ -446,7 +446,7 @@ define( ['define/view'],
                   @private
                 */
                 function viewReadyHandler(evt, view) {
-                    activeView.contents = view.dom();
+                    activeView.contents = view;
                     // As of right now IE 7 and 8 cannot seem to properly handle
                     // creating VML rotated text in an object that is not in the DOM
                     // In those conditions, the chart plugin inserts the graph into the
@@ -454,9 +454,9 @@ define( ['define/view'],
                     // passed is in the DOM or not, if not we inject it. The idea is to eventually
                     // when we can do this outside the dom in all browsers, to be able to do 
                     // this in the existing framework
-
-                    $contentBox.append(activeView.contents);
-                    activeView.contents.css("display","block");
+                    var activeViewDom = activeView.contents.dom;
+                    $contentBox.append(activeViewDom);
+                    activeViewDom.css("display","block");
                     
                     $(".chart", activeView.contents).css("display","block"); // Hack because of IE
 
@@ -486,9 +486,9 @@ define( ['define/view'],
                 */
                 function showViewHandler(evt, tabIndex) {
                     if (activeView !== null){
-                        activeView.contents.css("display","none");
-                        activeView.contents.children().trigger("LostFocusEvent");
-                        activeView.contents.detach();
+                        activeView.contents.dom.css("display","none");
+                        //activeView.contents.dom().children().trigger("LostFocusEvent");
+                        activeView.contents.dom.detach();
                     }
 
                     activeView = cache[activeConcept].views[tabIndex];
@@ -655,7 +655,7 @@ define( ['define/view'],
                   @private
                 */
                 function addQueryButtonHandler(event){
-                    activeView.contents.triggerHandler("UpdateQueryButtonClicked"); // This would be better if every view didn't need to handle this
+                    $(activeView.contents).triggerHandler("UpdateQueryButtonClicked"); // This would be better if every view didn't need to handle this
                 }                                                                   // it should be concept level thing.
                 
                /**
