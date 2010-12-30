@@ -17,11 +17,11 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                  '<option value="in">is one of</option>',
                                  '<option value="-in">is not one of</option>',
                                  '<option value="icontains">contains</option>',
-                                 '<option value="-icontains">does not contain</option>'];thats
+                                 '<option value="-icontains">does not contain</option>'];
+
     var Form  = ViewElement.extend({
         constructor: function(viewset, concept_pk){
             this.base(viewset, concept_pk);
-            debugger;
             // Add javascript date picker to date inputs
             $('input[data-validate="date"]', this.dom).datepicker({
                 changeMonth: true,
@@ -58,7 +58,6 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                       'string': Form.string_tmpl,
                       'string-list': Form.stringlist_tmpl
             };
-            debugger;
             var dom = this.dom = $('<span class="form_container"></span>');
             var concept_pk = this.concept_pk;
             $.each(this.viewset.fields, function(index,element){

@@ -454,7 +454,7 @@ define( ['define/view'],
                     // passed is in the DOM or not, if not we inject it. The idea is to eventually
                     // when we can do this outside the dom in all browsers, to be able to do 
                     // this in the existing framework
-                    var activeViewDom = activeView.contents.dom;
+                    var activeViewDom = activeView.contents.dom();
                     $contentBox.append(activeViewDom);
                     activeViewDom.css("display","block");
                     
@@ -467,6 +467,7 @@ define( ['define/view'],
                         // user clicks on a criteria in the right panel but the concept 
                         // has been shown before.
                         $(view).trigger("UpdateDSEvent", [cache[activeConcept].ds]);
+                        $(view).trigger("RegisterElementsEvent");
                     }
                     
                     $(view).trigger("GainedFocusEvent");
@@ -486,9 +487,9 @@ define( ['define/view'],
                 */
                 function showViewHandler(evt, tabIndex) {
                     if (activeView !== null){
-                        activeView.contents.dom.css("display","none");
-                        //activeView.contents.dom().children().trigger("LostFocusEvent");
-                        activeView.contents.dom.detach();
+                        activeView.contents.dom().css("display","none");
+                        $(activeView.contents).trigger("LostFocusEvent");
+                        activeView.contents.dom().detach();
                     }
 
                     activeView = cache[activeConcept].views[tabIndex];
@@ -675,8 +676,8 @@ define( ['define/view'],
                     var invalid_fields = cache[activeConcept].invalid_fields;
                     var target_name = $(evt.target).attr("name");
                     $.each(cache[activeConcept].views, function(index,view){
-                           view.contents && view.contents.find("[name="+target_name+"]").addClass("invalid"+evt.reason);
-                           view.contents && view.contents.find("[name="+target_name+"]").children().addClass("invalid"+evt.reason);
+                           view.contents && view.contents.dom().find("[name="+target_name+"]").addClass("invalid"+evt.reason);
+                           view.contents && view.contents.dom().find("[name="+target_name+"]").children().addClass("invalid"+evt.reason);
                     });
                     var message = evt.message ? evt.message : "This query contains invalid input, please correct any invalid fields.";
                     var already_displayed = false;
@@ -744,8 +745,8 @@ define( ['define/view'],
                     var invalid_fields = cache[activeConcept].invalid_fields;
                     var target_name = $(evt.target).attr("name");
                     $.each(cache[activeConcept].views, function(index,view){
-                        view.contents && view.contents.find("[name="+target_name+"]").removeClass("invalid"+evt.reason);
-                        view.contents && view.contents.find("[name="+target_name+"]").children().removeClass("invalid"+evt.reason);
+                        view.contents && view.contents.dom().find("[name="+target_name+"]").removeClass("invalid"+evt.reason);
+                        view.contents && view.contents.dom().find("[name="+target_name+"]").children().removeClass("invalid"+evt.reason);
                     });
                     var rc = invalid_fields[target_name+evt.reason].data('ref_count') - 1;
                     if (rc === 0){

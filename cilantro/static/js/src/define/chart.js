@@ -879,10 +879,12 @@ require.def(['define/form', 'lib/highcharts'], function(Form) {
              $range_form.triggerHandler(evt,[element]);
              manual_field_handler(null);
          });
-
+         
+         $chartDiv.bind("RegisterElementsEvent", function(evt) {
+             $('input,select',$chartDiv).change(); 
+         });
+         
          $chartDiv.bind("GainedFocusEvent", function(evt){
-             // TODO, remove this
-             $('input,select',$chartDiv).change();
              chart.xAxis[0].isDirty = true;
              chart.yAxis[0].isDirty = true;          
              chart.isDirty = true;

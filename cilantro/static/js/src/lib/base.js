@@ -1,12 +1,139 @@
 /*
-Base.js, version 1.1a
-Copyright 2006-2010, Dean Edwards
-License: http://www.opensource.org/licenses/mit-license.php
+	Base.js, version 1.1a
+	Copyright 2006-2010, Dean Edwards
+	License: http://www.opensource.org/licenses/mit-license.php
 */
 
-var Base=function(){};
-Base.extend=function(a,c){var e=Base.prototype.extend;Base._prototyping=true;var d=new this;e.call(d,a);d.base=function(){};delete Base._prototyping;var g=d.constructor,b=d.constructor=function(){if(!Base._prototyping)if(this._constructing||this.constructor==b){this._constructing=true;g.apply(this,arguments);delete this._constructing}else if(arguments[0]!=null)return(arguments[0].extend||e).call(arguments[0],d)};b.ancestor=this;b.extend=this.extend;b.forEach=this.forEach;b.implement=this.implement;
-b.prototype=d;b.toString=this.toString;b.valueOf=function(h){return h=="object"?b:g.valueOf()};e.call(b,c);typeof b.init=="function"&&b.init();return b};
-Base.prototype={extend:function(a,c){if(arguments.length>1){var e=this[a];if(e&&typeof c=="function"&&(!e.valueOf||e.valueOf()!=c.valueOf())&&/bbaseb/.test(c)){var d=c.valueOf();c=function(){var i=this.base||Base.prototype.base;this.base=e;var j=d.apply(this,arguments);this.base=i;return j};c.valueOf=function(i){return i=="object"?c:d};c.toString=Base.toString}this[a]=c}else if(a){var g=Base.prototype.extend;if(!Base._prototyping&&typeof this!="function")g=this.extend||g;for(var b={toSource:null},
-h=["constructor","toString","valueOf"],k=Base._prototyping?0:1;f=h[k++];)a[f]!=b[f]&&g.call(this,f,a[f]);for(var f in a)b[f]||g.call(this,f,a[f])}return this}};
-Base=Base.extend({constructor:function(a){this.extend(a)}},{ancestor:Object,version:"1.1",forEach:function(a,c,e){for(var d in a)this.prototype[d]===undefined&&c.call(e,a[d],d,a)},implement:function(){for(var a=0;a<arguments.length;a++)typeof arguments[a]=="function"?arguments[a](this.prototype):this.prototype.extend(arguments[a]);return this},toString:function(){return String(this.valueOf())}});
+var Base = function() {
+	// dummy
+};
+
+Base.extend = function(_instance, _static) { // subclass
+	var extend = Base.prototype.extend;
+	
+	// build the prototype
+	Base._prototyping = true;
+	var proto = new this;
+	extend.call(proto, _instance);
+  proto.base = function() {
+    // call this method from any other method to invoke that method's ancestor
+  };
+	delete Base._prototyping;
+	
+	// create the wrapper for the constructor function
+	//var constructor = proto.constructor.valueOf(); //-dean
+	var constructor = proto.constructor;
+	var klass = proto.constructor = function() {
+		if (!Base._prototyping) {
+			if (this._constructing || this.constructor == klass) { // instantiation
+				this._constructing = true;
+				constructor.apply(this, arguments);
+				delete this._constructing;
+			} else if (arguments[0] != null) { // casting
+				return (arguments[0].extend || extend).call(arguments[0], proto);
+			}
+		}
+	};
+	
+	// build the class interface
+	klass.ancestor = this;
+	klass.extend = this.extend;
+	klass.forEach = this.forEach;
+	klass.implement = this.implement;
+	klass.prototype = proto;
+	klass.toString = this.toString;
+	klass.valueOf = function(type) {
+		//return (type == "object") ? klass : constructor; //-dean
+		return (type == "object") ? klass : constructor.valueOf();
+	};
+	extend.call(klass, _static);
+	// class initialisation
+	if (typeof klass.init == "function") klass.init();
+	return klass;
+};
+
+Base.prototype = {	
+	extend: function(source, value) {
+		if (arguments.length > 1) { // extending with a name/value pair
+			var ancestor = this[source];
+			if (ancestor && (typeof value == "function") && // overriding a method?
+				// the valueOf() comparison is to avoid circular references
+				(!ancestor.valueOf || ancestor.valueOf() != value.valueOf()) &&
+				/\bbase\b/.test(value)) {
+				// get the underlying method
+				var method = value.valueOf();
+				// override
+				value = function() {
+					var previous = this.base || Base.prototype.base;
+					this.base = ancestor;
+					var returnValue = method.apply(this, arguments);
+					this.base = previous;
+					return returnValue;
+				};
+				// point to the underlying method
+				value.valueOf = function(type) {
+					return (type == "object") ? value : method;
+				};
+				value.toString = Base.toString;
+			}
+			this[source] = value;
+		} else if (source) { // extending with an object literal
+			var extend = Base.prototype.extend;
+			// if this object has a customised extend method then use it
+			if (!Base._prototyping && typeof this != "function") {
+				extend = this.extend || extend;
+			}
+			var proto = {toSource: null};
+			// do the "toString" and other methods manually
+			var hidden = ["constructor", "toString", "valueOf"];
+			// if we are prototyping then include the constructor
+			var i = Base._prototyping ? 0 : 1;
+			while (key = hidden[i++]) {
+				if (source[key] != proto[key]) {
+					extend.call(this, key, source[key]);
+
+				}
+			}
+			// copy each of the source object's properties to this object
+			for (var key in source) {
+				if (!proto[key]) extend.call(this, key, source[key]);
+			}
+		}
+		return this;
+	}
+};
+
+// initialise
+Base = Base.extend({
+	constructor: function() {
+		this.extend(arguments[0]);
+	}
+}, {
+	ancestor: Object,
+	version: "1.1",
+	
+	forEach: function(object, block, context) {
+		for (var key in object) {
+			if (this.prototype[key] === undefined) {
+				block.call(context, object[key], key, object);
+			}
+		}
+	},
+		
+	implement: function() {
+		for (var i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] == "function") {
+				// if it's a function, call it
+				arguments[i](this.prototype);
+			} else {
+				// add the interface using the extend method
+				this.prototype.extend(arguments[i]);
+			}
+		}
+		return this;
+	},
+	
+	toString: function() {
+		return String(this.valueOf());
+	}
+});

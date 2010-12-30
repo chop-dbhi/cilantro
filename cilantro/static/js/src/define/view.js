@@ -29,12 +29,12 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
                 $view.bind("UpdateQueryButtonClicked", jQuery.proxy(this.constructQuery, this));
                 
                 // These events need to be passed to view elements
-                $view.bind("UpdateDSEvent GainedFocusEvent", jQuery.proxy(this.notifyChildren, this));
+                $view.bind("UpdateDSEvent GainedFocusEvent RegisterElementsEvent", jQuery.proxy(this.notifyChildren, this));
                 
                 // This makes it so we can trigger an event on the view object itself, and still have the
                 // DOM element respond to it.
-                $(this).bind("UpdateQueryButtonClicked GainedFocusEvent UpdateQueryButtonClicked " +      
-                             "HideDependentsEvent ShowDependentsEvent UpdateDSEvent", jQuery.proxy(this.eventPassThru,this));
+                $(this).bind("UpdateQueryButtonClicked GainedFocusEvent LostFocusEvent UpdateQueryButtonClicked " +      
+                             "HideDependentsEvent RegisterElementsEvent ShowDependentsEvent UpdateDSEvent", jQuery.proxy(this.eventPassThru, this));
                 
                 this.render();
                
@@ -45,7 +45,7 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
                 $.each(this.viewset.elements, function(index, element) {
                        switch (element.type) {
                            case 'form':
-                               view.append(new Form(element,viewset.concept_id).dom()); 
+                               view.append(new Form(element,viewset.concept_id).dom); 
                                break;
                            case 'chart':
                                var datatype = element.data.datatype;
