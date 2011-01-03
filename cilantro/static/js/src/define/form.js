@@ -250,10 +250,10 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                   sendValue = selected[0] in Form.s_to_primative_map ? Form.s_to_primative_map[selected[0]] : selected[0];
                                               }
 
-                                              sendValue = $target.is(":visible") && $target.is(":enabled") ? sendValue: undefined;
+                                              sendValue = this.state == "INIT" || ($target.is(":visible") && $target.is(":enabled")) ? sendValue: undefined;
                                               dom.trigger("ElementChangedEvent", [{name:evt.target.name, value:sendValue}]);
                                               break;
-                     case "textarea": sendValue = $target.is(":visible") && $target.is(":enabled") ? $target.val().split("\n") : undefined;
+                     case "textarea": sendValue = this.state == "INIT" || ($target.is(":visible") && $target.is(":enabled")) ? $target.val().split("\n") : undefined;
                                       dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
                                       break;
                      default   : // This catches input boxes, if input boxes are not currently visible, send null for them
@@ -307,7 +307,7 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                      break;
                                      default: break;
                                  }
-                                 sendValue = $target.is(":visible") && $target.is(":enabled") ? $target.val() : undefined;
+                                 sendValue = this.state == "INIT" || ($target.is(":visible") && $target.is(":enabled")) ? $target.val() : undefined;
                                  dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
                                  break;
               }

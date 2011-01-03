@@ -50,9 +50,9 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
                            case 'chart':
                                var datatype = element.data.datatype;
                                if (datatype === 'number') {
-                                   view.append(new chart.LineChart(element, viewset.concept_id)); 
+                                   view.append(new chart.LineChart(element, viewset.concept_id).dom); 
                                } else if (datatype === 'nullboolean' || datatype === 'boolean'){
-                                   view.append(new chart.PieChart(element,  viewset.concept_id));
+                                   view.append(new chart.PieChart(element,  viewset.concept_id).dom);
                                } else {              
                                    view.append(new chart.BarChart(element,  viewset.concept_id).dom);
                                }
