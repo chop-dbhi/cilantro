@@ -50,11 +50,11 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
                            case 'chart':
                                var datatype = element.data.datatype;
                                if (datatype === 'number') {
-                                   view.append(chart.getLineChart(element, viewset.concept_id)); 
+                                   view.append(new chart.LineChart(element, viewset.concept_id)); 
                                } else if (datatype === 'nullboolean' || datatype === 'boolean'){
-                                   view.append(chart.getPieChart(element,  viewset.concept_id));
-                               } else {
-                                   view.append(chart.getBarChart(element,  viewset.concept_id));
+                                   view.append(new chart.PieChart(element,  viewset.concept_id));
+                               } else {              
+                                   view.append(new chart.BarChart(element,  viewset.concept_id).dom);
                                }
                                break;
                            case 'custom':
