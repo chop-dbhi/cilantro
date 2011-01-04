@@ -1,6 +1,90 @@
 define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, ViewElement) {
     // Base Class for all charts
     var Chart = ViewElement.extend({
+        constructor: function(viewset, concept_pk){
+            this.options = {
+                 chart: {
+                     marginBottom:50,
+                     renderTo : null,
+                     zoomType:'',
+                     events:{}
+                 },
+                 tooltip:{
+                     formatter: null
+                 },
+                 events:{},
+                 plotOptions:{
+                     series:{
+                         point : {
+                             events:{}
+                         },
+                         events: {
+                             click : null
+                         }
+                     },
+                     line:{
+                         animation: true
+                     },
+                     pie:{
+                         dataLabels: {
+                             enabled: true,
+                             formatter: function() {
+                                 return this.point.name;
+                             }
+                         },
+                         borderColor: "#000000",
+                         borderWidth: 2,
+                         allowPointSelect: false,
+                         cursor: "pointer",
+                         enableMouseTracking: true,
+                         stickyTracking: false,
+
+                         states:{
+                             hover:{
+                                 brightness: -.1,
+                                 enabled:true
+                             }
+                         },
+                         point:{
+                             events:{
+                                 mouseOver : function(){},
+                                 mouseOut : function(){}
+                             }
+                         }
+                     },
+                     column:{
+                         dataLabels: {
+                             enabled: true
+                         },
+                         allowPointSelect:false,
+                         cursor:"pointer",
+                         enableMouseTracking:true,
+                         stickyTracking:false,
+                         states:{
+                              hover:{
+                                  brightness: -.1,
+                                  enabled:true
+                              }
+                         }
+                     } 
+                 },
+
+                 credits:{
+                     enabled: false
+                 },
+                 legend:{
+                     enabled: false
+                 },
+                 title: {
+                      text: null
+                 },
+                 series: [{
+                    name:null,
+                    data:null
+                 }]
+            };
+            this.base(viewset, concept_pk);
+        },
         gainedFocus: function(){
             this.chart.xAxis[0].isDirty = true;
             this.chart.yAxis[0].isDirty = true;
@@ -8,89 +92,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
             this.chart.series[0].isDirty = true;
             this.updateChart();
         },
-        updateChart : function(){},
-        // HighCharts configuration object
-        options : {
-             chart: {
-                 marginBottom:50,
-                 renderTo : null,
-                 zoomType:'',
-                 events:{}
-             },
-             tooltip:{
-                 formatter: null
-             },
-             events:{},
-             plotOptions:{
-                 series:{
-                     point : {
-                         events:{}
-                     },
-                     events: {
-                         click : null
-                     }
-                 },
-                 line:{
-                     animation: true
-                 },
-                 pie:{
-                     dataLabels: {
-                         enabled: true,
-                         formatter: function() {
-                             return this.point.name;
-                         }
-                     },
-                     borderColor: "#000000",
-                     borderWidth: 2,
-                     allowPointSelect: false,
-                     cursor: "pointer",
-                     enableMouseTracking: true,
-                     stickyTracking: false,
-    
-                     states:{
-                         hover:{
-                             brightness: -.1,
-                             enabled:true
-                         }
-                     },
-                     point:{
-                         events:{
-                             mouseOver : function(){},
-                             mouseOut : function(){}
-                         }
-                     }
-                 },
-                 column:{
-                     dataLabels: {
-                         enabled: true
-                     },
-                     allowPointSelect:false,
-                     cursor:"pointer",
-                     enableMouseTracking:true,
-                     stickyTracking:false,
-                     states:{
-                          hover:{
-                              brightness: -.1,
-                              enabled:true
-                          }
-                     }
-                 } 
-             },
-    
-             credits:{
-                 enabled: false
-             },
-             legend:{
-                 enabled: false
-             },
-             title: {
-                  text: null
-             },
-             series: [{
-                name:null,
-                data:null
-             }]
-        }
+        updateChart : function(){}
     },
     {   // Colors used by all graphs
         UNSELECTED_COLOR: "#C5C5C5",
@@ -252,7 +254,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
               sum = sum + element[1];
            });
            
-           var min_slice_width = sum * this.MINIMUM_SLICE;
+           var min_slice_width = sum * Chart.MINIMUM_SLICE;
            $.each(coords, function(index,element){
               if (element[1] < min_slice_width){
                   element[1] = min_slice_width;

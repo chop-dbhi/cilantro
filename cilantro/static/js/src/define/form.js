@@ -142,7 +142,7 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
              var ds;
              var dom = this.dom;
              switch (evt.target.type){
-                     case "checkbox":sendValue = evt.target.checked;
+                     case "checkbox": sendValue = evt.target.checked;
                                      sendValue = $target.is(":visible") && $target.is(":enabled") ? sendValue: undefined;
                                      dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
                                      break;
