@@ -159,7 +159,6 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                   // Get the associated text input
                                                   $associated_inputs = $("[name^="+op_match[1]+"_"+op_match[2]+"]", dom).not($target).not("span");
                                               }
-
                                               $("option", $(evt.target)).each(function(index,opt){
                                                   if  (opt.selected) {
                                                      selected.push(opt.value);
@@ -250,13 +249,15 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                   sendValue = selected[0] in Form.s_to_primative_map ? Form.s_to_primative_map[selected[0]] : selected[0];
                                               }
 
-                                              sendValue = this.state == "INIT" || ($target.is(":visible") && $target.is(":enabled")) ? sendValue: undefined;
+                                              sendValue = (this.state === "INIT" && $target.css("display")!=="none") || 
+                                                          ($target.is(":visible") && $target.is(":enabled")) ? sendValue: undefined;
                                               dom.trigger("ElementChangedEvent", [{name:evt.target.name, value:sendValue}]);
                                               break;
-                     case "textarea": sendValue = this.state == "INIT" || ($target.is(":visible") && $target.is(":enabled")) ? $target.val().split("\n") : undefined;
+                     case "textarea": sendValue = (this.state === "INIT" && $target.css("display") !== "none") || 
+                                                  ($target.is(':visible') && $target.is(":enabled")) ? $target.val().split("\n") : undefined;
                                       dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
                                       break;
-                     default   : // This catches input boxes, if input boxes are not currently visible, send null for them
+                     default   : // This catches input boxes, if input boxes are not currently visible, send undefined for them
                                  // Input boxes require an extra validation step because of the free form input
 
                                  var associated_operator = $(evt.target).closest("p").find("select").val();
@@ -307,7 +308,8 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                      break;
                                      default: break;
                                  }
-                                 sendValue = this.state == "INIT" || ($target.is(":visible") && $target.is(":enabled")) ? $target.val() : undefined;
+                                 sendValue = (this.state === "INIT" && $target.css("display") !== "none") ||
+                                             ($target.is(':visible') && $target.is(":enabled")) ? $target.val() : undefined;
                                  dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
                                  break;
               }
@@ -328,8 +330,8 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
             switch (type){
                 case "checkbox": $element.attr("checked", element.value);
                                  break;
-                case "select-multiple": $("option", $element).each( function(index, opt){ // TODO can i somehow just set an array here ?
-                                            var iterator = $.isArray(element.val) ? element.val : [element.val];
+                case "select-multiple": var iterator = $.isArray(element.value) ? element.value : [element.value];
+                                        $("option", $element).each( function(index, opt){ // TODO can i somehow just set an array here ?
                                             var vals = $.map(iterator, function(val, index){
                                                 return typeof val in {string:1, number:1} ? val : String(val);
                                             });

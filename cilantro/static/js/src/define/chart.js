@@ -14,7 +14,6 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
              chart: {
                  marginBottom:50,
                  renderTo : null,
-                 defaultSeriesType: 'pie',
                  zoomType:'',
                  events:{}
              },
@@ -139,6 +138,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
             
             // Highcharts does not let us pass in null and true and false for coords
             // Here we map all the choices to their string equivalents
+            //TODO don't do this, shouldn't change it 
             $.each(viewset.data.coords, function(index,element){
                  viewset.data.coords[index][0] = map[viewset.data.coords[index][0]];
             });
@@ -258,6 +258,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                   element[1] = min_slice_width;
               }
            });
+           
            this.base(viewset, concept_pk);
         },
         render: function(){
@@ -269,11 +270,11 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                 // We use unmap here because name refers potentially cleaned string, ("No", instead of false, etc)
                 return "" + objRef.data_store[objRef.unmap[this.point.name]];
             };
+            this.options.chart.defaultSeriesType = 'pie';
             this.options.series[0].name = this.viewset.data.title;
             this.options.series[0].data = this.viewset.data.coords;
             this.options.title.text = this.viewset.data.title;
             this.options.plotOptions.series.events.click = $.proxy(this.seriesClick, this);
-            
             this.chart = new Highcharts.Chart(this.options);
         },       
         gainedFocus: function(evt){
@@ -292,7 +293,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
              this.options.chart.events.redraw = $.proxy(this.redraw, this);
              this.options.chart.events.load = $.proxy(this.load, this);
              this.options.plotOptions.series.events.click = $.proxy(this.seriesClick,this);
-             this.options.title = this.viewset.data.title;
+             this.options.title.text = this.viewset.data.title;
              this.options.series[0].name = this.viewset.data.title;
              this.options.series[0].data = $.map(this.viewset.data.coords, function(element, index){
                     return element[1]; 
@@ -304,7 +305,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
              };
              this.options.xAxis = {
                 categories: $.map(this.viewset.data.coords, function(element, index){
-                   return objRef.map[element[0]]; 
+                   return element[0]; 
                 }),
                 title: {
                     text: this.viewset.data.xaxis,
@@ -371,41 +372,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                         });            
                     }(col));
                }
-          },
-          load: function(){}// function(evt){
-          //                var chart = evt.target;
-          //                for (var index = 0; index < chart.series[0].data.length; index++){
-          //                    var col = chart.series[0].data[index];
-          //                    $(col.dataLabel.element).hover(function(event){
-          //                        $(this).css("cursor","pointer");
-          //                    }, function(event){
-          //                        $(this).css("cursor","");
-          //                    });
-          //                    var objRef = this;
-          //                    $(col.dataLabel.element).click(function(c){
-          //                        return (function(event){
-          //                               c.series.chart.hoverPoint = c;
-          //                               c.series.chart.isDirty = true;
-          //                               var index = $.inArray(objRef.unmap[c.category], objRef.selected);
-          //                               if (index === -1) {
-          //                                   if (objRef.negated){
-          //                                       $(c.dataLabel.element).css("color", BarChart.EXCLUDE_COLOR);
-          //                                       c.update({color:BarChart.EXCLUDE_COLOR});
-          //                                   }else{
-          //                                       $(c.dataLabel.element).css("color", BarChart.SELECTED_COLOR);
-          //                                       c.update({color:BarChart.SELECTED_COLOR});
-          //                                   }
-          //                                   objRef.selected.push(objRef.unmap[c.category]);
-          //                               }else{
-          //                                   $(c.dataLabel.element).css("color", BarChart.UNSELECTED_COLOR);
-          //                                   c.update({color:BarChart.UNSELECTED_COLOR});
-          //                                   objRef.selected.splice(index,1);
-          //                               }
-          //                               objRef.notify();
-          //                          });                       
-          //                    }(col));
-          //               }
-          //           }
+          }
      });    
      // We have an embedded form in this chart, which is really
      // the only thing that changes the datasource. The graph 
@@ -435,7 +402,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
              this.options.chart.renderTo = dom.get(0);
              this.options.chart.defaultSeriesType = 'line';
              this.options.chart.zoomType = 'x';
-             this.options.title = this.viewset.data.title;
+             this.options.title.text = this.viewset.data.title;
              // User selects range in chart
              this.options.chart.events.selection = $.proxy(this.chartSelection, this);
              // User selects single spot in chart;
@@ -539,8 +506,8 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                               color: Chart.EXCLUDE_COLOR,
                               width: 3
                          });
-                         chart.xAxis[0].addPlotBand({
-                              from: extremes.min,
+                         this.chart.xAxis[0].addPlotBand({
+                              from: this.extremes.min,
                               to: min,
                               color:color
                          });
@@ -703,6 +670,10 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
              // We only need to change the operator because it will in turn change its dependent
              // inputs
              $('select', this.range_form).change();
+         },
+         gainedFocus: function(evt){
+             this.base();
+             this.range_form.triggerHandler(evt);
          },
          chartSelection: function(event){
              var chart = event.target;

@@ -7,6 +7,7 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
                 this.viewset = viewset;
                 // DOM representation;
                 this.view = $('<div class="view"></div>');
+                this.name = name;
                 
                 var $view = this.view;
                 var $this = $(this);
@@ -29,19 +30,25 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
                 $view.bind("UpdateQueryButtonClicked", jQuery.proxy(this.constructQuery, this));
                 
                 // These events need to be passed to view elements
-                $view.bind("UpdateDSEvent GainedFocusEvent RegisterElementsEvent", jQuery.proxy(this.notifyChildren, this));
+                $view.bind("UpdateDSEvent GainedFocusEvent LostFocusEvent RegisterElementsEvent", jQuery.proxy(this.notifyChildren, this));
                 
                 // This makes it so we can trigger an event on the view object itself, and still have the
                 // DOM element respond to it.
                 $(this).bind("UpdateQueryButtonClicked GainedFocusEvent LostFocusEvent UpdateQueryButtonClicked " +      
                              "HideDependentsEvent RegisterElementsEvent ShowDependentsEvent UpdateDSEvent", jQuery.proxy(this.eventPassThru, this));
                 
-                this.render();
-               
+                this.render(); 
             },
             render: function(){  // Iterate over elements of this view and create them, appending them as we go.
                 var viewset = this.viewset;
                 var view = this.view;
+                
+                // Views without a first element that is a chart need a
+                // title created
+                if (viewset.elements[0].type !== "chart")
+                {
+                    view.append("<h2>"+this.name+"</h2>");
+                }
                 $.each(this.viewset.elements, function(index, element) {
                        switch (element.type) {
                            case 'form':
