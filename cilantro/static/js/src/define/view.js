@@ -1,10 +1,11 @@
-define(['define/chart','define/form', 'lib/base'], function(chart, Form){
+define(['define/chart','define/form','utils/frontdesk', 'lib/base'], function(Chart, Form, FrontDesk){
      //  **View Class** is the base class for object that represents a tab within the main Cilantro screen. The base class
      // supports construction of HTML forms as well as charts within those forms.
      var View = Base.extend({
             constructor: function(viewset, name){
                 // Save off the viewset 
                 this.viewset = viewset;
+                this.fd = new FrontDesk();
                 // DOM representation;
                 this.view = $('<div class="view"></div>');
                 this.name = name;
@@ -42,42 +43,81 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
             render: function(){  // Iterate over elements of this view and create them, appending them as we go.
                 var viewset = this.viewset;
                 var view = this.view;
-                
+                var fd = this.fd;
                 // Views without a first element that is a chart need a
                 // title created
                 if (viewset.elements[0].type !== "chart")
                 {
                     view.append("<h2>"+this.name+"</h2>");
                 }
+                
                 $.each(this.viewset.elements, function(index, element) {
+                       var chart = null;
                        switch (element.type) {
                            case 'form':
-                               view.append(new Form(element,viewset.concept_id).dom); 
+                               chart = new Form(element,viewset.concept_id);
+                               view.append(chart.dom);
+                               fd.checkIn(index,chart.dom);
+                               fd.checkOut(index);
                                break;
                            case 'chart':
                                var datatype = element.data.datatype;
                                if (datatype === 'number') {
-                                   view.append(new chart.LineChart(element, viewset.concept_id).dom); 
+                                   chart = new Chart.LineChart(element, viewset.concept_id);
+                                   view.append(chart.dom); 
+                                   fd.checkIn(index,chart.dom);
+                                   fd.checkOut(index);
                                } else if (datatype === 'nullboolean' || datatype === 'boolean'){
-                                   view.append(new chart.PieChart(element,  viewset.concept_id).dom);
-                               } else {              
-                                   view.append(new chart.BarChart(element,  viewset.concept_id).dom);
+                                   chart = new Chart.PieChart(element,  viewset.concept_id);
+                                   view.append(chart.dom);
+                                   fd.checkIn(index,chart.dom);
+                                   fd.checkOut(index);
+                               } else {
+                                   chart = new Chart.BarChart(element,  viewset.concept_id);
+                                   view.append(chart.dom);
+                                   fd.checkIn(index,chart.dom);
+                                   fd.checkOut(index);
                                }
                                break;
                            case 'custom':
-                               break;
+                                if (element.css){
+                                    View.loadCss(element.css);
+                                }
+                                // We need to keep track of the number of outstanding requests here.
+                                // A bug could occur if we return, and updateDS is called before all
+                                // the children of the view are initiated.
+                                fd.checkIn(index);
+                                require([element.js], function (Plugin) {
+                                    var plugin = new Plugin(element, viewset.concept_id);
+                                    // We need to make sure we actually put this in the correct spot, as things may have
+                                    // changed since the request for the plugin was made.
+                                    if (this.view.children().length - 1 >= index){
+                                        this.view.children()[index].prepend(plugin.dom);
+                                    }else{
+                                        this.view.append(plugin.dom);
+                                    }
+                                    fd.checkOut(index,plugin.dom);
+                                });
                            default:
-                               view.append($('<p>Undefined View!</p>'));                
+                                view.append($('<p>Undefined View!</p>'));                
                        }
                    });
-            },  
+            },
             updateElement: function(evt){
-                this.view.children().each(function(){$(this).triggerHandler(evt);});
+                var fd = this.fd;
+                $.each(this.viewset.elements, function(index){
+                    fd.leaveMessage(index,"triggerHandler",evt);
+                });
                 evt.stopPropagation();   
             },
             toggleDependents: function(evt){
+                // We know that evt.target exists already because it fired the event.
+                var fd = this.fd;
                 if (evt.target === this.view.children().get(0)){
-                    this.view.children().slice(1).each(function(){$(this).triggerHandler(evt);});
+                    $.each(this.viewset.elements, function(index){
+                        if (index === 0) return;
+                        fd.leaveMessage(index,"triggerHandler",evt);
+                    });
                 }
                 evt.stopPropagation();
             },
@@ -86,7 +126,10 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
                 evt.stopPropagation();
             },
             notifyChildren: function(evt,arg){
-              this.view.children().each(function(){$(this).triggerHandler(evt,arg);});
+              var fd = this.fd;
+              $.each(this.viewset.elements, function(index){
+                    fd.leaveMessage(index, "triggerHandler", evt, arg);
+              });
               evt.stopPropagation();
             },
             eventPassThru: function(evt, arg){
@@ -95,6 +138,15 @@ define(['define/chart','define/form', 'lib/base'], function(chart, Form){
             },
             dom: function(){
                 return this.view;
+            }
+     },{
+            // Simple dynamic load CSS function (taken from http://requirejs.org/docs/faq-advanced.html#css)
+            loadCss: function(url) {
+                var link = document.createElement("link");
+                link.type = "text/css";
+                link.rel = "stylesheet";
+                link.href = url;
+                document.getElementsByTagName("head")[0].appendChild(link);
             }
      });
      return View;

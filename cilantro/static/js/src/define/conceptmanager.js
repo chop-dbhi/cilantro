@@ -364,7 +364,7 @@ define( ['define/view'],
                         server_query = nodes[0];
                     }else{
                         server_query = {
-                                             'type':  activeView.join_by || "and",
+                                             'type':  active.join_by || "and", // TODO this should be on the concept
                                              'children': nodes,
                                              'concept_id':activeConcept
                                        };
@@ -502,12 +502,7 @@ define( ['define/view'],
                         // built-in views will need to be taken care of code here
                         var callback = null;
                         activeView.concept_id = activeConcept;
-                        if (activeView.type !== 'custom'){// Show the view
-                            $container.trigger('ViewReadyEvent', [new View(activeView,cache[activeConcept].name)]);
-                        }else{
-                            // Load the custom view
-                            loadDependencies(activeView, callback);
-                        }
+                        $container.trigger('ViewReadyEvent', [new View(activeView, cache[activeConcept].name)]);
                     }
                 }    
                 /**
@@ -776,17 +771,6 @@ define( ['define/view'],
                 });
                 
                 /**
-                  Simple dynamic load CSS function (taken from http://requirejs.org/docs/faq-advanced.html#css)
-                */
-                function loadCss(url) {
-                    var link = document.createElement("link");
-                    link.type = "text/css";
-                    link.rel = "stylesheet";
-                    link.href = url;
-                    document.getElementsByTagName("head")[0].appendChild(link);
-                }
-                
-                /**
                   This function loads dependencies for the concept and for the any views.
                   A callback does not have to be specified if the view is custom because
                   the view code is responsible for firing the ViewReadyEvent.
@@ -796,14 +780,11 @@ define( ['define/view'],
                     cb = cb || function(){};
 
                     if (deps.css){
-                        loadCss(deps.css);
+                        View.loadCss(deps.css);
                     }
                  
                     if (deps.js) {
                          require([deps.js], function (plugin) {
-                             if (plugin.hasOwnProperty("execute")){
-                                plugin.execute($contentBox, activeConcept, deps);
-                             }
                              cb(deps);
                          });
                     } else {
