@@ -638,8 +638,8 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                      }
                      this.chart.xAxis[0].removePlotBand();
                      this.chart.xAxis[0].addPlotLine({
-                                from: extremes.min,
-                                to: extremes.max,
+                                from: this.extremes.min,
+                                to: this.extremes.max,
                                 color:color
                      });
                      this.dom.trigger("HideDependentsEvent");
@@ -661,6 +661,9 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
          updateDSEvent : function(evt, ds){
              // pass the datasource to the embedded form
              this.range_form.triggerHandler(evt,[ds]);
+         },
+         elementChanged:function(){
+             
          },
          updateElement:  function(evt, element) {
              // Use triggerHandler here because otherwise it will bubble back up
