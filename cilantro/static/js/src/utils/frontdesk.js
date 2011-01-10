@@ -34,8 +34,7 @@ define(function(){
     // all saved messages will be delivered, and all future messages will be delivered immediately. In this way, once an object has checked
     // in or out, the library can be used as a proxy for the object.
     // [TODO] add a greeting feature that would allow a list of messages to be delivered everytime an object checks out.
-    // 
-    
+
     function FrontDesk(capacity){
         var guests = 0;
         var empty = [];
@@ -45,7 +44,7 @@ define(function(){
         var rooms = {};
         var expecting = null;
         var tracking = isArray(capacity);
-        
+
         // From JavaScript the Good Parts
         function isArray(val){
             if (val && typeof val === "object" && typeof val.length === "number" && !(val.propertyIsEnumerable('length'))){
@@ -53,15 +52,15 @@ define(function(){
             }
             return false;
         }
-        
+
         this.onEmpty = function(cb){
             empty.push(cb);
         };
-        
+
         this.onFull = function(cb){
             full.push(cb);
         };
-        
+
         this.checkIn = function(room, obj){
             var item;
             var allCheckedIn = false;
@@ -88,7 +87,7 @@ define(function(){
             }else{
                 guests++;
             }
-           
+
             if (numberOfGuests() === capacity || allCheckedIn){
                  $.each(full, function(index, element){
                         element();
@@ -96,13 +95,13 @@ define(function(){
             }
             return obj;
         };
-        
+
         this.checkOut = function(room, forwardAddress){
             if (numberOfGuests()===0){
                 // No one can checkout if no one is here.
                 return; 
             }
-            
+
             if (room === undefined){
                 guests--;
             }else{
@@ -115,7 +114,7 @@ define(function(){
                      for (var i = 0, l = messages[room].length; i < l; i++){
                          giveMessage(room,messages[room][i][0], messages[room][i][1]);
                      }
-                 }   
+                 }
             }
             if (numberOfGuests() === 0){
                 $.each(empty, function(index, element){
@@ -123,7 +122,7 @@ define(function(){
                 });
             }
         };
-        
+
         this.leaveMessage = function(room, message){
             var args = Array.prototype.slice.call(arguments, 2);
             if (status[room] === "in"){
@@ -132,7 +131,7 @@ define(function(){
                giveMessage(room, message, args);
             }
         };
-        
+
         // Determine what kind of message has been left and act accordingly
         function giveMessage(room, message, args){
              var guest = rooms[room];
@@ -146,7 +145,7 @@ define(function(){
                  guest[message].apply(guest, args);
              }
         }
-        
+
         function numberOfGuests(){
              var num = 0;
              for (var key in status){

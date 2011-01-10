@@ -87,17 +87,19 @@ define(['define/chart','define/form','utils/frontdesk', 'lib/base'], function(Ch
                                 // A bug could occur if we return, and updateDS is called before all
                                 // the children of the view are initiated.
                                 fd.checkIn(index);
+                                var offset = viewset.elements[0].type === "chart" ? 0 : 1;
                                 require([element.js], function (Plugin) {
                                     var plugin = new Plugin(element, viewset.concept_id);
                                     // We need to make sure we actually put this in the correct spot, as things may have
                                     // changed since the request for the plugin was made.
-                                    if (this.view.children().length - 1 >= index){
-                                        this.view.children()[index].prepend(plugin.dom);
+                                    if (view.children().length - 1 >= index + offset){
+                                        $(view.children()[index]).prepend(plugin.dom);
                                     }else{
-                                        this.view.append(plugin.dom);
+                                        view.append(plugin.dom);
                                     }
                                     fd.checkOut(index,plugin.dom);
                                 });
+                                break;
                            default:
                                 view.append($('<p>Undefined View!</p>'));                
                        }

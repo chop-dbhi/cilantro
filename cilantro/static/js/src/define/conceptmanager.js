@@ -157,14 +157,16 @@ define( ['define/view'],
                   @private
                 */
                 function getDataType(field_pk) {
-                    if (activeView.type === "custom") {
-                        return activeView.datatype;
-                    }
-                    
+
                     var elements = activeView.elements;
                     var datatype = null;
                     
                     $.each(elements, function(index,element) {
+       
+                       if (element.type === "custom") {
+                            return element.datatype;
+                       }
+                       
                        if (element.data){
                            if (element.data.pk == field_pk){
                                datatype = element.data.datatype;
@@ -364,7 +366,7 @@ define( ['define/view'],
                         server_query = nodes[0];
                     }else{
                         server_query = {
-                                             'type':  active.join_by || "and", // TODO this should be on the concept
+                                             'type':  activeView.join_by || "and", // TODO this should be on the concept
                                              'children': nodes,
                                              'concept_id':activeConcept
                                        };
@@ -799,7 +801,7 @@ define( ['define/view'],
                   @private
                 */
 
-                function loadConcept(concept){
+                function loadConcept(concept){;
                     // If we got here, the globals for the current concept have been loaded
                     // We will register it in our cache
                     concept = register(concept);
@@ -816,7 +818,6 @@ define( ['define/view'],
 
                     var tabs = $.jqote(tab_tmpl, concept.views);
                     $tabsBar.html(tabs); 
-                    
                     if (concept['static']){
                         $staticBox.append(concept['static']);
                         $addQueryButton = $staticBox.find("#add_to_query");
