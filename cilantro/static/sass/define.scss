@@ -48,14 +48,17 @@
 #tabs {
     background-color: #f9f9f9;
 
+    border-bottom: 1px solid #ccc;
+
     > * {
         vertical-align: bottom;
     }
 
     form {
         display: inline-block;
-        padding: 13px 12px 10px 12px;
-        border-bottom: 1px solid #ccc;
+        padding: 13px 0 10px 12px;
+        float: right;
+        margin-right: 1px;
     }
 
     input {
@@ -64,7 +67,6 @@
 } 
 
 #categories {
-    @include box-shadow(2px, -2px, 2px, 0, #ddd);
 
     display: inline-block;
     font-size: 13px;
@@ -84,6 +86,7 @@
         display: inline-block;
         cursor: pointer;
         background-color: #eee;
+        margin-bottom: -1px;
 
         &:hover {
             color: #333;
@@ -96,10 +99,14 @@
     }
     
     > .active {
+        @include box-shadow(3px, -3px, 1px, 0, #aaa);
         background-color: #fff;
         border-bottom-color: #fff;
+
         text-shadow: none;
         cursor: default;
+        position: relative;
+        z-index: 1000;
         
         &:hover {
             cursor: default;        
@@ -355,7 +362,7 @@
     }
 
     #tabs form {
-        padding-right: 7px;
+        padding-right: 0px;
         padding-left: 7px;
     }
 
