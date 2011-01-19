@@ -16,6 +16,7 @@ body {
 header {
     @include anchors(#666, #333);
     
+    display: block;
     background-color: #fff;
     margin-top: 10px;
     padding: 2px 10px;
@@ -24,6 +25,7 @@ header {
     font-size: 0.8em;
     color: #666;
     text-shadow: $LIGHT_TEXT_SHADOW;
+    min-height: 25px;
     
     > * {
         vertical-align: middle;        
