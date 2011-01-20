@@ -20,10 +20,10 @@
         <div class="content">
             {% spaceless %}
             <div id="tabs">
-                <div id="categories" data-uri="{% url api:categories:read %}"></div>
                 <form method="get" action="{% url api:criteria:read %}">
                     <input id="search" type="text" name="q" placeholder="Search...">
                 </form> 
+                <div id="categories" data-uri="{% url api:categories:read %}"></div>
             </div>
  
 {#             <div id="subcategories" class="tabs"> #}

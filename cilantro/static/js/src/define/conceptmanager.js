@@ -1,8 +1,5 @@
-define('define/conceptmanager',
-
-    ['define/views'],
-
-    function(views) { 
+define( ['define/view'],
+    function(View) { 
         /**
           Sets up and manages the view sets for each criterion option.
 
@@ -160,14 +157,16 @@ define('define/conceptmanager',
                   @private
                 */
                 function getDataType(field_pk) {
-                    if (activeView.type === "custom") {
-                        return activeView.datatype;
-                    }
-                    
+
                     var elements = activeView.elements;
                     var datatype = null;
                     
                     $.each(elements, function(index,element) {
+       
+                       if (element.type === "custom") {
+                            return element.datatype;
+                       }
+                       
                        if (element.data){
                            if (element.data.pk == field_pk){
                                datatype = element.data.datatype;
@@ -198,7 +197,7 @@ define('define/conceptmanager',
                     });
                     return datatype;
                 }
-         
+
                 /**
                   This function is a utility function, currently called by the AddQueryButtonHandler,
                   for concepts made of built-in views, the function will be responsible
@@ -367,12 +366,11 @@ define('define/conceptmanager',
                         server_query = nodes[0];
                     }else{
                         server_query = {
-                                             'type':  activeView.join_by || "and",
+                                             'type':  activeView.join_by || "and", // TODO this should be on the concept
                                              'children': nodes,
                                              'concept_id':activeConcept
                                        };
                     }
-                    //console.log(server_query);
                     return server_query;
                 }
 
@@ -449,8 +447,8 @@ define('define/conceptmanager',
                   
                   @private
                 */
-                function viewReadyHandler(evt, $view) {
-                    activeView.contents = $view;
+                function viewReadyHandler(evt, view) {
+                    activeView.contents = view;
                     // As of right now IE 7 and 8 cannot seem to properly handle
                     // creating VML rotated text in an object that is not in the DOM
                     // In those conditions, the chart plugin inserts the graph into the
@@ -458,9 +456,9 @@ define('define/conceptmanager',
                     // passed is in the DOM or not, if not we inject it. The idea is to eventually
                     // when we can do this outside the dom in all browsers, to be able to do 
                     // this in the existing framework
-
-                    $contentBox.append($view);
-                    activeView.contents.css("display","block");
+                    var activeViewDom = activeView.contents.dom();
+                    $contentBox.append(activeViewDom);
+                    activeViewDom.css("display","block");
                     
                     $(".chart", activeView.contents).css("display","block"); // Hack because of IE
 
@@ -470,10 +468,11 @@ define('define/conceptmanager',
                         // This will also prevent re-populating datasources when the
                         // user clicks on a criteria in the right panel but the concept 
                         // has been shown before.
-                        $view.children().trigger('UpdateDSEvent', [cache[activeConcept].ds]);
+                        $(view).trigger("UpdateDSEvent", [cache[activeConcept].ds]);
+                        $(view).trigger("RegisterElementsEvent");
                     }
                     
-                    $view.children().trigger("GainedFocusEvent");
+                    $(view).trigger("GainedFocusEvent");
 
                     activeView.loaded = true;
                  }
@@ -490,13 +489,13 @@ define('define/conceptmanager',
                 */
                 function showViewHandler(evt, tabIndex) {
                     if (activeView !== null){
-                        activeView.contents.css("display","none");
-                        activeView.contents.children().trigger("LostFocusEvent");
-                        activeView.contents.detach();
+                        activeView.contents.dom().css("display","none");
+                        $(activeView.contents).trigger("LostFocusEvent");
+                        activeView.contents.dom().detach();
                     }
-                    
+
                     activeView = cache[activeConcept].views[tabIndex];
-                
+
                     if (activeView.loaded) {
                         viewReadyHandler(null, activeView.contents);
                     } else {
@@ -505,12 +504,7 @@ define('define/conceptmanager',
                         // built-in views will need to be taken care of code here
                         var callback = null;
                         activeView.concept_id = activeConcept;
-                        if (activeView.type !== 'custom'){// Show the view
-                            $container.trigger('ViewReadyEvent', [views.createView(activeView,cache[activeConcept].name)]);
-                        }else{
-                            // Load the custom view
-                            loadDependencies(activeView, callback);
-                        }
+                        $container.trigger('ViewReadyEvent', [new View(activeView, cache[activeConcept].name)]);
                     }
                 }    
                 /**
@@ -659,7 +653,7 @@ define('define/conceptmanager',
                   @private
                 */
                 function addQueryButtonHandler(event){
-                    activeView.contents.triggerHandler("UpdateQueryButtonClicked"); // This would be better if every view didn't need to handle this
+                    $(activeView.contents).triggerHandler("UpdateQueryButtonClicked"); // This would be better if every view didn't need to handle this
                 }                                                                   // it should be concept level thing.
                 
                /**
@@ -674,14 +668,13 @@ define('define/conceptmanager',
                  code that sent it will prevent the action the error forbids.)
                  @private
                */
-
                 function badInputHandler(evt){
                     evt.reason = evt.reason ? "_"+ evt.reason : "";
                     var invalid_fields = cache[activeConcept].invalid_fields;
                     var target_name = $(evt.target).attr("name");
                     $.each(cache[activeConcept].views, function(index,view){
-                           view.contents && view.contents.find("[name="+target_name+"]").addClass("invalid"+evt.reason);
-                           view.contents && view.contents.find("[name="+target_name+"]").children().addClass("invalid"+evt.reason);
+                           view.contents && view.contents.dom().find("[name="+target_name+"]").addClass("invalid"+evt.reason);
+                           view.contents && view.contents.dom().find("[name="+target_name+"]").children().addClass("invalid"+evt.reason);
                     });
                     var message = evt.message ? evt.message : "This query contains invalid input, please correct any invalid fields.";
                     var already_displayed = false;
@@ -749,8 +742,8 @@ define('define/conceptmanager',
                     var invalid_fields = cache[activeConcept].invalid_fields;
                     var target_name = $(evt.target).attr("name");
                     $.each(cache[activeConcept].views, function(index,view){
-                        view.contents && view.contents.find("[name="+target_name+"]").removeClass("invalid"+evt.reason);
-                        view.contents && view.contents.find("[name="+target_name+"]").children().removeClass("invalid"+evt.reason);
+                        view.contents && view.contents.dom().find("[name="+target_name+"]").removeClass("invalid"+evt.reason);
+                        view.contents && view.contents.dom().find("[name="+target_name+"]").children().removeClass("invalid"+evt.reason);
                     });
                     var rc = invalid_fields[target_name+evt.reason].data('ref_count') - 1;
                     if (rc === 0){
@@ -780,17 +773,6 @@ define('define/conceptmanager',
                 });
                 
                 /**
-                  Simple dynamic load CSS function (taken from http://requirejs.org/docs/faq-advanced.html#css)
-                */
-                function loadCss(url) {
-                    var link = document.createElement("link");
-                    link.type = "text/css";
-                    link.rel = "stylesheet";
-                    link.href = url;
-                    document.getElementsByTagName("head")[0].appendChild(link);
-                }
-                
-                /**
                   This function loads dependencies for the concept and for the any views.
                   A callback does not have to be specified if the view is custom because
                   the view code is responsible for firing the ViewReadyEvent.
@@ -800,14 +782,11 @@ define('define/conceptmanager',
                     cb = cb || function(){};
 
                     if (deps.css){
-                        loadCss(deps.css);
+                        View.loadCss(deps.css);
                     }
                  
                     if (deps.js) {
                          require([deps.js], function (plugin) {
-                             if (plugin.hasOwnProperty("execute")){
-                                plugin.execute($contentBox, activeConcept, deps);
-                             }
                              cb(deps);
                          });
                     } else {
@@ -822,7 +801,7 @@ define('define/conceptmanager',
                   @private
                 */
 
-                function loadConcept(concept){
+                function loadConcept(concept){;
                     // If we got here, the globals for the current concept have been loaded
                     // We will register it in our cache
                     concept = register(concept);
@@ -839,7 +818,6 @@ define('define/conceptmanager',
 
                     var tabs = $.jqote(tab_tmpl, concept.views);
                     $tabsBar.html(tabs); 
-                    
                     if (concept['static']){
                         $staticBox.append(concept['static']);
                         $addQueryButton = $staticBox.find("#add_to_query");

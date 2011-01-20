@@ -106,12 +106,13 @@
         > .tab {
             @include border-radius(15px, 15px, 15px, 15px);
             background-color: #fff;
-            padding: 2px 10px;
+            padding: 1px 10px;
             margin-right: 5px;
             border: 1px solid #fff;
             color: #444;
             text-shadow: $LIGHT_TEXT_SHADOW;
             text-decoration: none;
+            font-weight: 500;
 
             &:hover {
                 cursor: pointer;
