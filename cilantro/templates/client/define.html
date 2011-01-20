@@ -9,7 +9,12 @@
 {% endblock %}
 
 {% block scripts %}
-    <script>require(['define/main']);</script>
+    <script>
+        window.__api__ = {
+            categories: '{% url api:categories:read %}'
+        };
+        require(['define/main']);
+    </script>
 {% endblock %}
 
 {% block content %}

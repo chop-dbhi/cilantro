@@ -13,7 +13,7 @@
 
 define('define/categories',
 
-    ['define/events', 'rest/resource'],
+    ['define/events', 'rest/resource', 'lib/backbone'],
 
     function(Events, Resource) {
 
@@ -25,101 +25,190 @@ define('define/categories',
             '</span>'
         ].join('');
 
-        var CategoryCollection;
+        var CategoryCollection, dom;
 
         $(function() {
 
-            var dom = {
+            dom = {
                 categories: $('#categories'),
                 subcategories: $('#subcategories')
             };
 
-            dom.categories.current = null;
+//            dom.categories.current = null;
+//
+//            CategoryCollection = new Resource({
+//
+//                url: dom.categories.data('uri'),
+//                template: template
+//
+//            }).ready(function() {
+//
+//                dom.categories.html(this.dom);
+//                this.dom.first().click();
+//
+//            });
+//
+//            /*
+//             * Handles doing the necessary processing for 'activating' the
+//             * defined category
+//             */ 
+//            dom.categories.bind(Events.ACTIVATE_CATEGORY,
+//                    
+//                function(evt, id) {
+//
+//                    // test cache
+//                    if (dom.categories.current === id)
+//                        return false;
+//                    dom.categories.current = id
+//
+//                    CategoryCollection.ready(function() {
+//
+//                        var target = this.store[id];
+//                        target.addClass('active');
+//                        target.siblings().removeClass('active');
+//                        
+//                        // check for associated criterion and trigger
+//                        var state = target.data('_state');
+//                        if (!!state && state.criterion)
+//                            dom.categories.trigger(Events.ACTIVATE_CRITERION,
+//                                [state.criterion]);
+//
+//                    });
+//
+//                }
+//            );
+//
+//            /*
+//             * When a criterion is activated, the id gets cached to be
+//             * associated with the current category.
+//             */ 
+//            dom.categories.bind(Events.SYNC_CATEGORY,
+//                    
+//                function(evt, id, criterion_id) {
+//
+//                    CategoryCollection.ready(function() {
+//
+//                        var target = this.store[id];
+//                        // stored in a 'hidden' object to not be mistakingly
+//                        // associated with the actual data of the object
+//                        target.data('_state', {criterion: criterion_id});
+//                        dom.categories.trigger(Events.ACTIVATE_CATEGORY, [id]);
+//
+//                    });
+//
+//                    return false;
+//                }
+//            );
+//
+//            /*
+//             * User-triggerable events
+//             */
+//            dom.categories.delegate('span.tab', 'click', function(evt) {
+//
+//                $(evt.currentTarget).trigger(Events.ACTIVATE_CATEGORY,
+//                    [$(this).data('id')]);
+//
+//            });
+//
+//            dom.subcategories.delegate('span', 'click', function(evt) {
+//
+//                var target = $(this);
+//                target.addClass('active').siblings().removeClass('active');
+//                return false;
+//
+//            });
 
-            CategoryCollection = new Resource({
+            var template2 = [
+                '<span id="tab-<%= name.toLowerCase() %>" ',
+                    'class="tab" data-id="<%= id %>">',
+                    '<div class="icon"></div>',
+                    '<span><%= name %></span>',
+                '</span>'
+            ].join('');
 
-                url: dom.categories.data('uri'),
-                template: template
-
-            }).ready(function() {
-
-                dom.categories.html(this.dom);
-                this.dom.first().click();
-
+            var Category = Backbone.Model.extend({ 
+            
             });
 
-            /*
-             * Handles doing the necessary processing for 'activating' the
-             * defined category
-             */ 
-            dom.categories.bind(Events.ACTIVATE_CATEGORY,
+            var CategoryView = Backbone.View.extend({
+
+                template: _.template(template2),
+
+                events: {
+                    'click': 'activate'
+                },
+
+                initialize: function() {
+                    _.bindAll(this, 'render');
+
+                    this.model.bind('change', this.render);
+                    this.model.view = this;
+
+                },
+
+                render: function() {
+                    this.el = $(this.template(this.model.toJSON()));
+
+                    // rebind events since the ``el`` element has been
+                    // redefined
+                    this.delegateEvents();
+
+                    if (this.model.cid === 'c0')
+                        this.activate();
+
+                    return this;
+                },
+
+                activate: function() {
+
+                    this.el.addClass('active');
                     
-                function(evt, id) {
-
-                    // test cache
-                    if (dom.categories.current === id)
-                        return false;
-                    dom.categories.current = id
-
-                    CategoryCollection.ready(function() {
-
-                        var target = this.store[id];
-                        target.addClass('active');
-                        target.siblings().removeClass('active');
-                        
-                        // check for associated criterion and trigger
-                        var state = target.data('_state');
-                        if (!!state && state.criterion)
-                            dom.categories.trigger(Events.ACTIVATE_CRITERION,
-                                [state.criterion]);
-
-                    });
-
                 }
-            );
 
-            /*
-             * When a criterion is activated, the id gets cached to be
-             * associated with the current category.
-             */ 
-            dom.categories.bind(Events.SYNC_CATEGORY,
+            });
+
+            var CategoryCollection = Backbone.Collection.extend({
+
+                model: Category,
+
+                url: window.__api__.categories
+
+            });
+
+            CategoryCollection = new CategoryCollection;
+
+            var CategoryCollectionView = Backbone.View.extend({
+
+                el: dom.categories,
+
+                collection: CategoryCollection,
+
+                initialize: function() {
+                    _.bindAll(this, 'addOne', 'addAll');
                     
-                function(evt, id, criterion_id) {
+                    this.collection.bind('add', this.addOne);
+                    this.collection.bind('refresh', this.addAll);
 
-                    CategoryCollection.ready(function() {
+                    this.collection.fetch();
+                },
 
-                        var target = this.store[id];
-                        // stored in a 'hidden' object to not be mistakingly
-                        // associated with the actual data of the object
-                        target.data('_state', {criterion: criterion_id});
-                        dom.categories.trigger(Events.ACTIVATE_CATEGORY, [id]);
+                addOne: function(object) {
+                    var view = new CategoryView({ model: object });
+                    this.el.append(view.render().el);
+                },
 
-                    });
-
-                    return false;
+                addAll: function() {
+                    this.collection.each(this.addOne);
                 }
-            );
-
-            /*
-             * User-triggerable events
-             */
-            dom.categories.delegate('span.tab', 'click', function(evt) {
-
-                $(evt.currentTarget).trigger(Events.ACTIVATE_CATEGORY,
-                    [$(this).data('id')]);
-
+            
             });
 
-            dom.subcategories.delegate('span', 'click', function(evt) {
 
-                var target = $(this);
-                target.addClass('active').siblings().removeClass('active');
-                return false;
-
-            });
+            var category_collection_view = new CategoryCollectionView;
 
         }); 
 
-        return CategoryCollection;
     }
 );
+
+
