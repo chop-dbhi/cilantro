@@ -127,6 +127,18 @@ define('define/categories',
             ].join('');
 
             var Category = Backbone.Model.extend({ 
+
+                active: false,
+
+                setActive: function() {
+                    this.active = true;
+                    this.trigger('active');
+                },
+
+                setInactive: function() {
+                    this.active = false;
+                    this.trigger('active');
+                }
             
             });
 
@@ -135,13 +147,16 @@ define('define/categories',
                 template: _.template(template2),
 
                 events: {
-                    'click': 'activate'
+
+                    'click': 'activateObject'
+
                 },
 
                 initialize: function() {
-                    _.bindAll(this, 'render');
+                    _.bindAll(this, 'render', 'toggleActive');
 
-                    this.model.bind('change', this.render);
+                    this.model.bind('add', this.render);
+                    this.model.bind('active', this.toggleActive);
                     this.model.view = this;
 
                 },
@@ -153,16 +168,26 @@ define('define/categories',
                     // redefined
                     this.delegateEvents();
 
+                    // select the first category
                     if (this.model.cid === 'c0')
-                        this.activate();
+                        this.activateObject();
 
                     return this;
                 },
 
-                activate: function() {
+                toggleActive: function() {
 
-                    this.el.addClass('active');
+                    if (this.model.active === true)
+                        this.el.addClass('active');
+                    else
+                        this.el.removeClass('active');
                     
+                },
+
+                activateObject: function() {
+                    
+                    this.model.collection.activateObject(this.model);
+
                 }
 
             });
@@ -171,7 +196,15 @@ define('define/categories',
 
                 model: Category,
 
-                url: window.__api__.categories
+                url: window.__api__.categories,
+
+                activateObject: function(object) {
+                    _.each(this.models, function(o) {
+                        o.setInactive();
+                    });
+
+                    object.setActive();
+                }    
 
             });
 
@@ -193,13 +226,17 @@ define('define/categories',
                 },
 
                 addOne: function(object) {
-                    var view = new CategoryView({ model: object });
+                    var view = new CategoryView({
+                        model: object
+                    });
+
                     this.el.append(view.render().el);
                 },
 
                 addAll: function() {
                     this.collection.each(this.addOne);
                 }
+
             
             });
 
