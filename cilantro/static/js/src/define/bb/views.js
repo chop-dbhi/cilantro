@@ -12,7 +12,8 @@ define('define/bb/views',
 
                 events: {
 
-                    'click': 'changeActiveState'
+                    // behaves like a tabbed interface, thus when the user clicks 
+                    'click': 'setModelActiveState'
 
                 },
 
@@ -22,11 +23,16 @@ define('define/bb/views',
 
                     // when the associated model changes it's "active" state,
                     // this needs to be reflected in the UI
-                    this.model.bind('change:active', _.bind(this.toggleActiveState,
-                        this));
+                    this.model.bind('change:active',
+                        _.bind(this.toggleActiveState, this));
 
                     // bind a reference of this view to the model for convenience
                     this.model.view = this;
+
+                    // once everything above is define, we can finally render
+                    // this view. note, this step does not necessarily mean the
+                    // view gets inserted into the DOM.
+                    this.render();
 
                 },
 
@@ -38,6 +44,9 @@ define('define/bb/views',
                     // render the inner html of this view
                     this.jq.html(this.template(this.model.toJSON()));
 
+                    // ensure the UI is in sync with the model
+                    this.toggleActiveState();
+
                     // custom event to notify when this view has been rendered,
                     // though not necessarily added in to the DOM
                     this.trigger('render');
@@ -47,27 +56,31 @@ define('define/bb/views',
                 },
 
                 /*
+                 * Method: setModelActiveState
+                 *
+                 * Click event handler for this view. This is the interface to
+                 * the associated model/collection.
+                 */
+                setModelActiveState: function(evt) {
+
+                    this.model.collection.updateActiveState(this.model.id);
+
+                },
+
+                /*
+                 * Method: toggleActiveState
+                 *
                  * Performs any necessary DOM changes when this view becomes
-                 * active or deactive.
+                 * active or deactive. This is a model event callback when the
+                 * associated model changes it's "active" state.
                  */
                 toggleActiveState: function() {
 
-                    if (this.model.get('active') === true)
+                    if (this.model.get('active'))
                         this.jq.addClass('active');
                     else
                         this.jq.removeClass('active');
                     
-                },
-
-                /*
-                 * Click event handler for this view. This calls a method on
-                 * the collection to manage activating and deactivating the
-                 * respective tabs.
-                 */
-                changeActiveState: function() {
-
-                    this.model.collection.changeActiveState(this.model.id);
-
                 }
 
             });
@@ -85,37 +98,53 @@ define('define/bb/views',
 
                     this.queue = new Queue;
 
-                    _.bindAll(this, 'appendView', 'render');
-                    
-                    this.collection.bind('add', this.appendView);
-                    this.collection.bind('refresh', this.render);
+                    // once the whole collection is refreshed, create the
+                    // associated views for each model in the collection
+                    this.collection.bind('refresh', _.bind(this.render, this));
 
+                    // fetch the data for this collection now that the above
+                    // callbacks are defined.
                     this.collection.fetch();
 
                 },
 
-                appendView: function(object) {
-
-                    var view = new this.childView({
-
-                        model: object
-
-                    });
-
-                    this.jq.append(view.render().el);
-
-                },
-
+                /*
+                 * Method: render
+                 *
+                 * Handles rendering the contents of this collection. It is
+                 * assumed the DOM element for this collection view is already
+                 * defined in the DOM. If not, define the render method in a
+                 * subclass, add the necessary steps to create the DOM element,
+                 * then call this render method at the end.
+                 */
                 render: function() {
 
-                    this.collection.each(this.appendView);
+                    this.collection.each(_.bind(this.createModelView, this));
 
                     // since this view is composed of other views, this is
                     // technically where the 'render' event should be triggered
                     this.trigger('render');
 
-                }
+                    return this;
+
+                },
  
+                /*
+                 * Method: createModelView
+                 *
+                 * Takes a new model instance, creates a corresponding view
+                 * and aappends it to this collection view.
+                 */ 
+                createModelView: function(model) {
+
+                    var view = new this.modelView({
+                        model: model
+                    });
+
+                    this.jq.append(view.el);
+
+                }
+
             });
 
 
@@ -145,15 +174,13 @@ define('define/bb/views',
 
                 jq: $('#categories'),
 
-                childView: CategoryView,
+                modelView: CategoryView,
 
                 collection: models.CategoryCollection,
 
                 initialize: function() {
 
-                    _.bindAll(this, 'selectFirst');
-
-                    this.bind('render', this.selectFirst);
+                    this.bind('render', _.bind(this.selectFirst, this));
 
                     SingleActiveStateCollectionView.prototype.initialize.call(this);
                 },
@@ -162,7 +189,7 @@ define('define/bb/views',
 
                     this.collection.queue.add(_.bind(function() {
 
-                        this.changeActiveState(this.at(0).id);
+                        this.updateActiveState(this.at(0).id);
 
                     }, this.collection));
 
@@ -182,20 +209,30 @@ define('define/bb/views',
                 ].join('')),
 
                 initialize: function() {
-                    _.bindAll(this, 'toggleVisibleState');
 
-                    this.model.bind('change:visible', this.toggleVisibleState);
+                    this.model.bind('change:visible',
+                        _.bind(this.toggleVisibleState, this));
 
                     SingleActiveStateView.prototype.initialize.call(this);
 
                 },
 
+                render: function() {
+                    SingleActiveStateView.prototype.render.call(this);
+
+                    this.toggleVisibleState();
+
+                    return this;
+                },
+
+                /*
+                 * Method: toggleVisibleState
+                 *
+                 * Toggles the visibility of this view in the DOM.
+                 */
                 toggleVisibleState: function() {
 
-                    if (this.model.get('visible'))
-                        this.jq.show();
-                    else
-                        this.jq.hide();
+                    this.model.get('visible') ? this.jq.show() : this.jq.hide();
 
                 }
 
@@ -205,19 +242,15 @@ define('define/bb/views',
 
                 jq: $('#criteria'),
 
-                childView: CriterionView,
+                modelView: CriterionView,
 
                 collection: models.CriterionCollection,
 
             });
 
             // invocations
+            CriterionCollectionView = new CriterionCollectionView;
             CategoryCollectionView = new CategoryCollectionView;
-
-            setTimeout(function() {
-                CriterionCollectionView = new CriterionCollectionView;
-            }, 10000);
-
         }); 
 
     }

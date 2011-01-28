@@ -43,25 +43,22 @@ define('define/bb/models',
             initialize: function() {
 
                 this.queue = new Queue;
+
                 this.bind('refresh', _.bind(this.queue.flush, this.queue));
 
             },
 
             /*
-             * Method: changeActiveState
+             * Method: updateActiveState
              *
              * Resets all models to an inactive state expect for the passed
-             * in model.
+             * in model id.
              */
-            changeActiveState: function(id) {
+            updateActiveState: function(id) {
 
-                // set all to the inactive state
                 this.each(function(o) {
 
-                    if (o.id === id)
-                        o.set({'active': true});
-                    else
-                        o.set({'active': false});
+                    o.set({ active: (o.id === id) });
 
                 });
 
@@ -69,7 +66,7 @@ define('define/bb/models',
 
         });
 
-        // 
+
         var CategoryModel = ActiveStateModel.extend({
 
             defaults: {
@@ -87,35 +84,29 @@ define('define/bb/models',
 
             },
 
-            toggleCriterionActiveState: function() {
+            /*
+             * Method: toggleCriterionActiveState
+             *
+             * This ensures that when this category changes it's active state,
+             * the associated criterion object is toggled as well.
+             */
+            toggleCriterionActiveState: function(model, isActive) {
 
-                var active = this.get('active');
                 var criterion = this.get('criterion');
 
                 // nothing to do
                 if (!criterion) return;
                 
                 // set active status relative to category
-                criterion.set({'active': active});
+                criterion.set({ active: isActive });
 
             },
 
-            filterCriteria: function() {
+            filterCriteria: function(model, isActive) {
 
-                if (!this.get('active'))
-                    return;
+                if (!isActive) return;
 
-                // ref to category id
-                var id = this.id;
-
-                CriterionCollection.each(function(model) {
-
-                    if (model.get('category').id === id)
-                        model.set({'visible': true});
-                    else
-                        model.set({'visible': false});
-                })
-
+                CriterionCollection.queue.add(CriterionCollection.filterByCategory, this.id);
             }
 
         });
@@ -128,8 +119,6 @@ define('define/bb/models',
 
         });
 
-        CategoryCollection = new CategoryCollection;
-
         var CriterionModel = ActiveStateModel.extend({
 
             defaults: {
@@ -141,7 +130,7 @@ define('define/bb/models',
 
             initialize: function() {
 
-                this.bind('change:active', this.setCategoryActiveState);
+                //this.bind('change:active', this.setCategoryActiveState);
 
                 ActiveStateModel.prototype.initialize.call(this);
 
@@ -153,7 +142,8 @@ define('define/bb/models',
                     return;
 
                 var id = this.get('category').id;
-                CategoryCollection.changeActiveState(id);
+
+                CategoryCollection.updateActiveState(id);
 
                 var criterion = this;
                 CategoryCollection.queue.add(_.bind(function() {
@@ -169,12 +159,33 @@ define('define/bb/models',
 
             url: window.__api__.criteria,
 
-            model: CriterionModel
+            model: CriterionModel,
+
+            initialize: function() {
+
+                _.bindAll(this, 'filterByCategory');
+
+                SingleActiveStateCollection.prototype.initialize.call(this);
+
+            },
+
+            filterByCategory: function(id) {
+
+                var category;
+                this.each(function(model) {
+
+                    category = model.get('category');
+                    model.set({ visible: (category.id === id) });
+
+                });
+
+            }
 
         });
 
-        CriterionCollection = new CriterionCollection;
 
+        CriterionCollection = new CriterionCollection;
+        CategoryCollection = new CategoryCollection;
 
         // set the newly define models
         var models = {
