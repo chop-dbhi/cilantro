@@ -2,10 +2,11 @@ require(
     // required modules
     [
         'define/events',
-        'define/categories',
-        'define/criteria2',
-        'define/search',
-        'define/criteriamanager',
+        'define/bb/views',
+//        'define/bb/categories',
+//        'define/bb/criteria',
+//        'define/search',
+//        'define/criteriamanager',
         'utils/html5fix',
         'utils/ajaxsetup',
         'utils/extensions',
