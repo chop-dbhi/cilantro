@@ -42,17 +42,12 @@
     filter: progid:DXImageTransform.Microsoft.Gradient(startColorstr='#{$c1}', endColorstr='#{$c2}');        
 }
 
-@mixin message($color, $background, $border, $image, $rad: 0px) {
-    @include border-radius($rad, $rad, $rad, $rad);
-    
+@mixin message($color, $image) {
     color: $color;
-	background-color: $background;
-	border: 1px solid $border;  
-	text-shadow: #fff 1px 1px 0;
-	padding: 3px 5px 3px 31px;
+	padding: 3px 0 3px 23px;
 	background-image: url(../img/icons/#{$image}.png);
     background-repeat: no-repeat;
-    background-position: 5px;
+    background-position-y: center;
 }
 
 @mixin vertical-thin-scrollbar {
