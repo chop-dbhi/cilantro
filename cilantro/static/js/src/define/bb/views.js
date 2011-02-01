@@ -1,6 +1,6 @@
 define('define/bb/views',
 
-    ['define/bb/models', 'lib/backbone', '/static/client/js/src/lib/queue.js'],
+    ['define/bb/models', 'lib/backbone', 'lib/clerk'],
 
     function(models) {            
 
@@ -8,7 +8,17 @@ define('define/bb/views',
 
         $(function() {
 
-            var SingleActiveStateView = Backbone.View.extend({
+
+            /*
+             * Class: ActiveStateView
+             *
+             * The corresponding view for ActiveStateModel. The primary hooks
+             * include provide a click event handler for the DOM element. This
+             * will set the corresponding model instance to the 'active' state.
+             * It also listens for when it's model 'active' state has changed
+             * and will make any UI changes to reflect that change.
+             */
+            var ActiveStateView = Backbone.View.extend({
 
                 events: {
 
@@ -18,8 +28,6 @@ define('define/bb/views',
                 },
 
                 initialize: function() {
-
-                    this.queue = new Queue;
 
                     // when the associated model changes it's "active" state,
                     // this needs to be reflected in the UI
@@ -43,9 +51,6 @@ define('define/bb/views',
 
                     // render the inner html of this view
                     this.jq.html(this.template(this.model.toJSON()));
-
-                    // ensure the UI is in sync with the model
-                    this.toggleActiveState();
 
                     // custom event to notify when this view has been rendered,
                     // though not necessarily added in to the DOM
@@ -85,18 +90,16 @@ define('define/bb/views',
 
             });
 
+
             /*
              * Class: SingleActiveStateCollectionView
              *
              * The role of this class is to manage activating or deactiving 
              * child views. 
              */
-
             var SingleActiveStateCollectionView = Backbone.View.extend({
 
                 initialize: function() {
-
-                    this.queue = new Queue;
 
                     // once the whole collection is refreshed, create the
                     // associated views for each model in the collection
@@ -107,6 +110,7 @@ define('define/bb/views',
                     this.collection.fetch();
 
                 },
+
 
                 /*
                  * Method: render
@@ -148,16 +152,18 @@ define('define/bb/views',
             });
 
 
-            var CategoryView = SingleActiveStateView.extend({
+            /*
+             * Class: CategoryView
+             *
+             * The corresponding view for CategoryModel.
+             */
+            var CategoryView = ActiveStateView.extend({
 
                 tagName: 'span',
 
                 className: 'tag',
 
-                template: _.template([
-                    '<div class="icon"></div>',
-                    '<span><%= name %></span>'
-                ].join('')),
+                template: _.template('<div class="icon"></div><span><%= name %></span>'),
 
                 render: function() {
 
@@ -165,40 +171,59 @@ define('define/bb/views',
                     if (!this.el.id)
                         this.el.id = 'tab-' + this.model.get('name').toLowerCase();
 
-                    return SingleActiveStateView.prototype.render.call(this);
+                    return ActiveStateView.prototype.render.call(this);
                 }    
 
             });
 
+
+            /*
+             * Class: CategoryCollectionView
+             *
+             * A bootstrap feature has been added to this class to activate
+             * the first category in this collection, so the user has a 
+             * starting point.
+             */
             var CategoryCollectionView = SingleActiveStateCollectionView.extend({
 
                 jq: $('#categories'),
 
                 modelView: CategoryView,
 
-                collection: models.CategoryCollection,
-
                 initialize: function() {
 
-                    this.bind('render', _.bind(this.selectFirst, this));
+                    this.bind('render', this.selectFirst);
 
                     SingleActiveStateCollectionView.prototype.initialize.call(this);
                 },
 
+                
+                /*
+                 * Method: selectFirst
+                 *
+                 * A bootstrap method that tells the collection to update it's
+                 * 'active' state relative to it's first element.
+                 */
                 selectFirst: function() {
 
-                    this.collection.queue.add(_.bind(function() {
+                    clerk.send(this.collection, function() {
 
                         this.updateActiveState(this.at(0).id);
 
-                    }, this.collection));
+                    });
 
                 }
 
             });
 
 
-            var CriterionView = SingleActiveStateView.extend({
+            /*
+             * Class: CriterionView
+             *
+             * Adds UI components to handle the additional property 'visible'
+             * on the CriterionModel.
+             */
+            var CriterionView = ActiveStateView.extend({
 
                 tagName: 'div',
 
@@ -213,16 +238,18 @@ define('define/bb/views',
                     this.model.bind('change:visible',
                         _.bind(this.toggleVisibleState, this));
 
-                    SingleActiveStateView.prototype.initialize.call(this);
+                    ActiveStateView.prototype.initialize.call(this);
 
                 },
 
                 render: function() {
-                    SingleActiveStateView.prototype.render.call(this);
+
+                    ActiveStateView.prototype.render.call(this);
 
                     this.toggleVisibleState();
 
                     return this;
+
                 },
 
                 /*
@@ -238,19 +265,212 @@ define('define/bb/views',
 
             });
 
+
+            /*
+             * Class: CriterionCollectionView
+             *
+             * Encapsulates all criterion views.
+             */
             var CriterionCollectionView = SingleActiveStateCollectionView.extend({
 
                 jq: $('#criteria'),
 
                 modelView: CriterionView,
 
-                collection: models.CriterionCollection,
+            });
+
+
+            /*
+             * Class: SearchInputView
+             *
+             * Represents the search input that delegates user input to a
+             * search interface.
+             */
+            var SearchInputView = Backbone.View.extend({
+
+                jq: $('#search'),
+
+                focused: false,
+
+                timer: null,
+
+                events: {
+
+                    'focus': 'focus',
+                    'blur': 'blur',
+                    'keyup': 'keyup'
+
+                },
+
+                initialize: function() {
+
+                    this.render();
+
+                },
+
+                render: function() {
+
+                    this.el = this.jq[0];
+                    this.delegateEvents();
+
+                },
+
+                focus: function() {
+                    this.focused = true;
+                    this.trigger('focused');
+                },
+
+                blur: function() {
+                    this.focused = false;
+                    this.trigger('blurred');
+                },
+
+                keyup: function() {
+
+                    clearTimeout(this.timer);
+
+                    var ref = this;
+                    this.timer = setTimeout(function() {
+
+                        ref.trigger('query', [ref.jq.val()]);
+
+                    }, 100);
+
+                }
 
             });
 
-            // invocations
-            CriterionCollectionView = new CriterionCollectionView;
-            CategoryCollectionView = new CategoryCollectionView;
+
+            /*
+             * Class: SearchResultsView
+             *
+             * Represents the filtered collection of criterion objects driven
+             * by the interaction with the search input.
+             */
+            var SearchResultsView = Backbone.View.extend({
+
+                id: 'search-results',
+
+                tagName: 'div',
+
+                empty: $('<p style="font-style:italic">No results found</p>'),
+
+                collection: models.CriterionCollection,
+
+                input: new SearchInputView,
+
+                events: {
+
+                    'mouseenter': 'enter',
+                    'mouseleave': 'leave'
+                
+                },
+
+                query: null,
+                
+                focused: false,
+
+                initialize: function() {
+
+                    this.input.bind('focused', _.bind(this.show, this));
+                    this.input.bind('blurred', _.bind(this.hide, this));
+                    this.input.bind('query', _.bind(this.query, this));
+
+                    this.render();
+
+                },
+
+                render: function() {
+
+                    this.jq = $(this.el);
+                    this.jq.appendTo('body');
+
+                },
+
+                setPosition: function() {
+
+                    var r = this.jq,            // results
+                        s = this.input.jq;      // input
+
+                    var rWidth = r.outerWidth(),
+                        sOffset = s.offset(),
+                        sHeight = s.outerHeight(),
+                        sWidth = s.outerWidth();
+
+                    r.css({
+
+                        left: sOffset.left - (rWidth - sWidth) / 2.0,
+                        top: sOffset.top + sHeight + 5
+
+                    });
+
+                },
+
+                enter: function() {
+
+                    this.focused = true;
+
+                },
+
+                leave: function() {
+
+                    this.focused = false;
+
+                    if (!this.input.focused)
+                        this.hide();
+
+                },
+
+                show: function() {
+
+                    this.setPosition();
+
+                    if (this.query)
+                        this.jq.show();
+
+                },
+
+                hide: function() {
+
+                    if (!this.focused)
+                        this.jq.fadeOut('fast');
+
+                },
+
+
+                query: function(value) {
+
+                    var ref = this;
+
+                    $.getJSON(this.collection.url, {'q': value}, function(resp) {
+
+
+
+                    });
+
+                }
+
+            });
+
+
+            SearchResultsView = new SearchResultsView({ });
+
+
+            // instaniate the collection views which effectively kickstarts
+            // the application
+            CategoryCollectionView = new CategoryCollectionView({
+                
+                collection: models.CategoryCollection
+
+            });
+
+            CriterionCollectionView = new CriterionCollectionView({
+
+                collection: models.CriterionCollection
+
+            });
+
+
         }); 
 
     }

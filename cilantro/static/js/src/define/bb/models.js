@@ -1,8 +1,9 @@
 define('define/bb/models',
 
-    ['lib/backbone'],
+    ['lib/backbone', 'lib/clerk'],
 
     function() {
+
 
         /*
          * Class: ActiveStateModel
@@ -19,15 +20,10 @@ define('define/bb/models',
 
                 active: false
 
-            },
-
-            initialize: function() {
-
-                this.queue = new Queue;
-
             }
        
         });
+
 
         /*
          * Class: SingleActiveStateCollection
@@ -42,17 +38,21 @@ define('define/bb/models',
 
             initialize: function() {
 
-                this.queue = new Queue;
+                // any messages sent to this collection will not executed
+                // until the data has been refreshed
+                this.bind('refresh', function() {
 
-                this.bind('refresh', _.bind(this.queue.flush, this.queue));
+                    clerk.receive(this);
+
+                });
 
             },
 
             /*
              * Method: updateActiveState
              *
-             * Resets all models to an inactive state expect for the passed
-             * in model id.
+             * Resets all models to an inactive state expect for the model
+             * representing the passed in identifier.
              */
             updateActiveState: function(id) {
 
@@ -62,11 +62,18 @@ define('define/bb/models',
 
                 });
 
-            }    
+            }
 
         });
 
 
+        /*
+         * Class: CategoryModel
+         *
+         * Each category instance can hold a reference to the last criterion
+         * that was active for this category. If a reference exists, anytime
+         * this category becomes active, the criterion also becomes active.
+         */
         var CategoryModel = ActiveStateModel.extend({
 
             defaults: {
@@ -84,11 +91,12 @@ define('define/bb/models',
 
             },
 
+
             /*
              * Method: toggleCriterionActiveState
              *
              * This ensures that when this category changes it's active state,
-             * the associated criterion object is toggled as well.
+             * the associated criterion object is set to active as well.
              */
             toggleCriterionActiveState: function(model, isActive) {
 
@@ -102,15 +110,29 @@ define('define/bb/models',
 
             },
 
+            
+            /*
+             * Method: filterCriteria
+             *
+             * This ensures that when this category becomes active, it sends a
+             * message to the collection of criteria notifying it of this
+             * change.
+             */
             filterCriteria: function(model, isActive) {
 
                 if (!isActive) return;
 
-                CriterionCollection.queue.add(CriterionCollection.filterByCategory, this.id);
+                clerk.send(CriterionCollection, 'filterByCategory', [this.id]);
             }
 
         });
 
+
+        /*
+         * Class: CategoryCollection
+         *
+         * The collection of categories.
+         */
         var CategoryCollection = SingleActiveStateCollection.extend({
 
             url: window.__api__.categories,
@@ -119,6 +141,15 @@ define('define/bb/models',
 
         });
 
+
+        /*
+         * Class: CriterionModel
+         *
+         * Criteria visibility is dependent on the current category that is
+         * selected. Thus, it has a 'visible' property which denotes whether it
+         * should be made available. The details of how it is made or not made
+         * available in the UI is defined in the corresponding view class.
+         */
         var CriterionModel = ActiveStateModel.extend({
 
             defaults: {
@@ -127,28 +158,39 @@ define('define/bb/models',
 
             },
 
-
             initialize: function() {
 
-                //this.bind('change:active', this.setCategoryActiveState);
+                this.bind('change:active', this.setCategoryActiveState);
 
                 ActiveStateModel.prototype.initialize.call(this);
 
+                clerk.send(CategoryCollection, function(model) {
+
+                    model.set({ category: this.get(model.get('category').id) });
+
+                }, [this]);
+
             },
 
+
+            /*
+             * Method: setCategoryActiveState
+             *
+             * When this criterion becomes active, it must tell the category
+             * collection to update it's active state (this occurs when this
+             * criterion is activated independent of the user, like onload),
+             * as well as send a reference of itself to it's category instance.
+             */
             setCategoryActiveState: function() {
 
                 if (!this.get('active'))
                     return;
 
-                var id = this.get('category').id;
+                var category = this.get('category');
+                category.set({ criterion: this });
 
-                CategoryCollection.updateActiveState(id);
-
-                var criterion = this;
-                CategoryCollection.queue.add(_.bind(function() {
-                    this.get(id).set({criterion: criterion});
-                }, CategoryCollection));
+                clerk.send(CategoryCollection, 'updateActiveState',
+                    [category.id]);
 
             }
 
@@ -172,6 +214,7 @@ define('define/bb/models',
             filterByCategory: function(id) {
 
                 var category;
+
                 this.each(function(model) {
 
                     category = model.get('category');

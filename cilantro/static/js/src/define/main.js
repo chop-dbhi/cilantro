@@ -3,8 +3,6 @@ require(
     [
         'define/events',
         'define/bb/views',
-//        'define/bb/categories',
-//        'define/bb/criteria',
 //        'define/search',
 //        'define/criteriamanager',
         'utils/html5fix',
