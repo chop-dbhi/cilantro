@@ -1,7 +1,46 @@
 define('lib/clerk', function() {
 
     var clerk;
+
     (function () {
+
+        if (!Array.prototype.indexOf) {
+
+            Array.prototype.indexOf = function(searchElement /*, fromIndex */) {
+                "use strict";
+
+                if (this === void 0 || this === null)
+                    throw new TypeError();
+
+                var t = Object(this);
+                var len = t.length >>> 0;
+                if (len === 0)
+                    return -1;
+
+                var n = 0;
+                if (arguments.length > 0) {
+                    n = Number(arguments[1]);
+                    if (n !== n)
+                        n = 0;
+                    else if (n !== 0 && n !== (1 / 0) && n !== -(1 / 0))
+                        n = (n > 0 || -1) * Math.floor(Math.abs(n));
+                }
+
+                if (n >= len)
+                    return -1;
+
+                var k = n >= 0
+                      ? n
+                      : Math.max(len - Math.abs(n), 0);
+
+                for (; k < len; k++) {
+                    if (k in t && t[k] === searchElement)
+                        return k;
+                }
+                return -1;
+            };
+
+        }
        
         var Clerk = function() {
 
@@ -17,55 +56,89 @@ define('lib/clerk', function() {
              */
             var cache = {};
 
+            this._index = function(ref, add) {
+                add = (add === undefined) ? true : false;
+
+                var idx = refs.indexOf(ref);
+
+                if (idx == -1) {
+                    if (add) idx = refs.push(ref) - 1;
+                }
+
+                return idx;
+            };
 
             /*
              * Gets the existing state for an object or creates a new state object
-             * if ``create`` is true.
+             * if ``add`` is true.
              */
-            this._state = function(obj, create) {
+            this._state = function(idx) {
+                var state = cache[idx];
 
-                create = (create === undefined) ? true : false;
-
-                var idx, state;
-
-                idx = refs.indexOf(obj);
-
-                if (idx === -1 || idx === undefined) {
-
-                    if (!create) return;
-
-                    // push an return the current index, not the next one
-                    idx = refs.push(obj) - 1;
-
+                if (!state) {
                     cache[idx] = state = {
-                    
-                        id: idx,
                         queue: [],
                         flushed: false
-
                     };
+                }
 
-                    if (jQuery.isPlainObject(obj)) {
+                return state;
+            };
 
-                        var ref = this;
+            this._istate = function(ref, add) {
+                return this._state(this._index(ref, add));
+            };
 
-                        jQuery(obj).bind('ready', function() {
+            this._bind = function(name, obj) {
+                // create the state relative to the name. when receiving the
+                // messages, the associated object will be checked and used
+                var nidx, oidx, idx, state;
 
-                            ref.receive(obj);
+                // let's try by name
+                nidx = this._index(name, false);
+                oidx = this._index(obj, false);
 
-                        });
+                if (nidx > -1 && oidx > -1)
+                    return this._state(nidx);
 
-                    }
+                // neither exist
+                if (oidx < 0) {
 
-                } else {
+                    // create state relative to 'name'
+                    state = this._istate(name)
+                    // get index for the object
+                    idx = this._index(obj);
 
-                    state = cache[idx];
+                // the state for the object exists, let us setup the name
+                // cache
+                } else if (nidx < 0) {
+
+                    state = this._istate(obj);
+                    idx = this._index(name);
 
                 }
+
+                // set the object as a property
+                state.object = obj;
+                // set the reference for the object in cache
+                cache[idx] = state;
 
                 return state;
 
             };
+
+
+            /*
+             * Method: bind
+             *
+             * Used to bind a name/object pair for use by remote objects.
+             * This establishes a name and the associated object up front, but
+             * does not denote that the object is ready to receive the messages.
+             */
+            this.bind = function(name, obj) {
+                this._bind(name, obj);
+            };
+
 
             /*
              * Method: send
@@ -96,14 +169,14 @@ define('lib/clerk', function() {
              */
             this.send = function(obj, func, args, cxt) {
 
-                var state = this._state(obj);
+                var state = this._istate(obj);
                    
                 // immediately forward the request to the object if the queue
                 // is already in a flushed state
                 if (state.flushed == true) {
 
                     // use the referenced object instead of the name
-                    if (!!state.object)
+                    if (state.object)
                         arguments[0] = state.object;
 
                     this._receive.apply(this,
@@ -126,14 +199,10 @@ define('lib/clerk', function() {
                 args = Array.prototype.slice.call(args, 0);
 
                 // get a reference to the object method
-                if (jQuery.type(func) == 'string') {
-
+                if (typeof func == 'string')
                     func = obj[func];
 
-                }
-
-                if (cxt === undefined)
-                    cxt = obj;
+                cxt = cxt || obj;
 
                 func.apply(cxt, args);
 
@@ -162,41 +231,20 @@ define('lib/clerk', function() {
              */
             this.receive = function(name, obj) {
 
-                var state = this._state(name);
+                var state, message;
 
-                if (state === undefined || state.flushed == true) {
+                if (typeof name !== 'object') {
+                    state = this._bind(name, obj);
+                } else {
+                    state = this._istate(name);
+                    obj = name;
+                }
 
+                if (state.flushed == true)
                     return;
 
-                }
-
-                // store a reference to the object now that it exists
-                if (jQuery.type(name) !== 'object') {
-
-                    var idx = refs.push(obj) - 1;
-
-                    cache[idx] = {
-                        id: idx,
-                        flushed: true,
-                        queue: state.queue
-                    };
-
-                    // reference, so post flushed calls are applied to this object
-                    // rather than the name
-                    state.object = obj;
-
-                } else {
-
-                    obj = name;
-
-                }
-
-                var message;
-
                 while (state.queue[0]) {
-
                     message = state.queue.shift();
-
                     this._receive.apply(this, [obj].concat(message));
                 }
 
@@ -212,7 +260,7 @@ define('lib/clerk', function() {
              */
             this.peek = function(obj) {
 
-                var state = this._state(obj, false);
+                var state = this._istate(obj, false);
 
                 if (state)
                     return state.queue;
@@ -222,7 +270,6 @@ define('lib/clerk', function() {
         };
 
         window.clerk = clerk = new Clerk;
-
 
     })();
 

@@ -10,9 +10,9 @@
 
 {% block scripts %}
     <script>
-        window.__api__ = {
-            categories: '{% url api:categories:read %}',
-            criteria: '{% url api:criteria:read %}'
+        window.api = {
+            category: '{% url api:categories:read %}',
+            criterion: '{% url api:criteria:read %}'
         };
         require(['define/main']);
     </script>
