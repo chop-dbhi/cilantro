@@ -7,6 +7,15 @@ import sys
 
 BASE_PACKAGE = 'cilantro'
 
+# FIXME: will not work on Windows
+# build the JS and CSS files prior to installing
+build_script = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+    'dist/run.sh')
+exit_code = os.system('sh %s' % build_script)
+
+if exit_code > 0:
+    sys.exit(exit_code)
+
 class osx_install_data(install_data):
     # On MacOS, the platform-specific lib dir is /System/Library/Framework/Python/.../
     # which is wrong. Python 2.5 supplied with MacOS 10.5 has an Apple-specific fix

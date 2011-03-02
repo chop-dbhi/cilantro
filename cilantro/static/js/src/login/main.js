@@ -13,8 +13,8 @@ define(
                 password = $('[name=password]');
 
             function check() {
-                var t = (username.val() && password.val()) ? false : true;
-                submit.attr('disabled', t);
+                var valid = (username.val() && password.val()) ? true : false;
+                submit.attr('disabled', !valid);
             };
             // check on page load since browser may autofill the form fields
             check();

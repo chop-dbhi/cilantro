@@ -2,9 +2,3 @@ syntax: glob
 .sass-cache
 .DS_Store
 *.pyc
-*.css
-
-js/min/*.js
-js/min/define
-js/min/report
-js/min/login
