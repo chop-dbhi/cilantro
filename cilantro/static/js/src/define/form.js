@@ -240,15 +240,15 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                   }
                                                   // If a select-multiple box is optional, and nothing is selected, send undefined so that it doesn't appear as empty in 
                                                   // the datasource, eitherwise, we will throw an error if nothing is supplied;
-                                                  if ($target.is('[data-optional=true]')) {
-                                                     sendValue = selected_prim.length ? selected_prim : undefined;
-                                                  } else {
-                                                     sendValue = selected_prim; 
-                                                  }
+                                                  sendValue = selected_prim;
                                               } else { 
                                                   sendValue = selected[0] in Form.s_to_primative_map ? Form.s_to_primative_map[selected[0]] : selected[0];
                                               }
-
+                                              
+                                              if ($target.is('[data-optional=true]')) {
+                                                 sendValue = $.type(sendValue) in {string:1, array:1} && sendValue.length === 0 ? undefined : sendValue;
+                                              }
+                                              
                                               sendValue = (this.state === "INIT" && $target.css("display")!=="none") || 
                                                           ($target.is(":visible") && $target.is(":enabled")) ? sendValue: undefined;
                                               dom.trigger("ElementChangedEvent", [{name:evt.target.name, value:sendValue}]);
@@ -366,7 +366,7 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
         boolean_tmpl: $.jqotec( ['<%if (this.optional) {%>',
                                      '<label for="<%=this.field_id%>"><%=this.label%></label>',
                                      '<select data-datatype="boolean" data-optional="<%=this.optional%>" id ="<%=this.field_id%>" name="<%=this.field_id%>">',
-                                          '<option value=""></option>',
+                                          '<option value="">Doesn\'t Matter</option>',
                                           '<option <%=this["default"]===true?"selected":""%> value="true">Yes</option>',
                                           '<option <%=this["default"]===false?"selected":""%> value="false">No</option>',
                                      '</select>',
