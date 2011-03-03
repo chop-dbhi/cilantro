@@ -366,7 +366,7 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
         boolean_tmpl: $.jqotec( ['<%if (this.optional) {%>',
                                      '<label for="<%=this.field_id%>"><%=this.label%></label>',
                                      '<select data-datatype="boolean" data-optional="<%=this.optional%>" id ="<%=this.field_id%>" name="<%=this.field_id%>">',
-                                          '<option value="">Doesn\'t Matter</option>',
+                                          '<option value="">No Preference</option>',
                                           '<option <%=this["default"]===true?"selected":""%> value="true">Yes</option>',
                                           '<option <%=this["default"]===false?"selected":""%> value="false">No</option>',
                                      '</select>',
