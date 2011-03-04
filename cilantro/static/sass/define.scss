@@ -1,5 +1,6 @@
 @import "partials/constants";
 @import "partials/mixins";
+@import "partials/shadows";
 @import "partials/icons";
 @import "partials/icons";
 @import "partials/overlay";
@@ -15,20 +16,21 @@
     left: 0;
     width: 730px;
     z-index: 100;
-    background-color: #F9F9F9;
+
+    @include linear-gradient(#f3f3f3, #e6e6e6);
     
     > .content {
         margin: 10px;
         padding: 0;
+        background: inherit;
     }
 }
 
 #center-pane {
-    min-height: 400px;
-    padding: 10px 10px 8px 10px;
-    border-right: 1px solid #ccc;    
-    border-left: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+    min-height: 300px;
+    padding-top: 10px;
+    position: relative;
+    z-index: 5;
 }
 
 #right-pane {
@@ -46,9 +48,8 @@
  */
 
 #tabs {
-    background-color: #f9f9f9;
 
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #aaa;
 
     > * {
         vertical-align: bottom;
@@ -56,7 +57,7 @@
 
     form {
         display: inline-block;
-        padding: 13px 0 10px 12px;
+        padding: 8px 0 5px 12px;
         float: right;
         margin-right: 1px;
     }
@@ -67,25 +68,27 @@
 } 
 
 #categories {
-
+    
     display: inline-block;
     font-size: 13px;
     font-weight: 600;
     text-shadow: $LIGHT_TEXT_SHADOW;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    border-top: 1px solid #ccc;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-top: 1px solid #aaa;
 
     > * {
+        @include linear-gradient(#eee, #ddd);
+
         color: #333;
         height: 16px;
-        padding: 9px 12px 18px 12px;
+        padding: 6px 12px 15px 12px;
         vertical-align: top;
-        border-bottom: 1px solid #ccc;
-        border-left: 1px dotted #aaa;
+        border-bottom: 1px solid #aaa;
+        border-left: 1px dotted #777;
         display: inline-block;
         cursor: pointer;
-        background-color: #eee;
+        background-color: #ddd;
         margin-bottom: -1px;
 
         &:hover {
@@ -99,14 +102,15 @@
     }
     
     > .active {
-        @include box-shadow(3px, -3px, 1px, 0, #aaa);
-        background-color: #fff;
-        border-bottom-color: #fff;
+        @include linear-gradient(#fff, #f6f6f6);
+        @include no-box-shadow;
+
+        border-color: #999;
+        border-bottom-color: #f6f6f6;
 
         text-shadow: none;
         cursor: default;
         position: relative;
-        z-index: 1000;
         
         &:hover {
             cursor: default;        
@@ -128,60 +132,52 @@
  * List of criteria
  */
 #criteria {
+    @include border-radius(3px, 3px, 3px, 3px);   
     @include vertical-thin-scrollbar;
-    
+
+    -moz-box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+    -webkit-box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+    -o-box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+    box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+
     font-size: 0.9em;
     width: 170px;
-    display: inline-block;
-    padding-right: 5px;
-    max-height: 550px;
+    padding: 5px 1px;
+    max-height: 500px;
     overflow: auto;
     text-shadow: $LIGHT_TEXT_SHADOW;
+    background-color: #f7f7f7;
+    border: 1px solid #aaa;
     
     > div {
-        @include inset-box-shadow(0, 0, 8px, 0, #ccc);
         @include border-radius(3px, 3px, 3px, 3px);
+        @include inset-box-shadow(0, 1px, 1px, 0, #fdfdfd);
 
-        margin-top: 1px;
-        padding: 10px;
-        background-color: #eee;
-        border: 1px solid #ccc;
+        padding: 7px;
+        border-bottom: 1px solid #ddd;
         cursor: pointer;
+        font-weight: 500;
         
         &.active {
-            @include inset-box-shadow(0, 2px, 7px, 0, #444);
-    
+            @include box-shadow(0, 2px, 7px, 0, #444);  
+            @include linear-gradient(#999, #777);
+
+            position: relative;
+            z-index: 5;
             color: #000;
             background-color: #999;
             border-color: transparent;
 
             &:hover {
-                @include inset-box-shadow(0, 2px, 7px, 0, #444);
-            }
-
-            > .info {
-                @include opacify(50);
+                @include box-shadow(0, 2px, 7px, 0, #444);
             }
         }        
         
-        &:first-child {
-            margin-top: 0;
-        }
-        
         &:hover {
-            @include no-box-shadow;
+//            @include no-box-shadow;
 
             color: #000;
             background-color: #999;
-            border-color: transparent;
-
-            > .info {
-                @include opacify(50);
-
-                &:hover {
-                    @include opacify(100);
-                }
-            }
         }
     }    
     
@@ -204,7 +200,7 @@
 
 /* Other standalone elements */
 #description, #search-results {
-    @include box-shadow(0, 15px, 10px, -10px, #999);
+    @include raised-drop-shadow;
     @include border-radius(5px, 5px, 5px, 5px);
     @include vertical-thin-scrollbar;
     
@@ -213,7 +209,7 @@
     position: absolute;
     display: none;
     background-color: #fff;
-    border: 3px solid #aaa;
+    border: 1px solid #666;
     width: 300px;
     max-height: 400px;
     overflow: auto;
@@ -236,10 +232,15 @@
     > * {
         padding: 5px 10px;
         margin: 0;
+
+        > span {
+            font-variant: italic;
+        }
     }
 
     > div:hover {
-        background-color: #ddd;
+        color: #000;
+        background-color: #dfdfdf;
         cursor: pointer;
     }
 }
@@ -250,11 +251,19 @@
 }
 
 #plugin-panel {
-    @include no-box-shadow;
-    
+    @include border-radius(3px, 3px, 3px, 3px);
+
+    -moz-box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+    -webkit-box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+    -o-box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+    box-shadow: 0 1px 1px #fff, 0 1px 2px #ccc inset;
+
     float: right;
-    width: 506px;
-    min-height: 300px;
+    width: 490px;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #aaa;
+    margin-bottom: 0;
     
     .content {
         padding: 0;
@@ -266,7 +275,7 @@
 }
 
 .chart {
-    width: 506px;
+    width: 484px;
 }
 
 #add_to_query {
@@ -297,7 +306,7 @@
             vertical-align: middle;
             
             &:first-child {
-                width: 100px;
+                width: 90px;
                 margin-left: 0;
             }
         }        
@@ -342,9 +351,10 @@
 // IE fixes
 
 .ie7, .ie8 {
-    #plugin-panel {
-        border: none;
-    }    
+    // background: transparent does not work..
+    #center-pane .content {
+        @include linear-gradient(#f3f3f3, #e6e6e6);
+    }
 }
 
 .ie7 {
@@ -353,8 +363,7 @@
         *display: inline;  
     } 
 
-    #categories {
-        
+    #categories {        
         > * {
             padding-right: 11px;
             padding-left: 11px;
@@ -365,5 +374,4 @@
         padding-right: 0px;
         padding-left: 7px;
     }
-
 }
