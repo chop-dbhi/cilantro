@@ -1,4 +1,4 @@
-VERSION = (1, 1, 4, 'rc', 1)
+VERSION = (1, 1, 5, 'rc', 1)
 
 def get_version():
     version = '%s.%s' % VERSION[:2]
@@ -8,5 +8,5 @@ def get_version():
         version = '%s pre-alpha' % version
     else:
         if VERSION[3] != 'final':
-            version '%s %s %s' % (version, VERSION[3], VERSION[4])
+            version = '%s %s %s' % (version, VERSION[3], VERSION[4])
     return version
