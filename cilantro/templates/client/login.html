@@ -5,10 +5,6 @@
     <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/login.css">
 {% endblock %}
 
-{% block scripts %}
-    <script>require(['login/main']);</script>
-{% endblock %}
-
 {% block content %}
     <div class="container">
         <div class="title">{% block login_title %}{% endblock %}</div>
@@ -31,7 +27,7 @@
                             {#<br><a style="font-size: 0.8em" href="#">Forget your password?</a>#}</td>
                     </tr>
                     <tr><td colspan="2" style="text-align: right">
-                        <input type="submit" value="Login" disabled></td></tr>
+                        <input type="submit" value="Login"></td></tr>
                 </table>
             </form>
         </div>

@@ -21,7 +21,7 @@
             {% spaceless %}
             <div id="tabs">
                 <form method="get" action="{% url api:criteria:read %}">
-                    <input id="search" type="text" name="q" placeholder="Search...">
+                    <input id="search" type="text" name="q" autocomplete="off" placeholder="Search...">
                 </form> 
                 <div id="categories" data-uri="{% url api:categories:read %}"></div>
             </div>
