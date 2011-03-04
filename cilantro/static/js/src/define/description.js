@@ -40,7 +40,7 @@ define('define/description',
             dom.description.bind(Events.DEACTIVATE_DESCRIPTION, function(evt, timeout) {
                 timeout = timeout || 0;
                 dom.description.timeout = setTimeout(function() {
-                    dom.description.fadeOut('fast');
+                    dom.description.fadeOut(100);
                 }, timeout);
                 return false;
 

@@ -117,8 +117,13 @@ define('define/criteria2',
              * Delegation for handling the mouse hovering the '.info' element.
              * This must notify the description box of the event
              */
+            var timeout = null;
             dom.criteria.delegate('div', 'mouseenter', function() {
-                $(this).trigger(Events.ACTIVATE_DESCRIPTION, ['right']);
+                clearTimeout(timeout);
+                var ref = this;
+                timeout = setTimeout(function() {
+                    $(ref).trigger(Events.ACTIVATE_DESCRIPTION, ['right']);
+                }, 700);
             });
 
             /*
@@ -127,10 +132,12 @@ define('define/criteria2',
              * the description box.
              */
             dom.criteria.delegate('div', 'mouseleave', function() {
+                clearTimeout(timeout);
                 $(this).trigger(Events.DEACTIVATE_DESCRIPTION, [200]);
             });
 
             dom.criteria.delegate('div', 'click', function(evt) {
+                clearTimeout(timeout);
                 $(this).trigger(Events.ACTIVATE_CRITERION,
                     [$(this).data('id')]);
                 $(this).trigger(Events.DEACTIVATE_DESCRIPTION);
