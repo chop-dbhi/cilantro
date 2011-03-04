@@ -141,6 +141,7 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
              var sendValue;
              var ds;
              var dom = this.dom;
+             var ref = this;
              switch (evt.target.type){
                      case "checkbox": sendValue = evt.target.checked;
                                      sendValue = $target.is(":visible") && $target.is(":enabled") ? sendValue: undefined;
@@ -202,20 +203,20 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                                  // We have not yet done a switch, otherwise we would have saved it, so we have to actually create the
                                                                  // textarea. This happens only once per input
                                                                  var $mline = $('<textarea rows="8" id="'+$associated_inputs.attr("id")+'" name="'+$associated_inputs.attr("name")+'" cols="25"></textarea>').data("switch",$associated_inputs);
-                                                                 $mline.bind("keyup", $associated_inputs.data("events").keyup[0].handler);
+                                                                 
                                                                  $associated_inputs.before($mline).detach();
                                                                  ds = dom.data("datasource")||{};
                                                                  // We are in this code for one of 3 reasons
 
                                                                  if (ds[$associated_inputs.attr('name')] instanceof Array) {
                                                                      // #1. We are reloading the page, and switching the original text input to textarea
-                                                                     updateElement(null, {name:$associated_inputs.attr('name'), value:ds[$associated_inputs.attr('name')]});
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:ds[$associated_inputs.attr('name')]});
                                                                  } else if (typeof(ds[$associated_inputs.attr('name')])==="string") {
                                                                      // #2. We typed something into the original text input, but then switched to textarea, populate it
-                                                                     updateElement(null, {name:$associated_inputs.attr('name'), value:[ds[$associated_inputs.attr('name')]]});
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:[ds[$associated_inputs.attr('name')]]});
                                                                  }else {
                                                                      // #3. We never typed anything into the original text input, just switched to textara
-                                                                     updateElement(null, {name:$associated_inputs.attr('name'), value:[]});
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:[]});
                                                                  }
                                                                  $mline.keyup();
                                                              }else{
