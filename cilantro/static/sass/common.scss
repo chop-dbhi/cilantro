@@ -11,16 +11,23 @@
 
 body {
     background: url(../img/linen_tile.png);
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 header {
     @include anchors(#666, #333);
     @include dual-shadow(0 1px 3px darken($DEFAULT_COLOR, 20), 0 1px 3px #aaa inset);
-    @include opacify(90);
 
     color: #666;
     font-size: 0.85em;
-    text-shadow: $LIGHT_TEXT_SHADOW;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
 
     min-height: 25px;
     padding: 5px 10px;
@@ -58,9 +65,22 @@ nav {
     }
 }
 
+#content {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    margin-left: -480px;
+    width: 960px;
+}
+
 footer {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    z-index: -1;
+
     color: darken($DEFAULT_COLOR, 50);
-    font-weight: 500;
     text-shadow: 0 1px 2px lighten($DEFAULT_COLOR, 100);
     font-size: 0.9em;
     text-align: center;
@@ -82,37 +102,37 @@ label {
 }
 
 input {
-    @include shadow(0 2px 4px #ddd inset);
+    @include inset(#f6f6f6);
 }
 
 input[type=button], input[type=submit], button {
     @include radius(3px);
     @include floated(#ddd);
+    @include letterpress(#222);
 
     cursor: pointer;
     position: relative;
 
-    color: #000;
-    padding: 2px 4px;
-    font-weight: 500;
+    padding: 2px 5px;
+    font-weight: 600;
+    font-size: 0.9em;
     border: 1px solid #666;
-    text-shadow: $LIGHT_TEXT_SHADOW;
 
     > .icon {
-        margin-top: -3px;
+        margin-top: -4px;
     }
 
     &:hover {
-        border-color: #000;
+        border-color: #222;
     }
 
     &:active {
-        @include linear-gradient(#bbb, #ddd); 
+        @include vertical-gradient(#bbb, #ddd); 
         top: 1px;
     }
 
     &:disabled {    
-        @include linear-gradient(#eee, #ccc);
+        @include vertical-gradient(#eee, #ccc);
         @include shadow(none);
 
         color: #999;
@@ -125,7 +145,7 @@ input[type=button], input[type=submit], button {
         }
 
         &:active {
-            @include linear-gradient(#eee, #ccc);
+            @include vertical-gradient(#eee, #ccc);
 
             top: 0;
             color: #999;
@@ -147,11 +167,4 @@ input[type=button], input[type=submit], button {
     &.warning { @include message(#653400, warning); }
     &.error { @include message(#500700, error); }
     &.information { @include message(#000F3C, info); }
-}
-
-#content {
-    position: relative;
-    left: -480px;
-    margin: 30px 50%;
-    width: 960px;
 }

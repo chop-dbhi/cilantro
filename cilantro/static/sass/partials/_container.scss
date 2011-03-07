@@ -1,3 +1,16 @@
+// defined as a mixin for other elements to extend from e.g. jQuery UI dialog
+@mixin container-title {
+    @include radius($BORDER_RADIUS $BORDER_RADIUS 0 0);
+    @include raised(#444, 2px);
+    @include letterpop(#eee);
+
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #fff;
+    padding: 5px 10px;
+    font-weight: 500;    
+    font-size: 1.1em; 
+}
+
 .container {
     @include shadow(0 1px 5px #777);	
     @include radius($BORDER_RADIUS $BORDER_RADIUS 0 0);
@@ -6,21 +19,13 @@
 
     // container title bar
     > .title {
-        @include radius($BORDER_RADIUS $BORDER_RADIUS 0 0);
-        @include raised(#444, 2px);
-
-        color: #fff;
-        border-top: 1px solid #333;
-        border-bottom: 1px solid #fff;
-        padding: 5px 10px;
-        text-shadow: $DARK_TEXT_SHADOW;
-        font-weight: 500;    
+        @include container-title;
 
         // container title bar buttons
         button {
             @include radius(3px);
             @include shadow(0 0 1px #fff);
-            @include linear-gradient(#444, #222);
+            @include vertical-gradient(#444, #222);
             
             color: #ddd;
             float: right;
@@ -35,7 +40,7 @@
             }
             
             &:active {
-                @include linear-gradient(#222, #444);
+                @include vertical-gradient(#222, #444);
                 background-color: #444;
             }
         }
@@ -43,13 +48,13 @@
     
     > .toolbar {
         @include raised($DEFAULT_COLOR);
+        @include letterpress(#333, 1px);
 
         border-top: 1px solid darken($DEFAULT_COLOR, 10);
         border-bottom: 1px solid darken($DEFAULT_COLOR, 20);
 
         font-size: 0.9em;
         padding: 3px 10px;
-        text-shadow: $LIGHT_TEXT_SHADOW;
 
         > * {
             vertical-align: middle;
@@ -58,23 +63,21 @@
                 margin-left: 0;
             }
         }
-        
-        &.header {
-        //    border-bottom: 1px solid darken($DEFAULT_COLOR, 20);
-        }
-        
+       
+        // this is here only to account for the drop shadow of the container
+        // itself. to ensure the bottom border stands out, the color is
+        // darkened
         &.footer {
             border-bottom-color: darken($DEFAULT_COLOR, 30);
         }
     }
     
     > .info {
-        @include shadow(0 2px 4px #eee inset);
-        @include linear-gradient(#f3f3f3, #eee);
+        @include shadow(0 2px 4px #ddd inset);
         
-        font-size: 0.85em;
         padding: 10px;
         background-color: #fff;
+        border-bottom: 1px solid #ccc;
     }
 
     // container content area, keep it simple...
@@ -92,7 +95,7 @@
         border-bottom: 1px solid #ccc;
 
         > .tab {
-            @include radius(15px);
+            @include radius(10px);
             background-color: #fff;
             padding: 1px 10px;
             margin-right: 5px;
@@ -104,16 +107,14 @@
 
             &:hover {
                 cursor: pointer;
-                background-color: #ddd;
-                border-color: #ddd;
+                color: #000;
             }
 
             &.active {
-                @include shadow(0 2px 5px #555 inset);
+                @include inset(darken($DEFAULT_COLOR, 40));
                 text-shadow: $DARK_TEXT_SHADOW;
-                background-color: #777;
                 color: #fff;
-                border-color: #444;
+                border-color: darken($DEFAULT_COLOR, 60);
                 cursor: auto;
                 text-decoration: none;
                 cursor: default;
@@ -121,9 +122,9 @@
 
             &.disabled {
                 cursor: default;
-                color: #999;
-                border-color: #fff;
-                background-color: inherit;
+                color: darken($DEFAULT_COLOR, 20);
+                border-color: transparent;
+                background-color: transparent;
             }
         }
     }

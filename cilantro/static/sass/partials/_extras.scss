@@ -1,7 +1,7 @@
 // jQuery UI components
 .ui-dialog {
     @extend .container;
-    @include shadow(0 10px 20px #999);
+    @include shadow(0 5px 20px 3px #999);
     
     position: absolute;
 
@@ -20,8 +20,9 @@
     }    
 
     .ui-dialog-titlebar {
-        @include linear-gradient(#444, #222);
-        @include dual-shadow(0 -1px 4px #000 inset, 0 1px 4px #aaa inset);
+        @include container-title;
+//        @include linear-gradient(#444, #222);
+//        @include dual-shadow(0 -1px 4px #000 inset, 0 1px 4px #aaa inset);
 
         .ui-dialog-titlebar-close {
             display: none;

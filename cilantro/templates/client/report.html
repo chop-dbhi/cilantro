@@ -36,14 +36,13 @@
             <div id="report-actions">
                 {% spaceless %}
                 {% block report_buttons %}
-                    <button id="export-data">Export to CSV</button><br>
                     <button id="data-columns">Add/Remove Columns...</button>
+                    <button id="export-data">Export to CSV</button>
                 {% endblock %}
                 {% endspaceless %}
             </div>
 
             <div>
-                <h4>Stats</h4>
                 <ul id="stats">
                     <li><b class="count"></b> rows</li>
                     <li><b class="unique-count"></b> unique patients</li>
@@ -51,7 +50,6 @@
             </div>
 
             <div>
-                <h4>Details</h4>
                 <span id="conditions-text">No conditions were defined for this report.</span>
             </div>
 
@@ -101,7 +99,7 @@
             patients</em> will stay constant.</p>
 
             <form method="get" action="{% url api:columns:read %}">
-                <input id="search" class="search" type="text" name="q" placeholder="Search...">
+                <input id="search" class="search" type="text" name="q" autocomplete="off" placeholder="Search...">
             </form>
 
             <div id="columns">
@@ -114,7 +112,7 @@
                                 <li class="active clearfix" data-model="column" data-id="{{ column.id }}">
                                     <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
                                     <span class="name">{{ column.name }}</span>
-                                    <span class="description">{{ column.full_description|safe }}</span>
+                                    <span class="description">{{ column.description|safe }}</span>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -124,7 +122,7 @@
         </div>
 
         <div>
-            <h4>Your Columns</h4>
+            <h4>Selected Columns</h4>
 
             <p class="ht mg">The order below (top-bottom) defines the order they will be
             displayed (left-right). To change the order simply click and drag any of the

@@ -139,18 +139,25 @@ require.def(
             var descriptionBox = $('<div id="description"></div>')
                 .appendTo('body');
 
-            $('#columns').delegate('.actions > .info', 'mouseover', function() {
-                var target = $(this).closest('li'),
-                    offset = target.offset(),
-                    width = target.outerWidth(),
-                    description = target.children('.description').html();
+            var timeout = null;
+            $('#columns').delegate('li', 'mouseenter', function() {
+                clearTimeout(timeout);
+                var ref = this;
+                timeout = setTimeout(function() {
+                    var target = $(ref),
+                        offset = target.offset(),
+                        width = target.outerWidth(),
+                        description = target.children('.description').html();
 
-                descriptionBox.html(description);
-                descriptionBox.css({
-                    left: offset.left + width + 20,
-                    top: offset.top
-                }).show();
-            }).delegate('.actions > .info', 'mouseout', function() {
+                    descriptionBox.html(description);
+                
+                    descriptionBox.css({
+                        left: offset.left + width + 20,
+                        top: offset.top
+                    }).show();                    
+                }, 700);
+            }).delegate('li', 'mouseleave', function() {
+                clearTimeout(timeout);
                 descriptionBox.hide();
             });
 
@@ -165,6 +172,8 @@ require.def(
 
             columns.delegate('.add-column', 'click', function(evt) {
                 var id = evt.target.hash.substr(1);
+                clearTimeout(timeout);
+                descriptionBox.hide();
                 columnsdialog.trigger('add.column', [id]);
                 return false;
             });
@@ -188,7 +197,7 @@ require.def(
 
             columnsdialog.dialog({
                 autoOpen: false,
-                draggable: false,
+                draggable: true,
                 resizable: false,
                 title: 'Add or Remove Columns from this Report',
                 height: 600,

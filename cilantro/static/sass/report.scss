@@ -8,12 +8,11 @@
 #search {
     @include search-box;
     width: 360px;
+    margin-bottom: 10px;
 }
 
 .container {
-    .info {
-        display: none;
-        font-size: 0.9em;
+    > .info {
         
         > * {
             vertical-align: top;
@@ -27,12 +26,8 @@
             margin: 0 0 5px 0;
         }
 
-        b {
-            text-shadow: $LIGHT_TEXT_SHADOW;
-        }
-        
         ul {
-            margin: 5px 0;
+            margin: 0;
             padding-left: 0;
             list-style: none;
         }
@@ -40,12 +35,21 @@
     
     .toolbar {
         display: none;
+        text-align: right;
         
         > * {
             vertical-align: middle;
         }
     }
 
+    .header {
+        border-top: none;
+    }
+
+    // contains the main data table, it provides a scrollable interface to
+    // ensure the user does not have to scroll horizontally
+    // TODO add a default height and when the table surpasses grows vertically
+    // increase the height up to the windows edge.
     .content {
         @include horizontal-thin-scrollbar; 
         overflow: auto;
@@ -76,14 +80,11 @@
     float: right;
     text-align: right;
     margin-right: 0;
+    margin-left: 10px;
+    font-size: 0.9em;
     
     button {
-        font-size: 1em;
-        margin-top: 5px;
-
-        &:first-child {
-            margin-top: 0;
-        }
+        margin-left: 5px;
     }
 }
 
@@ -107,7 +108,7 @@
         padding: 10px 10px 0 10px;
         vertical-align: top;
         width: 410px;
-        height: 520px;
+        height: 510px;
 
         &:first-child {
             margin-right: 10px;
@@ -126,7 +127,6 @@
         display: none;
         padding: 7px;
         border-bottom: 1px solid #ddd;
-        cursor: pointer;
         font-weight: 500;
                 
         &:hover {
@@ -165,11 +165,11 @@
 }
 
 #columns {
-    height: 400px;
+    height: 380px;
 }
 
 #active-columns {
-    height: 404px;
+    height: 394px;
 }
 
 #active-columns li.placeholder {
@@ -185,7 +185,7 @@
     @include vertical-thin-scrollbar;
     
     padding: 5px 10px;
-    z-index: 1000;
+    z-index: 2000;
     position: absolute;
     display: none;
     background-color: #fff;

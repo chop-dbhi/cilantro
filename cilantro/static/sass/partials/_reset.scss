@@ -239,16 +239,15 @@ th { padding-left: 0; font-weight: normal; text-align: left;}
   add classes for each one. ".title" simply creates a large text  
   field, this is purely for looks.
  */
-input[type=text], input[type=password],
-textarea {
+input[type=text], input[type=password], textarea {
     font-size: 0.9em;
     padding: 2px;
-  background-color:#fff;
-  border:1px solid #bbb;
+    background-color:#fff;
+    border:1px solid #bbb;
 }
-input[type=text]:focus, input[type=password]:focus,
-textarea:focus {
-  border-color:#666;
+input[type=text]:focus, input[type=password]:focus, textarea:focus {
+    @include shadow(0 0 5px darken($DEFAULT_COLOR, 20));
+    border-color:#666;
 }
 select { background-color:#fff; border-width:1px; border-style:solid; }
 

@@ -2,22 +2,19 @@
 @import "partials/mixins";
 @import "partials/shadows";
 @import "partials/icons";
-@import "partials/icons";
 @import "partials/overlay";
 
 $BLUE: hsl(207, 100, 33);
-
 
 /*
  * Panes - layout
  */
 
 #left-pane {
-    @include linear-gradient(#f3f3f3, #eee);
+    @include vertical-gradient(#f3f3f3, #eee);
 
-    width: 730px;
-    display: inline-block;
-    position: relative;
+    width: 745px;
+    position: absolute;
     top: 0;
     left: 0;
     
@@ -37,11 +34,10 @@ $BLUE: hsl(207, 100, 33);
 }
 
 #right-pane {
-    display: inline-block;
-    position: relative;
+    position: absolute;
     vertical-align: top;
     top: 0;
-    left: 20px;
+    right: 0;
     width: 200px;
 }
 
@@ -50,7 +46,6 @@ $BLUE: hsl(207, 100, 33);
  */
 
 #tabs {
-
     border-bottom: 1px solid #aaa;
 
     > * {
@@ -61,7 +56,6 @@ $BLUE: hsl(207, 100, 33);
         display: inline-block;
         padding: 8px 0 5px 12px;
         float: right;
-        margin-right: 1px;
     }
 
     input {
@@ -144,7 +138,7 @@ $BLUE: hsl(207, 100, 33);
  */
 #criteria {
     @include radius(3px);   
-    @include inset(#f7f7f7);
+    @include inset(#fff);
 
     @include vertical-thin-scrollbar;
 
@@ -308,7 +302,7 @@ $BLUE: hsl(207, 100, 33);
     $yellow: #FFFBB3;
 
     > .content {
-        @include linear-gradient(#f3f3f3, #eee);
+        @include vertical-gradient(#f3f3f3, #eee);
         background-color: #f3f3f3;
     }
 
@@ -324,7 +318,7 @@ $BLUE: hsl(207, 100, 33);
         
         &.selected {
             @include shadow(0 1px 2px darken($yellow, 60));
-            @include linear-gradient($yellow, darken($yellow, 5));
+            @include vertical-gradient($yellow, darken($yellow, 5));
             border-color: darken($yellow, 50);
             color: #fff;
             background-color: $yellow;
@@ -379,7 +373,7 @@ $BLUE: hsl(207, 100, 33);
 .ie7, .ie8 {
     // background: transparent does not work..
     #center-pane .content {
-        @include linear-gradient(#f3f3f3, #e6e6e6);
+        @include vertical-gradient(#f3f3f3, #e6e6e6);
     }
 }
 

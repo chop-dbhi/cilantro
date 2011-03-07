@@ -9,7 +9,7 @@ require.def(
     function(m_datasource, m_renderer, m_templates) {
 
         // TODO remove hardcoded URL
-        var EMPTY_RESULTS = '<div style="text-align: center">No results match your conditions. ' +
+        var EMPTY_RESULTS = '<div style="text-align: center; display: inline;" class="message warning">No results match your conditions. ' +
             '<a href="' + URLS.define + '">Refine your conditions</a>.</div>';
 
         function init() {
@@ -19,6 +19,7 @@ require.def(
                 content = $('#content'),                // resizing
                 report = $('#report'),                  // event binding, resizing, unhiding
                 info = $('#report-info'),               // unhiding
+                actions = $('#report-actions'),
                 conditionsText = $('#conditions-text'), // unhiding
                 toolbars = report.find('.toolbar'),     // unhiding
                 table = $('#table'),                    // resizing, unhiding
@@ -101,8 +102,15 @@ require.def(
                     ajax: {
                         url: API_URLS.report,
                         success: function(json) {
-                            if (json.rows.length === 0) {
-                                $('.content').html(EMPTY_RESULTS);
+                            if (json.unique !== undefined)
+                                unique.html(json.unique);
+
+                            if (json.count !== undefined)
+                                count.html(json.count);
+                            
+                            if (json.count === 0) {
+                                $('.content').html(EMPTY_RESULTS).css('text-align', 'center');
+                                actions.hide();
                                 return;
                             }
 
@@ -116,12 +124,6 @@ require.def(
                                 rnd.pages.target.hide();
                             }
 
-                            if (json.unique)
-                                unique.html(json.unique);
-
-                            if (json.count)
-                                count.html(json.count);
-                            
                             if (json.per_page)
                                 per_page.val(json.per_page);
 

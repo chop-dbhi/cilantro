@@ -59,7 +59,7 @@ define( ['define/view'],
                   @type string
                 */
                 var add_query_tmpl = [
-                    '<div class="success">Condition has been added.</div>',
+                    '<div class="message success">Condition has been added.</div>',
                     '<button id="add_to_query"></button>'
                 ].join('');
 
@@ -710,7 +710,7 @@ define( ['define/view'],
                         return;
                     }
 
-                    var warning = $('<div class="error">'+message+'</div>');
+                    var warning = $('<div class="message error">'+message+'</div>');
                     warning.data('ref_count',1);
                     if (!evt.ephemeral){
                         invalid_fields[target_name+evt.reason] = warning;
