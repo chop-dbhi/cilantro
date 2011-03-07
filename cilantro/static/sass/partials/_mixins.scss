@@ -1,37 +1,37 @@
-/*
- * BOX SHADOW MIXINS
- */
-@mixin box-shadow($h, $v, $b, $s, $c) {
-	-moz-box-shadow: $h $v $b $s $c;
-	-webkit-box-shadow: $h $v $b $s $c;
-	box-shadow: $h $v $b $s $c;    
+@mixin shadow($s) {
+	-moz-box-shadow: $s; 
+	-webkit-box-shadow: $s;
+	box-shadow: $s;
 }
 
-@mixin inset-box-shadow($h, $v, $b, $s, $c) {
-	-moz-box-shadow: inset $h $v $b $s $c;
-	-webkit-box-shadow: inset $h $v $b $s $c;
-	box-shadow: inset $h $v $b $s $c;
+@mixin dual-shadow($s1, $s2) {
+	-moz-box-shadow: $s1, $s2;
+	-webkit-box-shadow: $s1, $s2;
+	box-shadow: $s1, $s2;
 }
 
-@mixin no-box-shadow {
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	box-shadow: none;
+@mixin tri-shadow($s1, $s2, $s3) {
+	-moz-box-shadow: $s1, $s2, $s3;
+	-webkit-box-shadow: $s1, $s2, $s3;
+	box-shadow: $s1, $s2, $s3;
 }
 
-@mixin border-radius($tl, $tr, $bl, $br) {
-    -moz-border-radius: $tl $tr $bl $br;
-    border-radius: $tl $tr $bl $br;
+@mixin opacify($p) {
+    filter:alpha(opacity=$p);
+    -moz-opacity: $p/100;
+    -khtml-opacity: $p/100;
+    opacity: $p/100;
+}
+
+@mixin radius($r) {
+    -moz-border-radius: $r;
+    border-radius: $r;
 }
 
 @mixin anchors($c1, $c2) {
     a {
-        &:link, &:visited {
-            color: $c1;
-        }        
-        &:hover, &:active {
-            color: $c2;
-        }
+        &:link, &:visited { color: $c1; }        
+        &:hover, &:active { color: $c2; }
     }
 }
 
@@ -40,6 +40,23 @@
     background: -moz-linear-gradient(-90deg, $c1, $c2);
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from($c1), to($c2));
     filter: progid:DXImageTransform.Microsoft.Gradient(startColorstr='#{$c1}', endColorstr='#{$c2}');        
+}
+
+@mixin raised($color, $blur: 2px) {
+    @include dual-shadow(0 1px $blur lighten($color, 20) inset, 0 -1px $blur darken($color, 5) inset);
+    background: darken($color, 3);
+    @include linear-gradient($color, darken($color, 5));
+}
+
+@mixin inset($color) {
+    background-color: $color;
+    @include dual-shadow(0 1px 2px darken($color, 20) inset, 0 1px 1px lighten($color, 60));
+}
+
+@mixin floated($color, $blur: 2px) {
+    @include shadow(0 2px $blur darken($color, 15));
+    background: darken($color, 3);
+    @include linear-gradient($color, darken($color, 5));
 }
 
 @mixin message($color, $image) {
@@ -73,16 +90,10 @@
 }
 
 @mixin search-box {
-    @include border-radius(15px, 15px, 15px, 15px);
-    @include inset-box-shadow(2px, 2px, 3px, 0px, #ddd);
+    @include radius(15px);
+    @include shadow(2px 2px 3px #ddd inset);
     
     background: #fff url(../img/icons/search.png) no-repeat 3px;
     padding: 2px 5px 2px 21px;
     border: 1px solid #999;
-}
-
-@mixin opacify($p) {
-    -moz-opacity: $p/100;
-    -khtml-opacity: $p/100;
-    opacity: $p/100;
 }

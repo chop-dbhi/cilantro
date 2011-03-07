@@ -1,69 +1,56 @@
-@mixin container-title-gradient {
-    background: #444;
-    background: -moz-linear-gradient(-90deg, #555, #666 50%, #333 55%, #444);
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#555),
-        color-stop(50%, #666),
-        color-stop(55%, #333),
-        to(#444));
-    filter: progid:DXImageTransform.Microsoft.Gradient(startColorstr="#555555", endColorstr="#333333");      
-}
-
-@mixin container-title {
-    @include container-title-gradient;
-    @include border-radius($BORDER_RADIUS, $BORDER_RADIUS, 0, 0);
-
-    color: #eee;
-    padding: 5px 10px;
-    text-shadow: $DARK_TEXT_SHADOW;
-    font-weight: 500;    
-}
-
 .container {
-    @include box-shadow(0, 1px, 5px, 0, #777);	
-    @include border-radius($BORDER_RADIUS, $BORDER_RADIUS, 0, 0);
+    @include shadow(0 1px 5px #777);	
+    @include radius($BORDER_RADIUS $BORDER_RADIUS 0 0);
     
-	margin-bottom: 20px;
 	background-color: #fff;
 
     // container title bar
     > .title {
-        @include container-title;
+        @include radius($BORDER_RADIUS $BORDER_RADIUS 0 0);
+        @include raised(#444, 2px);
+
+        color: #fff;
+        border-top: 1px solid #333;
+        border-bottom: 1px solid #fff;
+        padding: 5px 10px;
+        text-shadow: $DARK_TEXT_SHADOW;
+        font-weight: 500;    
 
         // container title bar buttons
         button {
-            @include container-title-gradient;            
-            @include border-radius(3px, 3px, 3px, 3px);
-            @include box-shadow(0, 0, 1px, 0, #fff);
+            @include radius(3px);
+            @include shadow(0 0 1px #fff);
+            @include linear-gradient(#444, #222);
             
             color: #ddd;
             float: right;
+            margin-top: -1px;
             text-shadow: none;
             border-color: #000;
             font-size: 0.8em;
             padding: 2px 3px;
             
             &:hover {
-                @include box-shadow(0, 0, 2px, 0, #fff);
                 color: #fff;
             }
             
             &:active {
+                @include linear-gradient(#222, #444);
                 background-color: #444;
-                background-image: -moz-linear-gradient(-90deg, #444, #333 50%, #666 55%, #555);
-                background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#444),
-                    color-stop(50%, #333),
-                    color-stop(55%, #666),
-                    to(#555));                   
             }
         }
     }
     
     > .toolbar {
+        @include raised($DEFAULT_COLOR);
+
+        border-top: 1px solid darken($DEFAULT_COLOR, 10);
+        border-bottom: 1px solid darken($DEFAULT_COLOR, 20);
+
         font-size: 0.9em;
-        background-color: #D8E2F7; 
         padding: 3px 10px;
         text-shadow: $LIGHT_TEXT_SHADOW;
-        
+
         > * {
             vertical-align: middle;
             
@@ -73,26 +60,27 @@
         }
         
         &.header {
-            border-bottom: 1px dotted #B5C7DF;
+        //    border-bottom: 1px solid darken($DEFAULT_COLOR, 20);
         }
         
         &.footer {
-            border-top: 1px dotted #B5C7DF;
+            border-bottom-color: darken($DEFAULT_COLOR, 30);
         }
     }
     
     > .info {
-        @include inset-box-shadow(0, -5px, 10px, 0, #eee);
+        @include shadow(0 2px 4px #eee inset);
+        @include linear-gradient(#f3f3f3, #eee);
         
         font-size: 0.85em;
         padding: 10px;
-        border-top: 1px dotted #fff;
-        border-bottom: 1px dotted #999;
         background-color: #fff;
     }
 
     // container content area, keep it simple...
     > .content {
+        @include shadow(0 -1px 3px #ddd inset);
+
         background-color: #fff;
         padding: 10px;
     }
@@ -104,7 +92,7 @@
         border-bottom: 1px solid #ccc;
 
         > .tab {
-            @include border-radius(15px, 15px, 15px, 15px);
+            @include radius(15px);
             background-color: #fff;
             padding: 1px 10px;
             margin-right: 5px;
@@ -121,7 +109,7 @@
             }
 
             &.active {
-                @include inset-box-shadow(0, 2px, 5px, 0, #555);
+                @include shadow(0 2px 5px #555 inset);
                 text-shadow: $DARK_TEXT_SHADOW;
                 background-color: #777;
                 color: #fff;
@@ -142,7 +130,7 @@
 
     // for good measure...
     .container {
-        @include no-box-shadow;
-        @include border-radius(0, 0, 0, 0);
+        @include shadow(none);
+        @include radius(0);
     }
 }

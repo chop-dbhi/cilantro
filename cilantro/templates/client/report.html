@@ -112,10 +112,7 @@
                             {% for column in category.columns %}
 
                                 <li class="active clearfix" data-model="column" data-id="{{ column.id }}">
-                                    <span class="actions">
-                                        <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
-                                        <span class="info"><span class="icon info"></span> Info</span>
-                                    </span>
+                                    <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
                                     <span class="name">{{ column.name }}</span>
                                     <span class="description">{{ column.full_description|safe }}</span>
                                 </li>
@@ -138,9 +135,7 @@
                 {% for category in columns %} 
                     {% for column in category.columns %}
                         <li class="clearfix" data-model="column" data-id="{{ column.id }}">
-                            <span class="actions">
-                                <a class="remove-column" href="#{{ column.id }}"><span class="icon x"></span> Remove</a>
-                            </span>                            
+                            <a class="remove-column" href="#{{ column.id }}"><span class="icon x"></span> Remove</a>
                             <span class="name">{{ column.name }}</span>
                         </li>
                     {% endfor %}

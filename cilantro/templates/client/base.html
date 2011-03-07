@@ -18,6 +18,7 @@
         <script src="{{ CILANTRO_JS_URL }}lib/modernizr.js"></script>
         <script>var require={baseUrl:'{{ CILANTRO_JS_URL }}'};</script>
         <script src="{{ CILANTRO_JS_URL }}lib/requirejs.jquery.js"></script>
+        <script>if (!window.JSON) require(['{{ CILANTRO_JS_URL }}lib/json2.js']);</script>
 
         {% block scripts %}
         {% endblock %}
@@ -41,10 +42,6 @@
         </div>
 
         {# standard global footer #}        
-        {% include "snippets/footer.html" %}      
-
-        <!--[if lte IE 7 ]>
-            <script src="{{ CILANTRO_JS_URL }}lib/json2.js"></script>
-        <![endif]-->
+        {% include "snippets/footer.html" %}
     </body>
 </html>

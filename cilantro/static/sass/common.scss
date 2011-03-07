@@ -8,35 +8,33 @@
 // leave for last to override everything else
 @import "partials/iecompat";
 
+
 body {
-    height: 100%;
-    background: url(../img/noisy_tile.png);
+    background: url(../img/linen_tile.png);
 }
 
 header {
     @include anchors(#666, #333);
+    @include dual-shadow(0 1px 3px darken($DEFAULT_COLOR, 20), 0 1px 3px #aaa inset);
+    @include opacify(90);
 
-    -moz-box-shadow: 0 2px 5px #bbb, 0 1px 2px #ccc inset;
-    -webkit-box-shadow: 0 2px 5px #bbb, 0 1px 2px #ccc inset;
-    -o-box-shadow: 0 2px 5px #bbb, 0 1px 2px #ccc inset;
-    box-shadow: 0 2px 5px #bbb, 0 1px 2px #ccc inset;
-    
-    display: block;
-    background-color: #fcfcfc;
-    padding: 5px 10px;
-    border-bottom: 1px solid #fff;
-    font-size: 0.8em;
     color: #666;
+    font-size: 0.85em;
     text-shadow: $LIGHT_TEXT_SHADOW;
+
     min-height: 25px;
-    
+    padding: 5px 10px;
+
+    background-color: #fcfcfc;
+    border-bottom: 1px solid #fff;
+
     > * {
         vertical-align: middle;        
     }
     
     > span {
         float: right;
-        margin-top: 6px;      
+        margin-top: 7px;      
     }
 }
 
@@ -61,17 +59,11 @@ nav {
 }
 
 footer {
-    @include anchors(#999, #666);
-    
-    display: block;
-    color: #666;
-    position: relative;
-    top: 70px;
-    left: 0;
-    margin-bottom: 0;
+    color: darken($DEFAULT_COLOR, 50);
+    font-weight: 500;
+    text-shadow: 0 1px 2px lighten($DEFAULT_COLOR, 100);
+    font-size: 0.9em;
     text-align: center;
-    font-size: 11px;
-    text-shadow: $LIGHT_TEXT_SHADOW;
 }
 
 table {
@@ -90,22 +82,21 @@ label {
 }
 
 input {
-    -webkit-box-shadow: inset 0 2px 4px #ddd;
+    @include shadow(0 2px 4px #ddd inset);
 }
 
 input[type=button], input[type=submit], button {
-    @include linear-gradient(#aaa, #777);
-    @include border-radius(3px, 3px, 3px, 3px);
-    @include box-shadow(0, 2px, 5px, 0, #aaa);
+    @include radius(3px);
+    @include floated(#ddd);
 
-    height: 20px;
     cursor: pointer;
     position: relative;
-    color: #fff;
+
+    color: #000;
+    padding: 2px 4px;
+    font-weight: 500;
     border: 1px solid #666;
-    text-shadow: $DARK_TEXT_SHADOW;
-    font-weight: bold;
-    font-size: 0.9em;
+    text-shadow: $LIGHT_TEXT_SHADOW;
 
     > .icon {
         margin-top: -3px;
@@ -116,13 +107,13 @@ input[type=button], input[type=submit], button {
     }
 
     &:active {
-        @include linear-gradient(#444, #888); 
+        @include linear-gradient(#bbb, #ddd); 
         top: 1px;
     }
 
     &:disabled {    
         @include linear-gradient(#eee, #ccc);
-        @include no-box-shadow;
+        @include shadow(none);
 
         color: #999;
         border-color: #aaa;
@@ -144,49 +135,6 @@ input[type=button], input[type=submit], button {
     }
 }
 
-/*
-input[type=button], input[type=submit], button {
-    @include linear-gradient(#eee, #ccc);
-    @include border-radius(2px, 2px, 2px, 2px);
-    
-    font-size: 0.9em;
-    color: #000;
-    cursor: pointer;
-    padding: 2px 5px;    
-    border: 1px solid #aaa;
-    text-shadow: $LIGHT_TEXT_SHADOW;
-    
-    &:hover {
-        border-color: #666;        
-    }
-    
-    &:active {
-        @include linear-gradient(#555, #999);
-    
-        border-color: #666;
-        color: #fff;
-        text-shadow: $DARK_TEXT_SHADOW;        
-    }
-    
-    &:disabled {    
-        color: #999;
-        cursor: auto;        
-    }
-}
-
-button {
-    > * {
-        vertical-align: middle;
-    }
-
-    &:active {
-        // not sure how I feel about this being here...
-        .icon {
-            background-position-y: -16px;
-        }
-    }
-}
-*/
 .messages {
     .success { @include message(#002E24, success); }
     .warning { @include message(#653400, warning); }
@@ -203,8 +151,7 @@ button {
 
 #content {
     position: relative;
-    top: 50px;
-    left: 50%;
-    margin-left: -480px;
+    left: -480px;
+    margin: 30px 50%;
     width: 960px;
 }
