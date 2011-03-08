@@ -74,6 +74,12 @@
 
 #table {
     display: none;
+
+    td {
+        -moz-user-select: auto;
+        -webkit-user-select: auto;
+        user-select: auto;
+    }
 }
 
 #report-actions {
