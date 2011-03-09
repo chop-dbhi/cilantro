@@ -137,6 +137,7 @@
                 
         &:hover {
             color: #000;
+            background-color: #fff;
         }
 
         &.active {
@@ -163,10 +164,28 @@
 
     .add-column, .remove-column {
         float: right;
+        margin-top: 3px;
         font-size: 11px;
         color: #999;
         text-align: right;
         text-decoration: none;
+
+        > .icon {
+            position: relative;
+            bottom: 2px;
+        }
+    }
+
+    .add-column {
+        &:hover, &:active {
+            color: #000;
+        }
+    }
+
+    .remove-column {
+        &:hover, &:active {
+            color: maroon;
+        }
     }
 }
 

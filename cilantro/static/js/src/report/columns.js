@@ -171,21 +171,24 @@ require.def(
             }, null, 50);
 
             columns.delegate('.add-column', 'click', function(evt) {
-                var id = evt.target.hash.substr(1);
+                // remove timer for description box and hide it if it already
+                // is shown
                 clearTimeout(timeout);
                 descriptionBox.hide();
+
+                var id = this.hash.substr(1);
                 columnsdialog.trigger('add.column', [id]);
                 return false;
             });
 
             columns.delegate('.add-all', 'click', function(evt) {
-                var id = evt.target.hash.substr(1);
+                var id = this.hash.substr(1);
                 columnsdialog.trigger('addall.column', [id]);
                 return false;
             });
 
             active_columns.delegate('.remove-column', 'click', function(evt) {
-                var id = evt.target.hash.substr(1);
+                var id = this.hash.substr(1);
                 columnsdialog.trigger('remove.column', [id]);
                 return false;
             });
