@@ -5,33 +5,26 @@
     width: auto;
     border-collapse: separate;
 	font-size: 13px;
-	font-family: "Gill Sans", "Trebuchet MS", sans-serif;
 	margin: 15px 0;
-	border-spacing: 1px 1px;
+	border-spacing: 2px;
 	background-color: #fff;
 	
 	thead, tfoot {
         td, th {
-        	background-color: #FFF9A4;
-            border: 1px solid #fff;
-        	font-size: 13px;
-        	padding: 3px 7px;
-        }
-        
-        .header {
-            background-repeat: no-repeat;
-            background-position: right center;
-            text-align: left;
-        	cursor: pointer;
-            text-shadow: #fff 1px 1px 0;
-            
-            span {
-                padding-right: 16px;                
-            }
-        }
-        
+            @include raised(#FFF9A4);
+            border: 1px solid darken(#fff9a4, 35);
+            text-align: center;
+            font-weight: 500;
+        	padding: 5px 7px;
+        }       
+
         .desc, .asc {
-            background-color: #FFEA5F;            
+            // this cannot be used since the arrow icons override the
+            // 'background-image' anyway.
+            // @include raised(#FFEA5F);
+
+            background-color: #FFEA5F;
+            border-color: darken(#FFEA5F, 30);
         }
         
         .asc {
@@ -41,22 +34,38 @@
         .desc {
             background-image: url(../img/desc.gif);            
         }
+
+        .header {
+            @include letterpress(#444);
+            background-repeat: no-repeat;
+            background-position: right center;
+        	cursor: pointer;
+            
+            span {
+                padding-right: 16px;                
+            }
+        }
+ 
 	}
 
-    tr.selected {
-        background-color: #FFFBD8;
-    }
-    
-    td, th {
-        padding: 3px 5px;
-        text-align: center;
-        font-weight: normal;
-        background-color: #fff;
-        min-width: 100px;
+    tbody {
+    	font-family: "Gill Sans", "Trebuchet MS", sans-serif;
 
-        // elements rendered within each data cell, strip padding
-        > * {
-            padding: 0;
+        tr.selected {
+            background-color: #FFFBD8;
+        }
+        
+        td, th {
+            padding: 3px 5px;
+            text-align: center;
+            font-weight: normal;
+            background-color: #fff;
+            min-width: 150px; 
+
+            > p, ul {
+                text-align: left;
+            }
+
         }
     }
 }

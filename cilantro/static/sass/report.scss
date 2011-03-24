@@ -1,7 +1,6 @@
 @import "partials/constants";
 @import "partials/mixins";
 @import "partials/shadows";
-@import "partials/icons";
 @import "partials/overlay";
 @import "partials/sortable";
 
@@ -15,11 +14,9 @@
     > .info {
         
         > * {
+            @include inline-block;
             vertical-align: top;
             margin-right: 20px;
-            display: inline-block;
-            *display: inline;
-            zoom: 1;
         }
         
         h4 {
@@ -42,7 +39,7 @@
         }
     }
 
-    .header {
+    > .header {
         border-top: none;
     }
 
@@ -56,16 +53,20 @@
     }
 }
 
-.page-links > * {
-    margin-right: 10px;
-}
+.page-links {
+    
+    > * {
+        margin-right: 10px;
+    }
 
-.page-links .pages {
-    display: inline-block;
-}
+    .pages {
+        @include inline-block;
+    }
 
-.page-links .inactive {
-    color: #999;
+    .inactive {
+        color: #999;
+    }
+
 }
 
 .per-page {
@@ -103,13 +104,11 @@
     }
    
     > div {
+        @include inline-block;
         @include radius(3px);   
         @include inset(#f7f7f7);
 
         border: 1px solid #aaa;
-
-        display: inline-block;
-        *display: inline;
 
         padding: 10px 10px 0 10px;
         vertical-align: top;
