@@ -1,1 +1,0 @@
-define("login/main",function(){$(function(){function a(){var d=b.val()&&c.val()?true:false;e.attr("disabled",!d)}var e=$("[type=submit]"),b=$("[name=username]"),c=$("[name=password]");a();b.keyup(a);c.keyup(a)})});

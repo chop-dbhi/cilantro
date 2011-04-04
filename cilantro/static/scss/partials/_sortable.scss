@@ -4,7 +4,7 @@
 .sortable {
     width: auto;
     border-collapse: separate;
-	font-size: 13px;
+	font-size: 12px;
 	margin: 15px 0;
 	border-spacing: 2px;
 	background-color: #fff;
@@ -12,10 +12,11 @@
 	thead, tfoot {
         td, th {
             @include raised(#FFF9A4);
-            border: 1px solid darken(#fff9a4, 35);
+            border: 1px solid darken(#fff9a4, 40);
             text-align: center;
             font-weight: 500;
         	padding: 5px 7px;
+            @include letter-press(#444);        	
         }       
 
         .desc, .asc {
@@ -35,8 +36,8 @@
             background-image: url(../img/desc.gif);            
         }
 
+        // customize to accompany the ascending and descending icons
         .header {
-            @include letterpress(#444);
             background-repeat: no-repeat;
             background-position: right center;
         	cursor: pointer;
@@ -49,7 +50,7 @@
 	}
 
     tbody {
-    	font-family: "Gill Sans", "Trebuchet MS", sans-serif;
+    	//font-family: "Gill Sans", "Trebuchet MS", sans-serif;
 
         tr.selected {
             background-color: #FFFBD8;
@@ -65,7 +66,26 @@
             > p, ul {
                 text-align: left;
             }
-
+            
+            > ul li {
+                margin-bottom: 5px;
+            }
+        }
+        
+        th {
+            font-weight: 500;
+        }
+    }
+    
+    // nested tables
+    table {
+        thead, tfoot {
+            td, th {
+                @include shadow(none);
+                background-color: #eee;
+                border-color: #ddd;
+                font-weight: 500;
+            }
         }
     }
 }

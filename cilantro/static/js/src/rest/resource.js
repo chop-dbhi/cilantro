@@ -2,9 +2,7 @@
  * Resource - a ``resource`` provides an interface for retrieving and
  * interacting with some data.
  */
-define('rest/resource',
-    
-    ['lib/base', 'lib/jquery.jqote2'],
+define('rest/resource', ['lib/base'],
 
     function() {
 
@@ -170,7 +168,7 @@ define('rest/resource',
                     object = $(estring).data(datum);
 
                     // if a uid is not defined, use the index as the uid
-                    uid = (!this.uid) ? i : datum[this.uid]
+                    uid = (!this.uid) ? i : datum[this.uid];
 
                     // get unique identifier relative to the object
                     this.store[uid] = object;

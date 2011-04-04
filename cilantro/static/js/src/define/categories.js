@@ -11,9 +11,7 @@
  * All events are in the 'category' namespace.
  */
 
-define('define/categories',
-
-    ['define/events', 'rest/resource'],
+define('define/categories', ['define/events', 'rest/resource'],
 
     function(Events, Resource) {
 
@@ -59,7 +57,7 @@ define('define/categories',
                     // test cache
                     if (dom.categories.current === id)
                         return false;
-                    dom.categories.current = id
+                    dom.categories.current = id;
 
                     CategoryCollection.ready(function() {
 

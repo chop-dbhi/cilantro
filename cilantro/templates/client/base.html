@@ -10,8 +10,7 @@
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     
-        <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/common.css">
-        {# <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/iconic.css">         #}
+        <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/main.css">
 
         {% block styles %}{% endblock %}
     
@@ -21,13 +20,11 @@
     </head>
     
     <body>
-        <div id="overlay"></div>
-
         {# standard global header #}
         {% include "snippets/header.html" %}
 
         <noscript>
-            <span class="error bl">JavaScript must be enabled. Turn it on and refresh the page.</span>
+            <span class="message error">JavaScript must be enabled. Turn it on and refresh the page.</span>
         </noscript>
 
         {# primary area for displaying page content. override CSS for a page specific style #}
@@ -42,10 +39,8 @@
 
         {% block scripts %}
             <script>var require = { baseUrl: '{{ CILANTRO_JS_URL }}' };</script>
-            <script src="{{ CILANTRO_JS_URL }}lib/requirejs.jquery.js"></script>
-            <script>
-                if (!window.JSON) require(['{{ CILANTRO_JS_URL }}lib/json2.js']);
-            </script>
+            <script src="{{ CILANTRO_JS_URL }}lib/require-jquery.js"></script>
+            <script>if (!window.JSON) require(['{{ CILANTRO_JS_URL }}lib/json2.js']);</script>
         {% endblock %}
     </body>
 </html>

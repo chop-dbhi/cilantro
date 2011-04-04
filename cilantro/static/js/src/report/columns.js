@@ -1,10 +1,6 @@
 // report/columns
 
-require.def(
-    
-    'report/columns',
-
-    ['rest/datasource', 'rest/renderer', 'report/templates', 'lib/jquery.ui'],
+define('report/columns', ['rest/datasource', 'rest/renderer', 'report/templates'],
 
     function(m_datasource, m_renderer, m_templates) {
 

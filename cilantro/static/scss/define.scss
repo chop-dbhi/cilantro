@@ -1,36 +1,31 @@
-@import "partials/constants";
+@import "partials/colors";
 @import "partials/mixins";
 @import "partials/shadows";
 @import "partials/icons";
-@import "partials/overlay";
 
 $BLUE: hsl(207, 100, 33);
+
+input {
+    width: 40px;
+}
 
 /*
  * Panes - layout
  */
 
 #left-pane {
-    @include vertical-gradient(#f3f3f3, #eee);
-
     width: 745px;
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
-    
-    > .content {
-        @include shadow(none);
-
-        background: inherit;
-        margin: 10px;
-        padding: 0;
-    }
+    background-color: #eee;
 }
 
 #center-pane {
     min-height: 300px;
-    padding-top: 10px;
+    padding: 10px 0;
     position: relative;
+    overflow: auto;
 }
 
 #right-pane {
@@ -53,33 +48,38 @@ $BLUE: hsl(207, 100, 33);
     }
 
     form {
-        display: inline-block;
-        padding: 8px 0 5px 12px;
-        float: right;
+        @include inline-block;
+        padding: 7px 0 5px 0;
+        position: absolute;
+        right: 10px;
     }
 
     input {
         @include search-box;
+        width: 120px;   
     }
 } 
 
 #categories {
-    
-    display: inline-block;
+    @include inline-block;
+
     font-size: 13px;
     font-weight: 600;
-    text-shadow: $LIGHT_TEXT_SHADOW;
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
     border-top: 1px solid #aaa;
 
-    > * {
-        @include raised(#e9e9e9);
+    // the tabs themselves
+    > span {
+        @include dual-shadow(
+            inset 0 -1px 4px lighten(#e6e6e6, 20),
+            inset 0 1px 4px darken(#e6e6e6, 20)
+        );
+        @include letter-press(#444);
 
-        color: #333;
-        height: 16px;
-        padding: 6px 12px 15px 12px;
-        vertical-align: top;
+        background-color: #e6e6e6;
+        height: 26px;
+        padding: 5px 12px;
         border-bottom: 1px solid #aaa;
         border-left: 1px dotted #777;
         display: inline-block;
@@ -91,18 +91,19 @@ $BLUE: hsl(207, 100, 33);
             color: #333;
             cursor: pointer;        
         }
-        
-        > * {
-            vertical-align: middle;
+        // inner text
+        > span {
+            position: relative;
+            top: 4px;
         }
     }
     
     > .active {
-        @include shadow(0 -5px 10px #f4f4f4 inset);
+        @include shadow(0 -5px 10px #eee inset);
 
         color: $BLUE;
         border-color: #999;
-        border-bottom-color: #f4f4f4;
+        border-bottom-color: #eee;
         background: #fff;
 
         text-shadow: none;
@@ -110,6 +111,7 @@ $BLUE: hsl(207, 100, 33);
         position: relative;
         
         &:hover {
+            color: $BLUE;
             cursor: default;        
         }
     }
@@ -137,35 +139,28 @@ $BLUE: hsl(207, 100, 33);
  * List of criteria
  */
 #criteria {
-    @include radius(3px);   
-    @include inset(#fff);
-
     @include vertical-thin-scrollbar;
 
+    margin: 0;
     font-size: 0.9em;
     width: 170px;
     padding: 5px 1px;
     max-height: 500px;
     overflow: auto;
-    text-shadow: $LIGHT_TEXT_SHADOW;
-    border: 1px solid #aaa;
     
     > div {
         @include radius(3px);
         @include shadow(0 1px 1px #fdfdfd);
 
         padding: 7px;
+        border-top: 1px solid transparent;
         border-bottom: 1px solid #ddd;
         cursor: pointer;
         font-weight: 500;
         
         &.active {
-            @include floated($BLUE);
-
-            color: #fff;
-            text-shadow: $DARK_TEXT_SHADOW;
-            background-color: $BLUE;
-            border-color: transparent;
+            @include raised($BLUE);
+            @include letter-pop(#fff);
 
             &:hover {
                 color: #fff;
@@ -236,13 +231,9 @@ $BLUE: hsl(207, 100, 33);
 }
 
 #plugin-panel {
-    @include radius(3px);
-    @include inset(#fff);
-
+    margin: 0;
     float: right;
-    width: 500px;
-    padding: 10px;
-    border: 1px solid #aaa;
+    width: 520px;
     margin-bottom: 0;
     
     .content {
@@ -267,6 +258,7 @@ $BLUE: hsl(207, 100, 33);
 /* Form elements below charts */
 .view {
     font-size: 0.85em;
+    background-color: #fff;
 
     h2 {
         text-align: center;
@@ -370,28 +362,4 @@ $BLUE: hsl(207, 100, 33);
 
 // IE fixes
 
-.ie7, .ie8 {
-    // background: transparent does not work..
-    #center-pane .content {
-        @include vertical-gradient(#f3f3f3, #e6e6e6);
-    }
-}
-
-.ie7 {
-    #left-pane, #right-pane, #tabs > * {
-        zoom: 1;
-        *display: inline;  
-    } 
-
-    #categories {        
-        > * {
-            padding-right: 11px;
-            padding-left: 11px;
-        }        
-    }
-
-    #tabs form {
-        padding-right: 0px;
-        padding-left: 7px;
-    }
-}
+.ie7 { }

@@ -7,11 +7,13 @@
 
     .ui-dialog-content {
         padding: 10px;
+        background-color: #eee;
     }
     
     .ui-dialog-buttonpane {
         padding: 10px;
         text-align: right;
+        background-color: #eee;
 
         button {
             @extend button;
@@ -21,8 +23,6 @@
 
     .ui-dialog-titlebar {
         @include container-title;
-//        @include linear-gradient(#444, #222);
-//        @include dual-shadow(0 -1px 4px #000 inset, 0 1px 4px #aaa inset);
 
         .ui-dialog-titlebar-close {
             display: none;

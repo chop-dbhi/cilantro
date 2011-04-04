@@ -1,19 +1,21 @@
 @mixin inline-block {
+    vertical-align: top;
     display: inline-block;
+    // IE7 fix
     *display: inline;
     zoom: 1;
 }
 
 // adds a letter "press" effect to the text. this effects only works if the
 // surrounding color is lighter than the text color
-@mixin letterpress($color, $blur: 2px) {
+@mixin letter-press($color, $blur: 2px) {
     color: $color;
     text-shadow: 0 1px $blur lighten($color, 70);
 }
 
 // adds a letter "pop" effect to the text. this effects only works if the
 // surrounding color is darken than the text color
-@mixin letterpop($color, $blur: 2px) {
+@mixin letter-pop($color, $blur: 2px) {
     color: $color;
     text-shadow: 0 1px $blur darken($color, 70);
 }
@@ -67,25 +69,33 @@
     background: $c1;
     background-image: -moz-linear-gradient(-90deg, $c1, $c2);
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from($c1), to($c2));
+    /*    
+    // IE5.5+
     filter: progid:DXImageTransform.Microsoft.Gradient(startColorstr='#{$c1}', endColorstr='#{$c2}');
+    // IE8+
+    -ms-filter: "progid:DXImageTransform.Microsoft.Gradient(startColorstr='#{$c1}', endColorstr='#{$c2}')";
+    */
 }
 
 // adds a "raised" appearance to the element
 @mixin raised($color, $blur: 2px) {
-    @include dual-shadow(0 1px $blur desaturate(lighten($color, 20), 20) inset, 0 -1px $blur darken($color, 5) inset);
-    @include vertical-gradient($color, darken($color, 5));
+    background-color: $color;
+    border: 1px solid darken($color, 20);
+    @include tri-shadow(
+        inset 0 1px $blur desaturate(lighten($color, 30), 40),
+        inset 0 -1px $blur darken($color, 10),
+        0 1px $blur desaturate(darken($color, 20), 40)
+    );
 }
 
 // adds an "inset" appearance to the element
-@mixin inset($color) {
+@mixin inset($color, $blur: 2px) {
     background-color: $color;
-    @include dual-shadow(0 1px 2px darken($color, 20) inset, 0 1px 1px lighten($color, 60));
-}
-
-// makes the element appear to be slightly floating above other elements
-@mixin floated($color, $blur: 2px) {
-    @include shadow(0 2px $blur desaturate(darken($color, 15), 10));
-    @include vertical-gradient($color, darken($color, 5));
+    border: 1px solid darken($color, 20);
+    @include dual-shadow(
+        inset 0 1px $blur darken($color, 20),
+        0 1px $blur lighten($color, 80)
+    );
 }
 
 // shorcut to define a message color scheme
@@ -100,9 +110,7 @@
 
 // WebKit only: sets the scrollbar to be thinner and less obtrusive
 @mixin vertical-thin-scrollbar {
-    &::-webkit-scrollbar {
-        width: 1ex;
-    }
+    &::-webkit-scrollbar { width: 1ex; }
 
     &::-webkit-scrollbar-thumb:vertical {
         background: rgba(0, 0, 0, 0.2);
@@ -112,9 +120,7 @@
 
 // WebKit only: sets the scrollbar to be thinner and less obtrusive
 @mixin horizontal-thin-scrollbar {
-    &::-webkit-scrollbar {
-        height: 1ex;
-    }
+    &::-webkit-scrollbar { height: 1ex; }
 
     &::-webkit-scrollbar-thumb:horizontal {
         background: rgba(0, 0, 0, 0.2);
@@ -126,9 +132,9 @@
 // search boxes
 @mixin search-box {
     @include radius(15px);
-    @include shadow(2px 2px 3px #ddd inset);
+    @include shadow(inset 2px 2px 3px #ccc);
     
     background: #fff url(../img/icons/search.png) no-repeat 3px;
     padding: 2px 5px 2px 21px;
-    border: 1px solid #999;
+    border: 1px solid #777;
 }

@@ -828,7 +828,8 @@ define( ['define/view'],
                         $addQueryButton = $staticBox.find("#add_to_query");
                         $addQueryButton.click(function(){
                              var event = $.Event("UpdateQueryButtonClicked");
-                             $(this).trigger(event); 
+                             $(this).trigger(event);
+                             return false; 
                         });
                     }
                     // Make sure the button for this concept has the correct label

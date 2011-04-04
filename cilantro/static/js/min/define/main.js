@@ -1,413 +1,3216 @@
-define("rest/resource",["lib/base","lib/jquery.jqote2"],function(){return Resource=Base.extend({url:"",dataType:"json",timeout:5E3,interval:15,uid:"id",_setup:function(d){if(this.loaded!==true){var i=$.isArray(d)?[]:{};this._=$.extend(true,i,d);this.store={};if(this.template)this.dom=this.render(this.template);this.loaded=true}},_fetch:function(){var d=this;this.xhr=$.ajax({type:"GET",url:this.url,dataType:this.dataType,success:function(i){d._setup(i)}})},ready:function(d,i){d=d||function(){};if(this.loaded)d.apply(this);
-else{attempts=i||parseInt(this.timeout/this.interval);this.store&&!this.xhr&&this._setup(this.store);this.url&&!this.xhr&&this._fetch();if(!--attempts)throw new Error("Failed to get a response");var m=this;setTimeout(function(){m.ready(d,attempts)},15)}return this},render:function(d){if(arguments.length===1&&typeof d=="object"){data=d;d=this.template}else data=arguments[1]||this._;$.isArray(data)||(data=[data]);if(typeof d=="string")d=$.jqotec(d);for(var i,m,l=[],f=0,a=data.length;f<a;f++){i=data[f];
-m=$.jqote(d,i);m=$(m).data(i);i=!this.uid?f:i[this.uid];this.store[i]=m;l.push.apply(l,m.toArray())}return $(l)},grep:function(d,i,m,l){var f=l||this._;f=$.isArray(f)?f:[f];var a;this.ready(function(){a=$.grep(f,function(c){return $(c).data(d)===i})});return a}})});
-define("define/categories",["define/events","rest/resource"],function(d,i){var m;$(function(){var l={categories:$("#categories"),subcategories:$("#subcategories")};l.categories.current=null;m=(new i({url:l.categories.data("uri"),template:'<span id="tab-<%= this.name.toLowerCase() %>" class="tab" data-id="<%= this.id %>"><div class="icon"></div><span><%= this.name %></span></span>'})).ready(function(){l.categories.html(this.dom);this.dom.first().click()});l.categories.bind(d.ACTIVATE_CATEGORY,function(f,
-a){if(l.categories.current===a)return false;l.categories.current=a;m.ready(function(){var c=this.store[a];c.addClass("active");c.siblings().removeClass("active");(c=c.data("_state"))&&c.criterion&&l.categories.trigger(d.ACTIVATE_CRITERION,[c.criterion])})});l.categories.bind(d.SYNC_CATEGORY,function(f,a,c){m.ready(function(){this.store[a].data("_state",{criterion:c});l.categories.trigger(d.ACTIVATE_CATEGORY,[a])});return false});l.categories.delegate("span.tab","click",function(f){$(f.currentTarget).trigger(d.ACTIVATE_CATEGORY,
-[$(this).data("id")])});l.subcategories.delegate("span","click",function(){$(this).addClass("active").siblings().removeClass("active");return false})});return m});
-define("define/viewelement",["lib/base"],function(){return Base.extend({constructor:function(d,i){this.state="INIT";this.ds={};this.viewset=d;this.concept_pk=i;this.dom=$();this.render();this.dom.delegate("input,select,textarea","change keyup",$.proxy(this.elementChanged,this));this.dom.bind("UpdateElementEvent",$.proxy(this.updateElement,this));this.dom.bind("UpdateDSEvent",$.proxy(this.updateDS,this));this.dom.bind("GainedFocusEvent",$.proxy(this.gainedFocus,this));this.dom.bind("LostFocusEvent",
-$.proxy(this.lostFocus,this));this.dom.bind("RegisterElementsEvent",$.proxy(this.registerElements,this));this.dom.bind("HideDependentsEvent",$.proxy(this.hideDependents,this));this.dom.bind("ShowDependentsEvent",$.proxy(this.showDependents,this))},render:function(){throw{name:"FunctionNotImplementedException",message:'This function needs to set the "dom" attribute of this object.'};},elementChanged:function(){throw{name:"FunctionNotImplementedException",message:"This function needs to trigger an ElementChangedEvent with the new value of the evt.target."};
-},updateElement:function(){throw{name:"FunctionNotImplementedException",message:"This function needs to find the element whose name = element.name, and set its value to element.value."};},updateDS:function(d,i){for(var m in i)this.updateElement("UpdateElementEvent",{name:m,value:i[m]});this.ds=i;this.dom.data("datasource",i)},registerElements:function(){$("input,select",this.dom).change()},gainedFocus:function(){this.state="ONSCREEN"},lostFocus:function(){this.state="OFFSCREEN"},hideDependents:function(d){if(this.dom[0]!==
-(d.originalEvent?d.originalEvent.target:d.target)&&this.dom.has(d.target).length===0)$("input,select,label",this.dom).attr("disabled","true").change()},showDependents:function(d){if(this.dom[0]!==(d.originalEvent?d.originalEvent.target:d.target)&&this.dom.has(d.target).length===0)$("input,select,label",this.dom).filter(":disabled").removeAttr("disabled").change()}})});
-define("define/form",["define/viewelement","lib/jquery.ui"],function(d){var i=['<option selected value="in">is equal to</option>','<option value="-in">is not equal to</option>'],m=d.extend({constructor:function(l,f){this.base(l,f);$('input[data-validate="date"]',this.dom).datepicker({changeMonth:true,changeYear:true})},render:function(){var l={nullboolean:m.nullboolean_tmpl,"boolean":m.boolean_tmpl,date:m.number_tmpl,number:m.number_tmpl,string:m.string_tmpl,"string-list":m.stringlist_tmpl},f=this.dom=
-$('<span class="form_container"></span>'),a=this.concept_pk;$.each(this.viewset.fields,function(c,g){c=[l[g.datatype]];c.unshift($.jqotec("<p>"));c.push($.jqotec("</p>"));g.hasOwnProperty("pk")||c.push(m.pk_tmpl);$.each(["choices","pkchoices"],function(q,v){g[v]&&$.each(g[v],function(r){if(g[v][r][0]===null)g[v][r][0]="null";if(g[v][r][1]==="None")g[v][r][1]="No Data"})});var j=null,n=null;if(g.hasOwnProperty("pk"))j=a+"_"+g.pk;else{j=$.map(g.pkchoices,function(q){return parseInt(q[0])});j.sort();
-n=j.join("OR");j=a+"_"+n}c=$($.jqote(c,{datatype:g.datatype,choices:g.choices,field_id:j,label:g.name,pkchoices:g.pkchoices,pkchoice_label:g.pkchoice_label,pkchoice_id:n,optional:g.hasOwnProperty("optional")?g.optional:false,"default":g.hasOwnProperty("default")?g["default"]:0,pkchoice_default:g.hasOwnProperty("pkchoice_default")?g.pkchoice_default:0}));c.children().not("span").wrap("<span/>");f.append(c)})},elementChanged:function(l){var f=$(l.target);if($.contains(this.dom.get(0),f.get(0))){var a,
-c,g=this.dom,j=this;switch(l.target.type){case "checkbox":a=l.target.checked;a=f.is(":visible")&&f.is(":enabled")?a:undefined;g.trigger("ElementChangedEvent",[{name:l.target.name,value:a}]);break;case "select-one":case "select-multiple":case "select":var n=[],q=null;if(a=m.opRe.exec(f.attr("name")))q=$("[name^="+a[1]+"_"+a[2]+"]",g).not(f).not("span");$("option",$(l.target)).each(function(T,E){if(E.selected){n.push(E.value);T={decimal:1,number:1,date:1};if(q&&q.attr("data-validate")in T)if(E.value.search(/range/)>=
-0){$("input[name="+E.id+"_input1]",g).show().change();$("label[for="+E.id+"_input1]",g).show();$("input[name="+E.id+"_input0]",g).show().change()}else if(E.value.search(/null/)>=0){$("input[name="+E.id+"_input1],",g).hide().change();$("label[for="+E.id+"_input1]",g).hide();$("input[name="+E.id+"_input0]",g).hide().change()}else{$("input[name="+E.id+"_input1],",g).hide().change();$("label[for="+E.id+"_input1]",g).hide();$("input[name="+E.id+"_input0]",g).show().change()}else if(q&&q.attr("type")in
-{text:1,textarea:1})if(E.value.search(/exact/)>=0&&q.attr("type")==="textarea"){q.data("switch").data("switch",q);q.before(q.data("switch")).detach();q.data("switch").keyup()}else if(E.value.search(/^-?in$/)>=0&&q.attr("type")==="text")if(q.data("switch")){q.data("switch").data("switch",q);q.before(q.data("switch")).detach();q.data("switch").keyup()}else{E=$('<textarea rows="8" id="'+q.attr("id")+'" name="'+q.attr("name")+'" cols="25"></textarea>').data("switch",q);q.before(E).detach();c=g.data("datasource")||
-{};if(c[q.attr("name")]instanceof Array)j.updateElement(null,{name:q.attr("name"),value:c[q.attr("name")]});else typeof c[q.attr("name")]==="string"?j.updateElement(null,{name:q.attr("name"),value:[c[q.attr("name")]]}):j.updateElement(null,{name:q.attr("name"),value:[]});E.keyup()}}});if(l.target.type==="select-multiple"){a=[];for(var v=n.length,r=0;r<v;r++){var u=n[r];a.push(u in m.s_to_primative_map?m.s_to_primative_map[u]:u)}a=a}else a=n[0]in m.s_to_primative_map?m.s_to_primative_map[n[0]]:n[0];
-if(f.is("[data-optional=true]"))a=$.type(a)in{string:1,array:1}&&a.length===0?undefined:a;a=this.state==="INIT"&&f.css("display")!=="none"||f.is(":visible")&&f.is(":enabled")?a:undefined;g.trigger("ElementChangedEvent",[{name:l.target.name,value:a}]);break;case "textarea":a=this.state==="INIT"&&f.css("display")!=="none"||f.is(":visible")&&f.is(":enabled")?f.val().split("\n"):undefined;g.trigger("ElementChangedEvent",[{name:l.target.name,value:a}]);break;default:a=$(l.target).closest("p").find("select").val();
-r=l.target.name.substr(0,l.target.name.length-1);switch(f.attr("data-validate")){case "number":case "decimal":case "date":v=f.attr("data-validate");u=$("input[name="+r+"0]",g);r=$("input[name="+r+"1]",g);if(v==="date"){u=new Date(u.val());var F=new Date(r.val())}else{u=parseFloat(u.val());F=parseFloat(r.val())}if(v!=="date"&&f.is(":visible")&&isNaN(Number(f.val()))){a=$.Event("InvalidInputEvent");f.trigger(a)}else if($(l.target).hasClass("invalid")){a=$.Event("InputCorrectedEvent");f.trigger(a)}else if(a.search(/range/)>=
-0&&u>F){a=$.Event("InvalidInputEvent");a.reason="badrange";a.message="First input must be less than second input.";f.parent().trigger(a)}else if($(l.target).parent().hasClass("invalid_badrange")&&(r.css("display")==="none"||u<F)){a=$.Event("InputCorrectedEvent");a.reason="badrange";f.parent().trigger(a)}break;default:break}a=this.state==="INIT"&&f.css("display")!=="none"||f.is(":visible")&&f.is(":enabled")?f.val():undefined;g.trigger("ElementChangedEvent",[{name:l.target.name,value:a}]);break}l.stopPropagation()}},
-updateElement:function(l,f){l=$("[name="+f.name+"]",this.dom);if(l.length!==0)switch(l.attr("type")){case "checkbox":l.attr("checked",f.value);break;case "select-multiple":var a=$.isArray(f.value)?f.value:[f.value];$("option",l).each(function(c,g){c=$.map(a,function(j){return typeof j in{string:1,number:1}?j:String(j)});g.selected=$.inArray(g.value,c)!=-1?true:false});break;case "textarea":l.val(f.value.join("\n"));break;default:if($.isArray(f.value))break;l.attr("value",typeof f.value in{string:1,
-number:1}?f.value:String(f.value));break}}},{s_to_primative_map:{"true":true,"false":false,"null":null},opRe:/^(\d*)_(\d+(?:OR\d+)*)_operator$/,nullboolean_tmpl:$.jqotec('<label for="<%=this.field_id%>"><%=this.label%></label><select data-datatype="nullboolean"data-optional="<%=this.optional%>"  multiple id ="<%=this.field_id%>" name="<%=this.field_id%>"><option <%=this["default"]===true?"selected":""%> value="true">Yes</option><option <%=this["default"]===false?"selected":""%> value="false">No</option><option <%=this["default"]===null?"selected":""%> value="null">No Data</option></select>'),
-boolean_tmpl:$.jqotec('<%if (this.optional) {%><label for="<%=this.field_id%>"><%=this.label%></label><select data-datatype="boolean" data-optional="<%=this.optional%>" id ="<%=this.field_id%>" name="<%=this.field_id%>"><option value="">No Preference</option><option <%=this["default"]===true?"selected":""%> value="true">Yes</option><option <%=this["default"]===false?"selected":""%> value="false">No</option></select><%} else {%><input type="checkbox" name="<%=this.field_id%>" value="<%=this.field_id%>" <%= this["default"] ? "checked":""%>/><label for="<%=this.field_id%>"><%=this.label%></label><%}%>'),
-number_tmpl:$.jqotec('<label for="<%=this.field_id%>"><%=this.label%></label><select id="<%=this.field_id%>_operator" name="<%=this.field_id%>_operator"><option selected id="<%=this.field_id%>" value="range">is between</option><option id="<%=this.field_id%>" value="-range">is not between</option><option id="<%=this.field_id%>" value="lt">is less than</option><option id="<%=this.field_id%>" value="gt">is greater than</option><option id="<%=this.field_id%>" value="lte">is less than or equal to</option><option id="<%=this.field_id%>" value="gte">is greater than or equal to</option><option id="<%=this.field_id%>" value="exact">is equal to</option><option id="<%=this.field_id%>" value="-exact">is not equal to</option><option id="<%=this.field_id%>" value="isnull">is null</option><option id="<%=this.field_id%>" value="-isnull">is not null</option></select><span class="input_association" name="<%=this.field_id%>_input_assoc"><input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input0" type="text" name="<%=this.field_id%>_input0" size="5"><label for="<%=this.field_id%>_input1">and</label><input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input1" type="text" name="<%=this.field_id%>_input1" size="5"></span>'),
-string_tmpl:$.jqotec(['<% if (this.choices) {%><label for="<%=this.field_id%>"><%=this.label%></label><select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',i.join(""),'</select><select multiple="multiple" id="<%=this.field_id%>-value" name="<%=this.field_id%>" size="3" data-optional="<%=this.optional%>" ><% for (var index = 0; index < this.choices.length; index++) { %><option value="<%=this.choices[index][0]%>"><%=this.choices[index][1]%></option><%}%></select><%} else {%><label for="<%=this.field_id%>"><%=this.label%></label><select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator"><option selected value="iexact">is equal to</option><option value="-iexact">is not equal to</option><option value="in">is one of</option><option value="-in">is not one of</option><option value="icontains">contains</option><option value="-icontains">does not contain</option></select><input data-optional="<%=this.optional%>" type="text" id="<%=this.field_id%>_text" name="<%=this.field_id%>" size = "10"><%}%>'].join("")),
-stringlist_tmpl:$.jqotec(['<label for="<%=this.field_id%>"><%=this.label%></label><select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',i.join(""),'</select><textarea data-optional="<%=this.optional%>" id="<%=this.field_id%>_text" name="<%=this.field_id%>" rows="8" cols="25"></textarea>'].join("")),pk_tmpl:$.jqotec('<p><label for="<%=this.pkchoice_id%>"><%=this.pkchoice_label%></label><select id="<%=this.pkchoice_id%>" name="<%=this.pkchoice_id%>"><% for (index in this.pkchoices) { %><option value="<%=this.pkchoices[index][0]%>" <%=this.pkchoices[index][0]==this.pkchoice_default ? "selected":""%>><%=this.pkchoices[index][1]%></option><%}%></select></p>')});
-return m});
-define("define/chart",["define/form","define/viewelement","lib/highcharts"],function(d,i){var m=i.extend({constructor:function(c,g){this.options={chart:{marginBottom:50,renderTo:null,zoomType:"",events:{}},tooltip:{formatter:null},events:{},plotOptions:{series:{point:{events:{}},events:{click:null}},line:{animation:true},pie:{dataLabels:{enabled:true,formatter:function(){return this.point.name}},borderColor:"#000000",borderWidth:2,allowPointSelect:false,cursor:"pointer",enableMouseTracking:true,stickyTracking:false,
-states:{hover:{brightness:-0.1,enabled:true}},point:{events:{mouseOver:function(){},mouseOut:function(){}}}},column:{dataLabels:{enabled:true},allowPointSelect:false,cursor:"pointer",enableMouseTracking:true,stickyTracking:false,states:{hover:{brightness:-0.1,enabled:true}}}},credits:{enabled:false},legend:{enabled:false},title:{text:null},series:[{name:null,data:null}]};this.base(c,g)},gainedFocus:function(){this.chart.xAxis[0].isDirty=true;this.chart.yAxis[0].isDirty=true;this.chart.isDirty=true;
-this.chart.series[0].isDirty=true;this.updateChart()},updateChart:function(){}},{UNSELECTED_COLOR:"#C5C5C5",SELECTED_COLOR:"#99BDF1",EXCLUDE_COLOR:"#EE3A43",INCLUDE_COLOR:"#99BDF1",ALTERNATE_GRID_COLOR:"#FDFFD5",MINIMUM_SLICE:0.04,map_data_to_display:function(c){var g={};$.each(c,function(j,n){g[n[0]]=n[1]});return g},map_display_to_data:function(c){var g={};$.each(c,function(j,n){g[n[1]]=n[0]});return g},nb_plural_to_singular_map:{"in":"exact","-in":"-exact"},nb_singular_to_plural_map:{exact:"in",
-"-exact":"-in"}}),l=m.extend({constructor:function(c,g){this.selected=[];var j=this.map=m.map_data_to_display(c.data.choices);this.unmap=m.map_display_to_data(c.data.choices);this.negated=false;this.range_form=new d({fields:[{datatype:"string",name:c.data.name,choices:c.data.choices,pk:c.data.pk}]},g);this.range_form=this.range_form.dom;this.range_form.find("select[multiple]").hide();this.range_form.find("input").css("margin","10px");$.each(c.data.coords,function(n){c.data.coords[n][0]=j[c.data.coords[n][0]]});
-this.base(c,g)},notify:function(){this.dom.trigger("ElementChangedEvent",[{name:this.concept_pk+"_"+this.viewset.data.pk,value:this.selected}])},elementChanged:function(c,g){if(g.value!==null){this.negated=g.value==="in"?false:true;this.updateChart()}},updateDS:function(c,g){this.selected=g[this.concept_pk+"_"+this.viewset.data.pk];if(this.selected===undefined)this.selected=[];else if(!$.isArray(this.selected))this.selected=[this.selected];this.negated=g[this.concept_pk+"_"+this.viewset.data.pk+"_operator"]===
-"-in";this.range_form.triggerHandler(c,[g])},updateElement:function(c,g){if(g.name===this.concept_pk+"_"+this.viewset.data.pk)this.selected=g.value;else this.negated=g.name===this.concept_pk+"_"+this.viewset.data.pk+"_operator"&&g.value==="in"?false:true;this.range_form.triggerHandler(c,[g])},updateChart:function(){var c=this;$.map(this.chart.series[0].data,function(g){if($.inArray(c.unmap[g.name||g.category],c.selected)!==-1)c.negated?g.update({color:m.EXCLUDE_COLOR},false):g.update({color:m.SELECTED_COLOR},
-false);else g.update({color:m.UNSELECTED_COLOR},false)});this.chart.redraw();$.map(this.chart.series[0].data,function(g){$(g.tracker.element).mouseover();$(g.tracker.element).mouseout()})},seriesClick:function(c){var g=c.point.category||c.point.name,j=$.inArray(this.unmap[g],this.selected);if(j===-1){this.negated?c.point.update({color:l.EXCLUDE_COLOR}):c.point.update({color:l.SELECTED_COLOR});this.selected.push(this.unmap[g])}else{c.point.update({color:l.UNSELECTED_COLOR});this.selected.splice(j,
-1)}this.notify();this.updateChart();this.chart.hoverPoint=c.point;this.chart.hoverSeries=c.point.series}});i=l.extend({constructor:function(c,g){var j=c.data.coords,n=this.data_store={};$.each(j,function(r,u){n[u[0]]=u[1]});var q=0;$.each(j,function(r,u){q+=u[1]});var v=q*m.MINIMUM_SLICE;$.each(j,function(r,u){if(u[1]<v)u[1]=v});this.base(c,g)},render:function(){this.dom=$('<div class="chart"></div>');this.options.chart.renderTo=this.dom.get(0);var c=this;this.options.tooltip.formatter=function(){return""+
-c.data_store[c.unmap[this.point.name]]};this.options.chart.defaultSeriesType="pie";this.options.series[0].name=this.viewset.data.title;this.options.series[0].data=this.viewset.data.coords;this.options.title.text=this.viewset.data.title;this.options.plotOptions.series.events.click=$.proxy(this.seriesClick,this);this.chart=new Highcharts.Chart(this.options)},gainedFocus:function(){this.base();this.negated=false}});var f=l.extend({render:function(){var c=this;this.dom=$('<div class="chart"></div>');
-this.options.chart.marginBottom=this.viewset.data.coords.length>6?100:50;this.options.chart.renderTo=this.dom.get(0);this.options.chart.defaultSeriesType="column";this.options.chart.events.redraw=$.proxy(this.redraw,this);this.options.chart.events.load=$.proxy(this.load,this);this.options.plotOptions.series.events.click=$.proxy(this.seriesClick,this);this.options.title.text=this.viewset.data.title;this.options.series[0].name=this.viewset.data.title;this.options.series[0].data=$.map(this.viewset.data.coords,
-function(g){return g[1]});this.options.tooltip={formatter:function(){return this.point.category+", "+this.y}};this.options.xAxis={categories:$.map(this.viewset.data.coords,function(g){return g[0]}),title:{text:this.viewset.data.xaxis,margin:this.viewset.data.coords.length>6?90:50},labels:{align:this.viewset.data.coords.length>6?"left":"center",y:this.viewset.data.coords.length>6?10:20,rotation:this.viewset.data.coords.length>6?50:0,formatter:function(){var g=this.value;if(c.viewset.data.coords.length>
-6){if(g.length>20)g=g.substr(0,18)+".."}else g=this.value.split(" ").join("<br/>");return g}}};this.options.yAxis={min:0,title:{text:this.viewset.data.yaxis},labels:{rotation:45}};this.chart=new Highcharts.Chart(this.options)},redraw:function(){for(var c=0;c<this.chart.series[0].data.length;c++){var g=this.chart.series[0].data[c];$(g.dataLabel.element).unbind();$(g.dataLabel.element).attr("fill",g.color);$(g.dataLabel.element).css("color",g.color);$(g.dataLabel.element).hover(function(){$(this).css("cursor",
-"pointer")},function(){$(this).css("cursor","")});var j=this;$(g.dataLabel.element).click(function(n){return function(){n.series.chart.hoverPoint=n;n.series.chart.isDirty=true;var q=$.inArray(j.unmap[n.category],j.selected);q===-1?j.selected.push(j.unmap[n.category]):j.selected.splice(q,1);j.notify();j.updateChart()}}(g))}}}),a=m.extend({constructor:function(c,g){var j=this.range_form=(new d({fields:[c.data]},g)).dom;this.base(c,g);c=this.extremes=this.chart.xAxis[0].getExtremes();g=1/3*(c.max-c.min);
-$("input[name*=input0]",j).val((c.min+g).toFixed(1));$("input[name*=input1]",j).val((c.min+2*g).toFixed(1));this.range_form.bind("ElementChangedEvent",$.proxy(this.manual_field_handler,this));this.manual_field_handler(null)},render:function(){this.range_form.find("input").css("margin","10px");this.options.chart.renderTo=(this.dom=$('<div class="chart"></div>')).get(0);this.options.chart.defaultSeriesType="line";this.options.chart.zoomType="x";this.options.title.text=this.viewset.data.title;this.options.chart.events.selection=
-$.proxy(this.chartSelection,this);this.options.chart.events.click=$.proxy(this.chartClick,this);this.options.plotOptions.series.point.events.click=$.proxy(this.pointClick,this);this.options.series[0].name=this.viewset.data.title;this.options.series[0].data=this.viewset.data.coords;this.options.tooltip.formatter=function(){return""+this.y};this.options.xAxis={maxPadding:0.05,startOnTick:false,title:{text:this.viewset.data.xaxis},labels:{align:"center",y:20}};this.options.yAxis={min:0,title:{style:{fontWeight:"bold"},
-text:this.viewset.data.yaxis,rotation:270},labels:{rotation:45}};this.chart=new Highcharts.Chart(this.options);this.dom.append(this.range_form)},manual_field_handler:function(){var c=null,g=this.chart.options,j=parseFloat($("input[name*=input0]",this.range_form).val()).toFixed(1),n=parseFloat($("input[name*=input1]",this.range_form).val()).toFixed(1);switch(this.range_form.find("select[name*=operator]").val()){case "range":c=m.INCLUDE_COLOR;case "-range":c=c||m.EXCLUDE_COLOR;if(g.chart.zoomType!==
-"x"){this.range_form.detach();this.chart.destroy();g.chart.zoomType="x";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();j&&n&&this.chart.xAxis[0].addPlotBand({from:j,to:n,color:c});this.dom.trigger("ShowDependentsEvent");break;case "lt":c=m.INCLUDE_COLOR;if(g.chart.zoomType!==""){this.range_form.detach();this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);
-this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();if(j){this.chart.xAxis[0].addPlotLine({value:j,color:m.EXCLUDE_COLOR,width:3});this.chart.xAxis[0].addPlotBand({from:this.extremes.min,to:j,color:c})}this.dom.trigger("ShowDependentsEvent");break;case "gt":c=m.INCLUDE_COLOR;if(g.chart.zoomType!==""){this.range_form.detach();this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();
-if(j){this.chart.xAxis[0].addPlotLine({value:j,color:m.EXCLUDE_COLOR,width:3});this.chart.xAxis[0].addPlotBand({from:j,to:this.extremes.max,color:c})}this.dom.trigger("ShowDependentsEvent");break;case "lte":c=m.INCLUDE_COLOR;if(g.chart.zoomType!==""){this.range_form.detach();this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();j&&this.chart.xAxis[0].addPlotBand({from:this.extremes.min,
-to:j,color:c});this.dom.trigger("ShowDependentsEvent");break;case "gte":c=m.INCLUDE_COLOR;if(g.chart.zoomType!==""){this.range_form.detach();this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();j&&this.chart.xAxis[0].addPlotBand({from:j,to:this.extremes.max,color:c});this.dom.trigger("ShowDependentsEvent");break;case "exact":if(g.chart.zoomType!==""){this.range_form.detach();
-this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();j&&this.chart.xAxis[0].addPlotLine({value:j,color:m.INCLUDE_COLOR,width:3});this.dom.trigger("ShowDependentsEvent");break;case "-exact":if(g.chart.zoomType!==""){this.range_form.detach();this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();
-j&&this.chart.xAxis[0].addPlotLine({value:j,color:m.EXCLUDE_COLOR,width:3});this.dom.trigger("ShowDependentsEvent");break;case "isnull":c=m.EXCLUDE_COLOR;if(g.chart.zoomType!==""){this.range_form.detach();this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.chart.xAxis[0].removePlotBand();this.chart.xAxis[0].addPlotLine({from:this.extremes.min,to:this.extremes.max,color:c});this.dom.trigger("HideDependentsEvent");
-break;case "-isnull":if(g.chart.zoomType!==""){this.range_form.detach();this.chart.destroy();g.chart.zoomType="";g.plotOptions.line.animation=false;this.chart=new Highcharts.Chart(g);this.dom.append(this.range_form)}this.dom.trigger("ShowDependentsEvent");this.chart.xAxis[0].removePlotBand();break}},updateDSEvent:function(c,g){this.range_form.triggerHandler(c,[g])},elementChanged:function(){},updateElement:function(c,g){this.range_form.triggerHandler(c,[g])},registerElements:function(){$("select",
-this.range_form).change()},gainedFocus:function(c){this.base();this.range_form.triggerHandler(c)},chartSelection:function(c){this.range_form.find("select[name*=operator]").val();var g=c.xAxis[0].min,j=c.xAxis[0].max;g=g<this.extremes.min?this.extremes.min:g;j=j>this.extremes.max?this.extremes.max:j;g=parseFloat(g).toFixed(1);j=parseFloat(j).toFixed(1);$("input[name*=input0]",this.range_form).val(g).change();$("input[name*=input1]",this.range_form).val(j).change();c.preventDefault()},chartClick:function(c){if(!this.chart.options.chart.zoomType){c=
-c.xAxis[0].value;c=c<this.extremes.min?this.extremes.min:c;c=parseFloat(c).toFixed(1);$("input[name*=input0]",this.range_form).val(c).change()}},pointClick:function(c){if(!this.chart.options.chart.zoomType){c=c.target.x;c=c<this.extremes.min?this.extremes.min:c;c=parseFloat(c).toFixed(1);$("input[name*=input0]",this.range_form).val(c).change()}}});return{BarChart:f,LineChart:a,PieChart:i}});
-define("utils/frontdesk",["require","exports","module"],function(){function d(i){function m(r){if(r&&typeof r==="object"&&typeof r.length==="number"&&!r.propertyIsEnumerable("length"))return true;return false}function l(r,u,F){r=q[r];if(typeof u==="function")u.apply(u,F);else if(typeof u==="string"||u instanceof String)r[u].apply(r,F)}function f(){var r=0;for(var u in n)n[u]==="in"&&r++;return r+a}var a=0,c=[],g=[],j={},n={},q={},v=m(i);this.onEmpty=function(r){c.push(r)};this.onFull=function(r){g.push(r)};
-this.checkIn=function(r,u){var F,T=false;if(r!==undefined){if(n[r]!=="in"){j[r]=[];n[r]="in";if(u!==undefined)q[r]=u;T=true;if(v)for(F in i)if(n[F]!=="in"){T=false;break}}}else a++;if(f()===i||T)$.each(g,function(E,U){U()});return u};this.checkOut=function(r,u){if(f()!==0){if(r===undefined)a--;else if(n[r]==="in"){n[r]="out";if(u!==undefined)q[r]=u;u=0;for(var F=j[r].length;u<F;u++)l(r,j[r][u][0],j[r][u][1])}f()===0&&$.each(c,function(T,E){E()})}};this.leaveMessage=function(r,u){var F=Array.prototype.slice.call(arguments,
-2);n[r]==="in"?j[r].push([u,F]):l(r,u,F)}}return d});
-define("define/view",["define/chart","define/form","utils/frontdesk","lib/base"],function(d,i,m){var l=Base.extend({constructor:function(f,a){this.viewset=f;this.fd=new m;this.view=$('<div class="view"></div>');this.name=a;f=this.view;$(this);f.bind("UpdateElementEvent",jQuery.proxy(this.updateElement,this));f.bind("HideDependentsEvent ShowDependentsEvent",jQuery.proxy(this.toggleDependents,this));f.bind("UpdateQueryButtonClicked",jQuery.proxy(this.constructQuery,this));f.bind("UpdateDSEvent GainedFocusEvent LostFocusEvent RegisterElementsEvent",
-jQuery.proxy(this.notifyChildren,this));$(this).bind("UpdateQueryButtonClicked GainedFocusEvent LostFocusEvent UpdateQueryButtonClicked HideDependentsEvent RegisterElementsEvent ShowDependentsEvent UpdateDSEvent",jQuery.proxy(this.eventPassThru,this));this.render()},render:function(){var f=this.viewset,a=this.view,c=this.fd;f.elements[0].type!=="chart"&&a.append("<h2>"+this.name+"</h2>");$.each(this.viewset.elements,function(g,j){var n=null;switch(j.type){case "form":n=new i(j,f.concept_id);a.append(n.dom);
-c.checkIn(g,n.dom);c.checkOut(g);break;case "chart":n=j.data.datatype;n=n==="number"?new d.LineChart(j,f.concept_id):n==="nullboolean"||n==="boolean"?new d.PieChart(j,f.concept_id):new d.BarChart(j,f.concept_id);a.append(n.dom);c.checkIn(g,n.dom);c.checkOut(g);break;case "custom":j.css&&l.loadCss(j.css);c.checkIn(g);var q=f.elements[0].type==="chart"?0:1;require([j.js],function(v){v=new v(j,f.concept_id);a.children().length-1>=g+q?$(a.children()[g]).prepend(v.dom):a.append(v.dom);c.checkOut(g,v.dom)});
-break;default:a.append($("<p>Undefined View!</p>"))}})},updateElement:function(f){var a=this.fd;$.each(this.viewset.elements,function(c){a.leaveMessage(c,"triggerHandler",f)});f.stopPropagation()},toggleDependents:function(f){var a=this.fd;f.target===this.view.children().get(0)&&$.each(this.viewset.elements,function(c){c!==0&&a.leaveMessage(c,"triggerHandler",f)});f.stopPropagation()},constructQuery:function(f){this.view.trigger("ConstructQueryEvent");f.stopPropagation()},notifyChildren:function(f,
-a){var c=this.fd;$.each(this.viewset.elements,function(g){c.leaveMessage(g,"triggerHandler",f,a)});f.stopPropagation()},eventPassThru:function(f,a){this.view.triggerHandler(f,a);f.stopPropagation()},dom:function(){return this.view}},{loadCss:function(f){var a=document.createElement("link");a.type="text/css";a.rel="stylesheet";a.href=f;document.getElementsByTagName("head")[0].appendChild(a)}});return l});
-define("define/conceptmanager",["define/view"],function(d){var i;$(function(){var m=$("#plugin-panel");$("#plugin-title");var l=$("#plugin-tabs"),f=$("#plugin-dynamic-content"),a=$("#plugin-static-content");i=function(){function c(t){if($.inArray(t.concept_id,yb)<0){yb.push(parseInt(t.concept_id));if(ca===parseInt(t.concept_id)){mb.html('<span class="icon refresh"/> <span>Update Condition</span>');$(".success",a).show()}}t.stopPropagation()}function g(t){var x=$.inArray(parseInt(t.concept_id),yb);
-if(x>=0){yb.splice(x,1);if(ca===parseInt(t.concept_id)){mb.html('<span class="icon plus"/> <span>Add Condition</span>');$(".success",a).hide()}}t.stopPropagation()}function j(t){var x=null;$.each(Z.elements,function(B,V){if(V.type==="custom")return V.datatype;if(V.data){if(V.data.pk==t){x=V.data.datatype;return false}if(V.data.pkchoices&&$.inArray(t,$.map(V.data.pkchoices,function(sa){return sa[0]}))>=0){x=V.data.datatype;return false}}else{$.each(V.fields,function(sa,qa){if(qa.pk==t){x=qa.datatype;
-return false}if(qa.pkchoices&&$.inArray(t,$.map(qa.pkchoices,function(Xa){return Xa[0]}))>=0){x=qa.datatype;return false}});if(x!==null)return false}});return x}function n(t){var x={};for(var B in t)if(t.hasOwnProperty(B)){var V=va.exec(B);if(V)if(x.hasOwnProperty(V[2]))$.extend(x[V[2]],{val0:t[B],val1:undefined,op:undefined});else x[V[2]]={val0:t[B],val1:undefined,op:undefined};else if(V=Qb.exec(B)){x.hasOwnProperty(V[2])||(x[V[2]]={val0:undefined,val1:undefined,op:undefined});x[V[2]]["val"+V[3]]=
-Number(t[B])||t[B]}else if(V=zb.exec(B))if(x.hasOwnProperty(V[0]))x[V[0]].pk=t[B];else x[V[0]]={val0:undefined,val1:undefined,op:undefined,pk:t[B]}}for(B in t)if(t.hasOwnProperty(B))if((V=Ya.exec(B))&&(x[V[2]]||t[B].match(/null/))){x.hasOwnProperty(V[2])||(x[V[2]]={val0:undefined,val1:undefined,op:undefined});x[V[2]].op=t[B]}t=[];for(var sa in x){B=x[sa];V=false;var qa=null;if(zb.exec(sa)){qa=sa.split("OR");sa=B.pk;V=true}sa=Number(sa);if(B.val0===undefined&&B.val1===undefined&&B.op!==undefined)t.push({operator:B.op,
-id:sa,concept_id:ca,value:true,datatype:j(sa)});else if(B.val0!==undefined&&B.val1!==undefined&&B.op!==undefined)t.push({operator:B.op,id:sa,value:[B.val0,B.val1],concept_id:ca,datatype:j(sa)});else if(B.val0!==undefined&&B.op!==undefined&&!(B.val0 instanceof Array))t.push({operator:B.op,id:sa,value:B.val0,concept_id:ca,datatype:j(sa)});else if(B.val0!==undefined&&B.val0 instanceof Array){B.op=B.op!==undefined?B.op:"in";var Xa=j(sa);switch(Xa){case "boolean":case "nullboolean":var ia=[],nb=hb[B.op];
-$.each(B.val0,function(Ab,Za){ia.push({operator:nb,id:sa,value:Fa[Za]!==undefined?Fa[Za]:Za,concept_id:ca,datatype:Xa})});ia.length>1?t.push({type:Aa.test(B.op)?"and":"or",children:ia,concept_id:ca}):t.push(ia[0]);break;default:t.push({operator:B.op,id:sa,value:B.val0,concept_id:ca});break}}else if(B.val0!==undefined&&!(B.val0 instanceof Array)&&B.val1===undefined)t.push({operator:"exact",id:sa,value:B.val0,concept_id:ca});else throw"Unable to determine field "+B+" in concept "+ca;if(V)t[t.length-
-1].id_choices=qa}return t.length===1?t[0]:{type:Z.join_by||"and",children:t,concept_id:ca}}function q(t,x){var B=x||{};if(t.hasOwnProperty("type"))$.each(t.children,function(qa,Xa){q(Xa,B)});else{if(t.hasOwnProperty("id_choices")){x=t.id_choices.join("OR");B[x]=t.id}else x=t.id;x=t.concept_id+"_"+x;if(!t.operator.match(/null/))if(t.datatype in{number:1,date:1})for(var V=t.value instanceof Array?t.value:[t.value],sa=0;sa<V.length;sa++)B[x+"_input"+sa]=V[sa];else if(B.hasOwnProperty(x)){B[x]instanceof
-Array||(B[x]=[B[x]]);B[x].push(t.value)}else B[x]=t.value;B[x+"_operator"]=B[x]instanceof Array&&t.datatype&&t.datatype.indexOf("boolean")>=0?Tb[t.operator]:t.operator}return B}function v(t,x){Z.contents=x;t=Z.contents.dom();f.append(t);t.css("display","block");$(".chart",Z.contents).css("display","block");if(!Z.loaded){$(x).trigger("UpdateDSEvent",[da[ca].ds]);$(x).trigger("RegisterElementsEvent")}$(x).trigger("GainedFocusEvent");Z.loaded=true}function r(t,x){if(Z!==null){Z.contents.dom().css("display",
-"none");$(Z.contents).trigger("LostFocusEvent");Z.contents.dom().detach()}Z=da[ca].views[x];if(Z.loaded)v(null,Z.contents);else{Z.concept_id=ca;m.trigger("ViewReadyEvent",[new d(Z,da[ca].name)])}}function u(){}function F(t,x){t=da[ca].ds;var B=false;if(!(!(x.value instanceof Array)&&t[x.name]===x.value)){if(x.value instanceof Array&&t[x.name]instanceof Array){for(var V=0;V<x.value.length;V++)if($.inArray(x.value[V],t[x.name])==-1){B=true;break}if(B===false&&x.value.length==t[x.name].length)return}if(x.value===
-undefined)delete da[ca].ds[x.name];else da[ca].ds[x.name]=x.value instanceof Array?x.value.slice(0):x.value;$.each(da[ca].views,function(sa,qa){Z!==qa&&qa.contents&&qa.contents.trigger("UpdateElementEvent",[x])})}}function T(t){var x=false;if($.isEmptyObject(t))x=true;else{x=true;for(var B in t)if(t.hasOwnProperty(B))if(Ya.test(B)){if(t[B]&&t[B].indexOf("isnull")>=0){x=false;break}}else if(zb.test(B)||va.test(B)||Qb.test(B)){x=false;break}}if(x)return false;for(B in t)if(t.hasOwnProperty(B)){if(t[B]===
-undefined||t[B]==="")return false;if($.isArray(t[B])&&t[B].length===0)return false}return true}function E(t,x){x=x||da[ca].ds;if(!T(x)){x=$.Event("InvalidInputEvent");x.ephemeral=true;x.message="No value has been specified.";$(t.target).trigger(x);return false}x=n(x);$(t.target).trigger("UpdateQueryEvent",[x]);return true}function U(){$(Z.contents).triggerHandler("UpdateQueryButtonClicked")}function J(t){t.reason=t.reason?"_"+t.reason:"";var x=da[ca].invalid_fields,B=$(t.target).attr("name");$.each(da[ca].views,
-function(Xa,ia){ia.contents&&ia.contents.dom().find("[name="+B+"]").addClass("invalid"+t.reason);ia.contents&&ia.contents.dom().find("[name="+B+"]").children().addClass("invalid"+t.reason)});var V=t.message?t.message:"This query contains invalid input, please correct any invalid fields.",sa=false;$.each(a.find(".error"),function(Xa,ia){ia=$(ia);Xa=ia.data("ref_count");if(ia.text()===V){sa=true;if(!t.ephemeral)if(x[B+t.reason]===undefined){x[B+t.reason]=ia;ia.data("ref_count",Xa+1)}else if(ia.text()!==
-x[B+t.reason].text()){var nb=x[B+t.reason].data("ref_count");x[B+t.reason].data("ref_count",nb-1);x[B+t.reason].data("ref_count")===0&&x[B+t.reason].remove();x[B+t.reason]=ia;ia.data("ref_count",Xa+1)}}});if(!sa){var qa=$('<div class="message error">'+V+"</div>");qa.data("ref_count",1);t.ephemeral||(x[B+t.reason]=qa);a.prepend(qa);t.ephemeral?qa.fadeOut(3E3,function(){qa.remove()}):a.find("#add_to_query").attr("disabled","true")}}function X(t){t.reason=t.reason?"_"+t.reason:"";var x=da[ca].invalid_fields,
-B=$(t.target).attr("name");$.each(da[ca].views,function(sa,qa){qa.contents&&qa.contents.dom().find("[name="+B+"]").removeClass("invalid"+t.reason);qa.contents&&qa.contents.dom().find("[name="+B+"]").children().removeClass("invalid"+t.reason)});var V=x[B+t.reason].data("ref_count")-1;V===0?x[B+t.reason].remove():x[B+t.reason].data("ref_count",V);delete da[ca].invalid_fields[B+t.reason];$.isEmptyObject(da[ca].invalid_fields)&&a.find("#add_to_query").attr("disabled","")}function P(t,x){x=x||function(){};
-t.css&&d.loadCss(t.css);t.js?require([t.js],function(){x(t)}):x(t)}function L(t){t=Pa(t);ca=parseInt(t.id);t.globalsLoaded=true;t.views.length<2?l.hide():l.show();var x=$.jqote(bb,t.views);l.html(x);if(t["static"]){a.append(t["static"]);mb=a.find("#add_to_query")}else{a.append(Hb);mb=a.find("#add_to_query");mb.click(function(){var B=$.Event("UpdateQueryButtonClicked");$(this).trigger(B)})}if($.inArray(ca,yb)>=0){mb.html('<span class="icon refresh"/> <span>Update Condition</span>');$(".success",a).show()}else{mb.html('<span class="icon plus"/> <span>Add Condition</span>');
-$(".success",a).hide()}l.children(":first").click()}function pa(t,x){t=l.children().index(x);l.trigger("ShowViewEvent",t)}function Pa(t){if(da[t.id]===undefined)da[t.id]=t;else{$.extend(da[t.id],t);t=da[t.id]}if(!t.ds)t.ds=t.query?q(t.query):{};if(!t.invalid_fields)t.invalid_fields={};return t}function ja(t,x){if(parseInt(t.id)!==ca){if(x)t.query=x;if(ca!==null)da[ca]["static"]=a.children().detach();da[t.id]&&da[t.id].globalsLoaded?L(t):P(t,L)}}var da={},bb='<a class="tab" href="#"><%= this.tabname %></a> ',
-Hb='<div class="message success">Condition has been added.</div><button id="add_to_query"></button>',ca=null,Z=null,mb=null,yb=[],Qb=/^(\d+)_(\d+(?:OR\d+)*)_input([01])$/,va=/^(\d*)_(\d+(?:OR\d+)*)$/,Ya=/^(\d*)_(\d+(?:OR\d+)*)_operator$/,zb=/^\d+(?:OR\d+)+$/,Aa=/-/,hb={"in":"exact","-in":"-exact",exact:"exact","-exact":"-exact"},Tb={exact:"in","-exact":"-in"},Fa={"true":true,"false":false,"null":null};m.bind({ViewReadyEvent:v,ViewErrorEvent:u,ShowViewEvent:r,ElementChangedEvent:F,UpdateQueryButtonClicked:U,
-InvalidInputEvent:J,InputCorrectedEvent:X,ConstructQueryEvent:E,ConceptDeletedEvent:g,ConceptAddedEvent:c});l.bind("ConceptTabClickedEvent",pa);l.tabs(true,function(t,x){x.trigger("ConceptTabClickedEvent",x)});return{show:ja,isConceptLoaded:function(t){return t in da},buildQuery:n,constructQueryHandler:E}}()});return i});
-define("define/criteria",function(){var d=$.jqotec('<div data-uri="<%=this.uri%>" data-id="<%= this.pk %>" class="criterion clearfix"><a href="#" class="remove-criterion"></a><a href="#" class="field-anchor"><%= this.description %></a></div>');return{Criteria:function(i,m,l){var f=$($.jqote(d,{pk:i.concept_id,description:l,uri:m+i.concept_id}));f.data("constraint",i);f.find(".remove-criterion").click(function(){f.trigger("CriteriaRemovedEvent");return false});f.click(function(){f.trigger("activate-criterion",
-[i.concept_id]);return false});return f}}});
-define("define/criteriamanager",["define/criteria"],function(d){var i;$(function(){var m=$("#user-criteria");i=function(){var l={},f=m.find("#criteria-list"),a=m.find(".content"),c=m.find("#remove-criteria"),g=f.attr("data-uri"),j=f.attr("data-report"),n=m.attr("data-uri"),q=f.children(),v=$('<button id="submit-query"><span class="icon arrow-r"/> <span>Get Report</span></button>');$.getJSON(n,function(r){r.store===null||$.isEmptyObject(r.store)||(r.store.hasOwnProperty("concept_id")?m.triggerHandler("UpdateQueryEvent",
-[r.store,true]):$.each(r.store.children.reverse(),function(u,F){m.triggerHandler("UpdateQueryEvent",[F,true])}))});v.click(function(){var r=[];for(var u in l)l.hasOwnProperty(u)&&r.push(l[u].data("constraint"));$.putJSON(n,JSON.stringify(r.length<2?r[0]:{type:"and",children:r}),function(){window.location=j})});c.click(function(){for(var r in l)l.hasOwnProperty(r)&&l[r].trigger("CriteriaRemovedEvent")});m.bind("UpdateQueryEvent",function(r,u,F){var T=u.concept_id,E;if($.isEmptyObject(l)){q.detach();
-a.append(v)}v.attr("disabled","true");$.postJSON(g,JSON.stringify(u),function(U){v.removeAttr("disabled");var J=$.isEmptyObject(l);if(l.hasOwnProperty(T)){E=d.Criteria(u,g,U);l[T].replaceWith(E);E.fadeTo(300,0.5,function(){E.fadeTo("fast",1)})}else{E=d.Criteria(u,g,U);F?f.prepend(E):f.append(E);U=$.Event("ConceptAddedEvent");U.concept_id=T;m.trigger(U)}l[T]=E;if(!F){E.addClass("selected");E.siblings().removeClass("selected")}J&&$(f.children()[0]).find(".field-anchor").click()},"text/plain")});m.bind("CriteriaRemovedEvent",
-function(r){r=$(r.target).data("constraint");l[r.concept_id].remove();delete l[r.concept_id];var u=$.Event("ConceptDeletedEvent");u.concept_id=r.concept_id;m.trigger(u);if($.isEmptyObject(l)){f.append(q);v.detach()}});m.bind("ShowConceptEvent",function(r){var u=$(r.target);f.children(".criterion").removeClass("selected");if(u.is(".criterion"))u.addClass("selected");else{r=r.originalEvent.concept_id;l[r]&&l[r].addClass("selected")}});return{retrieveCriteriaDS:function(r){var u=null;r&&$.each(f.children(),
-function(F,T){if($(T).data("constraint"))if($(T).data("constraint").concept_id==r)u=$(T).data("constraint")});return u}}}()});return i});
-define("define/description",["define/events"],function(d){$(function(){var i={description:$('<div id="description"></div>').appendTo("body")};i.description.timeout=null;i.description.bind(d.ACTIVATE_DESCRIPTION,function(m){clearTimeout(i.description.timeout);var l;l=$(m.target);m=l.offset();var f=l.outerWidth();l=l.children(".description").html();i.description.html(l);l=i.description.outerHeight();l=$(window).height()-(l+m.top);i.description.css({left:m.left+f+20,top:m.top+(l<0?l:0)}).show();return false});
-i.description.bind(d.DEACTIVATE_DESCRIPTION,function(m,l){l=l||0;i.description.timeout=setTimeout(function(){i.description.fadeOut(100)},l);return false});i.description.bind({mouseover:function(){clearTimeout(i.description.timeout)},mouseout:function(){i.description.trigger(d.DEACTIVATE_DESCRIPTION,[200])}})})});
-define("define/criteria2",["define/events","rest/resource","define/conceptmanager","define/criteriamanager","define/description"],function(d,i,m,l){var f;$(function(){var a={criteria:$("#criteria")};f=(new i({url:a.criteria.data("uri"),template:'<div data-id="<%= this.id %>"><span class="name"><%= this.name %></span><span class="description"><%= this.description %></span></div>'})).ready(function(){a.criteria.html(this.dom)});a.criteria.current=null;a.criteria.bind(d.ACTIVATE_CATEGORY,function(g,
-j){f.ready(function(){$.each(this.store,function(){this.data("category").id===j?this.show():this.hide()})})});a.criteria.bind(d.ACTIVATE_CRITERION+" ShowConceptEvent",function(g,j){if(a.criteria.current===j)return false;a.criteria.current=j;f.ready(function(){var n=this.store[j];n.addClass("active");n.siblings().removeClass("active");var q=n.data();a.criteria.trigger(d.SYNC_CATEGORY,[q.category.id,j]);var v=null;v=l.retrieveCriteriaDS(j);m.isConceptLoaded(j)?m.show({id:j},v):$.ajax({url:n.data("uri"),
-dataType:"json",success:function(r){m.show(r,v)}})})});var c=null;a.criteria.delegate("div","mouseenter",function(){clearTimeout(c);var g=this;c=setTimeout(function(){$(g).trigger(d.ACTIVATE_DESCRIPTION,["right"])},700)});a.criteria.delegate("div","mouseleave",function(){clearTimeout(c);$(this).trigger(d.DEACTIVATE_DESCRIPTION,[200])});a.criteria.delegate("div","click",function(){clearTimeout(c);$(this).trigger(d.ACTIVATE_CRITERION,[$(this).data("id")]);$(this).trigger(d.DEACTIVATE_DESCRIPTION)})});
-return f});
-define("define/search",["define/events","define/criteria2","rest/resource"],function(d,i,m){var l;$(function(){function f(){var c=a.results.outerWidth(),g=a.search.offset(),j=a.search.outerHeight(),n=a.search.outerWidth();a.results.css({left:g.left-(c-n)/2,top:g.top+j+5})}var a={search:$("#search"),results:$('<div id="search-results"></div>').appendTo("body"),noresults:$('<p style="font-style:italic">No Results Found</p>')};i.ready(function(){l=(new m({store:i._,template:'<div data-id="<%= this.id %>"><b><%= this.name %></b><br><span><%= this.category.name %></span></div>'})).ready(function(){a.results.html(this.dom);f()});
-a.search.autocomplete2({success:function(c,g){a.noresults.detach();a.results.show().children().hide();g.length?$.each(g,function(){l.store[this]&&l.store[this].show()}):a.noresults.prependTo(a.results)}},null,50)});a.results.entered=false;a.search.bind({blur:function(){a.search.focused=false;a.results.entered||a.results.trigger("mouseleave")},focus:function(){a.search.focused=true;var c=a.search.val();c&&c!==a.search.attr("placeholder")&&a.results.fadeIn("fast")}});a.results.bind({mouseenter:function(){a.results.entered=
-true},mouseleave:function(){a.results.entered=false;a.search.focused||a.results.fadeOut("fast")}});a.results.delegate("div","click",function(){var c=$(this);c.trigger(d.ACTIVATE_CRITERION,[c.data("id")])});$(window).bind("resize",function(){f()})});return l});define("utils/html5fix",function(){$(function(){Modernizr.input.placeholder||$("input[placeholder]").placeholder();Modernizr.input.autofocus||$("input[autofocus]").focus()})});
-require(["define/events","define/categories","define/criteria2","define/search","define/criteriamanager","utils/html5fix","utils/ajaxsetup","utils/extensions","utils/sanitizer","lib/jquery.bubbleproxy"],function(d){$(function(){var i={};i[d.ACTIVATE_CATEGORY]={listeners:["#criteria","#categories"]};i[d.ACTIVATE_CRITERION]={listeners:["#criteria"]};i[d.SYNC_CATEGORY]={listeners:["#categories"]};i[d.ACTIVATE_DESCRIPTION]={listeners:["#description"]};i[d.DEACTIVATE_DESCRIPTION]={listeners:["#description"]};
-i["ConceptAddedEvent ConceptDeletedEvent"]={listeners:["#plugin-panel"]};i.UpdateQueryEvent={listeners:["#user-criteria"]};var m=$("body");m.bubbleproxy(i);m.ajaxComplete(function(){OVERLAY.fadeOut()})})});define("define/main",function(){});define("define/events",{ACTIVATE_DESCRIPTION:"activate-description",DEACTIVATE_DESCRIPTION:"deactivate-description",ACTIVATE_CATEGORY:"activate-category",SYNC_CATEGORY:"sync-category",ACTIVATE_CRITERION:"activate-criterion"});var OVERLAY=$("#overlay");
-$("body").bind({ajaxComplete:function(d,i){if(i.status===302){d=$.parseJSON(i.responseText);if(d.redirect)window.location=d.redirect}},ajaxError:function(){}});define("utils/ajaxsetup",function(){});if(!Array.prototype.map)Array.prototype.map=function(d,i){var m=this.length>>>0;if(typeof d!="function")throw new TypeError;for(var l=new Array(m),f=0;f<m;f++)if(f in this)l[f]=d.call(i,this[f],f,this);return l};
-(function(d){d.extend({putJSON:function(i,m,l,f){return d.ajax({type:"PUT",url:i,contentType:"application/json",data:m,success:l,dataType:f})},postJSON:function(i,m,l,f){return d.ajax({type:"POST",url:i,contentType:"application/json",data:m,success:l,dataType:f})},log:function(i){window.console?console.log(i):alert(i)},jqoteobj:function(i,m,l){out=d.jqote(i,m,l);return d(out)}});d.fn.placeholder=function(i){var m=this;m.each(function(){var l=d(this),f=l.css("color");i=i||l.attr("placeholder");if(!l.is("input")&&
-!l.is("textarea"))return m;if(l.val()===""||l.val()===i)l.val(i).css("color","#999");l.focus(function(){l.val()===i&&l.css("color",f).val("")}).blur(function(){l.css("color",f);l.val()===""&&l.css("color","#999").val(i)})});return this};d.fn.jdata=function(i,m){var l=d.grep(this,function(f){return d(f).data(i)==m});return d(l)};d.fn.autocomplete2=function(i,m,l,f){if(!this.is("input[type=text]")&&!this.is("input[type=search]"))throw new TypeError("A text or search field is required");m=m||null;l=
-l||300;f=f||false;var a=d.extend({},i),c=a.success||function(){},g=a.error||function(){},j=a.start||function(){},n=a.end||function(){};a.data={};return this.each(function(q){var v=d(this),r,u,F,T=null,E=null,U=null,J=false;r=v.closest("form").submit(function(){return false});a.url=r.attr("action");a.success=function(P,L,pa){c(u,P,L,pa);if(U==null&&f)U={resp:P,status:L,xhr:pa};if(F&&L=="success")v.cache[u]=P;T=u;J=false;a.end()};a.error=function(P,L,pa){g(u,P,L,pa);a.end()};a.start=function(){J=true;
-j(u)};a.end=function(){J=false;n()};var X="search-"+q;v.cache={};v.bind(X,function(P,L,pa){F=pa?true:false;u=L;if(F&&v.cache[u])a.success(v.cache[u],"cached",null);else{clearTimeout(E);if(m!==null&&u===m)u="";u=u||"";u=SearchSanitizer.clean(u).toLowerCase();if(u!==T){J==false&&a.start();a.data.q=u;E=setTimeout(function(){f&&U?a.success(U.resp,U.status,U.xhr):d.ajax(a)},l)}else a.end()}});v.keyup(function(){v.trigger(X,[this.value]);return false})})};d.fn.tabs=function(){var i={nextTab:function(f,
-a,c,g){a=a===undefined?f.data("tabindex"):a;c=c||f.attr("children").length;g=g===undefined?0:g+1;if(g==c)return null;if(c+1<=a)return this.nextTab(f,0,c,g);if(f.children(":nth("+a+")").hasClass("disabled"))return this.nextTab(f,a+1,c,g);return a},getTab:function(f,a){return f.children(":nth("+a+")")}},m={init:function(f,a,c){f.data("tabified",true);a=a===true?true:false;c=c||function(){};var g=f.children(".tab");a?d(".tab",f).live("click",l(c)):g.click(l(c));g.filter(".active").length===0&&g.not(".disabled").filter(":first").click()},
-toggle:function(f,a){i.getTab(f,a).click();f.data("tabindex",a)},disable:function(f,a){i.getTab(f,a).addClass("disabled").removeClass("active");nindex=i.nextTab(f,a);nindex!==null&&this.toggle(f,nindex)},enable:function(f,a){i.getTab(f,a).removeClass("disabled")}},l=function(f){return function(a){a.preventDefault();var c=d(this).not(".disabled");if(c.length==0||c.hasClass("active"))return false;var g=c.siblings(".tab");c.addClass("active");g.removeClass("active");f(a,c)}};return function(f,a){if(typeof f===
-"string"){if(this.data("tabified")===null)throw new TypeError("tabs have not been initialized yet");m[f](this,a)}else m.init(this,f,a);return this}}()})(jQuery);define("utils/extensions",function(){});
-var SearchSanitizer={regexes:{truncateWhiteSpace:[/\s{2,}/g," "],removeNonAlphaNumeric:[/[^\sA-Za-z0-9]/g,""],removeStopWords:[/\b(a|able|about|across|after|all|almost|also|am|among|an|and|any|are|as|at|be|because|been|but|by|can|cannot|could|dear|did|do|does|either|else|ever|every|for|from|get|got|had|has|have|he|her|hers|him|his|how|however|i|if|in|into|is|it|its|just|least|let|like|likely|may|me|might|most|must|my|neither|no|nor|not|of|off|often|on|only|or|other|our|own|rather|said|say|says|she|should|since|so|some|than|that|the|their|them|then|there|these|they|this|tis|to|too|twas|us|wants|was|we|were|what|when|where|which|while|who|whom|why|will|with|would|yet|you|your)\b/g,""],
-trimRightWhiteSpace:[/^\s+/,""],trimLeftWhiteSpace:[/\s+$/,""]},clean:function(d){for(var i in this.regexes){var m=this.regexes[i];d=d.replace(m[0],m[1])}return d}};define("utils/sanitizer",function(){});
-(function(d){d.bubbleproxy=function(i,m){return d(m||"body").bubbleproxy(i)};d.fn.bubbleproxy=function(i,m){i=i||{};if(typeof i=="string"){nconfig={};nconfig[i]=m||{};i=nconfig}var l=this;d.each(i,function(f,a){if(a.listeners){var c=d.map(a.listeners||[],function(n){return n.jquery?n:d(n)}),g=d.map(a.sources||[],function(n){return n.jquery?n.selector:n}),j=a.stopPropagation===undefined?true:a.stopPropagation;l.bind(f,function(n){if(g.length){var q=false,v=d(n.target);d.each(g,function(){return q=
-!v.is(this)});if(!q)return}var r,u,F=Array.prototype.slice.call(arguments,1);d.each(c,function(){u=d.extend(d.Event(n.type),n);r=F.slice(0);r.unshift(u);j&&u.stopPropagation();this.each(function(){d.event.trigger(u,r,this,true)})})})}});return this}})(jQuery);define("lib/jquery.bubbleproxy",function(){});var Base=function(){};
-Base.extend=function(d,i){var m=Base.prototype.extend;Base._prototyping=true;var l=new this;m.call(l,d);l.base=function(){};delete Base._prototyping;var f=l.constructor,a=l.constructor=function(){if(!Base._prototyping)if(this._constructing||this.constructor==a){this._constructing=true;f.apply(this,arguments);delete this._constructing}else if(arguments[0]!=null)return(arguments[0].extend||m).call(arguments[0],l)};a.ancestor=this;a.extend=this.extend;a.forEach=this.forEach;a.implement=this.implement;
-a.prototype=l;a.toString=this.toString;a.valueOf=function(c){return c=="object"?a:f.valueOf()};m.call(a,i);typeof a.init=="function"&&a.init();return a};
-Base.prototype={extend:function(d,i){if(arguments.length>1){var m=this[d];if(m&&typeof i=="function"&&(!m.valueOf||m.valueOf()!=i.valueOf())&&/\bbase\b/.test(i)){var l=i.valueOf();i=function(){var n=this.base||Base.prototype.base;this.base=m;var q=l.apply(this,arguments);this.base=n;return q};i.valueOf=function(n){return n=="object"?i:l};i.toString=Base.toString}this[d]=i}else if(d){var f=Base.prototype.extend;if(!Base._prototyping&&typeof this!="function")f=this.extend||f;for(var a={toSource:null},
-c=["constructor","toString","valueOf"],g=Base._prototyping?0:1;j=c[g++];)d[j]!=a[j]&&f.call(this,j,d[j]);for(var j in d)a[j]||f.call(this,j,d[j])}return this}};
-Base=Base.extend({constructor:function(d){this.extend(d)}},{ancestor:Object,version:"1.1",forEach:function(d,i,m){for(var l in d)this.prototype[l]===undefined&&i.call(m,d[l],l,d)},implement:function(){for(var d=0;d<arguments.length;d++)typeof arguments[d]=="function"?arguments[d](this.prototype):this.prototype.extend(arguments[d]);return this},toString:function(){return String(this.valueOf())}});define("lib/base",function(){});
-(function(d){function i(j,n){throw d.extend(j,n),j;}function m(j){var n=[];if(g.call(j)!=="[object Array]")return false;for(var q=0,v=j.length;q<v;q++)n[q]=j[q].jqote_id;return n.length?n.sort().join(".").replace(/(\b\d+\b)\.(?:\1(\.|$))+/g,"$1$2"):false}function l(j,n){var q,v=[];n=n||a;q=g.call(j);if(q==="[object Function]")return j.jqote_id?[j]:false;if(q!=="[object Array]")return[d.jqotec(j,n)];if(q==="[object Array]")for(var r=0,u=j.length;r<u;r++)if(q=l(j[r],n))v.push(q[0]);return v.length?
-v:false}var f=1,a="%",c=/^[^<]*(<[\w\W]+>)[^>]*$/,g=Object.prototype.toString;d.fn.extend({jqote:function(j,n){j=g.call(j)==="[object Array]"?j:[j];var q="";this.each(function(v){for(var r=d.jqotec(this,n),u=0;u<j.length;u++)q+=r.call(j[u],v,u,j,r)});return q}});d.each({app:"append",pre:"prepend",sub:"html"},function(j,n){d.fn["jqote"+j]=function(q,v,r){var u,F=d.jqote(q,v,r),T=!c.test(F)?function(E){return d(document.createTextNode(E))}:d;if(q=m(l(q)))u=new RegExp("(^|\\.)"+q.split(".").join("\\.(.*)?")+
-"(\\.|$)");return this.each(function(){var E=T(F);d(this)[n](E);(E[0].nodeType===3?d(this):E).trigger("jqote."+j,[E,u])})}});d.extend({jqote:function(j,n){var q="";j=l(j);j===false&&i(new Error("Empty or undefined template passed to $.jqote"),{type:"UndefinedTemplateError"});n=g.call(n)!=="[object Array]"?[n]:n;for(var v=0,r=j.length;v<r;v++)for(var u=0;u<n.length;u++)q+=j[v].call(n[u],v,u,n,j[v]);return q},jqotec:function(j,n){var q,v;n=n||a;q=g.call(j);if(q==="[object String]"&&c.test(j)){q=v=j;
-if(j=d.jqotecache[j])return j}else{q=q==="[object String]"||j.nodeType?d(j):j instanceof jQuery?j:null;if(!q[0]||!(v=q[0].innerHTML)&&!(v=q.text()))i(new Error("Empty or undefined template passed to $.jqotec"),{type:"UndefinedTemplateError"});if(j=d.jqotecache[d.data(q[0],"jqote_id")])return j}j="";n=v.replace(/\s*<!\[CDATA\[\s*|\s*\]\]>\s*|[\r\n\t]/g,"").split("<"+n).join(n+">\u001b").split(n+">");v=0;for(var r=n.length;v<r;v++)j+=n[v].charAt(0)!=="\u001b"?"out+='"+n[v].replace(/(\\|["'])/g,"\\$1")+
-"'":n[v].charAt(1)==="="?";out+=("+n[v].substr(2)+");":n[v].charAt(1)==="!"?";out+=$.jqotenc(("+n[v].substr(2)+"));":";"+n[v].substr(1);j="try{"+('var out="";'+j+";return out;").split("out+='';").join("").split('var out="";out+=').join("var out=")+'}catch(e){e.type="TemplateExecutionError";e.args=arguments;e.template=arguments.callee.toString();throw e;}';try{var u=new Function("i, j, data, fn",j)}catch(F){i(F,{type:"TemplateCompilationError"})}q=q instanceof jQuery?d.data(q[0],"jqote_id",f):q;return d.jqotecache[q]=
-(u.jqote_id=f++,u)},jqotefn:function(j){j=g.call(j)==="[object String]"&&c.test(j)?j:d.data(d(j)[0],"jqote_id");return d.jqotecache[j]||false},jqotetag:function(j){if(g.call(j)==="[object String]")a=j},jqotenc:function(j){return j.toString().replace(/&(?!\w+;)/g,"&#38;").split("<").join("&#60;").split(">").join("&#62;").split('"').join("&#34;").split("'").join("&#39;")},jqotecache:{}});d.event.special.jqote={add:function(j){var n,q=j.handler,v=!j.data?[]:g.call(j.data)!=="[object Array]"?[j.data]:
-j.data;if(!j.namespace)j.namespace="app.pre.sub";if(v.length&&(n=m(l(v))))j.handler=function(r,u,F){return!F||F.test(n)?q.apply(this,[r,u]):null}}}})(jQuery);define("lib/jquery.jqote2",function(){});
-(function(){function d(b,e){b||(b={});for(var h in e)b[h]=e[h];return b}function i(b){return b!==x&&b!==null}function m(b,e,h){var k,o;if(typeof e=="string")if(i(h))b.setAttribute(e,h);else{if(b&&b.getAttribute)o=b.getAttribute(e)}else if(i(e)&&typeof e=="object")for(k in e)b.setAttribute(k,e[k]);return o}function l(b){if(!b||b.constructor!=Array)b=[b];return b}function f(){var b=arguments,e,h;for(e=0;e<b.length;e++){h=b[e];if(i(h))return h}}function a(b){var e="",h;for(h in b)e+=Bc(h)+":"+b[h]+";";
-return e}function c(b,e){if(mb)if(e&&e.opacity!==x)e.filter="alpha(opacity="+e.opacity*100+")";d(b.style,e)}function g(b,e,h,k,o){b=J.createElement(b);e&&d(b,e);o&&c(b,{padding:0,border:nb,margin:0});h&&c(b,h);k&&k.appendChild(b);return b}function j(){var b=Fa.global.useUTC;rc=b?Date.UTC:function(e,h,k,o,p,s){return(new Date(e,h,f(k,1),f(o,0),f(p,0),f(s,0))).getTime()};Cc=b?"getUTCMinutes":"getMinutes";Dc=b?"getUTCHours":"getHours";Ec=b?"getUTCDay":"getDay";kc=b?"getUTCDate":"getDate";sc=b?"getUTCMonth":
-"getMonth";tc=b?"getUTCFullYear":"getFullYear";Xc=b?"setUTCMinutes":"setMinutes";Yc=b?"setUTCHours":"setHours";Fc=b?"setUTCDate":"setDate";Zc=b?"setUTCMonth":"setMonth";$c=b?"setUTCFullYear":"setFullYear"}function n(b){Fa=Qa(Fa,b);j();return Fa}function q(){return Fa}function v(b){Tb||(Tb=g(B));b&&Tb.appendChild(b);Tb.innerHTML=""}function r(b,e){var h=function(){};h.prototype=new b;d(h.prototype,e);return h}function u(b,e,h,k){var o=Fa.lang;b=b;var p=isNaN(e=bb(e))?2:e;e=h===undefined?o.decimalPoint:
-h;k=k===undefined?o.thousandsSep:k;o=b<0?"-":"";h=parseInt(b=bb(+b||0).toFixed(p),10)+"";var s=(s=h.length)>3?s%3:0;return o+(s?h.substr(0,s)+k:"")+h.substr(s).replace(/(\d{3})(?=\d)/g,"$1"+k)+(p?e+bb(b-h).toFixed(p).slice(2):"")}function F(b){for(var e={x:b.offsetLeft,y:b.offsetTop};b.offsetParent;){b=b.offsetParent;e.x+=b.offsetLeft;e.y+=b.offsetTop;if(b!=J.body&&b!=J.documentElement){e.x-=b.scrollLeft;e.y-=b.scrollTop}}return e}function T(){}function E(b,e){function h(D,y){function O(){var z=[],
-K;la=ta=null;Ba=[];H($a,function(N){K=false;H(["xAxis","yAxis"],function(ea){if(N.isCartesian&&(ea=="xAxis"&&ra||ea=="yAxis"&&!ra)&&(N.options[ea]==y.index||N.options[ea]===x&&y.index===0)){N[ea]=Ca;Ba.push(N);K=true}});if(!N.visible&&wa.ignoreHiddenSeries)K=false;if(K){var W,fa;if(!ra){W=N.options.stacking;uc=W=="percent";if(W){fa=z[N.type]||[];z[N.type]=fa}if(uc){la=0;ta=99}}if(N.isCartesian){H(N.data,function(ea){var ma=ea.x,La=ea.y;if(la===null)la=ta=ea[Rb];if(ra)if(ma>ta)ta=ma;else{if(ma<la)la=
-ma}else if(i(La)){if(W)fa[ma]=fa[ma]?fa[ma]+La:La;ea=fa?fa[ma]:La;if(!uc)if(ea>ta)ta=ea;else if(ea<la)la=ea;if(W)Ib[N.type][ma]={total:ea,cum:ea}}});if(/(area|column|bar)/.test(N.type)&&!ra)if(la>=0){la=0;ad=true}else if(ta<0){ta=0;bd=true}}}})}function S(z,K,N){var W=1,fa=0;if(N){W*=-1;fa=rb}if(ac){W*=-1;fa-=W*rb}if(ua===x)z=null;else if(K){if(ac)z=rb-z;z=z/Mb+ua}else z=W*(z-ua)*Mb+fa;return z}function na(z,K,N){if(N){var W,fa,ea;W=S(z);var ma;z=fa=W+bc;W=ea=jb-W-bc;if(Da){W=Ma;ea=jb-cc;if(z<Ga||
-z>Ga+cb)ma=true}else{z=Ga;fa=Bb-Gc;if(W<Ma||W>Ma+Ua)ma=true}ma||xa.path(xa.crispLine([Ab,z,W,Za,fa,ea],N)).attr({stroke:K,"stroke-width":N}).add(ya)}}function oa(z,K,N){z=ja(z,ua);K=da(K,Ea);na(z+(K-z)/2,N,(K-z)*Mb)}function ha(z,K,N,W,fa,ea,ma){var La,Ub,Ja,Cb=y.labels;if(K=="inside")fa=-fa;if(Sa)fa=-fa;K=Ub=S(z+dc)+bc;La=Ja=jb-S(z+dc)-bc;if(Da){La=jb-cc-(Sa?Ua:0)+Db;Ja=La+fa}else{K=Ga+(Sa?cb:0)+Db;Ub=K-fa}W&&xa.path(xa.crispLine([Ab,K,La,Za,Ub,Ja],W)).attr({stroke:N,"stroke-width":W}).add(I);if(ea&&
-Cb.enabled)if((z=ld.call({index:ma,isFirst:z==Ka[0],isLast:z==Ka[Ka.length-1],dateTimeLabelFormat:vc,value:sb&&sb[z]?sb[z]:z}))||z===0){K=K+Cb.x-(dc&&Da?dc*Mb*(ac?-1:1):0);La=La+Cb.y-(dc&&!Da?dc*Mb*(ac?1:-1):0);xa.text(z,K,La,Cb.style,Cb.rotation,Cb.align).add(I)}}function Ra(z,K){var N;Xb=K?1:P.pow(10,pa(P.log(z)/P.LN10));N=z/Xb;if(!K){K=[1,2,2.5,5,10];if(y.allowDecimals===false)if(Xb==1)K=[1,2,5,10];else if(Xb<=0.1)K=[1/Xb]}for(var W=0;W<K.length;W++){z=K[W];if(N<=(K[W]+(K[W+1]||K[W]))/2)break}z*=
-Xb;return z}function ab(){Ka=[];var z,K=Fa.global.useUTC,N=1E3/hb,W=6E4/hb,fa=36E5/hb,ea=864E5/hb,ma=6048E5/hb,La=2592E6/hb,Ub=31556952E3/hb,Ja=[["second",N,[1,2,5,10,15,30]],["minute",W,[1,2,5,10,15,30]],["hour",fa,[1,2,3,4,6,8,12]],["day",ea,[1,2]],["week",ma,[1,2]],["month",La,[1,2,3,4,6]],["year",Ub,null]],Cb=Ja[6],Na=Cb[1],Ha=Cb[2];for(z=0;z<Ja.length;z++){Cb=Ja[z];Na=Cb[1];Ha=Cb[2];if(Ja[z+1])if(tb<=(Na*Ha[Ha.length-1]+Ja[z+1][1])/2)break}if(Na==Ub&&tb<5*Na)Ha=[1,2,5];Ja=Ra(tb/Na,Ha);var Yb;
-Ha=new Date(ua*hb);Ha.setMilliseconds(0);if(Na>=N)Ha.setSeconds(Na>=W?0:Ja*pa(Ha.getSeconds()/Ja));if(Na>=W)Ha[Xc](Na>=fa?0:Ja*pa(Ha[Cc]()/Ja));if(Na>=fa)Ha[Yc](Na>=ea?0:Ja*pa(Ha[Dc]()/Ja));if(Na>=ea)Ha[Fc](Na>=La?1:Ja*pa(Ha[kc]()/Ja));if(Na>=La){Ha[Zc](Na>=Ub?0:Ja*pa(Ha[sc]()/Ja));Yb=Ha[tc]()}if(Na>=Ub){Yb-=Yb%Ja;Ha[$c](Yb)}Na==ma&&Ha[Fc](Ha[kc]()-Ha[Ec]()+y.startOfWeek);z=1;Yb=Ha[tc]();N=Ha.getTime()/hb;W=Ha[sc]();for(fa=Ha[kc]();N<Ea&&z<cb;){Ka.push(N);if(Na==Ub)N=rc(Yb+z*Ja,0)/hb;else if(Na==
-La)N=rc(Yb,W+z*Ja)/hb;else if(!K&&(Na==ea||Na==ma))N=rc(Yb,W,fa+z*Ja*(Na==ea?1:7));else N+=Na*Ja;z++}Ka.push(N);vc=y.dateTimeLabelFormats[Cb[0]]}function Oa(z){var K=(Xb<1?L(1/Xb):1)*10;return L(z*K)/K}function kb(){var z;z=pa(ua/tb)*tb;var K=Pa(Ea/tb)*tb;Ka=[];for(z=Oa(z);z<=K;){Ka.push(z);z=Oa(z+tb)}if(sb){ua-=0.5;Ea+=0.5}}function db(){Nb?ab():kb();var z=Ka[0],K=Ka[Ka.length-1];if(y.startOnTick)ua=z;else ua>z&&Ka.shift();if(y.endOnTick)Ea=K;else Ea<K&&Ka.pop()}function eb(){if(!Nb&&!sb){var z=
-hc,K=Ka.length;hc=ic[Rb];if(K<hc){for(;Ka.length<hc;)Ka.push(Oa(Ka[Ka.length-1]+tb));Mb*=(K-1)/(hc-1)}if(i(z)&&hc!=z)Ca.isDirty=true}}function Jb(){var z,K,N,W=ua,fa=Ea;z=y.maxZoom;var ea;O();ua=f(ub,y.min,la);Ea=f(lc,y.max,ta);if(Hc){ea=D[ra?"xAxis":"yAxis"][y.linkedTo];ea=ea.getExtremes();ua=f(ea.min,ea.dataMin);Ea=f(ea.max,ea.dataMax)}if(Ea-ua<z){ea=(z-Ea+ua)/2;ua=ja(ua-ea,f(y.min,ua-ea));Ea=da(ua+z,f(y.max,ua+z))}if(!sb&&!uc&&!Hc&&i(ua)&&i(Ea)){z=Ea-ua||1;if(!i(y.min)&&!i(ub)&&cd&&(la<0||!ad))ua-=
-z*cd;if(!i(y.max)&&!i(lc)&&dd&&(ta>0||!bd))Ea+=z*dd}tb=sb||ua==Ea?1:f(y.tickInterval,(Ea-ua)*y.tickPixelInterval/rb);if(!Nb&&!i(y.tickInterval))tb=Ra(tb);Ic=y.minorTickInterval==="auto"&&tb?tb/5:y.minorTickInterval;db();Mb=rb/(Ea-ua||1);ic||(ic={x:0,y:0});if(!Nb&&Ka.length>ic[Rb])ic[Rb]=Ka.length;if(!ra)for(K in Ib)for(N in Ib[K])Ib[K][N].cum=Ib[K][N].total;if(!Ca.isDirty)Ca.isDirty=ua!=W||Ea!=fa}function lb(z,K,N){N=f(N,true);fb(Ca,"setExtremes",{min:z,max:K},function(){if(sb){if(z<0)z=0;if(K>sb.length-
-1)K=sb.length-1}ub=z;lc=K;N&&D.redraw()})}function Eb(){return{min:ua,max:Ea,dataMin:la,dataMax:ta}}function Vb(z){if(ua>z)z=ua;else if(Ea<z)z=Ea;return S(z,0,1)}function Ia(z){var K=z.width;(K?Jc:Kc).push(z);K?na(z.value,z.color,z.width):oa(z.from,z.to,z.color)}function M(){var z=y.title,K=y.alternateGridColor,N=y.minorTickWidth,W=y.lineWidth,fa,ea;fa=Ba.length&&i(ua)&&i(Ea);if(I){I.empty();ya.empty()}else{I=xa.g("axis").attr({zIndex:7}).add();ya=xa.g("grid").attr({zIndex:1}).add()}if(fa||Hc){K&&
-H(Ka,function(ma,La){if(La%2===0&&ma<Ea)oa(ma,Ka[La+1]!==x?Ka[La+1]:Ea,K)});H(Kc,function(ma){oa(ma.from,ma.to,ma.color)});if(Ic&&!sb)for(fa=ua;fa<=Ea;fa+=Ic){na(fa,y.minorGridLineColor,y.minorGridLineWidth);N&&ha(fa,y.minorTickPosition,y.minorTickColor,N,y.minorTickLength)}H(Ka,function(ma,La){ea=ma+dc;na(ea,y.gridLineColor,y.gridLineWidth);ha(ma,y.tickPosition,y.tickColor,y.tickWidth,y.tickLength,!(ma==ua&&!y.showFirstLabel||ma==Ea&&!y.showLastLabel),La)});H(Jc,function(ma){na(ma.value,ma.color,
-ma.width)})}if(!Ca.hasRenderedLine&&W){N=Ga+(Sa?cb:0)+Db;fa=jb-cc-(Sa?Ua:0)+Db;xa.path(xa.crispLine([Ab,Da?Ga:N,Da?fa:Ma,Za,Da?Bb-Gc:N,Da?fa:jb-cc],W)).attr({stroke:y.lineColor,"stroke-width":W,zIndex:7}).add();Ca.hasRenderedLine=true}if(!Ca.hasRenderedTitle&&!Ca.axisTitle&&z&&z.text){W=Da?Ga:Ma;W={low:W+(Da?0:rb),middle:W+rb/2,high:W+(Da?rb:0)}[z.align];N=(Da?Ma+Ua:Ga)+(Da?1:-1)*(Sa?-1:1)*z.margin-(mb?parseInt(z.style.fontSize||12,10)/3:0);Ca.axisTitle=xa.text(z.text,(Da?W:N+(Sa?cb:0)+Db)+(z.x||
-0),(Da?N-(Sa?Ua:0)+Db:W)+(z.y||0),z.style,z.rotation||0,{low:"left",middle:"center",high:"right"}[z.align]).attr({zIndex:7}).add();Ca.hasRenderedTitle=true}Ca.isDirty=false}function Q(z){H([Kc,Jc],function(K){for(var N=0;N<K.length;N++)if(K[N].id==z){K.splice(N,1);break}});M()}function ga(){jc.resetTracker&&jc.resetTracker();M();H(Ba,function(z){z.isDirty=true})}function za(z,K){Ca.categories=sb=z;H(Ba,function(N){N.translate();N.setTooltipPoints(true)});Ca.isDirty=true;f(K,true)&&ga()}var ra=y.isX,
-Sa=y.opposite,Da=Ta?!ra:ra,Ib={bar:{},column:{},area:{},areaspline:{},line:{}};y=Qa(ra?wc:Lc,Da?Sa?md:ed:Sa?nd:od,y);var Ca=this,Nb=y.type=="datetime",Db=y.offset||0,Rb=ra?"x":"y",rb=Da?cb:Ua,Mb,bc=Da?Ga:cc,I,ya,la,ta,Ba,ub,lc,Ea=null,ua=null,cd=y.minPadding,dd=y.maxPadding,Hc=i(y.linkedTo),ad,bd,uc,fd=y.events,Mc,Kc=y.plotBands||[],Jc=y.plotLines||[],tb,Ic,Xb,Ka,hc,vc,ld=y.labels.formatter||function(){var z=this.value;return vc?t(vc,z):z},sb=y.categories||ra&&D.columnCount,ac=y.reversed,dc=sb&&y.tickmarkPlacement==
-"between"?0.5:0;if(Ta&&ra&&ac===x)ac=true;Sa||(Db*=-1);if(Da)Db*=-1;d(Ca,{addPlotBand:Ia,addPlotLine:Ia,adjustTickAmount:eb,categories:sb,getExtremes:Eb,getThreshold:Vb,isXAxis:ra,options:y,render:M,setExtremes:lb,setScale:Jb,setCategories:za,translate:S,redraw:ga,removePlotBand:Q,removePlotLine:Q,reversed:ac,stacks:Ib});for(Mc in fd)Ob(Ca,Mc,fd[Mc]);Jb()}function k(){function D(S,na,oa,ha){if(!O[S]){na=xa.text(na,Ga+cb-20,Ma+30,b.toolbar.itemStyle,0,"right").on("click",ha).attr({zIndex:20}).add();
-O[S]=na}}function y(S){v(O[S].element);O[S]=null}var O={};return{add:D,remove:y}}function o(D){function y(Ia,M){eb=Oa?Ia:(2*eb+Ia)/3;Jb=Oa?M:(Jb+M)/2;lb.translate(eb,Jb);Nc=bb(Ia-eb)>1||bb(M-Jb)>1?function(){y(Ia,M)}:null}function O(){Oa=true;lb.hide()}function S(Ia){var M=Ia.series,Q=D.borderColor||Ia.color||M.color||"#606060",ga,za;za=Ia.tooltipText;ga=Ia.tooltipPos;na=M;M=L(ga?ga[0]:Ta?cb-Ia.plotY:Ia.plotX);Ia=L(ga?ga[1]:Ta?Ua-Ia.plotX:Ia.plotY);ga=mc(M,Ia);if(za===false||!ga)O();else{if(Oa){lb.show();
-Oa=false}Vb.attr({text:za});za=Vb.getBBox();kb=za.width;db=za.height;Eb.attr({width:kb+2*Ra,height:db+2*Ra,stroke:Q});Q=M-kb+Ga-25;M=Ia-db+Ma+10;if(Q<7){Q=7;M-=20}if(M<5)M=5;else if(M+db>jb)M=jb-db-5;y(L(Q-ab),L(M-ab))}}var na,oa=D.borderWidth,ha=D.style,Ra=parseInt(ha.padding,10),ab=oa+Ra,Oa=true,kb,db,eb=0,Jb=0;ha.padding=0;var lb=xa.g("tooltip").attr({zIndex:8}).add(),Eb=xa.rect(ab,ab,0,0,D.borderRadius,oa).attr({fill:D.backgroundColor,"stroke-width":oa}).add(lb).shadow(D.shadow),Vb=xa.text("",
-Ra+ab,parseInt(ha.fontSize,10)+Ra+ab).attr({zIndex:1}).css(ha).add(lb);return{refresh:S,hide:O}}function p(D,y){function O(M){M=M||X.event;if(!M.target)M.target=M.srcElement;if(M.type!="mousemove"||X.opera)nc=F(gb);if(mb){M.chartX=M.x;M.chartY=M.y}else if(M.layerX===x){M.chartX=M.pageX-nc.x;M.chartY=M.pageY-nc.y}else{M.chartX=M.layerX;M.chartY=M.layerY}return M}function S(M){var Q={xAxis:[],yAxis:[]};H(vb,function(ga){var za=ga.translate,ra=ga.isXAxis;Q[ra?"xAxis":"yAxis"].push({axis:ga,value:za((Ta?
-!ra:ra)?M.chartX-Ga:Ua-M.chartY+Ma,true)})});return Q}function na(M){var Q=D.hoverPoint,ga=D.hoverSeries;if(ga&&ga.tracker)(M=ga.tooltipPoints[Ta?M.chartY:M.chartX-Ga])&&M!=Q&&M.onMouseOver()}function oa(){var M=D.hoverSeries,Q=D.hoverPoint;Q&&Q.onMouseOut();M&&M.onMouseOut();Oc&&Oc.hide()}function ha(){if(eb){var M={xAxis:[],yAxis:[]},Q=eb.getBBox(),ga=Q.x-Ga,za=Q.y-Ma;if(db){H(vb,function(ra){var Sa=ra.translate,Da=ra.isXAxis,Ib=Ta?!Da:Da,Ca=Sa(Ib?ga:Ua-za-Q.height,true);Sa=Sa(Ib?ga+Q.width:Ua-
-za,true);M[Da?"xAxis":"yAxis"].push({axis:ra,min:da(Ca,Sa),max:ja(Ca,Sa)})});fb(D,"selection",M,Pc)}eb=eb.destroy()}D.mouseIsDown=Qc=db=false}function Ra(){var M=true;gb.onmousedown=function(Q){Q=O(Q);Q.preventDefault&&Q.preventDefault();D.mouseIsDown=Qc=true;Oa=Q.chartX;kb=Q.chartY;if(xc&&(lb||Eb))eb||(eb=xa.rect(Ga,Ma,Vb?1:cb,Ia?1:Ua,0).attr({fill:"rgba(69,114,167,0.25)",zIndex:7}).add())};gb.onmousemove=function(Q){Q=O(Q);Q.returnValue=false;var ga=Q.chartX,za=Q.chartY,ra=!mc(ga-Ga,za-Ma);if(Qc){db=
-Math.sqrt(Math.pow(Oa-ga,2)+Math.pow(kb-za,2))>10;if(Vb){Q=ga-Oa;eb.attr({width:bb(Q),x:(Q>0?0:Q)+Oa})}if(Ia){za-=kb;eb.attr({height:bb(za),y:(za>0?0:za)+kb})}}else ra||na(Q);if(ra&&!M){oa();ha()}M=ra;return false};gb.onmouseup=function(){ha()};gb.onclick=function(Q){var ga=D.hoverPoint;Q=O(Q);Q.cancelBubble=true;if(!db)if(ga&&m(Q.target,"isTracker")){var za=ga.plotX,ra=ga.plotY;d(ga,{pageX:nc.x+Ga+(Ta?cb-ra:za),pageY:nc.y+Ma+(Ta?Ua-za:ra)});fb(D.hoverSeries||ga.series,"click",d(Q,{point:ga}));ga.firePointEvent("click",
-Q)}else{d(Q,S(Q));mc(Q.chartX-Ga,Q.chartY-Ma)&&fb(D,"click",Q)}db=false}}function ab(){D.trackerGroup=Rc=xa.g("tracker");Ta&&Rc.attr({width:D.plotWidth,height:D.plotHeight}).invert();Rc.attr({zIndex:9}).translate(Ga,Ma).add()}var Oa,kb,db,eb,Jb=wa.zoomType,lb=/x/.test(Jb),Eb=/y/.test(Jb),Vb=lb&&!Ta||Eb&&Ta,Ia=Eb&&!Ta||lb&&Ta;ab();if(y.enabled)D.tooltip=Oc=o(y);Ra();gd=setInterval(function(){Nc&&Nc()},32);d(this,{zoomX:lb,zoomY:Eb,resetTracker:oa})}function s(D){var y=D.type||wa.defaultSeriesType,
-O=Kb[y],S=R.hasRendered;if(S)if(Ta&&y=="column")O=Kb.bar;else if(!Ta&&y=="bar")O=Kb.column;y=new O;y.init(R,D);if(!S&&y.inverted)Ta=true;if(y.isCartesian)xc=y.isCartesian;$a.push(y);return y}function w(D,y){var O;y=f(y,true);fb(R,"addSeries",{options:D},function(){O=s(D);O.isDirty=true;R.isDirty=true;y&&R.redraw()});return O}function A(){wa.alignTicks!==false&&H(vb,function(D){D.adjustTickAmount()})}function C(){for(var D=R.isDirty,y,O=$a.length,S=O,na;S--;){na=$a[S];if(na.isDirty&&na.options.stacking){y=
-true;break}}if(y)for(S=O;S--;){na=$a[S];if(na.options.stacking)na.isDirty=true}H($a,function(oa){if(oa.isDirty){oa.cleanData();oa.getSegments();if(oa.options.legendType=="point")D=true}});ic=null;if(xc){H(vb,function(oa){oa.setScale()});A();H(vb,function(oa){oa.isDirty&&oa.redraw()})}H($a,function(oa){oa.isDirty&&oa.visible&&oa.redraw()});if(D&&Sc.renderLegend){Sc.renderLegend();R.isDirty=false}jc&&jc.resetTracker&&jc.resetTracker();fb(R,"redraw")}function G(D){var y=b.loading;if(!Zb){Zb=g(B,{className:"highcharts-loading"},
-d(y.style,{left:Ga+ia,top:Ma+ia,width:cb+ia,height:Ua+ia,zIndex:10,display:nb}),gb);g("span",null,y.labelStyle,Zb)}if(!Tc){c(Zb,{opacity:0,display:""});Zb.getElementsByTagName("span")[0].innerHTML=D||b.lang.loading;oc(Zb,{opacity:y.style.opacity},{duration:y.showDuration});Tc=true}}function aa(){oc(Zb,{opacity:0},{duration:b.loading.hideDuration,complete:function(){c(Zb,{display:nb})}});Tc=false}function ba(D){var y,O,S;for(y=0;y<vb.length;y++)if(vb[y].options.id==D)return vb[y];for(y=0;y<$a.length;y++)if($a[y].options.id==
-D)return $a[y];for(y=0;y<$a.length;y++){S=$a[y].data;for(O=0;O<S.length;O++)if(S[O].id==D)return S[O]}return null}function ka(){var D=b.xAxis||{},y=b.yAxis||{},O;D=l(D);H(D,function(S,na){S.index=na;S.isX=true});y=l(y);H(y,function(S,na){S.index=na});vb=D.concat(y);R.xAxis=[];R.yAxis=[];vb=ec(vb,function(S){O=new h(R,S);R[O.isXAxis?"xAxis":"yAxis"].push(O);return O});A()}function Va(){var D=[];H($a,function(y){D=D.concat(yc(y.data,function(O){return O.selected}))});return D}function Y(){return yc($a,
-function(D){return D.selected})}function ob(){var D=b.title,y=D.align,O=b.subtitle,S=O.align,na={left:0,center:Bb/2,right:Bb};D&&D.text&&xa.text(D.text,na[y]+D.x,D.y,D.style,0,y).attr({"class":"highcharts-title"}).add();O&&O.text&&xa.text(O.text,na[S]+O.x,O.y,O.style,0,S).attr({"class":"highcharts-subtitle"}).add()}function wb(){Pb=wa.renderTo;hd=Xa+Aa++;if(typeof Pb=="string")Pb=J.getElementById(Pb);Pb.innerHTML="";if(!Pb.offsetWidth){$b=Pb.cloneNode(0);c($b,{position:V,top:"-9999px",display:""});
-J.body.appendChild($b)}var D=($b||Pb).offsetHeight;R.chartWidth=Bb=wa.width||($b||Pb).offsetWidth||600;R.chartHeight=jb=wa.height||(D>Ma+cc?D:0)||400;R.plotWidth=cb=Bb-Ga-Gc;R.plotHeight=Ua=jb-Ma-cc;R.plotLeft=Ga;R.plotTop=Ma;R.container=gb=g(B,{className:"highcharts-container"+(wa.className?" "+wa.className:""),id:hd},d({position:sa,overflow:qa,width:Bb+ia,height:jb+ia,textAlign:"left"},wa.style),$b||Pb);R.renderer=xa=wa.renderer=="SVG"?new pc(gb,Bb,jb):new id(gb,Bb,jb)}function Wb(){var D,y=b.labels,
-O=b.credits,S=wa.borderWidth||0,na=wa.backgroundColor,oa=wa.plotBackgroundColor,ha=wa.plotBackgroundImage;D=2*S+(wa.shadow?8:0);if(S||na)xa.rect(D/2,D/2,Bb-D,jb-D,wa.borderRadius,S).attr({stroke:wa.borderColor,"stroke-width":S,fill:na||nb}).add().shadow(wa.shadow);oa&&xa.rect(Ga,Ma,cb,Ua,0).attr({fill:oa}).add().shadow(wa.plotShadow);ha&&xa.image(ha,Ga,Ma,cb,Ua).add();wa.plotBorderWidth&&xa.rect(Ga,Ma,cb,Ua,0,wa.plotBorderWidth).attr({stroke:wa.plotBorderColor,"stroke-width":wa.plotBorderWidth,zIndex:4}).add();
-xc&&H(vb,function(Ra){Ra.render()});ob();y.items&&H(y.items,function(){var Ra=d(y.style,this.style),ab=parseInt(Ra.left,10)+Ga,Oa=parseInt(Ra.top,10)+Ma+12;delete Ra.left;delete Ra.top;xa.text(this.html,ab,Oa,Ra).attr({zIndex:2}).add()});H($a,function(Ra){Ra.render()});Sc=R.legend=new pd(R);if(!R.toolbar)R.toolbar=k(R);O.enabled&&!R.credits&&xa.text(O.text,Bb-10,jb-5,O.style,0,"right").on("click",function(){location.href=O.href}).attr({zIndex:8}).add();R.hasRendered=true;if($b){Pb.appendChild(gb);
-v($b)}}function Lb(){var D=$a.length;fc(X,"unload",Lb);fc(R);for(H(vb,function(y){fc(y)});D--;)$a[D].destroy();gb.onmousedown=gb.onmousemove=gb.onmouseup=gb.onclick=null;gb.parentNode.removeChild(gb);gb=null;clearInterval(gd);for(D in R)delete R[D]}function Fb(){if(!Qb&&J.readyState!="complete")J.attachEvent("onreadystatechange",function(){J.detachEvent("onreadystatechange",arguments.callee);Fb()});else{wb();H(b.series||[],function(D){s(D)});R.inverted=Ta=f(Ta,b.chart.inverted);R.plotSizeX=qd=Ta?
-Ua:cb;R.plotSizeY=rd=Ta?cb:Ua;R.tracker=jc=new p(R,b.tooltip);ka();H($a,function(D){D.translate();D.setTooltipPoints()});R.render=Wb;Wb();fb(R,"load");e&&e(R)}}wc=Qa(wc,Fa.xAxis);Lc=Qa(Lc,Fa.yAxis);Fa.xAxis=Fa.yAxis=null;b=Qa(Fa,b);var wa=b.chart,pb=wa.margin;pb=typeof pb=="number"?[pb,pb,pb,pb]:pb;var Ma=f(wa.marginTop,pb[0]),Gc=f(wa.marginRight,pb[1]),cc=f(wa.marginBottom,pb[2]),Ga=f(wa.marginLeft,pb[3]),Pb,$b,gb,hd,Bb,jb,R=this;pb=wa.events;var Uc,Vc,mc,Oc,Qc,Zb,Tc,Ua,cb,qd,rd,jc,Rc,Sc,nc,xc=wa.showAxes,
-vb=[],ic,$a=[],Ta,xa,Nc,gd,Pc,jd,pd=function(D){function y(I,ya){var la=I.legendItem,ta=I.legendLine,Ba=I.legendSymbol,ub=lb.color,lc=ya?ha.itemStyle.color:ub;I=ya?I.color:ub;la&&la.css({color:lc});ta&&ta.attr({stroke:I});Ba&&Ba.attr({stroke:I,fill:I})}function O(I,ya,la){var ta=I.legendItem,Ba=I.legendLine,ub=I.legendSymbol;I=I.checkbox;ta&&ta.attr({x:ya,y:la});Ba&&Ba.translate(ya,la-4);ub&&ub.translate(ya,la);if(I){I.x=ya;I.y=la}}function S(I){for(var ya=kb.length,la=I.checkbox;ya--;)if(kb[ya]==
-I){kb.splice(ya,1);break}H(["legendItem","legendLine","legendSymbol"],function(ta){I[ta]&&I[ta].destroy()});la&&v(I.checkbox)}function na(I){var ya,la,ta=I.legendItem;la=I.series||I;if(!ta){la=/^(bar|pie|area|column)$/.test(la.type);I.legendItem=ta=xa.text(ha.labelFormatter.call(I),0,0).css(I.visible?eb:lb).on("mouseover",function(){I.setState(Sb);ta.css(Jb)}).on("mouseout",function(){ta.css(I.visible?eb:lb);I.setState()}).on("click",function(){var Ba=function(){I.setVisible()};I.firePointEvent?I.firePointEvent("legendItemClick",
-null,Ba):fb(I,"legendItemClick",null,Ba)}).attr({zIndex:2}).add(Ca);if(!la&&I.options&&I.options.lineWidth)I.legendLine=xa.path([Ab,-ab-Oa,0,Za,-Oa,0]).attr({"stroke-width":I.options.lineWidth,zIndex:2}).add(Ca);if(la)ya=xa.rect(-ab-Oa,-11,ab,12,2).attr({"stroke-width":0,zIndex:3}).add(Ca);else if(I.options&&I.options.marker&&I.options.marker.enabled)ya=xa.symbol(I.symbol,-ab/2-Oa,-4,I.options.marker.radius).attr(I.pointAttr[qb]).attr({zIndex:3}).add(Ca);I.legendSymbol=ya;y(I,I.visible);if(I.options&&
-I.options.showCheckbox){I.checkbox=g("input",{type:"checkbox",checked:I.selected,defaultChecked:I.selected},ha.itemCheckboxStyle,gb);Ob(I.checkbox,"click",function(Ba){Ba=Ba.target;fb(I,"checkboxClick",{checked:Ba.checked},function(){I.select()})})}}O(I,ga,za);ya=ta.getBBox();ra=za;I.legendItemWidth=ya=ha.itemWidth||ab+Oa+ya.width+Vb;if(Ra){ga+=ya;Nb=Db||ja(ga-Q,Nb);if(ga-Q+ya>(Db||Bb-2*Eb-Q)){ga=Q;za+=Ia}}else{za+=Ia;Nb=Db||ja(ya,Nb)}kb.push(I)}function oa(){ga=Q;za=M;ra=Nb=0;Ca||(Ca=xa.g("legend").attr({zIndex:7}).add());
-bc&&Mb.reverse();H(Mb,function(Ba){if(Ba.options.showInLegend){Ba=Ba.options.legendType=="point"?Ba.data:[Ba];H(Ba,na)}});bc&&Mb.reverse();Rb=Db||Nb;rb=ra-M+Ia;if(Da||Ib){Rb+=2*Eb;rb+=2*Eb;if(Sa)Sa.attr({height:rb,width:Rb});else Sa=xa.rect(0,0,Rb,rb,ha.borderRadius,Da||0).attr({stroke:ha.borderColor,"stroke-width":Da||0,fill:Ib||nb}).add(Ca).shadow(ha.shadow)}for(var I=["left","right","top","bottom"],ya,la=4;la--;){ya=I[la];if(db[ya]&&db[ya]!="auto"){ha[la<2?"align":"verticalAlign"]=ya;ha[la<2?"x":
-"y"]=parseInt(db[ya],10)*(la%2?-1:1)}}var ta=Vc(d({width:Rb,height:rb},ha));Ca.translate(ta.x,ta.y);H(kb,function(Ba){var ub=Ba.checkbox;ub&&c(ub,{left:ta.x+Ba.legendItemWidth+ub.x-40+ia,top:ta.y+ub.y-11+ia})})}var ha=D.options.legend;if(ha.enabled){var Ra=ha.layout=="horizontal",ab=ha.symbolWidth,Oa=ha.symbolPadding,kb=[],db=ha.style,eb=ha.itemStyle,Jb=ha.itemHoverStyle,lb=ha.itemHiddenStyle,Eb=parseInt(db.padding,10),Vb=20,Ia=ha.lineHeight||16,M=18,Q=4+Eb+ab+Oa,ga,za,ra,Sa,Da=ha.borderWidth,Ib=
-ha.backgroundColor,Ca,Nb,Db=ha.width,Rb,rb,Mb=D.series,bc=ha.reversed;oa();return{colorizeItem:y,destroyItem:S,renderLegend:oa}}};mc=function(D,y){return D>=0&&D<=0+cb&&y>=0&&y<=0+Ua};jd=function(){fb(R,"selection",{resetSelection:true},Pc);R.toolbar.remove("zoom")};Pc=function(D){var y=Fa.lang;R.toolbar.add("zoom",y.resetZoom,y.resetZoomTitle,jd);!D||D.resetSelection?H(vb,function(O){O.setExtremes(null,null,false)}):H(D.xAxis.concat(D.yAxis),function(O){var S=O.axis;if(R.tracker[S.isXAxis?"zoomX":
-"zoomY"])S.setExtremes(O.min,O.max,false)});C()};Vc=function(D){var y=D.align,O=D.verticalAlign,S=D.x||0,na=D.y||0,oa={x:S||0,y:na||0};if(/^(right|center)$/.test(y))oa.x=(Bb-D.width)/{right:1,center:2}[y]+S;if(/^(bottom|middle)$/.test(O))oa.y=(jb-D.height)/{bottom:1,middle:2}[O]+na;return oa};Ya=va=0;Ob(X,"unload",Lb);if(pb)for(Uc in pb)Ob(R,Uc,pb[Uc]);R.options=b;R.series=$a;R.addSeries=w;R.destroy=Lb;R.get=ba;R.getAlignment=Vc;R.getSelectedPoints=Va;R.getSelectedSeries=Y;R.hideLoading=aa;R.isInsidePlot=
-mc;R.redraw=C;R.showLoading=G;Fb()}function U(b){var e=[],h=[],k;for(k=0;k<b.length;k++){e[k]=b[k].plotX;h[k]=b[k].plotY}this.xdata=e;this.ydata=h;b=[];this.y2=[];var o=h.length;this.n=o;this.y2[0]=0;this.y2[o-1]=0;b[0]=0;for(k=1;k<o-1;k++){var p=e[k+1]-e[k-1];p=(e[k]-e[k-1])/p;var s=p*this.y2[k-1]+2;this.y2[k]=(p-1)/s;b[k]=(h[k+1]-h[k])/(e[k+1]-e[k])-(h[k]-h[k-1])/(e[k]-e[k-1]);b[k]=(6*b[k]/(e[k+1]-e[k-1])-p*b[k-1])/s}for(e=o-2;e>=0;e--)this.y2[e]=this.y2[e]*this.y2[e+1]+b[e]}var J=document,X=window,
-P=Math,L=P.round,pa=P.floor,Pa=P.ceil,ja=P.max,da=P.min,bb=P.abs,Hb=P.cos,ca=P.sin,Z=navigator.userAgent,mb=/msie/i.test(Z)&&!X.opera,yb=/AppleWebKit/.test(Z),Qb=X.SVGAngle||J.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure","1.1"),va,Ya,zb={},Aa=0,hb=1,Tb,Fa,t,x,B="div",V="absolute",sa="relative",qa="hidden",Xa="highcharts-",ia="px",nb="none",Ab="M",Za="L",kd="rgba(192,192,192,"+(Qb?1.0E-6:0.0020)+")",qb="",Sb="hover",rc,Cc,Dc,Ec,kc,sc,tc,Xc,Yc,Fc,Zc,$c,ib=X.HighchartsAdapter,
-Wa=ib||{},H=Wa.each,yc=Wa.grep,ec=Wa.map,Qa=Wa.merge,Bc=Wa.hyphenate,Ob=Wa.addEvent,fc=Wa.removeEvent,fb=Wa.fireEvent,oc=Wa.animate,zc=Wa.stop;Wa=Wa.getAjax;var Kb={};if(!ib&&X.jQuery){var Gb=jQuery;H=function(b,e){for(var h=0,k=b.length;h<k;h++)if(e.call(b[h],b[h],h,b)===false)return h};yc=Gb.grep;ec=function(b,e){for(var h=[],k=0,o=b.length;k<o;k++)h[k]=e.call(b[k],b[k],k,b);return h};Qa=function(){var b=arguments;return Gb.extend(true,null,b[0],b[1],b[2],b[3])};Bc=function(b){return b.replace(/([A-Z])/g,
-function(e,h){return"-"+h.toLowerCase()})};Ob=function(b,e,h){Gb(b).bind(e,h)};fc=function(b,e,h){var k=J.removeEventListener?"removeEventListener":"detachEvent";if(J[k]&&!b[k])b[k]=function(){};Gb(b).unbind(e,h)};fb=function(b,e,h,k){var o=Gb.Event(e),p="detached"+e;d(o,h);if(b[e]){b[p]=b[e];b[e]=null}Gb(b).trigger(o);if(b[p]){b[e]=b[p];b[p]=null}k&&!o.isDefaultPrevented()&&k(o)};oc=function(b,e,h){b=Gb(b);b.stop();b.animate(e,h)};zc=function(b){Gb(b).stop()};Wa=function(b,e){Gb.get(b,null,e)};Gb.extend(Gb.easing,
-{easeOutQuad:function(b,e,h,k,o){return-k*(e/=o)*(e-2)+h}});var sd=jQuery.fx.step._default,td=jQuery.fx.prototype.cur;Gb.fx.step._default=function(b){var e=b.elem;e.attr?e.attr(b.prop,b.now):sd.apply(this,arguments)};Gb.fx.prototype.cur=function(){var b=this.elem;return b.attr?b.attr(this.prop):td.apply(this,arguments)}}else if(!ib&&X.MooTools){H=$each;ec=function(b,e){return b.map(e)};yc=function(b,e){return b.filter(e)};Qa=$merge;Bc=function(b){return b.hyphenate()};Ob=function(b,e,h){if(typeof e==
-"string"){if(e=="unload")e="beforeunload";if(!b.addEvent)if(b.nodeName)b=$(b);else d(b,new Events);b.addEvent(e,h)}};fc=function(b,e,h){if(e){if(e=="unload")e="beforeunload";b.removeEvent(e,h)}};fb=function(b,e,h,k){e=new Event({type:e,target:b});e=d(e,h);e.preventDefault=function(){k=null};b.fireEvent&&b.fireEvent(e.type,e);k&&k(e)};oc=function(b,e,h){var k=b.attr;if(k&&!b.setStyle){b.setStyle=b.getStyle=b.attr;b.$family=b.uid=true}zc(b);h=new Fx.Morph(k?b:$(b),d(h,{transition:Fx.Transitions.Quad.easeInOut}));
-h.start(e);b.fx=h};zc=function(b){b.fx&&b.fx.cancel()};Wa=function(b,e){(new Request({url:b,method:"get",onSuccess:e})).send()}}ib={enabled:true,align:"center",x:0,y:15,style:{color:"#666",fontSize:"11px"}};Fa={colors:["#4572A7","#AA4643","#89A54E","#80699B","#3D96AE","#DB843D","#92A8CD","#A47D7C","#B5CA92"],symbols:["circle","diamond","square","triangle","triangle-down"],lang:{loading:"Loading...",months:["January","February","March","April","May","June","July","August","September","October","November",
-"December"],weekdays:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],decimalPoint:".",resetZoom:"Reset zoom",resetZoomTitle:"Reset zoom level 1:1",thousandsSep:","},global:{useUTC:true},chart:{margin:[50,50,90,80],borderColor:"#4572A7",borderRadius:5,defaultSeriesType:"line",ignoreHiddenSeries:true,style:{fontFamily:'"Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif',fontSize:"12px"},backgroundColor:"#FFFFFF",plotBorderColor:"#C0C0C0"},title:{text:"Chart title",
-x:0,y:20,align:"center",style:{color:"#3E576F",fontSize:"16px"}},subtitle:{text:"",x:0,y:40,align:"center",style:{color:"#6D869F"}},plotOptions:{line:{allowPointSelect:false,showCheckbox:false,animation:true,events:{},lineWidth:2,shadow:true,marker:{enabled:true,lineWidth:0,radius:4,lineColor:"#FFFFFF",states:{hover:{},select:{fillColor:"#FFFFFF",lineColor:"#000000",lineWidth:2}}},point:{events:{}},dataLabels:Qa(ib,{enabled:false,y:-6,formatter:function(){return this.y}}),showInLegend:true,states:{hover:{lineWidth:3,
-marker:{}},select:{marker:{}}},stickyTracking:true}},labels:{style:{position:V,color:"#3E576F"}},legend:{enabled:true,align:"center",layout:"horizontal",labelFormatter:function(){return this.name},borderWidth:1,borderColor:"#909090",borderRadius:5,shadow:false,style:{padding:"5px"},itemStyle:{cursor:"pointer",color:"#3E576F"},itemHoverStyle:{cursor:"pointer",color:"#000000"},itemHiddenStyle:{color:"#C0C0C0"},itemCheckboxStyle:{position:V,width:"13px",height:"13px"},symbolWidth:16,symbolPadding:5,
-verticalAlign:"bottom",x:15,y:-15},loading:{hideDuration:100,labelStyle:{fontWeight:"bold",position:sa,top:"1em"},showDuration:100,style:{position:V,backgroundColor:"white",opacity:0.5,textAlign:"center"}},tooltip:{enabled:true,formatter:function(){var b=this.series,e=b.xAxis,h=this.x;return"<b>"+(this.point.name||b.name)+"</b><br/>"+(i(h)?"X value: "+(e&&e.options.type=="datetime"?t(null,h):h)+"<br/>":"")+"Y value: "+this.y},backgroundColor:"rgba(255, 255, 255, .85)",borderWidth:2,borderRadius:5,
-shadow:true,snap:10,style:{color:"#333333",fontSize:"12px",padding:"5px",whiteSpace:"nowrap"}},toolbar:{itemStyle:{color:"#4572A7",cursor:"pointer"}},credits:{enabled:true,text:"Highcharts.com",href:"http://www.highcharts.com",style:{cursor:"pointer",color:"#909090",fontSize:"10px"}}};var wc={dateTimeLabelFormats:{second:"%H:%M:%S",minute:"%H:%M",hour:"%H:%M",day:"%e. %b",week:"%e. %b",month:"%b '%y",year:"%Y"},endOnTick:false,gridLineColor:"#C0C0C0",labels:ib,lineColor:"#C0D0E0",lineWidth:1,max:null,
-min:null,minPadding:0.01,maxPadding:0.01,maxZoom:null,minorGridLineColor:"#E0E0E0",minorGridLineWidth:1,minorTickColor:"#A0A0A0",minorTickLength:2,minorTickPosition:"outside",minorTickWidth:1,showFirstLabel:true,showLastLabel:false,startOfWeek:1,startOnTick:false,tickColor:"#C0D0E0",tickLength:5,tickmarkPlacement:"between",tickPixelInterval:100,tickPosition:"outside",tickWidth:1,title:{align:"middle",margin:35,style:{color:"#6D869F",fontWeight:"bold"}},type:"linear"},Lc=Qa(wc,{endOnTick:true,gridLineWidth:1,
-tickPixelInterval:72,showLastLabel:true,labels:{align:"right",x:-8,y:3},lineWidth:0,maxPadding:0.05,minPadding:0.05,startOnTick:true,tickWidth:0,title:{margin:40,rotation:270,text:"Y-values"}}),od={labels:{align:"right",x:-8,y:3},title:{rotation:270}},nd={labels:{align:"left",x:8,y:3},title:{rotation:90}},ed={labels:{align:"center",x:0,y:14},title:{rotation:0}},md=Qa(ed,{labels:{y:-5}});ib=Fa.plotOptions;Wa=ib.line;ib.spline=Qa(Wa);ib.scatter=Qa(Wa,{lineWidth:0,states:{hover:{lineWidth:0}}});ib.area=
-Qa(Wa,{});ib.areaspline=Qa(ib.area);ib.column=Qa(Wa,{borderColor:"#FFFFFF",borderWidth:1,borderRadius:0,groupPadding:0.2,marker:null,pointPadding:0.1,minPointLength:0,states:{hover:{brightness:0.1,shadow:false},select:{color:"#C0C0C0",borderColor:"#000000",shadow:false}}});ib.bar=Qa(ib.column,{dataLabels:{align:"left",x:5,y:0}});ib.pie=Qa(Wa,{borderColor:"#FFFFFF",borderWidth:1,center:["50%","50%"],colorByPoint:true,legendType:"point",marker:null,size:"90%",slicedOffset:10,states:{hover:{brightness:0.1,
-shadow:false}}});j();var gc=function(b){function e(w){if(s=/rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]?(?:\.[0-9]+)?)\s*\)/.exec(w))p=[parseInt(s[1],10),parseInt(s[2],10),parseInt(s[3],10),parseFloat(s[4],10)];else if(s=/#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(w))p=[parseInt(s[1],16),parseInt(s[2],16),parseInt(s[3],16),1]}function h(w){return p&&!isNaN(p[0])?w=="rgb"?"rgb("+p[0]+","+p[1]+","+p[2]+")":w=="a"?p[3]:"rgba("+p.join(",")+")":b}function k(w){if(typeof w==
-"number"&&w!==0)for(var A=0;A<3;A++){p[A]+=parseInt(w*255,10);if(p[A]<0)p[A]=0;if(p[A]>255)p[A]=255}return this}function o(w){p[3]=w;return this}var p=[],s;e(b);return{get:h,brighten:k,setOpacity:o}};t=function(b,e,h){function k(ba){return ba.toString().replace(/^([0-9])$/,"0$1")}if(!i(e)||isNaN(e))return"Invalid date";b=f(b,"%Y-%m-%d %H:%M:%S");e=new Date(e*hb);var o=e[Dc](),p=e[Ec](),s=e[kc](),w=e[sc](),A=e[tc](),C=Fa.lang,G=C.weekdays;C=C.months;e={a:G[p].substr(0,3),A:G[p],d:k(s),e:s,b:C[w].substr(0,
-3),B:C[w],m:k(w+1),y:A.toString().substr(2,2),Y:A,H:k(o),I:k(o%12||12),l:o%12||12,M:k(e[Cc]()),p:o<12?"AM":"PM",P:o<12?"am":"pm",S:k(e.getSeconds())};for(var aa in e)b=b.replace("%"+aa,e[aa]);return h?b.substr(0,1).toUpperCase()+b.substr(1):b};T.prototype={init:function(b,e){this.element=J.createElementNS("http://www.w3.org/2000/svg",e);this.renderer=b},animate:function(b,e){oc(this,b,e)},attr:function(b,e){var h,k,o,p=this.element,s=p.nodeName,w=this.renderer,A,C=this.shadows,G,aa=this;if(typeof b==
-"string"&&i(e)){h=b;b={};b[h]=e}if(typeof b=="string"){h=b;if(s=="circle")h={x:"cx",y:"cy"}[h]||h;else if(h=="strokeWidth")h="stroke-width";aa=parseFloat(m(p,h)||this[h]||0)}else for(h in b){e=b[h];if(h=="d"){if(e&&e.join)e=e.join(" ");if(/(NaN|  |^$)/.test(e))e="M 0 0"}else if(h=="x"&&s=="text")for(k=0;k<p.childNodes.length;k++){o=p.childNodes[k];m(o,"x")==m(p,"x")&&m(o,"x",e)}else if(h=="fill")e=w.color(e,p,h);else if(s=="circle")h={x:"cx",y:"cy"}[h]||h;else if(h=="translateX"||h=="translateY"){this[h]=
-e;this.updateTransform();A=true}else if(h=="stroke")e=w.color(e,p,h);else if(h=="isTracker")this[h]=e;if(h=="strokeWidth")h="stroke-width";if(yb&&h=="stroke-width"&&e===0)e=1.0E-6;if(this.symbolName&&/^(x|y|r|start|end|innerR)/.test(h)){if(!G){this.symbolAttr(b);G=true}A=true}if(C&&/^(width|height|visibility|x|y|d)$/.test(h))for(k=C.length;k--;)m(C[k],h,e);if(h=="text")w.buildText(p,e);else A||m(p,h,e)}return aa},symbolAttr:function(b){this.x=f(b.x,this.x);this.y=parseFloat(f(b.y,this.y));this.r=
-f(b.r,this.r);this.start=f(b.start,this.start);this.end=f(b.end,this.end);this.width=f(b.width,this.width);this.height=parseFloat(f(b.height,this.height));this.innerR=f(b.innerR,this.innerR);this.attr({d:this.renderer.symbols[this.symbolName](this.x,this.y,this.r,{start:this.start,end:this.end,width:this.width,height:this.height,innerR:this.innerR})})},clip:function(b){return this.attr("clip-path","url("+this.renderer.url+"#"+b.id+")")},css:function(b){if(b&&b.color)b.fill=b.color;b=d(this.styles,
-b);this.attr({style:a(b)});this.styles=b;return this},on:function(b,e){this.element["on"+b]=e;return this},translate:function(b,e){this.translateX=b;this.translateY=e;this.updateTransform();return this},invert:function(){this.inverted=true;this.updateTransform();return this},updateTransform:function(){var b=this.translateX||0,e=this.translateY||0,h=this.inverted,k=[];if(h){b+=this.attr("width");e+=this.attr("height")}if(b||e)k.push("translate("+b+","+e+")");h&&k.push("rotate(90) scale(-1,1)");k.length&&
-m(this.element,"transform",k.join(" "))},toFront:function(){var b=this.element;b.parentNode.appendChild(b);return this},getBBox:function(){return this.element.getBBox()},show:function(){return this.attr({visibility:"visible"})},hide:function(){return this.attr({visibility:qa})},add:function(b){var e=this.renderer,h=b||e;e=h.element||e.box;var k=e.childNodes,o=this.element,p=m(o,"zIndex"),s;this.parentInverted=b&&b.inverted;if(p){h.handleZ=true;p=parseInt(p,10)}if(h.handleZ)for(s=0;s<k.length;s++){b=
-k[s];h=m(b,"zIndex");if(b!=o&&(parseInt(h,10)>p||!i(p)&&i(h))){e.insertBefore(o,b);return this}}e.appendChild(o);return this},destroy:function(){var b=this.element,e=this.shadows,h=b.parentNode,k;b.onclick=b.onmouseout=b.onmouseover=b.onmousemove=null;zc(this);h&&h.removeChild(b);e&&H(e,function(o){(h=o.parentNode)&&h.removeChild(o)});for(k in this)delete this[k];return null},empty:function(){for(var b=this.element,e=b.childNodes,h=e.length;h--;)b.removeChild(e[h])},shadow:function(b){var e=[],h,
-k=this.element,o=this.parentInverted?"(-1,-1)":"(1,1)";if(b){for(b=1;b<=3;b++){h=k.cloneNode(0);m(h,{isShadow:"true",stroke:"rgb(0, 0, 0)","stroke-opacity":0.05*b,"stroke-width":7-2*b,transform:"translate"+o,fill:nb});k.parentNode.insertBefore(h,k);e.push(h)}this.shadows=e}return this}};var pc=function(){this.init.apply(this,arguments)};pc.prototype={init:function(b,e,h){var k=J.createElementNS("http://www.w3.org/2000/svg","svg"),o=location;m(k,{width:e,height:h,xmlns:"http://www.w3.org/2000/svg",
-version:"1.1"});b.appendChild(k);this.Element=T;this.box=k;this.url=mb?"":o.href.replace(/#.*?$/,"");this.defs=this.createElement("defs").add()},createElement:function(b){var e=new this.Element;e.init(this,b);return e},buildText:function(b,e){e=e.toString().replace(/<(b|strong)>/g,'<span style="font-weight:bold">').replace(/<(i|em)>/g,'<span style="font-style:italic">').replace(/<a/g,"<span").replace(/<\/(b|strong|i|em|a)>/g,"</span>").split(/<br[^>]?>/g);for(var h=b.childNodes,k=/style="([^"]+)"/,
-o=/href="([^"]+)"/,p=m(b,"x"),s=h.length;s--;)b.removeChild(h[s]);H(e,function(w,A){var C,G=0;w=w.replace(/<span/g,"|||<span").replace(/<\/span>/g,"</span>|||");C=w.split("|||");H(C,function(aa){if(aa!==""||C.length==1){var ba={},ka=J.createElementNS("http://www.w3.org/2000/svg","tspan");k.test(aa)&&m(ka,"style",aa.match(k)[1].replace(/(;| |^)color([ :])/,"$1fill$2"));if(o.test(aa)){m(ka,"onclick",'location.href="'+aa.match(o)[1]+'"');c(ka,{cursor:"pointer"})}aa=aa.replace(/<(.|\n)*?>/g,"");ka.appendChild(J.createTextNode(aa||
-" "));if(G)ba.dx=3;else ba.x=p;if(A&&!G)ba.dy=16;m(ka,ba);b.appendChild(ka);G++}})})},crispLine:function(b,e){if(b[1]==b[4])b[1]=b[4]=L(b[1])+e%2/2;if(b[2]==b[5])b[2]=b[5]=L(b[2])+e%2/2;return b},path:function(b){return this.createElement("path").attr({d:b,fill:nb})},circle:function(b,e,h){b=typeof b=="object"?b:{x:b,y:e,r:h};return this.createElement("circle").attr(b)},arc:function(b,e,h,k,o,p){if(typeof b=="object"){e=b.y;h=b.r;k=b.innerR;o=b.start;p=b.end;b=b.x}return this.symbol("arc",b||0,e||
-0,h||0,{innerR:k||0,start:o||0,end:p||0})},rect:function(b,e,h,k,o,p){if(arguments.length>1){var s=(p||0)%2/2;b=L(b||0)+s;e=L(e||0)+s;h=L((h||0)-2*s);k=L((k||0)-2*s)}s=typeof b=="object"?b:{x:b,y:e,width:ja(h,0),height:ja(k,0)};return this.createElement("rect").attr(d(s,{rx:o||s.r,ry:o||s.r,fill:nb}))},g:function(b){return this.createElement("g").attr(i(b)&&{"class":Xa+b})},image:function(b,e,h,k,o){e=this.createElement("image").attr({x:e,y:h,width:k,height:o,preserveAspectRatio:nb});e.element.setAttributeNS("http://www.w3.org/1999/xlink",
-"href",b);return e},symbol:function(b,e,h,k,o){var p,s=this.symbols[b];s=s&&s(e,h,k,o);var w=/^url\((.*?)\)$/;if(s){p=this.path(s);d(p,{symbolName:b,x:e,y:h,r:k});o&&d(p,o)}else if(w.test(b)){b=b.match(w)[1];p=this.image(b).attr({visibility:qa});g("img",{onload:function(){var A=this;A=zb[A.src]||[A.width,A.height];p.attr({x:L(e-A[0]/2)+ia,y:L(h-A[1]/2)+ia,width:A[0],height:A[1],visibility:"inherit"})},src:b})}else p=this.circle(e,h,k);return p},symbols:{square:function(b,e,h){h=0.707*h;return[Ab,
-b-h,e-h,Za,b+h,e-h,b+h,e+h,b-h,e+h,"Z"]},triangle:function(b,e,h){return[Ab,b,e-1.33*h,Za,b+h,e+0.67*h,b-h,e+0.67*h,"Z"]},"triangle-down":function(b,e,h){return[Ab,b,e+1.33*h,Za,b-h,e-0.67*h,b+h,e-0.67*h,"Z"]},diamond:function(b,e,h){return[Ab,b,e-h,Za,b+h,e,b,e+h,b-h,e,"Z"]},arc:function(b,e,h,k){var o=Math.PI,p=k.start,s=k.end-1.0E-6,w=k.innerR,A=Hb(p),C=ca(p),G=Hb(s);s=ca(s);k=k.end-p<o?0:1;return[Ab,b+h*A,e+h*C,"A",h,h,0,k,1,b+h*G,e+h*s,Za,b+w*G,e+w*s,"A",w,w,0,k,0,b+w*A,e+w*C,"Z"]}},clipRect:function(b,
-e,h,k){var o=Xa+Aa++,p=this.createElement("clipPath").attr({id:o}).add(this.defs);b=this.rect(b,e,h,k,0).add(p);b.id=o;return b},color:function(b,e,h){var k,o=/^rgba/;if(b&&b.linearGradient){var p=this;e="linearGradient";h=b[e];var s=Xa+Aa++,w,A,C;w=p.createElement(e).attr({id:s,gradientUnits:"userSpaceOnUse",x1:h[0],y1:h[1],x2:h[2],y2:h[3]}).add(p.defs);H(b.stops,function(G){if(o.test(G[1])){k=gc(G[1]);A=k.get("rgb");C=k.get("a")}else{A=G[1];C=1}p.createElement("stop").attr({offset:G[0],"stop-color":A,
-"stop-opacity":C}).add(w)});return"url("+this.url+"#"+s+")"}else if(o.test(b)){k=gc(b);m(e,h+"-opacity",k.get("a"));return k.get("rgb")}else return b},text:function(b,e,h,k,o,p){k=k||{};p=p||"left";o=o||0;var s=k.color||"#000000",w=Fa.chart.style;e=L(f(e,0));h=L(f(h,0));d(k,{fontFamily:k.fontFamily||w.fontFamily,fontSize:k.fontSize||w.fontSize});k=a(k);b={x:e,y:h,text:b,fill:s,style:k.replace(/"/g,"'")};if(o||p!="left")b=d(b,{"text-anchor":{left:"start",center:"middle",right:"end"}[p],transform:"rotate("+
-o+" "+e+" "+h+")"});return this.createElement("text").attr(b)}};var Wc;if(!Qb){var ud=r(T,{init:function(b,e){var h=["<",e,' filled="f" stroked="f"'],k=["position: ",V,";"];if(e=="shape"||e==B)k.push("left:0;top:0;width:10px;height:10px");h.push(' style="',k.join(""),'"/>');if(e){h=e==B||e=="span"||e=="img"?h.join(""):b.prepVML(h);this.element=g(h)}this.renderer=b},add:function(b){var e=this.renderer,h=this.element,k=e.box;e=b&&b.inverted;b=b?b.element||b:k;if(e){e=b.style;c(h,{flip:"x",left:parseInt(e.width,
-10)-10,top:parseInt(e.height,10)-10,rotation:-90})}b.appendChild(h);return this},attr:function(b,e){var h,k,o,p=this.element,s=p.style,w=p.nodeName,A=this.renderer,C=this.symbolName,G,aa=this.shadows,ba=J.documentMode,ka,Va=this;if(typeof b=="string"&&i(e)){h=b;b={};b[h]=e}if(typeof b=="string"){h=b;Va=h=="strokeWidth"||h=="stroke-width"?p.strokeweight:f(this[h],parseInt(s[{x:"left",y:"top"}[h]||h],10))}else for(h in b){k=b[h];ka=false;if(C&&/^(x|y|r|start|end|width|height|innerR)/.test(h)){if(!G){this.symbolAttr(b);
-G=true}ka=true}else if(h=="d"){o=k.length;for(ka=[];o--;)ka[o]=typeof k[o]=="number"?L(k[o]*10)-5:k[o]=="Z"?"x":k[o];k=ka.join(" ")||"x";p.path=k;if(aa)for(o=aa.length;o--;)aa[o].path=k;ka=true}else if(h=="zIndex"||h=="visibility"){s[h]=k;ba==8&&h=="visibility"&&w=="DIV"&&H(p.childNodes,function(Y){c(Y,{visibility:k})});ka=true}else if(/^(width|height)$/.test(h)){s[h]=k;this.updateClipping&&this.updateClipping();ka=true}else if(/^(x|y)$/.test(h)){if(h=="y"&&p.tagName=="SPAN"&&p.lineHeight)k-=p.lineHeight;
-s[{x:"left",y:"top"}[h]]=k}else if(h=="class")p.className=k;else if(h=="stroke"){k=A.color(k,p,h);h="strokecolor"}else if(h=="stroke-width"||h=="strokeWidth"){p.stroked=k?true:false;h="strokeweight";if(typeof k=="number")k+=ia}else if(h=="fill")if(w=="SPAN")s.color=k;else{p.filled=k!=nb?true:false;k=A.color(k,p,h);h="fillcolor"}else if(h=="translateX"||h=="translateY"){this[h]=e;this.updateTransform();ka=true}if(aa&&h=="visibility")for(o=aa.length;o--;)aa[o].style[h]=k;if(h=="text")p.innerHTML=k;
-else if(!ka)if(ba==8)p[h]=k;else m(p,h,k)}return Va},clip:function(b){var e=b.members,h=e.length;e.push(this);this.destroyClip=function(){e.splice(h,1)};return this.css(b.getCSS(this.inverted))},css:function(b){c(this.element,b);return this},destroy:function(){this.destroyClip&&this.destroyClip();T.prototype.destroy.apply(this)},empty:function(){var b=this.element;b=b.childNodes;for(var e=b.length,h;e--;){h=b[e];h.parentNode.removeChild(h)}},getBBox:function(){var b=this.element,e,h=b.offsetWidth,
-k=b.parentNode;h||J.body.appendChild(b);e={x:b.offsetLeft,y:b.offsetTop,width:b.offsetWidth,height:b.offsetHeight};h||(k?k.appendChild(b):J.body.removeChild(b));return e},on:function(b,e){this.element["on"+b]=function(){var h=X.event;h.target=h.srcElement;e(h)};return this},updateTransform:function(){var b=this.translateX||0,e=this.translateY||0;if(b||e)this.css({left:b,top:e})},shadow:function(b){var e=[],h=this.element,k=this.renderer,o,p=h.style,s,w=h.path;if(""+h.path=="")w="x";if(b){for(b=1;b<=
-3;b++){s=['<shape isShadow="true" strokeweight="',7-2*b,'" filled="false" path="',w,'" coordsize="100,100" style="',h.style.cssText,'" />'];o=g(k.prepVML(s),null,{left:parseInt(p.left,10)+1,top:parseInt(p.top,10)+1});s=['<stroke color="black" opacity="',0.05*b,'"/>'];g(k.prepVML(s),null,null,o);h.parentNode.insertBefore(o,h);e.push(o)}this.shadows=e}return this}});Wc=function(){this.init.apply(this,arguments)};Wc.prototype=Qa(pc.prototype,{isIE8:Z.indexOf("MSIE 8.0")>-1,init:function(b,e,h){this.width=
-e;this.height=h;this.box=g(B,null,{width:e+ia,height:h+ia},b);this.Element=ud;if(!J.namespaces.hcv){J.namespaces.add("hcv","urn:schemas-microsoft-com:vml");J.createStyleSheet().cssText="hcv\\:fill, hcv\\:path, hcv\\:textpath, hcv\\:shape, hcv\\:stroke, hcv\\:line { behavior:url(#default#VML); display: inline-block; } "}},clipRect:function(b,e,h,k){var o=this.createElement();return d(o,{members:[],element:{style:{left:b,top:e,width:h,height:k}},getCSS:function(p){var s=o.element.style,w=s.top,A=s.left,
-C=A+s.width;s=w+s.height;w={clip:"rect("+(p?A:w)+"px,"+(p?s:C)+"px,"+(p?C:s)+"px,"+(p?w:A)+"px)"};!p&&J.documentMode==8&&d(w,{width:C+ia,height:s+ia});return w},updateClipping:function(){H(o.members,function(p){p.css(o.getCSS(p.inverted))})}})},color:function(b,e,h){var k,o=/^rgba/;if(b&&b.linearGradient){var p,s,w=b.linearGradient,A,C,G,aa;H(b.stops,function(ba,ka){if(o.test(ba[1])){k=gc(ba[1]);p=k.get("rgb");s=k.get("a")}else{p=ba[1];s=1}if(ka){G=p;aa=s}else{A=p;C=s}});b=90-P.atan((w[3]-w[1])/(w[2]-
-w[0]))*180/P.PI;h=["<",h,' colors="0% ',A,",100% ",G,'" angle="',b,'" opacity="',aa,'" o:opacity2="',C,'" type="gradient" focus="100%" />'];g(this.prepVML(h),null,null,e)}else if(o.test(b)){k=gc(b);h=["<",h,' opacity="',k.get("a"),'"/>'];g(this.prepVML(h),null,null,e);return k.get("rgb")}else return b},prepVML:function(b){var e=this.isIE8;try{b=b.join("")}catch(h){for(var k="",o=0;o<b.length;o++)k+=b[o];b=k}if(e){b=b.replace("/>",' xmlns="urn:schemas-microsoft-com:vml" />');b=b.indexOf('style="')==
--1?b.replace("/>",' style="display:inline-block;behavior:url(#default#VML);" />'):b.replace('style="','style="display:inline-block;behavior:url(#default#VML);')}else b=b.replace("<","<hcv:");return b},text:function(b,e,h,k,o,p){k=k||{};p=p||"left";o=o||0;var s=L(parseInt(k.fontSize||12,10)*1.2),w=Fa.chart.style;e=L(e);h=L(h);d(k,{color:k.color||"#000000",whiteSpace:"nowrap",fontFamily:k.fontFamily||w.fontFamily,fontSize:k.fontSize||w.fontSize});if(o){w=(o||0)*P.PI*2/360;o=Hb(w);w=ca(w);s*=0.3;var A=
-p=="left",C=p=="right",G=A?e:e-10*o;e=C?e:e+10*o;A=A?h:h-10*w;h=C?h:h+10*w;G+=s*w;e+=s*w;A-=s*o;h-=s*o;if(bb(G-e)<0.1)G+=0.1;if(bb(A-h)<0.1)A+=0.1;h=this.createElement("line").attr({from:G+", "+A,to:e+", "+h});o=h.element;g("hcv:fill",{on:true,color:k.color},null,o);g("hcv:path",{textpathok:true},null,o);g('<hcv:textpath style="v-text-align:'+p+";"+a(k).replace(/"/g,"'")+'" on="true" string="'+b.toString().replace(/<br[^>]?>/g,"\n")+'">',null,null,o)}else{h=this.createElement("span").attr({x:e,y:h-
-s,text:b});o=h.element;o.lineHeight=s;c(o,k);if(p!="left"){b=h.getBBox().width;c(o,{left:e-b/{right:1,center:2}[p]+ia})}}return h},path:function(b){return this.createElement("shape").attr({coordsize:"100 100",d:b})},circle:function(b,e,h){return this.path(this.symbols.circle(b,e,h))},g:function(b){var e;if(b)e={className:Xa+b,"class":Xa+b};return this.createElement(B).attr(e)},image:function(b,e,h,k,o){return this.createElement("img").attr({src:b}).css({left:e,top:h,width:k,height:o})},rect:function(b,
-e,h,k,o,p){if(arguments.length>1){var s=(p||0)%2/2;b=L(b||0)+s;e=L(e||0)+s;h=L((h||0)-2*s);k=L((k||0)-2*s)}if(typeof b=="object"){e=b.y;h=b.width;k=b.height;o=b.r;b=b.x}return this.symbol("rect",b||0,e||0,o||0,{width:h||0,height:k||0})},symbol:function(b,e,h){var k;k=/^url\((.*?)\)$/;return k=k.test(b)?this.createElement("img").attr({onload:function(){var o=[this.width,this.height];c(this,{left:L(e-o[0]/2),top:L(h-o[1]/2)})},src:b.match(k)[1]}):pc.prototype.symbol.apply(this,arguments)},symbols:{arc:function(b,
-e,h,k){var o=k.start,p=k.end,s=p-o==2*Math.PI?p-0.0010:p,w=Hb(o),A=ca(o),C=Hb(s);s=ca(s);k=k.innerR;if(p-o===0)return["x"];return["wa",b-h,e-h,b+h,e+h,b+h*w,e+h*A,b+h*C,e+h*s,"at",b-k,e-k,b+k,e+k,b+k*C,e+k*s,b+k*w,e+k*A,"x","e"]},circle:function(b,e,h){return["wa",b-h,e-h,b+h,e+h,b+h,e,b+h,e,"e"]},rect:function(b,e,h,k){var o=k.width;k=k.height;var p=b+o,s=e+k;h=da(h,o,k);return[Ab,b+h,e,Za,p-h,e,"wa",p-2*h,e,p,e+2*h,p-h,e,p,e+h,Za,p,s-h,"wa",p-2*h,s-2*h,p,s,p,s-h,p-h,s,Za,b+h,s,"wa",b,s-2*h,b+2*
-h,s,b+h,s,b,s-h,Za,b,e+h,"wa",b,e,b+2*h,e+2*h,b,e+h,b+h,e,"x","e"]}}})}var id=Qb?pc:Wc,qc=function(){};qc.prototype={init:function(b,e){this.series=b;this.applyOptions(e);this.pointAttr={};if(b.options.colorByPoint){b=b.chart.options.colors;if(!this.options)this.options={};this.color=this.options.color=this.color||b[va++];if(va>=b.length)va=0}return this},applyOptions:function(b){var e=this.series;this.config=b;if(typeof b=="number"||b===null)this.y=b;else if(typeof b=="object"&&typeof b.length!=
-"number"){d(this,b);this.options=b}else if(typeof b[0]=="string"){this.name=b[0];this.y=b[1]}else if(typeof b[0]=="number"){this.x=b[0];this.y=b[1]}if(this.x===x)this.x=e.autoIncrement()},destroy:function(){var b=this,e;b==b.series.chart.hoverPoint&&b.onMouseOut();fc(b);H(["dataLabel","graphic","tracker","group"],function(h){b[h]&&b[h].destroy()});b.legendItem&&b.series.chart.legend.destroyItem(b);for(e in b)b[e]=null},select:function(b,e){var h=this,k=h.series;k=k.chart;h.selected=b=f(b,!h.selected);
-h.firePointEvent(b?"select":"unselect");h.setState(b&&"select");e||H(k.getSelectedPoints(),function(o){if(o.selected&&o!=h){o.selected=false;o.setState(qb);o.firePointEvent("unselect")}})},onMouseOver:function(){var b=this.series.chart,e=b.tooltip,h=b.hoverPoint;h&&h!=this&&h.onMouseOut();this.firePointEvent("mouseOver");e&&e.refresh(this);this.setState(Sb);b.hoverPoint=this},onMouseOut:function(){this.firePointEvent("mouseOut");this.setState(qb);this.series.chart.hoverPoint=null},update:function(b,
-e){var h=this,k=h.series;e=f(e,true);h.firePointEvent("update",{options:b},function(){h.applyOptions(b);k.isDirty=true;e&&k.chart.redraw()})},remove:function(b){var e=this,h=e.series,k=h.chart,o=h.data,p=o.length;b=f(b,true);e.firePointEvent("remove",null,function(){for(;p--;)if(o[p]==e){o.splice(p,1);break}e.destroy();h.isDirty=true;b&&k.redraw()})},firePointEvent:function(b,e,h){var k=this,o=this.series;o=o.options;if(o.point.events[b]||k.options&&k.options.events&&k.options.events[b])this.importEvents();
-if(b=="click"&&o.allowPointSelect)h=function(p){k.select(null,p.ctrlKey||p.metaKey||p.shiftKey)};fb(this,b,e,h)},importEvents:function(){if(!this.hasImportedEvents){var b=Qa(this.series.options.point,this.options);b=b.events;var e;this.events=b;for(e in b)Ob(this,e,b[e]);this.hasImportedEvents=true}},setState:function(b){var e=this.series,h=e.options.states,k=e.options.marker,o=k&&!k.enabled,p=(k=k&&k.states[b])&&k.enabled===false,s=e.chart,w=this.pointAttr;b||(b=qb);if(!(this.selected&&b!="select"||
-h[b]&&h[b].enabled===false||b&&(p||o&&!k.enabled)))if(b&&!this.graphic){if(!e.stateMarkerGraphic)e.stateMarkerGraphic=s.renderer.circle(0,0,w[b].r).attr(w[b]).add(e.group);e.stateMarkerGraphic.translate(this.plotX,this.plotY)}else this.graphic&&this.graphic.attr(w[b])},setTooltipText:function(){this.tooltipText=this.series.chart.options.tooltip.formatter.call({series:this.series,point:this,x:this.category,y:this.y,percentage:this.percentage,total:this.total||this.stackTotal})}};var xb=function(){};
-xb.prototype={isCartesian:true,type:"line",pointClass:qc,pointAttrToOptions:{stroke:"lineColor","stroke-width":"lineWidth",fill:"fillColor",r:"radius"},init:function(b,e){var h,k=b.series.length;this.chart=b;e=this.setOptions(e);d(this,{index:k,options:e,name:e.name||"Series "+(k+1),state:qb,pointAttr:{},visible:e.visible!==false,selected:e.selected===true});b=e.events;for(h in b)Ob(this,h,b[h]);this.getColor();this.getSymbol();this.setData(e.data,false)},autoIncrement:function(){var b=this.options,
-e=this.xIncrement;e=f(e,b.pointStart,0);this.pointInterval=f(this.pointInterval,b.pointInterval,1);this.xIncrement=e+this.pointInterval;return e},cleanData:function(){var b=this;b=b.data;var e;b.sort(function(h,k){return h.x-k.x});for(e=b.length-1;e>=0;e--)b[e-1]&&b[e-1].x==b[e].x&&b.splice(e-1,1)},getSegments:function(){var b=-1,e=[],h=this.data;H(h,function(k,o){if(k.y===null){o>b+1&&e.push(h.slice(b+1,o));b=o}else o==h.length-1&&e.push(h.slice(b+1,o+1))});this.segments=e},setOptions:function(b){var e=
-this.chart.options.plotOptions;return Qa(e[this.type],e.series,b)},getColor:function(){var b=this.chart.options.colors;this.color=this.options.color||b[va++]||"#0000ff";if(va>=b.length)va=0},getSymbol:function(){var b=this.chart.options.symbols;this.symbol=this.options.marker.symbol||b[Ya++];if(Ya>=b.length)Ya=0},addPoint:function(b,e,h){var k=this.data;b=(new this.pointClass).init(this,b);e=f(e,true);k.push(b);h&&k[0].remove(false);this.isDirty=true;e&&this.chart.redraw()},setData:function(b,e){var h=
-this,k=h.data,o=h.initialColor,p=k&&k.length||0;h.xIncrement=null;if(i(o))va=o;for(b=ec(l(b||[]),function(s){return(new h.pointClass).init(h,s)});p--;)k[p].destroy();h.data=b;h.cleanData();h.getSegments();h.isDirty=true;f(e,true)&&h.chart.redraw()},remove:function(b){var e=this,h=e.chart;b=f(b,true);if(!e.isRemoving){e.isRemoving=true;fb(e,"remove",null,function(){e.destroy();h.isDirty=true;b&&h.redraw()})}e.isRemoving=false},translate:function(){for(var b=this.chart,e=this.options.stacking,h=this.xAxis.categories,
-k=this.yAxis,o=k.stacks[this.type],p=this.data,s=p.length;s--;){var w=p[s],A=w.x,C=w.y,G;w.plotX=this.xAxis.translate(A);if(e&&this.visible&&o[A]){G=o[A];A=G.total;G.cum=G=G.cum-C;C=G+C;if(e=="percent"){G=A?G*100/A:0;C=A?C*100/A:0}w.percentage=A?w.y*100/A:0;w.stackTotal=A;w.yBottom=k.translate(G,0,1)}if(C!==null)w.plotY=k.translate(C,0,1);w.clientX=b.inverted?b.plotHeight-w.plotX:w.plotX;w.category=h&&h[w.x]!==x?h[w.x]:w.x}},setTooltipPoints:function(b){var e=this,h=e.chart,k=h.inverted,o=[],p=(k?
-h.plotTop:h.plotLeft)+h.plotSizeX,s,w,A=[];if(b)e.tooltipPoints=null;H(e.segments,function(C){o=o.concat(C)});if(e.xAxis&&e.xAxis.reversed)o=o.reverse();H(o,function(C,G){e.tooltipPoints||C.setTooltipText();s=o[G-1]?o[G-1].high+1:0;for(w=C.high=o[G+1]?pa((C.plotX+(o[G+1]?o[G+1].plotX:p))/2):p;s<=w;)A[k?p-s++:s++]=C});e.tooltipPoints=A},onMouseOver:function(){var b=this.chart,e=b.hoverSeries,h=this.stateMarkerGraphic;if(!b.mouseIsDown){h&&h.show();e&&e!=this&&e.onMouseOut();this.options.events.mouseOver&&
-fb(this,"mouseOver");this.tracker&&this.tracker.toFront();this.setState(Sb);b.hoverSeries=this}},onMouseOut:function(){var b=this.options,e=this.chart,h=e.tooltip,k=e.hoverPoint;k&&k.onMouseOut();this&&b.events.mouseOut&&fb(this,"mouseOut");h&&!b.stickyTracking&&h.hide();this.setState();e.hoverSeries=null},animate:function(b){var e=this.chart,h=this.clipRect;if(b){if(!h.isAnimating){h.attr("width",0);h.isAnimating=true}}else{h.animate({width:e.plotSizeX},{complete:function(){h.isAnimating=false},
-duration:1E3});this.animate=null}},drawPoints:function(){var b,e=this.data,h=this.chart,k,o,p,s,w,A;if(this.options.marker.enabled)for(p=e.length;p--;){s=e[p];k=s.plotX;o=s.plotY;A=s.graphic;if(o!==x){b=s.pointAttr[s.selected?"select":qb];w=b.r;if(A)A.attr({x:k,y:o,r:w});else s.graphic=h.renderer.symbol(f(s.marker&&s.marker.symbol,this.symbol),k,o,w).attr(b).add(this.group)}}},convertAttribs:function(b,e,h,k){var o=this.pointAttrToOptions,p,s,w={};b=b||{};e=e||{};h=h||{};k=k||{};for(p in o){s=o[p];
-w[p]=f(b[s],e[p],h[p],k[p])}return w},getAttribs:function(){var b=this,e=b.options.marker||b.options,h=e.states,k=h[Sb],o,p={},s=b.color,w=b.data,A=[],C,G=b.pointAttrToOptions;if(b.options.marker){p={stroke:s,fill:s};k.radius=k.radius||e.radius+2;k.lineWidth=k.lineWidth||e.lineWidth+1}else{p={fill:s};k.color=k.color||gc(k.color||s).brighten(k.brightness).get()}A[qb]=b.convertAttribs(e,p);H([Sb,"select"],function(ba){A[ba]=b.convertAttribs(h[ba],A[qb])});b.pointAttr=A;for(p=w.length;p--;){s=w[p];if((e=
-s.options&&s.options.marker||s.options)&&e.enabled===false)e.radius=0;o=false;if(s.options)for(var aa in G)if(i(e[G[aa]]))o=true;if(o){C=[];h=e.states||{};o=h[Sb]=h[Sb]||{};if(!b.options.marker)o.color=gc(o.color||s.options.color).brighten(o.brightness||k.brightness).get();C[qb]=b.convertAttribs(e,A[qb]);C[Sb]=b.convertAttribs(h[Sb],A[Sb],C[qb]);C.select=b.convertAttribs(h.select,A.select,C[qb])}else C=A;s.pointAttr=C}},destroy:function(){var b=this,e=b.chart,h=e.series,k=b.clipRect,o;fc(b);b.legendItem&&
-b.chart.legend.destroyItem(b);H(b.data,function(p){p.destroy()});H(["area","graph","dataLabelsGroup","group","tracker"],function(p){b[p]&&b[p].destroy()});k&&k!=b.chart.clipRect&&k.destroy();if(e.hoverSeries==b)e.hoverSeries=null;H(h,function(p,s){p==b&&h.splice(s,1)});for(o in b)delete b[o]},drawDataLabels:function(){if(this.options.dataLabels.enabled){var b=this,e,h,k=b.data,o=b.options.dataLabels,p,s=b.dataLabelsGroup,w=b.chart,A=w.inverted,C=b.type,G,aa;if(!s)s=b.dataLabelsGroup=w.renderer.g(Xa+
-"data-labels").attr({visibility:b.visible?"visible":qa,zIndex:4}).translate(w.plotLeft,w.plotTop).add();G=o.color;if(G=="auto")G=null;o.style.color=f(G,b.color);H(k,function(ba){var ka=f(ba.barX,ba.plotX),Va=ba.plotY,Y=ba.tooltipPos,ob=ba.dataLabel;if(ob)ba.dataLabel=ob.destroy();p=o.formatter.call({x:ba.x,y:ba.y,series:b,point:ba,percentage:ba.percentage,total:ba.total||ba.stackTotal});e=(A?w.plotWidth-Va:ka)+o.x;h=(A?w.plotHeight-ka:Va)+o.y;if(Y){e=Y[0]+o.x;h=Y[1]+o.y}aa=o.align;if(C=="column")e+=
-{center:ba.barW/2,right:ba.barW}[aa]||0;if(p)ba.dataLabel=w.renderer.text(p,e,h,o.style,o.rotation,aa).attr({zIndex:1,visibility:ba.visible===false?qa:"inherit"}).add(s);b.drawConnector&&b.drawConnector(ba)})}},drawGraph:function(){var b=this,e=b.options,h=b.chart,k=b.graph,o=[],p=b.area,s=b.group,w=e.lineColor||b.color,A=e.lineWidth,C,G=h.renderer,aa=b.yAxis.getThreshold(e.threshold||0),ba=/^area/.test(b.type),ka=[],Va=[];H(b.segments,function(Y){if(Y.length>1){C=[];H(Y,function(Lb,Fb){Fb<2&&C.push([Ab,
-Za][Fb]);if(Fb&&e.step){Fb=Y[Fb-1];C.push(Lb.plotX,Fb.plotY)}C.push(Lb.plotX,Lb.plotY)});o=o.concat(C);if(ba){var ob=[],wb,Wb=C.length;for(wb=0;wb<Wb;wb++)ob.push(C[wb]);if(e.stacking&&b.type!="areaspline")for(wb=Y.length-1;wb>=0;wb--)ob.push(Y[wb].plotX,Y[wb].yBottom);else ob.push(Y[Y.length-1].plotX,aa,Y[0].plotX,aa,"z");Va=Va.concat(ob)}}else ka.push(Y[0])});b.graphPath=o;b.singlePoints=ka;if(ba){h=f(e.fillColor,gc(b.color).setOpacity(e.fillOpacity||0.75).get());if(p)p.attr({d:Va});else b.area=
-b.chart.renderer.path(Va).attr({fill:h}).add(b.group)}if(k)k.attr({d:o});else if(A)b.graph=G.path(o).attr({stroke:w,"stroke-width":A+ia}).add(s).shadow(e.shadow)},render:function(){var b=this.chart,e,h=this.options.animation&&this.animate;e=b.renderer;if(!this.clipRect){this.clipRect=!b.hasRendered&&b.clipRect?b.clipRect:e.clipRect(0,0,b.plotSizeX,b.plotSizeY);if(!b.clipRect)b.clipRect=this.clipRect}if(!this.group){e=this.group=e.g("series");b.inverted&&e.attr({width:b.plotWidth,height:b.plotHeight}).invert();
-e.clip(this.clipRect).attr({visibility:this.visible?"visible":qa,zIndex:3}).translate(b.plotLeft,b.plotTop).add()}this.drawDataLabels();h&&this.animate(true);this.getAttribs();this.drawGraph&&this.drawGraph();this.drawPoints();this.options.enableMouseTracking!==false&&this.drawTracker();h&&this.animate();this.isDirty=false},redraw:function(){this.translate();this.setTooltipPoints(true);this.render()},setState:function(b){var e=this.options,h=this.graph,k=e.states,o=this.stateMarkerGraphic;e=e.lineWidth;
-b=b||qb;if(this.state!=b){this.state=b;if(!(k[b]&&k[b].enabled===false)){if(b)e=k[b].lineWidth||e;else o&&o.hide();if(h)h.animate({"stroke-width":e},b?0:500)}}},setVisible:function(b,e){var h=this.chart,k=this.legendItem,o=this.group,p=this.tracker,s=this.dataLabelsGroup,w,A=this.data,C=h.options.chart.ignoreHiddenSeries;w=this.visible;w=(this.visible=b=b===x?!w:b)?"show":"hide";if(b)this.isDirty=C;o&&o[w]();if(p)p[w]();else for(o=A.length;o--;){p=A[o];p.tracker&&p.tracker[w]()}s&&s[w]();k&&h.legend.colorizeItem(this,
-b);C&&this.options.stacking&&H(h.series,function(G){if(G.options.stacking&&G.visible)G.isDirty=true});e!==false&&h.redraw();fb(this,w)},show:function(){this.setVisible(true)},hide:function(){this.setVisible(false)},select:function(b){this.selected=b=b===x?!this.selected:b;if(this.checkbox)this.checkbox.checked=b;fb(this,b?"select":"unselect")},drawTracker:function(){var b=this,e=b.options,h=b.graphPath,k=b.chart,o=k.options.tooltip.snap,p=b.tracker,s=e.cursor;s=s&&{cursor:s};var w=b.singlePoints,
-A,C;for(C=0;C<w.length;C++){A=w[C];h.push(Ab,A.plotX-3,A.plotY,Za,A.plotX+3,A.plotY)}if(p)p.attr({d:h});else b.tracker=k.renderer.path(h).attr({isTracker:true,stroke:kd,fill:nb,"stroke-width":e.lineWidth+2*o,"stroke-linecap":"round",visibility:b.visible?"visible":qa,zIndex:1}).on("mouseover",function(){k.hoverSeries!=b&&b.onMouseOver()}).on("mouseout",function(){e.stickyTracking||b.onMouseOut()}).css(s).add(k.trackerGroup)}};Z=r(xb);Kb.line=Z;Z=r(xb,{type:"area"});Kb.area=Z;U.prototype={get:function(b){b||
-(b=50);var e=this.n;e=(this.xdata[e-1]-this.xdata[0])/(b-1);var h=[],k=[];h[0]=this.xdata[0];k[0]=this.ydata[0];for(var o=[{plotX:h[0],plotY:k[0]}],p=1;p<b;p++){h[p]=h[0]+p*e;k[p]=this.interpolate(h[p]);o[p]={plotX:h[p],plotY:k[p]}}return o},interpolate:function(b){for(var e=this.n-1,h=0;e-h>1;){var k=(e+h)/2;if(this.xdata[pa(k)]>b)e=k;else h=k}e=pa(e);h=pa(h);k=this.xdata[e]-this.xdata[h];var o=(this.xdata[e]-b)/k;b=(b-this.xdata[h])/k;return o*this.ydata[h]+b*this.ydata[e]+((o*o*o-o)*this.y2[h]+
-(b*b*b-b)*this.y2[e])*k*k/6}};Z=r(xb,{type:"spline",drawGraph:function(){var b=this.segments;this.segments=this.splinedata=this.getSplineData();xb.prototype.drawGraph.apply(this,arguments);this.segments=b},getSplineData:function(){var b=this,e=[],h=b.chart.plotSizeX,k;H(b.segments,function(o){if(b.xAxis.reversed)o=o.reverse();var p=[],s,w;H(o,function(A,C){s=o[C+2]||o[C+1]||A;w=o[C-2]||o[C-1]||A;s.plotX>=0&&w.plotX<=h&&p.push(A)});if(p.length>1)k=L(ja(h,p[p.length-1].clientX-p[0].clientX)/3);e.push(o.length>
-1?k?(new U(p)).get(k):[]:o)});return e}});Kb.spline=Z;Z=r(Z,{type:"areaspline"});Kb.areaspline=Z;var Ac=r(xb,{type:"column",pointAttrToOptions:{stroke:"borderColor","stroke-width":"borderWidth",fill:"color",r:"borderRadius"},init:function(){xb.prototype.init.apply(this,arguments);var b=this,e=b.chart;e.hasRendered&&H(e.series,function(h){if(h.type==b.type)h.isDirty=true})},translate:function(){var b=this,e=b.chart,h=0,k=b.xAxis.reversed,o=b.xAxis.categories,p;xb.prototype.translate.apply(b);H(e.series,
-function(Y){if(Y.type==b.type)if(Y.options.stacking){i(p)||(p=h++);Y.columnIndex=p}else Y.columnIndex=h++});var s=b.options,w=b.data,A=b.closestPoints;e=bb(w[1]?w[A].plotX-w[A-1].plotX:e.plotSizeX/(o?o.length:1));o=e*s.groupPadding;A=e-2*o;A/=h;var C=s.pointWidth,G=i(C)?(A-C)/2:A*s.pointPadding,aa=f(C,A-2*G);C=(k?h-b.columnIndex:b.columnIndex)||0;var ba=G+(o+C*A-e/2)*(k?-1:1),ka=b.yAxis.getThreshold(s.threshold||0),Va=s.minPointLength;H(w,function(Y){var ob=Y.plotY,wb=Y.plotX+ba,Wb=Pa(da(ob,ka)),
-Lb=Pa(bb((Y.yBottom||ka)-ob)),Fb;if(bb(Lb)<(Va||5)){if(Va){Lb=Va;Wb=ka-(ob<=ka?Va:0)}Fb=Wb-3}d(Y,{barX:wb,barY:Wb,barW:aa,barH:Lb});Y.shapeType="rect";Y.shapeArgs={x:wb,y:Wb,width:aa,height:Lb,r:s.borderRadius};Y.trackerArgs=i(Fb)&&Qa(Y.shapeArgs,{height:6,y:Fb})})},getSymbol:function(){},drawGraph:function(){},drawPoints:function(){var b=this,e=b.options,h=b.chart.renderer,k,o;H(b.data,function(p){if(i(p.plotY)){k=p.graphic;o=p.shapeArgs;if(k)k.attr(o);else p.graphic=h[p.shapeType](o).attr(p.pointAttr[p.selected?
-"select":qb]).add(b.group).shadow(e.shadow)}})},drawTracker:function(){var b=this,e=b.chart,h=e.renderer,k,o,p=+new Date,s=b.options.cursor,w=s&&{cursor:s},A;H(b.data,function(C){o=C.tracker;k=C.trackerArgs||C.shapeArgs;if(o)o.attr(k);else C.tracker=h[C.shapeType](k).attr({isTracker:p,fill:kd,visibility:b.visible?"visible":qa,zIndex:1}).on("mouseover",function(G){A=G.relatedTarget||G.fromElement;e.hoverSeries!=b&&m(A,"isTracker")!=p&&b.onMouseOver();C.onMouseOver()}).on("mouseout",function(G){if(!b.options.stickyTracking){A=
-G.relatedTarget||G.toElement;m(A,"isTracker")!=p&&b.onMouseOut()}}).css(w).add(e.trackerGroup)})},cleanData:function(){var b=this.data,e,h,k,o;xb.prototype.cleanData.apply(this);for(o=b.length-1;o>=0;o--)if(b[o-1]){e=b[o].x-b[o-1].x;if(h===x||e<h){h=e;k=o}}this.closestPoints=k},animate:function(b){var e=this,h=e.data;if(!b){H(h,function(k){var o=k.graphic;if(o){o.attr({height:0,y:e.yAxis.translate(0,0,1)});o.animate({height:k.barH,y:k.barY},{duration:1E3})}});e.animate=null}},remove:function(){var b=
-this,e=b.chart;e.hasRendered&&H(e.series,function(h){if(h.type==b.type)h.isDirty=true});xb.prototype.remove.apply(b,arguments)}});Kb.column=Ac;Z=r(Ac,{type:"bar",init:function(b){b.inverted=this.inverted=true;Ac.prototype.init.apply(this,arguments)}});Kb.bar=Z;Z=r(xb,{type:"scatter",translate:function(){var b=this;xb.prototype.translate.apply(b);H(b.data,function(e){e.shapeType="circle";e.shapeArgs={x:e.plotX,y:e.plotY,r:b.chart.options.tooltip.snap}})},drawTracker:function(){var b=this,e=b.options.cursor,
-h=e&&{cursor:e},k;H(b.data,function(o){(k=o.graphic)&&k.attr({isTracker:true}).on("mouseover",function(){b.onMouseOver();o.onMouseOver()}).on("mouseout",function(){b.options.stickyTracking||b.onMouseOut()}).css(h)})},cleanData:function(){}});Kb.scatter=Z;Z=r(qc,{init:function(){qc.prototype.init.apply(this,arguments);var b=this,e;d(b,{visible:b.visible!==false,name:f(b.name,"Slice")});e=function(){b.slice()};Ob(b,"select",e);Ob(b,"unselect",e);return b},setVisible:function(b){var e=this.series.chart,
-h;h=(this.visible=b=b===x?!this.visible:b)?"show":"hide";this.group[h]();this.tracker&&this.tracker[h]();this.dataLabel&&this.dataLabel[h]();this.legendItem&&e.legend.colorizeItem(this,b)},slice:function(b,e){var h=this.series;h=h.chart;var k=this.slicedTranslation;f(e,true);b=this.sliced=i(b)?b:!this.sliced;this.group.animate({translateX:b?k[0]:h.plotLeft,translateY:b?k[1]:h.plotTop},100)}});Z=r(xb,{type:"pie",isCartesian:false,pointClass:Z,pointAttrToOptions:{stroke:"borderColor","stroke-width":"borderWidth",
-fill:"color"},getColor:function(){this.initialColor=va},translate:function(){var b=0,e=this,h=-0.25,k=e.options,o=k.slicedOffset,p=k.center,s=e.chart,w=s.plotWidth,A=s.plotHeight,C,G,aa;e=e.data;var ba=2*P.PI,ka,Va=da(w,A);p.push(k.size,k.innerSize||0);p=ec(p,function(Y,ob){return/%$/.test(Y)?[w,A,Va,Va][ob]*parseInt(Y,10)/100:Y});H(e,function(Y){b+=Y.y});H(e,function(Y){ka=b?Y.y/b:0;C=h*ba;h+=ka;G=h*ba;Y.shapeType="arc";Y.shapeArgs={x:p[0],y:p[1],r:p[2]/2,innerR:p[3]/2,start:C,end:G};aa=(G+C)/2;
-Y.slicedTranslation=ec([Hb(aa)*o+s.plotLeft,ca(aa)*o+s.plotTop],L);Y.tooltipPos=[p[0]+Hb(aa)*p[2]*0.35,p[1]+ca(aa)*p[2]*0.35];Y.percentage=ka*100;Y.total=b});this.setTooltipPoints()},render:function(){this.getAttribs();this.drawPoints();this.options.enableMouseTracking!==false&&this.drawTracker();this.drawDataLabels();this.isDirty=false},drawPoints:function(){var b=this.chart,e=b.renderer,h,k,o;H(this.data,function(p){k=p.graphic;o=p.shapeArgs;if(!p.group){h=p.sliced?p.slicedTranslation:[b.plotLeft,
-b.plotTop];p.group=e.g("point").attr({zIndex:3}).add().translate(h[0],h[1])}if(k)k.attr(o);else p.graphic=e.arc(o).attr(p.pointAttr[qb]).add(p.group);p.visible===false&&p.setVisible(false)})},drawTracker:Ac.prototype.drawTracker,getSymbol:function(){}});Kb.pie=Z;X.Highcharts={Chart:E,dateFormat:t,getOptions:q,numberFormat:u,Point:qc,Renderer:id,seriesTypes:Kb,setOptions:n,Series:xb,addEvent:Ob,createElement:g,discardElement:v,css:c,each:H,extend:d,map:ec,merge:Qa,pick:f,extendClass:r}})();
-define("lib/highcharts",function(){});
-(function(d,i){function m(l){return!d(l).parents().andSelf().filter(function(){return d.curCSS(this,"visibility")==="hidden"||d.expr.filters.hidden(this)}).length}d.ui=d.ui||{};if(!d.ui.version){d.extend(d.ui,{version:"1.8.6",keyCode:{ALT:18,BACKSPACE:8,CAPS_LOCK:20,COMMA:188,COMMAND:91,COMMAND_LEFT:91,COMMAND_RIGHT:93,CONTROL:17,DELETE:46,DOWN:40,END:35,ENTER:13,ESCAPE:27,HOME:36,INSERT:45,LEFT:37,MENU:93,NUMPAD_ADD:107,NUMPAD_DECIMAL:110,NUMPAD_DIVIDE:111,NUMPAD_ENTER:108,NUMPAD_MULTIPLY:106,NUMPAD_SUBTRACT:109,
-PAGE_DOWN:34,PAGE_UP:33,PERIOD:190,RIGHT:39,SHIFT:16,SPACE:32,TAB:9,UP:38,WINDOWS:91}});d.fn.extend({_focus:d.fn.focus,focus:function(l,f){return typeof l==="number"?this.each(function(){var a=this;setTimeout(function(){d(a).focus();f&&f.call(a)},l)}):this._focus.apply(this,arguments)},scrollParent:function(){var l;l=d.browser.msie&&/(static|relative)/.test(this.css("position"))||/absolute/.test(this.css("position"))?this.parents().filter(function(){return/(relative|absolute|fixed)/.test(d.curCSS(this,
-"position",1))&&/(auto|scroll)/.test(d.curCSS(this,"overflow",1)+d.curCSS(this,"overflow-y",1)+d.curCSS(this,"overflow-x",1))}).eq(0):this.parents().filter(function(){return/(auto|scroll)/.test(d.curCSS(this,"overflow",1)+d.curCSS(this,"overflow-y",1)+d.curCSS(this,"overflow-x",1))}).eq(0);return/fixed/.test(this.css("position"))||!l.length?d(document):l},zIndex:function(l){if(l!==i)return this.css("zIndex",l);if(this.length){l=d(this[0]);for(var f;l.length&&l[0]!==document;){f=l.css("position");
-if(f==="absolute"||f==="relative"||f==="fixed"){f=parseInt(l.css("zIndex"),10);if(!isNaN(f)&&f!==0)return f}l=l.parent()}}return 0},disableSelection:function(){return this.bind((d.support.selectstart?"selectstart":"mousedown")+".ui-disableSelection",function(l){l.preventDefault()})},enableSelection:function(){return this.unbind(".ui-disableSelection")}});d.each(["Width","Height"],function(l,f){function a(n,q,v,r){d.each(c,function(){q-=parseFloat(d.curCSS(n,"padding"+this,true))||0;if(v)q-=parseFloat(d.curCSS(n,
-"border"+this+"Width",true))||0;if(r)q-=parseFloat(d.curCSS(n,"margin"+this,true))||0});return q}var c=f==="Width"?["Left","Right"]:["Top","Bottom"],g=f.toLowerCase(),j={innerWidth:d.fn.innerWidth,innerHeight:d.fn.innerHeight,outerWidth:d.fn.outerWidth,outerHeight:d.fn.outerHeight};d.fn["inner"+f]=function(n){if(n===i)return j["inner"+f].call(this);return this.each(function(){d(this).css(g,a(this,n)+"px")})};d.fn["outer"+f]=function(n,q){if(typeof n!=="number")return j["outer"+f].call(this,n);return this.each(function(){d(this).css(g,
-a(this,n,true,q)+"px")})}});d.extend(d.expr[":"],{data:function(l,f,a){return!!d.data(l,a[3])},focusable:function(l){var f=l.nodeName.toLowerCase(),a=d.attr(l,"tabindex");if("area"===f){f=l.parentNode;a=f.name;if(!l.href||!a||f.nodeName.toLowerCase()!=="map")return false;l=d("img[usemap=#"+a+"]")[0];return!!l&&m(l)}return(/input|select|textarea|button|object/.test(f)?!l.disabled:"a"==f?l.href||!isNaN(a):!isNaN(a))&&m(l)},tabbable:function(l){var f=d.attr(l,"tabindex");return(isNaN(f)||f>=0)&&d(l).is(":focusable")}});
-d(function(){var l=document.body,f=l.appendChild(f=document.createElement("div"));d.extend(f.style,{minHeight:"100px",height:"auto",padding:0,borderWidth:0});d.support.minHeight=f.offsetHeight===100;d.support.selectstart="onselectstart"in f;l.removeChild(f).style.display="none"});d.extend(d.ui,{plugin:{add:function(l,f,a){l=d.ui[l].prototype;for(var c in a){l.plugins[c]=l.plugins[c]||[];l.plugins[c].push([f,a[c]])}},call:function(l,f,a){if((f=l.plugins[f])&&l.element[0].parentNode)for(var c=0;c<f.length;c++)l.options[f[c][0]]&&
-f[c][1].apply(l.element,a)}},contains:function(l,f){return document.compareDocumentPosition?l.compareDocumentPosition(f)&16:l!==f&&l.contains(f)},hasScroll:function(l,f){if(d(l).css("overflow")==="hidden")return false;f=f&&f==="left"?"scrollLeft":"scrollTop";var a=false;if(l[f]>0)return true;l[f]=1;a=l[f]>0;l[f]=0;return a},isOverAxis:function(l,f,a){return l>f&&l<f+a},isOver:function(l,f,a,c,g,j){return d.ui.isOverAxis(l,a,g)&&d.ui.isOverAxis(f,c,j)}})}})(jQuery);
-(function(d,i){if(d.cleanData){var m=d.cleanData;d.cleanData=function(f){for(var a=0,c;(c=f[a])!=null;a++)d(c).triggerHandler("remove");m(f)}}else{var l=d.fn.remove;d.fn.remove=function(f,a){return this.each(function(){if(!a)if(!f||d.filter(f,[this]).length)d("*",this).add([this]).each(function(){d(this).triggerHandler("remove")});return l.call(d(this),f,a)})}}d.widget=function(f,a,c){var g=f.split(".")[0],j;f=f.split(".")[1];j=g+"-"+f;if(!c){c=a;a=d.Widget}d.expr[":"][j]=function(n){return!!d.data(n,
-f)};d[g]=d[g]||{};d[g][f]=function(n,q){arguments.length&&this._createWidget(n,q)};a=new a;a.options=d.extend(true,{},a.options);d[g][f].prototype=d.extend(true,a,{namespace:g,widgetName:f,widgetEventPrefix:d[g][f].prototype.widgetEventPrefix||f,widgetBaseClass:j},c);d.widget.bridge(f,d[g][f])};d.widget.bridge=function(f,a){d.fn[f]=function(c){var g=typeof c==="string",j=Array.prototype.slice.call(arguments,1),n=this;c=!g&&j.length?d.extend.apply(null,[true,c].concat(j)):c;if(g&&c.charAt(0)==="_")return n;
-g?this.each(function(){var q=d.data(this,f),v=q&&d.isFunction(q[c])?q[c].apply(q,j):q;if(v!==q&&v!==i){n=v;return false}}):this.each(function(){var q=d.data(this,f);q?q.option(c||{})._init():d.data(this,f,new a(c,this))});return n}};d.Widget=function(f,a){arguments.length&&this._createWidget(f,a)};d.Widget.prototype={widgetName:"widget",widgetEventPrefix:"",options:{disabled:false},_createWidget:function(f,a){d.data(a,this.widgetName,this);this.element=d(a);this.options=d.extend(true,{},this.options,
-this._getCreateOptions(),f);var c=this;this.element.bind("remove."+this.widgetName,function(){c.destroy()});this._create();this._trigger("create");this._init()},_getCreateOptions:function(){return d.metadata&&d.metadata.get(this.element[0])[this.widgetName]},_create:function(){},_init:function(){},destroy:function(){this.element.unbind("."+this.widgetName).removeData(this.widgetName);this.widget().unbind("."+this.widgetName).removeAttr("aria-disabled").removeClass(this.widgetBaseClass+"-disabled ui-state-disabled")},
-widget:function(){return this.element},option:function(f,a){var c=f;if(arguments.length===0)return d.extend({},this.options);if(typeof f==="string"){if(a===i)return this.options[f];c={};c[f]=a}this._setOptions(c);return this},_setOptions:function(f){var a=this;d.each(f,function(c,g){a._setOption(c,g)});return this},_setOption:function(f,a){this.options[f]=a;if(f==="disabled")this.widget()[a?"addClass":"removeClass"](this.widgetBaseClass+"-disabled ui-state-disabled").attr("aria-disabled",a);return this},
-enable:function(){return this._setOption("disabled",false)},disable:function(){return this._setOption("disabled",true)},_trigger:function(f,a,c){var g=this.options[f];a=d.Event(a);a.type=(f===this.widgetEventPrefix?f:this.widgetEventPrefix+f).toLowerCase();c=c||{};if(a.originalEvent){f=d.event.props.length;for(var j;f;){j=d.event.props[--f];a[j]=a.originalEvent[j]}}this.element.trigger(a,c);return!(d.isFunction(g)&&g.call(this.element[0],a,c)===false||a.isDefaultPrevented())}}})(jQuery);
-(function(d){d.widget("ui.mouse",{options:{cancel:":input,option",distance:1,delay:0},_mouseInit:function(){var i=this;this.element.bind("mousedown."+this.widgetName,function(m){return i._mouseDown(m)}).bind("click."+this.widgetName,function(m){if(i._preventClickEvent){i._preventClickEvent=false;m.stopImmediatePropagation();return false}});this.started=false},_mouseDestroy:function(){this.element.unbind("."+this.widgetName)},_mouseDown:function(i){i.originalEvent=i.originalEvent||{};if(!i.originalEvent.mouseHandled){this._mouseStarted&&
-this._mouseUp(i);this._mouseDownEvent=i;var m=this,l=i.which==1,f=typeof this.options.cancel=="string"?d(i.target).parents().add(i.target).filter(this.options.cancel).length:false;if(!l||f||!this._mouseCapture(i))return true;this.mouseDelayMet=!this.options.delay;if(!this.mouseDelayMet)this._mouseDelayTimer=setTimeout(function(){m.mouseDelayMet=true},this.options.delay);if(this._mouseDistanceMet(i)&&this._mouseDelayMet(i)){this._mouseStarted=this._mouseStart(i)!==false;if(!this._mouseStarted){i.preventDefault();
-return true}}this._mouseMoveDelegate=function(a){return m._mouseMove(a)};this._mouseUpDelegate=function(a){return m._mouseUp(a)};d(document).bind("mousemove."+this.widgetName,this._mouseMoveDelegate).bind("mouseup."+this.widgetName,this._mouseUpDelegate);i.preventDefault();return i.originalEvent.mouseHandled=true}},_mouseMove:function(i){if(d.browser.msie&&!(document.documentMode>=9)&&!i.button)return this._mouseUp(i);if(this._mouseStarted){this._mouseDrag(i);return i.preventDefault()}if(this._mouseDistanceMet(i)&&
-this._mouseDelayMet(i))(this._mouseStarted=this._mouseStart(this._mouseDownEvent,i)!==false)?this._mouseDrag(i):this._mouseUp(i);return!this._mouseStarted},_mouseUp:function(i){d(document).unbind("mousemove."+this.widgetName,this._mouseMoveDelegate).unbind("mouseup."+this.widgetName,this._mouseUpDelegate);if(this._mouseStarted){this._mouseStarted=false;this._preventClickEvent=i.target==this._mouseDownEvent.target;this._mouseStop(i)}return false},_mouseDistanceMet:function(i){return Math.max(Math.abs(this._mouseDownEvent.pageX-
-i.pageX),Math.abs(this._mouseDownEvent.pageY-i.pageY))>=this.options.distance},_mouseDelayMet:function(){return this.mouseDelayMet},_mouseStart:function(){},_mouseDrag:function(){},_mouseStop:function(){},_mouseCapture:function(){return true}})})(jQuery);
-(function(d){d.ui=d.ui||{};var i=/left|center|right/,m=/top|center|bottom/,l=d.fn.position,f=d.fn.offset;d.fn.position=function(a){if(!a||!a.of)return l.apply(this,arguments);a=d.extend({},a);var c=d(a.of),g=c[0],j=(a.collision||"flip").split(" "),n=a.offset?a.offset.split(" "):[0,0],q,v,r;if(g.nodeType===9){q=c.width();v=c.height();r={top:0,left:0}}else if(g.setTimeout){q=c.width();v=c.height();r={top:c.scrollTop(),left:c.scrollLeft()}}else if(g.preventDefault){a.at="left top";q=v=0;r={top:a.of.pageY,
-left:a.of.pageX}}else{q=c.outerWidth();v=c.outerHeight();r=c.offset()}d.each(["my","at"],function(){var u=(a[this]||"").split(" ");if(u.length===1)u=i.test(u[0])?u.concat(["center"]):m.test(u[0])?["center"].concat(u):["center","center"];u[0]=i.test(u[0])?u[0]:"center";u[1]=m.test(u[1])?u[1]:"center";a[this]=u});if(j.length===1)j[1]=j[0];n[0]=parseInt(n[0],10)||0;if(n.length===1)n[1]=n[0];n[1]=parseInt(n[1],10)||0;if(a.at[0]==="right")r.left+=q;else if(a.at[0]==="center")r.left+=q/2;if(a.at[1]==="bottom")r.top+=
-v;else if(a.at[1]==="center")r.top+=v/2;r.left+=n[0];r.top+=n[1];return this.each(function(){var u=d(this),F=u.outerWidth(),T=u.outerHeight(),E=parseInt(d.curCSS(this,"marginLeft",true))||0,U=parseInt(d.curCSS(this,"marginTop",true))||0,J=F+E+parseInt(d.curCSS(this,"marginRight",true))||0,X=T+U+parseInt(d.curCSS(this,"marginBottom",true))||0,P=d.extend({},r),L;if(a.my[0]==="right")P.left-=F;else if(a.my[0]==="center")P.left-=F/2;if(a.my[1]==="bottom")P.top-=T;else if(a.my[1]==="center")P.top-=T/2;
-P.left=parseInt(P.left);P.top=parseInt(P.top);L={left:P.left-E,top:P.top-U};d.each(["left","top"],function(pa,Pa){d.ui.position[j[pa]]&&d.ui.position[j[pa]][Pa](P,{targetWidth:q,targetHeight:v,elemWidth:F,elemHeight:T,collisionPosition:L,collisionWidth:J,collisionHeight:X,offset:n,my:a.my,at:a.at})});d.fn.bgiframe&&u.bgiframe();u.offset(d.extend(P,{using:a.using}))})};d.ui.position={fit:{left:function(a,c){var g=d(window);g=c.collisionPosition.left+c.collisionWidth-g.width()-g.scrollLeft();a.left=
-g>0?a.left-g:Math.max(a.left-c.collisionPosition.left,a.left)},top:function(a,c){var g=d(window);g=c.collisionPosition.top+c.collisionHeight-g.height()-g.scrollTop();a.top=g>0?a.top-g:Math.max(a.top-c.collisionPosition.top,a.top)}},flip:{left:function(a,c){if(c.at[0]!=="center"){var g=d(window);g=c.collisionPosition.left+c.collisionWidth-g.width()-g.scrollLeft();var j=c.my[0]==="left"?-c.elemWidth:c.my[0]==="right"?c.elemWidth:0,n=c.at[0]==="left"?c.targetWidth:-c.targetWidth,q=-2*c.offset[0];a.left+=
-c.collisionPosition.left<0?j+n+q:g>0?j+n+q:0}},top:function(a,c){if(c.at[1]!=="center"){var g=d(window);g=c.collisionPosition.top+c.collisionHeight-g.height()-g.scrollTop();var j=c.my[1]==="top"?-c.elemHeight:c.my[1]==="bottom"?c.elemHeight:0,n=c.at[1]==="top"?c.targetHeight:-c.targetHeight,q=-2*c.offset[1];a.top+=c.collisionPosition.top<0?j+n+q:g>0?j+n+q:0}}}};if(!d.offset.setOffset){d.offset.setOffset=function(a,c){if(/static/.test(d.curCSS(a,"position")))a.style.position="relative";var g=d(a),
-j=g.offset(),n=parseInt(d.curCSS(a,"top",true),10)||0,q=parseInt(d.curCSS(a,"left",true),10)||0;j={top:c.top-j.top+n,left:c.left-j.left+q};"using"in c?c.using.call(a,j):g.css(j)};d.fn.offset=function(a){var c=this[0];if(!c||!c.ownerDocument)return null;if(a)return this.each(function(){d.offset.setOffset(this,a)});return f.call(this)}}})(jQuery);
-(function(d){d.widget("ui.sortable",d.ui.mouse,{widgetEventPrefix:"sort",options:{appendTo:"parent",axis:false,connectWith:false,containment:false,cursor:"auto",cursorAt:false,dropOnEmpty:true,forcePlaceholderSize:false,forceHelperSize:false,grid:false,handle:false,helper:"original",items:"> *",opacity:false,placeholder:false,revert:false,scroll:true,scrollSensitivity:20,scrollSpeed:20,scope:"default",tolerance:"intersect",zIndex:1E3},_create:function(){this.containerCache={};this.element.addClass("ui-sortable");
-this.refresh();this.floating=this.items.length?/left|right/.test(this.items[0].item.css("float")):false;this.offset=this.element.offset();this._mouseInit()},destroy:function(){this.element.removeClass("ui-sortable ui-sortable-disabled").removeData("sortable").unbind(".sortable");this._mouseDestroy();for(var i=this.items.length-1;i>=0;i--)this.items[i].item.removeData("sortable-item");return this},_setOption:function(i,m){if(i==="disabled"){this.options[i]=m;this.widget()[m?"addClass":"removeClass"]("ui-sortable-disabled")}else d.Widget.prototype._setOption.apply(this,
-arguments)},_mouseCapture:function(i,m){if(this.reverting)return false;if(this.options.disabled||this.options.type=="static")return false;this._refreshItems(i);var l=null,f=this;d(i.target).parents().each(function(){if(d.data(this,"sortable-item")==f){l=d(this);return false}});if(d.data(i.target,"sortable-item")==f)l=d(i.target);if(!l)return false;if(this.options.handle&&!m){var a=false;d(this.options.handle,l).find("*").andSelf().each(function(){if(this==i.target)a=true});if(!a)return false}this.currentItem=
-l;this._removeCurrentsFromItems();return true},_mouseStart:function(i,m,l){m=this.options;this.currentContainer=this;this.refreshPositions();this.helper=this._createHelper(i);this._cacheHelperProportions();this._cacheMargins();this.scrollParent=this.helper.scrollParent();this.offset=this.currentItem.offset();this.offset={top:this.offset.top-this.margins.top,left:this.offset.left-this.margins.left};this.helper.css("position","absolute");this.cssPosition=this.helper.css("position");d.extend(this.offset,
-{click:{left:i.pageX-this.offset.left,top:i.pageY-this.offset.top},parent:this._getParentOffset(),relative:this._getRelativeOffset()});this.originalPosition=this._generatePosition(i);this.originalPageX=i.pageX;this.originalPageY=i.pageY;m.cursorAt&&this._adjustOffsetFromHelper(m.cursorAt);this.domPosition={prev:this.currentItem.prev()[0],parent:this.currentItem.parent()[0]};this.helper[0]!=this.currentItem[0]&&this.currentItem.hide();this._createPlaceholder();m.containment&&this._setContainment();
-if(m.cursor){if(d("body").css("cursor"))this._storedCursor=d("body").css("cursor");d("body").css("cursor",m.cursor)}if(m.opacity){if(this.helper.css("opacity"))this._storedOpacity=this.helper.css("opacity");this.helper.css("opacity",m.opacity)}if(m.zIndex){if(this.helper.css("zIndex"))this._storedZIndex=this.helper.css("zIndex");this.helper.css("zIndex",m.zIndex)}if(this.scrollParent[0]!=document&&this.scrollParent[0].tagName!="HTML")this.overflowOffset=this.scrollParent.offset();this._trigger("start",
-i,this._uiHash());this._preserveHelperProportions||this._cacheHelperProportions();if(!l)for(l=this.containers.length-1;l>=0;l--)this.containers[l]._trigger("activate",i,this._uiHash(this));if(d.ui.ddmanager)d.ui.ddmanager.current=this;d.ui.ddmanager&&!m.dropBehaviour&&d.ui.ddmanager.prepareOffsets(this,i);this.dragging=true;this.helper.addClass("ui-sortable-helper");this._mouseDrag(i);return true},_mouseDrag:function(i){this.position=this._generatePosition(i);this.positionAbs=this._convertPositionTo("absolute");
-if(!this.lastPositionAbs)this.lastPositionAbs=this.positionAbs;if(this.options.scroll){var m=this.options,l=false;if(this.scrollParent[0]!=document&&this.scrollParent[0].tagName!="HTML"){if(this.overflowOffset.top+this.scrollParent[0].offsetHeight-i.pageY<m.scrollSensitivity)this.scrollParent[0].scrollTop=l=this.scrollParent[0].scrollTop+m.scrollSpeed;else if(i.pageY-this.overflowOffset.top<m.scrollSensitivity)this.scrollParent[0].scrollTop=l=this.scrollParent[0].scrollTop-m.scrollSpeed;if(this.overflowOffset.left+
-this.scrollParent[0].offsetWidth-i.pageX<m.scrollSensitivity)this.scrollParent[0].scrollLeft=l=this.scrollParent[0].scrollLeft+m.scrollSpeed;else if(i.pageX-this.overflowOffset.left<m.scrollSensitivity)this.scrollParent[0].scrollLeft=l=this.scrollParent[0].scrollLeft-m.scrollSpeed}else{if(i.pageY-d(document).scrollTop()<m.scrollSensitivity)l=d(document).scrollTop(d(document).scrollTop()-m.scrollSpeed);else if(d(window).height()-(i.pageY-d(document).scrollTop())<m.scrollSensitivity)l=d(document).scrollTop(d(document).scrollTop()+
-m.scrollSpeed);if(i.pageX-d(document).scrollLeft()<m.scrollSensitivity)l=d(document).scrollLeft(d(document).scrollLeft()-m.scrollSpeed);else if(d(window).width()-(i.pageX-d(document).scrollLeft())<m.scrollSensitivity)l=d(document).scrollLeft(d(document).scrollLeft()+m.scrollSpeed)}l!==false&&d.ui.ddmanager&&!m.dropBehaviour&&d.ui.ddmanager.prepareOffsets(this,i)}this.positionAbs=this._convertPositionTo("absolute");if(!this.options.axis||this.options.axis!="y")this.helper[0].style.left=this.position.left+
-"px";if(!this.options.axis||this.options.axis!="x")this.helper[0].style.top=this.position.top+"px";for(m=this.items.length-1;m>=0;m--){l=this.items[m];var f=l.item[0],a=this._intersectsWithPointer(l);if(a)if(f!=this.currentItem[0]&&this.placeholder[a==1?"next":"prev"]()[0]!=f&&!d.ui.contains(this.placeholder[0],f)&&(this.options.type=="semi-dynamic"?!d.ui.contains(this.element[0],f):true)){this.direction=a==1?"down":"up";if(this.options.tolerance=="pointer"||this._intersectsWithSides(l))this._rearrange(i,
-l);else break;this._trigger("change",i,this._uiHash());break}}this._contactContainers(i);d.ui.ddmanager&&d.ui.ddmanager.drag(this,i);this._trigger("sort",i,this._uiHash());this.lastPositionAbs=this.positionAbs;return false},_mouseStop:function(i,m){if(i){d.ui.ddmanager&&!this.options.dropBehaviour&&d.ui.ddmanager.drop(this,i);if(this.options.revert){var l=this;m=l.placeholder.offset();l.reverting=true;d(this.helper).animate({left:m.left-this.offset.parent.left-l.margins.left+(this.offsetParent[0]==
-document.body?0:this.offsetParent[0].scrollLeft),top:m.top-this.offset.parent.top-l.margins.top+(this.offsetParent[0]==document.body?0:this.offsetParent[0].scrollTop)},parseInt(this.options.revert,10)||500,function(){l._clear(i)})}else this._clear(i,m);return false}},cancel:function(){if(this.dragging){this._mouseUp();this.options.helper=="original"?this.currentItem.css(this._storedCSS).removeClass("ui-sortable-helper"):this.currentItem.show();for(var i=this.containers.length-1;i>=0;i--){this.containers[i]._trigger("deactivate",
-null,this._uiHash(this));if(this.containers[i].containerCache.over){this.containers[i]._trigger("out",null,this._uiHash(this));this.containers[i].containerCache.over=0}}}this.placeholder[0].parentNode&&this.placeholder[0].parentNode.removeChild(this.placeholder[0]);this.options.helper!="original"&&this.helper&&this.helper[0].parentNode&&this.helper.remove();d.extend(this,{helper:null,dragging:false,reverting:false,_noFinalSort:null});this.domPosition.prev?d(this.domPosition.prev).after(this.currentItem):
-d(this.domPosition.parent).prepend(this.currentItem);return this},serialize:function(i){var m=this._getItemsAsjQuery(i&&i.connected),l=[];i=i||{};d(m).each(function(){var f=(d(i.item||this).attr(i.attribute||"id")||"").match(i.expression||/(.+)[-=_](.+)/);if(f)l.push((i.key||f[1]+"[]")+"="+(i.key&&i.expression?f[1]:f[2]))});!l.length&&i.key&&l.push(i.key+"=");return l.join("&")},toArray:function(i){var m=this._getItemsAsjQuery(i&&i.connected),l=[];i=i||{};m.each(function(){l.push(d(i.item||this).attr(i.attribute||
-"id")||"")});return l},_intersectsWith:function(i){var m=this.positionAbs.left,l=m+this.helperProportions.width,f=this.positionAbs.top,a=f+this.helperProportions.height,c=i.left,g=c+i.width,j=i.top,n=j+i.height,q=this.offset.click.top,v=this.offset.click.left;q=f+q>j&&f+q<n&&m+v>c&&m+v<g;return this.options.tolerance=="pointer"||this.options.forcePointerForContainers||this.options.tolerance!="pointer"&&this.helperProportions[this.floating?"width":"height"]>i[this.floating?"width":"height"]?q:c<m+
-this.helperProportions.width/2&&l-this.helperProportions.width/2<g&&j<f+this.helperProportions.height/2&&a-this.helperProportions.height/2<n},_intersectsWithPointer:function(i){var m=d.ui.isOverAxis(this.positionAbs.top+this.offset.click.top,i.top,i.height);i=d.ui.isOverAxis(this.positionAbs.left+this.offset.click.left,i.left,i.width);m=m&&i;i=this._getDragVerticalDirection();var l=this._getDragHorizontalDirection();if(!m)return false;return this.floating?l&&l=="right"||i=="down"?2:1:i&&(i=="down"?
-2:1)},_intersectsWithSides:function(i){var m=d.ui.isOverAxis(this.positionAbs.top+this.offset.click.top,i.top+i.height/2,i.height);i=d.ui.isOverAxis(this.positionAbs.left+this.offset.click.left,i.left+i.width/2,i.width);var l=this._getDragVerticalDirection(),f=this._getDragHorizontalDirection();return this.floating&&f?f=="right"&&i||f=="left"&&!i:l&&(l=="down"&&m||l=="up"&&!m)},_getDragVerticalDirection:function(){var i=this.positionAbs.top-this.lastPositionAbs.top;return i!=0&&(i>0?"down":"up")},
-_getDragHorizontalDirection:function(){var i=this.positionAbs.left-this.lastPositionAbs.left;return i!=0&&(i>0?"right":"left")},refresh:function(i){this._refreshItems(i);this.refreshPositions();return this},_connectWith:function(){var i=this.options;return i.connectWith.constructor==String?[i.connectWith]:i.connectWith},_getItemsAsjQuery:function(i){var m=[],l=[],f=this._connectWith();if(f&&i)for(i=f.length-1;i>=0;i--)for(var a=d(f[i]),c=a.length-1;c>=0;c--){var g=d.data(a[c],"sortable");if(g&&g!=
-this&&!g.options.disabled)l.push([d.isFunction(g.options.items)?g.options.items.call(g.element):d(g.options.items,g.element).not(".ui-sortable-helper").not(".ui-sortable-placeholder"),g])}l.push([d.isFunction(this.options.items)?this.options.items.call(this.element,null,{options:this.options,item:this.currentItem}):d(this.options.items,this.element).not(".ui-sortable-helper").not(".ui-sortable-placeholder"),this]);for(i=l.length-1;i>=0;i--)l[i][0].each(function(){m.push(this)});return d(m)},_removeCurrentsFromItems:function(){for(var i=
-this.currentItem.find(":data(sortable-item)"),m=0;m<this.items.length;m++)for(var l=0;l<i.length;l++)i[l]==this.items[m].item[0]&&this.items.splice(m,1)},_refreshItems:function(i){this.items=[];this.containers=[this];var m=this.items,l=[[d.isFunction(this.options.items)?this.options.items.call(this.element[0],i,{item:this.currentItem}):d(this.options.items,this.element),this]],f=this._connectWith();if(f)for(var a=f.length-1;a>=0;a--)for(var c=d(f[a]),g=c.length-1;g>=0;g--){var j=d.data(c[g],"sortable");
-if(j&&j!=this&&!j.options.disabled){l.push([d.isFunction(j.options.items)?j.options.items.call(j.element[0],i,{item:this.currentItem}):d(j.options.items,j.element),j]);this.containers.push(j)}}for(a=l.length-1;a>=0;a--){i=l[a][1];f=l[a][0];g=0;for(c=f.length;g<c;g++){j=d(f[g]);j.data("sortable-item",i);m.push({item:j,instance:i,width:0,height:0,left:0,top:0})}}},refreshPositions:function(i){if(this.offsetParent&&this.helper)this.offset.parent=this._getParentOffset();for(var m=this.items.length-1;m>=
-0;m--){var l=this.items[m],f=this.options.toleranceElement?d(this.options.toleranceElement,l.item):l.item;if(!i){l.width=f.outerWidth();l.height=f.outerHeight()}f=f.offset();l.left=f.left;l.top=f.top}if(this.options.custom&&this.options.custom.refreshContainers)this.options.custom.refreshContainers.call(this);else for(m=this.containers.length-1;m>=0;m--){f=this.containers[m].element.offset();this.containers[m].containerCache.left=f.left;this.containers[m].containerCache.top=f.top;this.containers[m].containerCache.width=
-this.containers[m].element.outerWidth();this.containers[m].containerCache.height=this.containers[m].element.outerHeight()}return this},_createPlaceholder:function(i){var m=i||this,l=m.options;if(!l.placeholder||l.placeholder.constructor==String){var f=l.placeholder;l.placeholder={element:function(){var a=d(document.createElement(m.currentItem[0].nodeName)).addClass(f||m.currentItem[0].className+" ui-sortable-placeholder").removeClass("ui-sortable-helper")[0];if(!f)a.style.visibility="hidden";return a},
-update:function(a,c){if(!(f&&!l.forcePlaceholderSize)){c.height()||c.height(m.currentItem.innerHeight()-parseInt(m.currentItem.css("paddingTop")||0,10)-parseInt(m.currentItem.css("paddingBottom")||0,10));c.width()||c.width(m.currentItem.innerWidth()-parseInt(m.currentItem.css("paddingLeft")||0,10)-parseInt(m.currentItem.css("paddingRight")||0,10))}}}}m.placeholder=d(l.placeholder.element.call(m.element,m.currentItem));m.currentItem.after(m.placeholder);l.placeholder.update(m,m.placeholder)},_contactContainers:function(i){for(var m=
-null,l=null,f=this.containers.length-1;f>=0;f--)if(!d.ui.contains(this.currentItem[0],this.containers[f].element[0]))if(this._intersectsWith(this.containers[f].containerCache)){if(!(m&&d.ui.contains(this.containers[f].element[0],m.element[0]))){m=this.containers[f];l=f}}else if(this.containers[f].containerCache.over){this.containers[f]._trigger("out",i,this._uiHash(this));this.containers[f].containerCache.over=0}if(m)if(this.containers.length===1){this.containers[l]._trigger("over",i,this._uiHash(this));
-this.containers[l].containerCache.over=1}else if(this.currentContainer!=this.containers[l]){m=1E4;f=null;for(var a=this.positionAbs[this.containers[l].floating?"left":"top"],c=this.items.length-1;c>=0;c--)if(d.ui.contains(this.containers[l].element[0],this.items[c].item[0])){var g=this.items[c][this.containers[l].floating?"left":"top"];if(Math.abs(g-a)<m){m=Math.abs(g-a);f=this.items[c]}}if(f||this.options.dropOnEmpty){this.currentContainer=this.containers[l];f?this._rearrange(i,f,null,true):this._rearrange(i,
-null,this.containers[l].element,true);this._trigger("change",i,this._uiHash());this.containers[l]._trigger("change",i,this._uiHash(this));this.options.placeholder.update(this.currentContainer,this.placeholder);this.containers[l]._trigger("over",i,this._uiHash(this));this.containers[l].containerCache.over=1}}},_createHelper:function(i){var m=this.options;i=d.isFunction(m.helper)?d(m.helper.apply(this.element[0],[i,this.currentItem])):m.helper=="clone"?this.currentItem.clone():this.currentItem;i.parents("body").length||
-d(m.appendTo!="parent"?m.appendTo:this.currentItem[0].parentNode)[0].appendChild(i[0]);if(i[0]==this.currentItem[0])this._storedCSS={width:this.currentItem[0].style.width,height:this.currentItem[0].style.height,position:this.currentItem.css("position"),top:this.currentItem.css("top"),left:this.currentItem.css("left")};if(i[0].style.width==""||m.forceHelperSize)i.width(this.currentItem.width());if(i[0].style.height==""||m.forceHelperSize)i.height(this.currentItem.height());return i},_adjustOffsetFromHelper:function(i){if(typeof i==
-"string")i=i.split(" ");if(d.isArray(i))i={left:+i[0],top:+i[1]||0};if("left"in i)this.offset.click.left=i.left+this.margins.left;if("right"in i)this.offset.click.left=this.helperProportions.width-i.right+this.margins.left;if("top"in i)this.offset.click.top=i.top+this.margins.top;if("bottom"in i)this.offset.click.top=this.helperProportions.height-i.bottom+this.margins.top},_getParentOffset:function(){this.offsetParent=this.helper.offsetParent();var i=this.offsetParent.offset();if(this.cssPosition==
-"absolute"&&this.scrollParent[0]!=document&&d.ui.contains(this.scrollParent[0],this.offsetParent[0])){i.left+=this.scrollParent.scrollLeft();i.top+=this.scrollParent.scrollTop()}if(this.offsetParent[0]==document.body||this.offsetParent[0].tagName&&this.offsetParent[0].tagName.toLowerCase()=="html"&&d.browser.msie)i={top:0,left:0};return{top:i.top+(parseInt(this.offsetParent.css("borderTopWidth"),10)||0),left:i.left+(parseInt(this.offsetParent.css("borderLeftWidth"),10)||0)}},_getRelativeOffset:function(){if(this.cssPosition==
-"relative"){var i=this.currentItem.position();return{top:i.top-(parseInt(this.helper.css("top"),10)||0)+this.scrollParent.scrollTop(),left:i.left-(parseInt(this.helper.css("left"),10)||0)+this.scrollParent.scrollLeft()}}else return{top:0,left:0}},_cacheMargins:function(){this.margins={left:parseInt(this.currentItem.css("marginLeft"),10)||0,top:parseInt(this.currentItem.css("marginTop"),10)||0}},_cacheHelperProportions:function(){this.helperProportions={width:this.helper.outerWidth(),height:this.helper.outerHeight()}},
-_setContainment:function(){var i=this.options;if(i.containment=="parent")i.containment=this.helper[0].parentNode;if(i.containment=="document"||i.containment=="window")this.containment=[0-this.offset.relative.left-this.offset.parent.left,0-this.offset.relative.top-this.offset.parent.top,d(i.containment=="document"?document:window).width()-this.helperProportions.width-this.margins.left,(d(i.containment=="document"?document:window).height()||document.body.parentNode.scrollHeight)-this.helperProportions.height-
-this.margins.top];if(!/^(document|window|parent)$/.test(i.containment)){var m=d(i.containment)[0];i=d(i.containment).offset();var l=d(m).css("overflow")!="hidden";this.containment=[i.left+(parseInt(d(m).css("borderLeftWidth"),10)||0)+(parseInt(d(m).css("paddingLeft"),10)||0)-this.margins.left,i.top+(parseInt(d(m).css("borderTopWidth"),10)||0)+(parseInt(d(m).css("paddingTop"),10)||0)-this.margins.top,i.left+(l?Math.max(m.scrollWidth,m.offsetWidth):m.offsetWidth)-(parseInt(d(m).css("borderLeftWidth"),
-10)||0)-(parseInt(d(m).css("paddingRight"),10)||0)-this.helperProportions.width-this.margins.left,i.top+(l?Math.max(m.scrollHeight,m.offsetHeight):m.offsetHeight)-(parseInt(d(m).css("borderTopWidth"),10)||0)-(parseInt(d(m).css("paddingBottom"),10)||0)-this.helperProportions.height-this.margins.top]}},_convertPositionTo:function(i,m){if(!m)m=this.position;i=i=="absolute"?1:-1;var l=this.cssPosition=="absolute"&&!(this.scrollParent[0]!=document&&d.ui.contains(this.scrollParent[0],this.offsetParent[0]))?
-this.offsetParent:this.scrollParent,f=/(html|body)/i.test(l[0].tagName);return{top:m.top+this.offset.relative.top*i+this.offset.parent.top*i-(d.browser.safari&&this.cssPosition=="fixed"?0:(this.cssPosition=="fixed"?-this.scrollParent.scrollTop():f?0:l.scrollTop())*i),left:m.left+this.offset.relative.left*i+this.offset.parent.left*i-(d.browser.safari&&this.cssPosition=="fixed"?0:(this.cssPosition=="fixed"?-this.scrollParent.scrollLeft():f?0:l.scrollLeft())*i)}},_generatePosition:function(i){var m=
-this.options,l=this.cssPosition=="absolute"&&!(this.scrollParent[0]!=document&&d.ui.contains(this.scrollParent[0],this.offsetParent[0]))?this.offsetParent:this.scrollParent,f=/(html|body)/i.test(l[0].tagName);if(this.cssPosition=="relative"&&!(this.scrollParent[0]!=document&&this.scrollParent[0]!=this.offsetParent[0]))this.offset.relative=this._getRelativeOffset();var a=i.pageX,c=i.pageY;if(this.originalPosition){if(this.containment){if(i.pageX-this.offset.click.left<this.containment[0])a=this.containment[0]+
-this.offset.click.left;if(i.pageY-this.offset.click.top<this.containment[1])c=this.containment[1]+this.offset.click.top;if(i.pageX-this.offset.click.left>this.containment[2])a=this.containment[2]+this.offset.click.left;if(i.pageY-this.offset.click.top>this.containment[3])c=this.containment[3]+this.offset.click.top}if(m.grid){c=this.originalPageY+Math.round((c-this.originalPageY)/m.grid[1])*m.grid[1];c=this.containment?!(c-this.offset.click.top<this.containment[1]||c-this.offset.click.top>this.containment[3])?
-c:!(c-this.offset.click.top<this.containment[1])?c-m.grid[1]:c+m.grid[1]:c;a=this.originalPageX+Math.round((a-this.originalPageX)/m.grid[0])*m.grid[0];a=this.containment?!(a-this.offset.click.left<this.containment[0]||a-this.offset.click.left>this.containment[2])?a:!(a-this.offset.click.left<this.containment[0])?a-m.grid[0]:a+m.grid[0]:a}}return{top:c-this.offset.click.top-this.offset.relative.top-this.offset.parent.top+(d.browser.safari&&this.cssPosition=="fixed"?0:this.cssPosition=="fixed"?-this.scrollParent.scrollTop():
-f?0:l.scrollTop()),left:a-this.offset.click.left-this.offset.relative.left-this.offset.parent.left+(d.browser.safari&&this.cssPosition=="fixed"?0:this.cssPosition=="fixed"?-this.scrollParent.scrollLeft():f?0:l.scrollLeft())}},_rearrange:function(i,m,l,f){l?l[0].appendChild(this.placeholder[0]):m.item[0].parentNode.insertBefore(this.placeholder[0],this.direction=="down"?m.item[0]:m.item[0].nextSibling);this.counter=this.counter?++this.counter:1;var a=this,c=this.counter;window.setTimeout(function(){c==
-a.counter&&a.refreshPositions(!f)},0)},_clear:function(i,m){this.reverting=false;var l=[];!this._noFinalSort&&this.currentItem[0].parentNode&&this.placeholder.before(this.currentItem);this._noFinalSort=null;if(this.helper[0]==this.currentItem[0]){for(var f in this._storedCSS)if(this._storedCSS[f]=="auto"||this._storedCSS[f]=="static")this._storedCSS[f]="";this.currentItem.css(this._storedCSS).removeClass("ui-sortable-helper")}else this.currentItem.show();this.fromOutside&&!m&&l.push(function(a){this._trigger("receive",
-a,this._uiHash(this.fromOutside))});if((this.fromOutside||this.domPosition.prev!=this.currentItem.prev().not(".ui-sortable-helper")[0]||this.domPosition.parent!=this.currentItem.parent()[0])&&!m)l.push(function(a){this._trigger("update",a,this._uiHash())});if(!d.ui.contains(this.element[0],this.currentItem[0])){m||l.push(function(a){this._trigger("remove",a,this._uiHash())});for(f=this.containers.length-1;f>=0;f--)if(d.ui.contains(this.containers[f].element[0],this.currentItem[0])&&!m){l.push(function(a){return function(c){a._trigger("receive",
-c,this._uiHash(this))}}.call(this,this.containers[f]));l.push(function(a){return function(c){a._trigger("update",c,this._uiHash(this))}}.call(this,this.containers[f]))}}for(f=this.containers.length-1;f>=0;f--){m||l.push(function(a){return function(c){a._trigger("deactivate",c,this._uiHash(this))}}.call(this,this.containers[f]));if(this.containers[f].containerCache.over){l.push(function(a){return function(c){a._trigger("out",c,this._uiHash(this))}}.call(this,this.containers[f]));this.containers[f].containerCache.over=
-0}}this._storedCursor&&d("body").css("cursor",this._storedCursor);this._storedOpacity&&this.helper.css("opacity",this._storedOpacity);if(this._storedZIndex)this.helper.css("zIndex",this._storedZIndex=="auto"?"":this._storedZIndex);this.dragging=false;if(this.cancelHelperRemoval){if(!m){this._trigger("beforeStop",i,this._uiHash());for(f=0;f<l.length;f++)l[f].call(this,i);this._trigger("stop",i,this._uiHash())}return false}m||this._trigger("beforeStop",i,this._uiHash());this.placeholder[0].parentNode.removeChild(this.placeholder[0]);
-this.helper[0]!=this.currentItem[0]&&this.helper.remove();this.helper=null;if(!m){for(f=0;f<l.length;f++)l[f].call(this,i);this._trigger("stop",i,this._uiHash())}this.fromOutside=false;return true},_trigger:function(){d.Widget.prototype._trigger.apply(this,arguments)===false&&this.cancel()},_uiHash:function(i){var m=i||this;return{helper:m.helper,placeholder:m.placeholder||d([]),position:m.position,originalPosition:m.originalPosition,offset:m.positionAbs,item:m.currentItem,sender:i?i.element:null}}});
-d.extend(d.ui.sortable,{version:"1.8.6"})})(jQuery);
-(function(d,i){var m={buttons:true,height:true,maxHeight:true,maxWidth:true,minHeight:true,minWidth:true,width:true},l={maxHeight:true,maxWidth:true,minHeight:true,minWidth:true};d.widget("ui.dialog",{options:{autoOpen:true,buttons:{},closeOnEscape:true,closeText:"close",dialogClass:"",draggable:true,hide:null,height:"auto",maxHeight:false,maxWidth:false,minHeight:150,minWidth:150,modal:false,position:{my:"center",at:"center",of:window,collision:"fit",using:function(f){var a=d(this).css(f).offset().top;
-a<0&&d(this).css("top",f.top-a)}},resizable:true,show:null,stack:true,title:"",width:300,zIndex:1E3},_create:function(){this.originalTitle=this.element.attr("title");if(typeof this.originalTitle!=="string")this.originalTitle="";this.options.title=this.options.title||this.originalTitle;var f=this,a=f.options,c=a.title||"&#160;",g=d.ui.dialog.getTitleId(f.element),j=(f.uiDialog=d("<div></div>")).appendTo(document.body).hide().addClass("ui-dialog ui-widget ui-widget-content ui-corner-all "+a.dialogClass).css({zIndex:a.zIndex}).attr("tabIndex",
--1).css("outline",0).keydown(function(v){if(a.closeOnEscape&&v.keyCode&&v.keyCode===d.ui.keyCode.ESCAPE){f.close(v);v.preventDefault()}}).attr({role:"dialog","aria-labelledby":g}).mousedown(function(v){f.moveToTop(false,v)});f.element.show().removeAttr("title").addClass("ui-dialog-content ui-widget-content").appendTo(j);var n=(f.uiDialogTitlebar=d("<div></div>")).addClass("ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix").prependTo(j),q=d('<a href="#"></a>').addClass("ui-dialog-titlebar-close ui-corner-all").attr("role",
-"button").hover(function(){q.addClass("ui-state-hover")},function(){q.removeClass("ui-state-hover")}).focus(function(){q.addClass("ui-state-focus")}).blur(function(){q.removeClass("ui-state-focus")}).click(function(v){f.close(v);return false}).appendTo(n);(f.uiDialogTitlebarCloseText=d("<span></span>")).addClass("ui-icon ui-icon-closethick").text(a.closeText).appendTo(q);d("<span></span>").addClass("ui-dialog-title").attr("id",g).html(c).prependTo(n);if(d.isFunction(a.beforeclose)&&!d.isFunction(a.beforeClose))a.beforeClose=
-a.beforeclose;n.find("*").add(n).disableSelection();a.draggable&&d.fn.draggable&&f._makeDraggable();a.resizable&&d.fn.resizable&&f._makeResizable();f._createButtons(a.buttons);f._isOpen=false;d.fn.bgiframe&&j.bgiframe()},_init:function(){this.options.autoOpen&&this.open()},destroy:function(){this.overlay&&this.overlay.destroy();this.uiDialog.hide();this.element.unbind(".dialog").removeData("dialog").removeClass("ui-dialog-content ui-widget-content").hide().appendTo("body");this.uiDialog.remove();
-this.originalTitle&&this.element.attr("title",this.originalTitle);return this},widget:function(){return this.uiDialog},close:function(f){var a=this,c;if(false!==a._trigger("beforeClose",f)){a.overlay&&a.overlay.destroy();a.uiDialog.unbind("keypress.ui-dialog");a._isOpen=false;if(a.options.hide)a.uiDialog.hide(a.options.hide,function(){a._trigger("close",f)});else{a.uiDialog.hide();a._trigger("close",f)}d.ui.dialog.overlay.resize();if(a.options.modal){c=0;d(".ui-dialog").each(function(){if(this!==
-a.uiDialog[0])c=Math.max(c,d(this).css("z-index"))});d.ui.dialog.maxZ=c}return a}},isOpen:function(){return this._isOpen},moveToTop:function(f,a){var c=this.options;if(c.modal&&!f||!c.stack&&!c.modal)return this._trigger("focus",a);if(c.zIndex>d.ui.dialog.maxZ)d.ui.dialog.maxZ=c.zIndex;if(this.overlay){d.ui.dialog.maxZ+=1;this.overlay.$el.css("z-index",d.ui.dialog.overlay.maxZ=d.ui.dialog.maxZ)}f={scrollTop:this.element.attr("scrollTop"),scrollLeft:this.element.attr("scrollLeft")};d.ui.dialog.maxZ+=
-1;this.uiDialog.css("z-index",d.ui.dialog.maxZ);this.element.attr(f);this._trigger("focus",a);return this},open:function(){if(!this._isOpen){var f=this.options,a=this.uiDialog;this.overlay=f.modal?new d.ui.dialog.overlay(this):null;this._size();this._position(f.position);a.show(f.show);this.moveToTop(true);f.modal&&a.bind("keypress.ui-dialog",function(c){if(c.keyCode===d.ui.keyCode.TAB){var g=d(":tabbable",this),j=g.filter(":first");g=g.filter(":last");if(c.target===g[0]&&!c.shiftKey){j.focus(1);
-return false}else if(c.target===j[0]&&c.shiftKey){g.focus(1);return false}}});d(this.element.find(":tabbable").get().concat(a.find(".ui-dialog-buttonpane :tabbable").get().concat(a.get()))).eq(0).focus();this._isOpen=true;this._trigger("open");return this}},_createButtons:function(f){var a=this,c=false,g=d("<div></div>").addClass("ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"),j=d("<div></div>").addClass("ui-dialog-buttonset").appendTo(g);a.uiDialog.find(".ui-dialog-buttonpane").remove();
-typeof f==="object"&&f!==null&&d.each(f,function(){return!(c=true)});if(c){d.each(f,function(n,q){q=d.isFunction(q)?{click:q,text:n}:q;n=d('<button type="button"></button>').attr(q,true).unbind("click").click(function(){q.click.apply(a.element[0],arguments)}).appendTo(j);d.fn.button&&n.button()});g.appendTo(a.uiDialog)}},_makeDraggable:function(){function f(n){return{position:n.position,offset:n.offset}}var a=this,c=a.options,g=d(document),j;a.uiDialog.draggable({cancel:".ui-dialog-content, .ui-dialog-titlebar-close",
-handle:".ui-dialog-titlebar",containment:"document",start:function(n,q){j=c.height==="auto"?"auto":d(this).height();d(this).height(d(this).height()).addClass("ui-dialog-dragging");a._trigger("dragStart",n,f(q))},drag:function(n,q){a._trigger("drag",n,f(q))},stop:function(n,q){c.position=[q.position.left-g.scrollLeft(),q.position.top-g.scrollTop()];d(this).removeClass("ui-dialog-dragging").height(j);a._trigger("dragStop",n,f(q));d.ui.dialog.overlay.resize()}})},_makeResizable:function(f){function a(n){return{originalPosition:n.originalPosition,
-originalSize:n.originalSize,position:n.position,size:n.size}}f=f===i?this.options.resizable:f;var c=this,g=c.options,j=c.uiDialog.css("position");f=typeof f==="string"?f:"n,e,s,w,se,sw,ne,nw";c.uiDialog.resizable({cancel:".ui-dialog-content",containment:"document",alsoResize:c.element,maxWidth:g.maxWidth,maxHeight:g.maxHeight,minWidth:g.minWidth,minHeight:c._minHeight(),handles:f,start:function(n,q){d(this).addClass("ui-dialog-resizing");c._trigger("resizeStart",n,a(q))},resize:function(n,q){c._trigger("resize",
-n,a(q))},stop:function(n,q){d(this).removeClass("ui-dialog-resizing");g.height=d(this).height();g.width=d(this).width();c._trigger("resizeStop",n,a(q));d.ui.dialog.overlay.resize()}}).css("position",j).find(".ui-resizable-se").addClass("ui-icon ui-icon-grip-diagonal-se")},_minHeight:function(){var f=this.options;return f.height==="auto"?f.minHeight:Math.min(f.minHeight,f.height)},_position:function(f){var a=[],c=[0,0],g;if(f){if(typeof f==="string"||typeof f==="object"&&"0"in f){a=f.split?f.split(" "):
-[f[0],f[1]];if(a.length===1)a[1]=a[0];d.each(["left","top"],function(j,n){if(+a[j]===a[j]){c[j]=a[j];a[j]=n}});f={my:a.join(" "),at:a.join(" "),offset:c.join(" ")}}f=d.extend({},d.ui.dialog.prototype.options.position,f)}else f=d.ui.dialog.prototype.options.position;(g=this.uiDialog.is(":visible"))||this.uiDialog.show();this.uiDialog.css({top:0,left:0}).position(f);g||this.uiDialog.hide()},_setOptions:function(f){var a=this,c={},g=false;d.each(f,function(j,n){a._setOption(j,n);if(j in m)g=true;if(j in
-l)c[j]=n});g&&this._size();this.uiDialog.is(":data(resizable)")&&this.uiDialog.resizable("option",c)},_setOption:function(f,a){var c=this.uiDialog;switch(f){case "beforeclose":f="beforeClose";break;case "buttons":this._createButtons(a);break;case "closeText":this.uiDialogTitlebarCloseText.text(""+a);break;case "dialogClass":c.removeClass(this.options.dialogClass).addClass("ui-dialog ui-widget ui-widget-content ui-corner-all "+a);break;case "disabled":a?c.addClass("ui-dialog-disabled"):c.removeClass("ui-dialog-disabled");
-break;case "draggable":var g=c.is(":data(draggable)");g&&!a&&c.draggable("destroy");!g&&a&&this._makeDraggable();break;case "position":this._position(a);break;case "resizable":(g=c.is(":data(resizable)"))&&!a&&c.resizable("destroy");g&&typeof a==="string"&&c.resizable("option","handles",a);!g&&a!==false&&this._makeResizable(a);break;case "title":d(".ui-dialog-title",this.uiDialogTitlebar).html(""+(a||"&#160;"));break}d.Widget.prototype._setOption.apply(this,arguments)},_size:function(){var f=this.options,
-a,c;this.element.show().css({width:"auto",minHeight:0,height:0});if(f.minWidth>f.width)f.width=f.minWidth;a=this.uiDialog.css({height:"auto",width:f.width}).height();c=Math.max(0,f.minHeight-a);if(f.height==="auto")if(d.support.minHeight)this.element.css({minHeight:c,height:"auto"});else{this.uiDialog.show();f=this.element.css("height","auto").height();this.uiDialog.hide();this.element.height(Math.max(f,c))}else this.element.height(Math.max(f.height-a,0));this.uiDialog.is(":data(resizable)")&&this.uiDialog.resizable("option",
-"minHeight",this._minHeight())}});d.extend(d.ui.dialog,{version:"1.8.6",uuid:0,maxZ:0,getTitleId:function(f){f=f.attr("id");if(!f){this.uuid+=1;f=this.uuid}return"ui-dialog-title-"+f},overlay:function(f){this.$el=d.ui.dialog.overlay.create(f)}});d.extend(d.ui.dialog.overlay,{instances:[],oldInstances:[],maxZ:0,events:d.map("focus,mousedown,mouseup,keydown,keypress,click".split(","),function(f){return f+".dialog-overlay"}).join(" "),create:function(f){if(this.instances.length===0){setTimeout(function(){d.ui.dialog.overlay.instances.length&&
-d(document).bind(d.ui.dialog.overlay.events,function(c){if(d(c.target).zIndex()<d.ui.dialog.overlay.maxZ)return false})},1);d(document).bind("keydown.dialog-overlay",function(c){if(f.options.closeOnEscape&&c.keyCode&&c.keyCode===d.ui.keyCode.ESCAPE){f.close(c);c.preventDefault()}});d(window).bind("resize.dialog-overlay",d.ui.dialog.overlay.resize)}var a=(this.oldInstances.pop()||d("<div></div>").addClass("ui-widget-overlay")).appendTo(document.body).css({width:this.width(),height:this.height()});
-d.fn.bgiframe&&a.bgiframe();this.instances.push(a);return a},destroy:function(f){this.oldInstances.push(this.instances.splice(d.inArray(f,this.instances),1)[0]);this.instances.length===0&&d([document,window]).unbind(".dialog-overlay");f.remove();var a=0;d.each(this.instances,function(){a=Math.max(a,this.css("z-index"))});this.maxZ=a},height:function(){var f,a;if(d.browser.msie&&d.browser.version<7){f=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);a=Math.max(document.documentElement.offsetHeight,
-document.body.offsetHeight);return f<a?d(window).height()+"px":f+"px"}else return d(document).height()+"px"},width:function(){var f,a;if(d.browser.msie&&d.browser.version<7){f=Math.max(document.documentElement.scrollWidth,document.body.scrollWidth);a=Math.max(document.documentElement.offsetWidth,document.body.offsetWidth);return f<a?d(window).width()+"px":f+"px"}else return d(document).width()+"px"},resize:function(){var f=d([]);d.each(d.ui.dialog.overlay.instances,function(){f=f.add(this)});f.css({width:0,
-height:0}).css({width:d.ui.dialog.overlay.width(),height:d.ui.dialog.overlay.height()})}});d.extend(d.ui.dialog.overlay.prototype,{destroy:function(){d.ui.dialog.overlay.destroy(this.$el)}})})(jQuery);
-(function(d,i){function m(){this.debug=false;this._curInst=null;this._keyEvent=false;this._disabledInputs=[];this._inDialog=this._datepickerShowing=false;this._mainDivId="ui-datepicker-div";this._inlineClass="ui-datepicker-inline";this._appendClass="ui-datepicker-append";this._triggerClass="ui-datepicker-trigger";this._dialogClass="ui-datepicker-dialog";this._disableClass="ui-datepicker-disabled";this._unselectableClass="ui-datepicker-unselectable";this._currentClass="ui-datepicker-current-day";this._dayOverClass=
-"ui-datepicker-days-cell-over";this.regional=[];this.regional[""]={closeText:"Done",prevText:"Prev",nextText:"Next",currentText:"Today",monthNames:["January","February","March","April","May","June","July","August","September","October","November","December"],monthNamesShort:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],dayNames:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],dayNamesShort:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],dayNamesMin:["Su",
-"Mo","Tu","We","Th","Fr","Sa"],weekHeader:"Wk",dateFormat:"mm/dd/yy",firstDay:0,isRTL:false,showMonthAfterYear:false,yearSuffix:""};this._defaults={showOn:"focus",showAnim:"fadeIn",showOptions:{},defaultDate:null,appendText:"",buttonText:"...",buttonImage:"",buttonImageOnly:false,hideIfNoPrevNext:false,navigationAsDateFormat:false,gotoCurrent:false,changeMonth:false,changeYear:false,yearRange:"c-10:c+10",showOtherMonths:false,selectOtherMonths:false,showWeek:false,calculateWeek:this.iso8601Week,shortYearCutoff:"+10",
-minDate:null,maxDate:null,duration:"fast",beforeShowDay:null,beforeShow:null,onSelect:null,onChangeMonthYear:null,onClose:null,numberOfMonths:1,showCurrentAtPos:0,stepMonths:1,stepBigMonths:12,altField:"",altFormat:"",constrainInput:true,showButtonPanel:false,autoSize:false};d.extend(this._defaults,this.regional[""]);this.dpDiv=d('<div id="'+this._mainDivId+'" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all ui-helper-hidden-accessible"></div>')}function l(a,c){d.extend(a,
-c);for(var g in c)if(c[g]==null||c[g]==i)a[g]=c[g];return a}d.extend(d.ui,{datepicker:{version:"1.8.6"}});var f=(new Date).getTime();d.extend(m.prototype,{markerClassName:"hasDatepicker",log:function(){this.debug&&console.log.apply("",arguments)},_widgetDatepicker:function(){return this.dpDiv},setDefaults:function(a){l(this._defaults,a||{});return this},_attachDatepicker:function(a,c){var g=null;for(var j in this._defaults){var n=a.getAttribute("date:"+j);if(n){g=g||{};try{g[j]=eval(n)}catch(q){g[j]=
-n}}}j=a.nodeName.toLowerCase();n=j=="div"||j=="span";if(!a.id){this.uuid+=1;a.id="dp"+this.uuid}var v=this._newInst(d(a),n);v.settings=d.extend({},c||{},g||{});if(j=="input")this._connectDatepicker(a,v);else n&&this._inlineDatepicker(a,v)},_newInst:function(a,c){return{id:a[0].id.replace(/([^A-Za-z0-9_-])/g,"\\\\$1"),input:a,selectedDay:0,selectedMonth:0,selectedYear:0,drawMonth:0,drawYear:0,inline:c,dpDiv:!c?this.dpDiv:d('<div class="'+this._inlineClass+' ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div>')}},
-_connectDatepicker:function(a,c){var g=d(a);c.append=d([]);c.trigger=d([]);if(!g.hasClass(this.markerClassName)){this._attachments(g,c);g.addClass(this.markerClassName).keydown(this._doKeyDown).keypress(this._doKeyPress).keyup(this._doKeyUp).bind("setData.datepicker",function(j,n,q){c.settings[n]=q}).bind("getData.datepicker",function(j,n){return this._get(c,n)});this._autoSize(c);d.data(a,"datepicker",c)}},_attachments:function(a,c){var g=this._get(c,"appendText"),j=this._get(c,"isRTL");c.append&&
-c.append.remove();if(g){c.append=d('<span class="'+this._appendClass+'">'+g+"</span>");a[j?"before":"after"](c.append)}a.unbind("focus",this._showDatepicker);c.trigger&&c.trigger.remove();g=this._get(c,"showOn");if(g=="focus"||g=="both")a.focus(this._showDatepicker);if(g=="button"||g=="both"){g=this._get(c,"buttonText");var n=this._get(c,"buttonImage");c.trigger=d(this._get(c,"buttonImageOnly")?d("<img/>").addClass(this._triggerClass).attr({src:n,alt:g,title:g}):d('<button type="button"></button>').addClass(this._triggerClass).html(n==
-""?g:d("<img/>").attr({src:n,alt:g,title:g})));a[j?"before":"after"](c.trigger);c.trigger.click(function(){d.datepicker._datepickerShowing&&d.datepicker._lastInput==a[0]?d.datepicker._hideDatepicker():d.datepicker._showDatepicker(a[0]);return false})}},_autoSize:function(a){if(this._get(a,"autoSize")&&!a.inline){var c=new Date(2009,11,20),g=this._get(a,"dateFormat");if(g.match(/[DM]/)){var j=function(n){for(var q=0,v=0,r=0;r<n.length;r++)if(n[r].length>q){q=n[r].length;v=r}return v};c.setMonth(j(this._get(a,
-g.match(/MM/)?"monthNames":"monthNamesShort")));c.setDate(j(this._get(a,g.match(/DD/)?"dayNames":"dayNamesShort"))+20-c.getDay())}a.input.attr("size",this._formatDate(a,c).length)}},_inlineDatepicker:function(a,c){var g=d(a);if(!g.hasClass(this.markerClassName)){g.addClass(this.markerClassName).append(c.dpDiv).bind("setData.datepicker",function(j,n,q){c.settings[n]=q}).bind("getData.datepicker",function(j,n){return this._get(c,n)});d.data(a,"datepicker",c);this._setDate(c,this._getDefaultDate(c),
-true);this._updateDatepicker(c);this._updateAlternate(c)}},_dialogDatepicker:function(a,c,g,j,n){a=this._dialogInst;if(!a){this.uuid+=1;this._dialogInput=d('<input type="text" id="'+("dp"+this.uuid)+'" style="position: absolute; top: -100px; width: 0px; z-index: -10;"/>');this._dialogInput.keydown(this._doKeyDown);d("body").append(this._dialogInput);a=this._dialogInst=this._newInst(this._dialogInput,false);a.settings={};d.data(this._dialogInput[0],"datepicker",a)}l(a.settings,j||{});c=c&&c.constructor==
-Date?this._formatDate(a,c):c;this._dialogInput.val(c);this._pos=n?n.length?n:[n.pageX,n.pageY]:null;if(!this._pos)this._pos=[document.documentElement.clientWidth/2-100+(document.documentElement.scrollLeft||document.body.scrollLeft),document.documentElement.clientHeight/2-150+(document.documentElement.scrollTop||document.body.scrollTop)];this._dialogInput.css("left",this._pos[0]+20+"px").css("top",this._pos[1]+"px");a.settings.onSelect=g;this._inDialog=true;this.dpDiv.addClass(this._dialogClass);this._showDatepicker(this._dialogInput[0]);
-d.blockUI&&d.blockUI(this.dpDiv);d.data(this._dialogInput[0],"datepicker",a);return this},_destroyDatepicker:function(a){var c=d(a),g=d.data(a,"datepicker");if(c.hasClass(this.markerClassName)){var j=a.nodeName.toLowerCase();d.removeData(a,"datepicker");if(j=="input"){g.append.remove();g.trigger.remove();c.removeClass(this.markerClassName).unbind("focus",this._showDatepicker).unbind("keydown",this._doKeyDown).unbind("keypress",this._doKeyPress).unbind("keyup",this._doKeyUp)}else if(j=="div"||j=="span")c.removeClass(this.markerClassName).empty()}},
-_enableDatepicker:function(a){var c=d(a),g=d.data(a,"datepicker");if(c.hasClass(this.markerClassName)){var j=a.nodeName.toLowerCase();if(j=="input"){a.disabled=false;g.trigger.filter("button").each(function(){this.disabled=false}).end().filter("img").css({opacity:"1.0",cursor:""})}else if(j=="div"||j=="span")c.children("."+this._inlineClass).children().removeClass("ui-state-disabled");this._disabledInputs=d.map(this._disabledInputs,function(n){return n==a?null:n})}},_disableDatepicker:function(a){var c=
-d(a),g=d.data(a,"datepicker");if(c.hasClass(this.markerClassName)){var j=a.nodeName.toLowerCase();if(j=="input"){a.disabled=true;g.trigger.filter("button").each(function(){this.disabled=true}).end().filter("img").css({opacity:"0.5",cursor:"default"})}else if(j=="div"||j=="span")c.children("."+this._inlineClass).children().addClass("ui-state-disabled");this._disabledInputs=d.map(this._disabledInputs,function(n){return n==a?null:n});this._disabledInputs[this._disabledInputs.length]=a}},_isDisabledDatepicker:function(a){if(!a)return false;
-for(var c=0;c<this._disabledInputs.length;c++)if(this._disabledInputs[c]==a)return true;return false},_getInst:function(a){try{return d.data(a,"datepicker")}catch(c){throw"Missing instance data for this datepicker";}},_optionDatepicker:function(a,c,g){var j=this._getInst(a);if(arguments.length==2&&typeof c=="string")return c=="defaults"?d.extend({},d.datepicker._defaults):j?c=="all"?d.extend({},j.settings):this._get(j,c):null;var n=c||{};if(typeof c=="string"){n={};n[c]=g}if(j){this._curInst==j&&
-this._hideDatepicker();var q=this._getDateDatepicker(a,true);l(j.settings,n);this._attachments(d(a),j);this._autoSize(j);this._setDateDatepicker(a,q);this._updateDatepicker(j)}},_changeDatepicker:function(a,c,g){this._optionDatepicker(a,c,g)},_refreshDatepicker:function(a){(a=this._getInst(a))&&this._updateDatepicker(a)},_setDateDatepicker:function(a,c){if(a=this._getInst(a)){this._setDate(a,c);this._updateDatepicker(a);this._updateAlternate(a)}},_getDateDatepicker:function(a,c){(a=this._getInst(a))&&
-!a.inline&&this._setDateFromField(a,c);return a?this._getDate(a):null},_doKeyDown:function(a){var c=d.datepicker._getInst(a.target),g=true,j=c.dpDiv.is(".ui-datepicker-rtl");c._keyEvent=true;if(d.datepicker._datepickerShowing)switch(a.keyCode){case 9:d.datepicker._hideDatepicker();g=false;break;case 13:g=d("td."+d.datepicker._dayOverClass,c.dpDiv).add(d("td."+d.datepicker._currentClass,c.dpDiv));g[0]?d.datepicker._selectDay(a.target,c.selectedMonth,c.selectedYear,g[0]):d.datepicker._hideDatepicker();
-return false;case 27:d.datepicker._hideDatepicker();break;case 33:d.datepicker._adjustDate(a.target,a.ctrlKey?-d.datepicker._get(c,"stepBigMonths"):-d.datepicker._get(c,"stepMonths"),"M");break;case 34:d.datepicker._adjustDate(a.target,a.ctrlKey?+d.datepicker._get(c,"stepBigMonths"):+d.datepicker._get(c,"stepMonths"),"M");break;case 35:if(a.ctrlKey||a.metaKey)d.datepicker._clearDate(a.target);g=a.ctrlKey||a.metaKey;break;case 36:if(a.ctrlKey||a.metaKey)d.datepicker._gotoToday(a.target);g=a.ctrlKey||
-a.metaKey;break;case 37:if(a.ctrlKey||a.metaKey)d.datepicker._adjustDate(a.target,j?+1:-1,"D");g=a.ctrlKey||a.metaKey;if(a.originalEvent.altKey)d.datepicker._adjustDate(a.target,a.ctrlKey?-d.datepicker._get(c,"stepBigMonths"):-d.datepicker._get(c,"stepMonths"),"M");break;case 38:if(a.ctrlKey||a.metaKey)d.datepicker._adjustDate(a.target,-7,"D");g=a.ctrlKey||a.metaKey;break;case 39:if(a.ctrlKey||a.metaKey)d.datepicker._adjustDate(a.target,j?-1:+1,"D");g=a.ctrlKey||a.metaKey;if(a.originalEvent.altKey)d.datepicker._adjustDate(a.target,
-a.ctrlKey?+d.datepicker._get(c,"stepBigMonths"):+d.datepicker._get(c,"stepMonths"),"M");break;case 40:if(a.ctrlKey||a.metaKey)d.datepicker._adjustDate(a.target,+7,"D");g=a.ctrlKey||a.metaKey;break;default:g=false}else if(a.keyCode==36&&a.ctrlKey)d.datepicker._showDatepicker(this);else g=false;if(g){a.preventDefault();a.stopPropagation()}},_doKeyPress:function(a){var c=d.datepicker._getInst(a.target);if(d.datepicker._get(c,"constrainInput")){c=d.datepicker._possibleChars(d.datepicker._get(c,"dateFormat"));
-var g=String.fromCharCode(a.charCode==i?a.keyCode:a.charCode);return a.ctrlKey||g<" "||!c||c.indexOf(g)>-1}},_doKeyUp:function(a){a=d.datepicker._getInst(a.target);if(a.input.val()!=a.lastVal)try{if(d.datepicker.parseDate(d.datepicker._get(a,"dateFormat"),a.input?a.input.val():null,d.datepicker._getFormatConfig(a))){d.datepicker._setDateFromField(a);d.datepicker._updateAlternate(a);d.datepicker._updateDatepicker(a)}}catch(c){d.datepicker.log(c)}return true},_showDatepicker:function(a){a=a.target||
-a;if(a.nodeName.toLowerCase()!="input")a=d("input",a.parentNode)[0];if(!(d.datepicker._isDisabledDatepicker(a)||d.datepicker._lastInput==a)){var c=d.datepicker._getInst(a);d.datepicker._curInst&&d.datepicker._curInst!=c&&d.datepicker._curInst.dpDiv.stop(true,true);var g=d.datepicker._get(c,"beforeShow");l(c.settings,g?g.apply(a,[a,c]):{});c.lastVal=null;d.datepicker._lastInput=a;d.datepicker._setDateFromField(c);if(d.datepicker._inDialog)a.value="";if(!d.datepicker._pos){d.datepicker._pos=d.datepicker._findPos(a);
-d.datepicker._pos[1]+=a.offsetHeight}var j=false;d(a).parents().each(function(){j|=d(this).css("position")=="fixed";return!j});if(j&&d.browser.opera){d.datepicker._pos[0]-=document.documentElement.scrollLeft;d.datepicker._pos[1]-=document.documentElement.scrollTop}g={left:d.datepicker._pos[0],top:d.datepicker._pos[1]};d.datepicker._pos=null;c.dpDiv.css({position:"absolute",display:"block",top:"-1000px"});d.datepicker._updateDatepicker(c);g=d.datepicker._checkOffset(c,g,j);c.dpDiv.css({position:d.datepicker._inDialog&&
-d.blockUI?"static":j?"fixed":"absolute",display:"none",left:g.left+"px",top:g.top+"px"});if(!c.inline){g=d.datepicker._get(c,"showAnim");var n=d.datepicker._get(c,"duration"),q=function(){d.datepicker._datepickerShowing=true;var v=d.datepicker._getBorders(c.dpDiv);c.dpDiv.find("iframe.ui-datepicker-cover").css({left:-v[0],top:-v[1],width:c.dpDiv.outerWidth(),height:c.dpDiv.outerHeight()})};c.dpDiv.zIndex(d(a).zIndex()+1);d.effects&&d.effects[g]?c.dpDiv.show(g,d.datepicker._get(c,"showOptions"),n,
-q):c.dpDiv[g||"show"](g?n:null,q);if(!g||!n)q();c.input.is(":visible")&&!c.input.is(":disabled")&&c.input.focus();d.datepicker._curInst=c}}},_updateDatepicker:function(a){var c=this,g=d.datepicker._getBorders(a.dpDiv);a.dpDiv.empty().append(this._generateHTML(a)).find("iframe.ui-datepicker-cover").css({left:-g[0],top:-g[1],width:a.dpDiv.outerWidth(),height:a.dpDiv.outerHeight()}).end().find("button, .ui-datepicker-prev, .ui-datepicker-next, .ui-datepicker-calendar td a").bind("mouseout",function(){d(this).removeClass("ui-state-hover");
-this.className.indexOf("ui-datepicker-prev")!=-1&&d(this).removeClass("ui-datepicker-prev-hover");this.className.indexOf("ui-datepicker-next")!=-1&&d(this).removeClass("ui-datepicker-next-hover")}).bind("mouseover",function(){if(!c._isDisabledDatepicker(a.inline?a.dpDiv.parent()[0]:a.input[0])){d(this).parents(".ui-datepicker-calendar").find("a").removeClass("ui-state-hover");d(this).addClass("ui-state-hover");this.className.indexOf("ui-datepicker-prev")!=-1&&d(this).addClass("ui-datepicker-prev-hover");
-this.className.indexOf("ui-datepicker-next")!=-1&&d(this).addClass("ui-datepicker-next-hover")}}).end().find("."+this._dayOverClass+" a").trigger("mouseover").end();g=this._getNumberOfMonths(a);var j=g[1];j>1?a.dpDiv.addClass("ui-datepicker-multi-"+j).css("width",17*j+"em"):a.dpDiv.removeClass("ui-datepicker-multi-2 ui-datepicker-multi-3 ui-datepicker-multi-4").width("");a.dpDiv[(g[0]!=1||g[1]!=1?"add":"remove")+"Class"]("ui-datepicker-multi");a.dpDiv[(this._get(a,"isRTL")?"add":"remove")+"Class"]("ui-datepicker-rtl");
-a==d.datepicker._curInst&&d.datepicker._datepickerShowing&&a.input&&a.input.is(":visible")&&!a.input.is(":disabled")&&a.input.focus()},_getBorders:function(a){var c=function(g){return{thin:1,medium:2,thick:3}[g]||g};return[parseFloat(c(a.css("border-left-width"))),parseFloat(c(a.css("border-top-width")))]},_checkOffset:function(a,c,g){var j=a.dpDiv.outerWidth(),n=a.dpDiv.outerHeight(),q=a.input?a.input.outerWidth():0,v=a.input?a.input.outerHeight():0,r=document.documentElement.clientWidth+d(document).scrollLeft(),
-u=document.documentElement.clientHeight+d(document).scrollTop();c.left-=this._get(a,"isRTL")?j-q:0;c.left-=g&&c.left==a.input.offset().left?d(document).scrollLeft():0;c.top-=g&&c.top==a.input.offset().top+v?d(document).scrollTop():0;c.left-=Math.min(c.left,c.left+j>r&&r>j?Math.abs(c.left+j-r):0);c.top-=Math.min(c.top,c.top+n>u&&u>n?Math.abs(n+v):0);return c},_findPos:function(a){for(var c=this._get(this._getInst(a),"isRTL");a&&(a.type=="hidden"||a.nodeType!=1);)a=a[c?"previousSibling":"nextSibling"];
-a=d(a).offset();return[a.left,a.top]},_hideDatepicker:function(a){var c=this._curInst;if(!(!c||a&&c!=d.data(a,"datepicker")))if(this._datepickerShowing){a=this._get(c,"showAnim");var g=this._get(c,"duration"),j=function(){d.datepicker._tidyDialog(c);this._curInst=null};d.effects&&d.effects[a]?c.dpDiv.hide(a,d.datepicker._get(c,"showOptions"),g,j):c.dpDiv[a=="slideDown"?"slideUp":a=="fadeIn"?"fadeOut":"hide"](a?g:null,j);a||j();if(a=this._get(c,"onClose"))a.apply(c.input?c.input[0]:null,[c.input?c.input.val():
-"",c]);this._datepickerShowing=false;this._lastInput=null;if(this._inDialog){this._dialogInput.css({position:"absolute",left:"0",top:"-100px"});if(d.blockUI){d.unblockUI();d("body").append(this.dpDiv)}}this._inDialog=false}},_tidyDialog:function(a){a.dpDiv.removeClass(this._dialogClass).unbind(".ui-datepicker-calendar")},_checkExternalClick:function(a){if(d.datepicker._curInst){a=d(a.target);a[0].id!=d.datepicker._mainDivId&&a.parents("#"+d.datepicker._mainDivId).length==0&&!a.hasClass(d.datepicker.markerClassName)&&
-!a.hasClass(d.datepicker._triggerClass)&&d.datepicker._datepickerShowing&&!(d.datepicker._inDialog&&d.blockUI)&&d.datepicker._hideDatepicker()}},_adjustDate:function(a,c,g){a=d(a);var j=this._getInst(a[0]);if(!this._isDisabledDatepicker(a[0])){this._adjustInstDate(j,c+(g=="M"?this._get(j,"showCurrentAtPos"):0),g);this._updateDatepicker(j)}},_gotoToday:function(a){a=d(a);var c=this._getInst(a[0]);if(this._get(c,"gotoCurrent")&&c.currentDay){c.selectedDay=c.currentDay;c.drawMonth=c.selectedMonth=c.currentMonth;
-c.drawYear=c.selectedYear=c.currentYear}else{var g=new Date;c.selectedDay=g.getDate();c.drawMonth=c.selectedMonth=g.getMonth();c.drawYear=c.selectedYear=g.getFullYear()}this._notifyChange(c);this._adjustDate(a)},_selectMonthYear:function(a,c,g){a=d(a);var j=this._getInst(a[0]);j._selectingMonthYear=false;j["selected"+(g=="M"?"Month":"Year")]=j["draw"+(g=="M"?"Month":"Year")]=parseInt(c.options[c.selectedIndex].value,10);this._notifyChange(j);this._adjustDate(a)},_clickMonthYear:function(a){var c=
-this._getInst(d(a)[0]);c.input&&c._selectingMonthYear&&setTimeout(function(){c.input.focus()},0);c._selectingMonthYear=!c._selectingMonthYear},_selectDay:function(a,c,g,j){var n=d(a);if(!(d(j).hasClass(this._unselectableClass)||this._isDisabledDatepicker(n[0]))){n=this._getInst(n[0]);n.selectedDay=n.currentDay=d("a",j).html();n.selectedMonth=n.currentMonth=c;n.selectedYear=n.currentYear=g;this._selectDate(a,this._formatDate(n,n.currentDay,n.currentMonth,n.currentYear))}},_clearDate:function(a){a=
-d(a);this._getInst(a[0]);this._selectDate(a,"")},_selectDate:function(a,c){a=this._getInst(d(a)[0]);c=c!=null?c:this._formatDate(a);a.input&&a.input.val(c);this._updateAlternate(a);var g=this._get(a,"onSelect");if(g)g.apply(a.input?a.input[0]:null,[c,a]);else a.input&&a.input.trigger("change");if(a.inline)this._updateDatepicker(a);else{this._hideDatepicker();this._lastInput=a.input[0];typeof a.input[0]!="object"&&a.input.focus();this._lastInput=null}},_updateAlternate:function(a){var c=this._get(a,
-"altField");if(c){var g=this._get(a,"altFormat")||this._get(a,"dateFormat"),j=this._getDate(a),n=this.formatDate(g,j,this._getFormatConfig(a));d(c).each(function(){d(this).val(n)})}},noWeekends:function(a){a=a.getDay();return[a>0&&a<6,""]},iso8601Week:function(a){a=new Date(a.getTime());a.setDate(a.getDate()+4-(a.getDay()||7));var c=a.getTime();a.setMonth(0);a.setDate(1);return Math.floor(Math.round((c-a)/864E5)/7)+1},parseDate:function(a,c,g){if(a==null||c==null)throw"Invalid arguments";c=typeof c==
-"object"?c.toString():c+"";if(c=="")return null;for(var j=(g?g.shortYearCutoff:null)||this._defaults.shortYearCutoff,n=(g?g.dayNamesShort:null)||this._defaults.dayNamesShort,q=(g?g.dayNames:null)||this._defaults.dayNames,v=(g?g.monthNamesShort:null)||this._defaults.monthNamesShort,r=(g?g.monthNames:null)||this._defaults.monthNames,u=g=-1,F=-1,T=-1,E=false,U=function(ja){(ja=pa+1<a.length&&a.charAt(pa+1)==ja)&&pa++;return ja},J=function(ja){U(ja);ja=new RegExp("^\\d{1,"+(ja=="@"?14:ja=="!"?20:ja==
-"y"?4:ja=="o"?3:2)+"}");ja=c.substring(L).match(ja);if(!ja)throw"Missing number at position "+L;L+=ja[0].length;return parseInt(ja[0],10)},X=function(ja,da,bb){ja=U(ja)?bb:da;for(da=0;da<ja.length;da++)if(c.substr(L,ja[da].length).toLowerCase()==ja[da].toLowerCase()){L+=ja[da].length;return da+1}throw"Unknown name at position "+L;},P=function(){if(c.charAt(L)!=a.charAt(pa))throw"Unexpected literal at position "+L;L++},L=0,pa=0;pa<a.length;pa++)if(E)if(a.charAt(pa)=="'"&&!U("'"))E=false;else P();else switch(a.charAt(pa)){case "d":F=
-J("d");break;case "D":X("D",n,q);break;case "o":T=J("o");break;case "m":u=J("m");break;case "M":u=X("M",v,r);break;case "y":g=J("y");break;case "@":var Pa=new Date(J("@"));g=Pa.getFullYear();u=Pa.getMonth()+1;F=Pa.getDate();break;case "!":Pa=new Date((J("!")-this._ticksTo1970)/1E4);g=Pa.getFullYear();u=Pa.getMonth()+1;F=Pa.getDate();break;case "'":if(U("'"))P();else E=true;break;default:P()}if(g==-1)g=(new Date).getFullYear();else if(g<100)g+=(new Date).getFullYear()-(new Date).getFullYear()%100+
-(g<=j?0:-100);if(T>-1){u=1;F=T;do{j=this._getDaysInMonth(g,u-1);if(F<=j)break;u++;F-=j}while(1)}Pa=this._daylightSavingAdjust(new Date(g,u-1,F));if(Pa.getFullYear()!=g||Pa.getMonth()+1!=u||Pa.getDate()!=F)throw"Invalid date";return Pa},ATOM:"yy-mm-dd",COOKIE:"D, dd M yy",ISO_8601:"yy-mm-dd",RFC_822:"D, d M y",RFC_850:"DD, dd-M-y",RFC_1036:"D, d M y",RFC_1123:"D, d M yy",RFC_2822:"D, d M yy",RSS:"D, d M y",TICKS:"!",TIMESTAMP:"@",W3C:"yy-mm-dd",_ticksTo1970:(718685+Math.floor(492.5)-Math.floor(19.7)+
-Math.floor(4.925))*24*60*60*1E7,formatDate:function(a,c,g){if(!c)return"";var j=(g?g.dayNamesShort:null)||this._defaults.dayNamesShort,n=(g?g.dayNames:null)||this._defaults.dayNames,q=(g?g.monthNamesShort:null)||this._defaults.monthNamesShort;g=(g?g.monthNames:null)||this._defaults.monthNames;var v=function(U){(U=E+1<a.length&&a.charAt(E+1)==U)&&E++;return U},r=function(U,J,X){J=""+J;if(v(U))for(;J.length<X;)J="0"+J;return J},u=function(U,J,X,P){return v(U)?P[J]:X[J]},F="",T=false;if(c)for(var E=
-0;E<a.length;E++)if(T)if(a.charAt(E)=="'"&&!v("'"))T=false;else F+=a.charAt(E);else switch(a.charAt(E)){case "d":F+=r("d",c.getDate(),2);break;case "D":F+=u("D",c.getDay(),j,n);break;case "o":F+=r("o",(c.getTime()-(new Date(c.getFullYear(),0,0)).getTime())/864E5,3);break;case "m":F+=r("m",c.getMonth()+1,2);break;case "M":F+=u("M",c.getMonth(),q,g);break;case "y":F+=v("y")?c.getFullYear():(c.getYear()%100<10?"0":"")+c.getYear()%100;break;case "@":F+=c.getTime();break;case "!":F+=c.getTime()*1E4+this._ticksTo1970;
-break;case "'":if(v("'"))F+="'";else T=true;break;default:F+=a.charAt(E)}return F},_possibleChars:function(a){for(var c="",g=false,j=function(q){(q=n+1<a.length&&a.charAt(n+1)==q)&&n++;return q},n=0;n<a.length;n++)if(g)if(a.charAt(n)=="'"&&!j("'"))g=false;else c+=a.charAt(n);else switch(a.charAt(n)){case "d":case "m":case "y":case "@":c+="0123456789";break;case "D":case "M":return null;case "'":if(j("'"))c+="'";else g=true;break;default:c+=a.charAt(n)}return c},_get:function(a,c){return a.settings[c]!==
-i?a.settings[c]:this._defaults[c]},_setDateFromField:function(a,c){if(a.input.val()!=a.lastVal){var g=this._get(a,"dateFormat"),j=a.lastVal=a.input?a.input.val():null,n,q;n=q=this._getDefaultDate(a);var v=this._getFormatConfig(a);try{n=this.parseDate(g,j,v)||q}catch(r){this.log(r);j=c?"":j}a.selectedDay=n.getDate();a.drawMonth=a.selectedMonth=n.getMonth();a.drawYear=a.selectedYear=n.getFullYear();a.currentDay=j?n.getDate():0;a.currentMonth=j?n.getMonth():0;a.currentYear=j?n.getFullYear():0;this._adjustInstDate(a)}},
-_getDefaultDate:function(a){return this._restrictMinMax(a,this._determineDate(a,this._get(a,"defaultDate"),new Date))},_determineDate:function(a,c,g){var j=function(q){var v=new Date;v.setDate(v.getDate()+q);return v},n=function(q){try{return d.datepicker.parseDate(d.datepicker._get(a,"dateFormat"),q,d.datepicker._getFormatConfig(a))}catch(v){}var r=(q.toLowerCase().match(/^c/)?d.datepicker._getDate(a):null)||new Date,u=r.getFullYear(),F=r.getMonth();r=r.getDate();for(var T=/([+-]?[0-9]+)\s*(d|D|w|W|m|M|y|Y)?/g,
-E=T.exec(q);E;){switch(E[2]||"d"){case "d":case "D":r+=parseInt(E[1],10);break;case "w":case "W":r+=parseInt(E[1],10)*7;break;case "m":case "M":F+=parseInt(E[1],10);r=Math.min(r,d.datepicker._getDaysInMonth(u,F));break;case "y":case "Y":u+=parseInt(E[1],10);r=Math.min(r,d.datepicker._getDaysInMonth(u,F));break}E=T.exec(q)}return new Date(u,F,r)};if(c=(c=c==null?g:typeof c=="string"?n(c):typeof c=="number"?isNaN(c)?g:j(c):c)&&c.toString()=="Invalid Date"?g:c){c.setHours(0);c.setMinutes(0);c.setSeconds(0);
-c.setMilliseconds(0)}return this._daylightSavingAdjust(c)},_daylightSavingAdjust:function(a){if(!a)return null;a.setHours(a.getHours()>12?a.getHours()+2:0);return a},_setDate:function(a,c,g){var j=!c,n=a.selectedMonth,q=a.selectedYear;c=this._restrictMinMax(a,this._determineDate(a,c,new Date));a.selectedDay=a.currentDay=c.getDate();a.drawMonth=a.selectedMonth=a.currentMonth=c.getMonth();a.drawYear=a.selectedYear=a.currentYear=c.getFullYear();if((n!=a.selectedMonth||q!=a.selectedYear)&&!g)this._notifyChange(a);
-this._adjustInstDate(a);if(a.input)a.input.val(j?"":this._formatDate(a))},_getDate:function(a){return!a.currentYear||a.input&&a.input.val()==""?null:this._daylightSavingAdjust(new Date(a.currentYear,a.currentMonth,a.currentDay))},_generateHTML:function(a){var c=new Date;c=this._daylightSavingAdjust(new Date(c.getFullYear(),c.getMonth(),c.getDate()));var g=this._get(a,"isRTL"),j=this._get(a,"showButtonPanel"),n=this._get(a,"hideIfNoPrevNext"),q=this._get(a,"navigationAsDateFormat"),v=this._getNumberOfMonths(a),
-r=this._get(a,"showCurrentAtPos"),u=this._get(a,"stepMonths"),F=v[0]!=1||v[1]!=1,T=this._daylightSavingAdjust(!a.currentDay?new Date(9999,9,9):new Date(a.currentYear,a.currentMonth,a.currentDay)),E=this._getMinMaxDate(a,"min"),U=this._getMinMaxDate(a,"max");r=a.drawMonth-r;var J=a.drawYear;if(r<0){r+=12;J--}if(U){var X=this._daylightSavingAdjust(new Date(U.getFullYear(),U.getMonth()-v[0]*v[1]+1,U.getDate()));for(X=E&&X<E?E:X;this._daylightSavingAdjust(new Date(J,r,1))>X;){r--;if(r<0){r=11;J--}}}a.drawMonth=
-r;a.drawYear=J;X=this._get(a,"prevText");X=!q?X:this.formatDate(X,this._daylightSavingAdjust(new Date(J,r-u,1)),this._getFormatConfig(a));X=this._canAdjustMonth(a,-1,J,r)?'<a class="ui-datepicker-prev ui-corner-all" onclick="DP_jQuery_'+f+".datepicker._adjustDate('#"+a.id+"', -"+u+", 'M');\" title=\""+X+'"><span class="ui-icon ui-icon-circle-triangle-'+(g?"e":"w")+'">'+X+"</span></a>":n?"":'<a class="ui-datepicker-prev ui-corner-all ui-state-disabled" title="'+X+'"><span class="ui-icon ui-icon-circle-triangle-'+
-(g?"e":"w")+'">'+X+"</span></a>";var P=this._get(a,"nextText");P=!q?P:this.formatDate(P,this._daylightSavingAdjust(new Date(J,r+u,1)),this._getFormatConfig(a));n=this._canAdjustMonth(a,+1,J,r)?'<a class="ui-datepicker-next ui-corner-all" onclick="DP_jQuery_'+f+".datepicker._adjustDate('#"+a.id+"', +"+u+", 'M');\" title=\""+P+'"><span class="ui-icon ui-icon-circle-triangle-'+(g?"w":"e")+'">'+P+"</span></a>":n?"":'<a class="ui-datepicker-next ui-corner-all ui-state-disabled" title="'+P+'"><span class="ui-icon ui-icon-circle-triangle-'+
-(g?"w":"e")+'">'+P+"</span></a>";u=this._get(a,"currentText");P=this._get(a,"gotoCurrent")&&a.currentDay?T:c;u=!q?u:this.formatDate(u,P,this._getFormatConfig(a));q=!a.inline?'<button type="button" class="ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all" onclick="DP_jQuery_'+f+'.datepicker._hideDatepicker();">'+this._get(a,"closeText")+"</button>":"";j=j?'<div class="ui-datepicker-buttonpane ui-widget-content">'+(g?q:"")+(this._isInRange(a,P)?'<button type="button" class="ui-datepicker-current ui-state-default ui-priority-secondary ui-corner-all" onclick="DP_jQuery_'+
-f+".datepicker._gotoToday('#"+a.id+"');\">"+u+"</button>":"")+(g?"":q)+"</div>":"";q=parseInt(this._get(a,"firstDay"),10);q=isNaN(q)?0:q;u=this._get(a,"showWeek");P=this._get(a,"dayNames");this._get(a,"dayNamesShort");var L=this._get(a,"dayNamesMin"),pa=this._get(a,"monthNames"),Pa=this._get(a,"monthNamesShort"),ja=this._get(a,"beforeShowDay"),da=this._get(a,"showOtherMonths"),bb=this._get(a,"selectOtherMonths");this._get(a,"calculateWeek");for(var Hb=this._getDefaultDate(a),ca="",Z=0;Z<v[0];Z++){for(var mb=
-"",yb=0;yb<v[1];yb++){var Qb=this._daylightSavingAdjust(new Date(J,r,a.selectedDay)),va=" ui-corner-all",Ya="";if(F){Ya+='<div class="ui-datepicker-group';if(v[1]>1)switch(yb){case 0:Ya+=" ui-datepicker-group-first";va=" ui-corner-"+(g?"right":"left");break;case v[1]-1:Ya+=" ui-datepicker-group-last";va=" ui-corner-"+(g?"left":"right");break;default:Ya+=" ui-datepicker-group-middle";va="";break}Ya+='">'}Ya+='<div class="ui-datepicker-header ui-widget-header ui-helper-clearfix'+va+'">'+(/all|left/.test(va)&&
-Z==0?g?n:X:"")+(/all|right/.test(va)&&Z==0?g?X:n:"")+this._generateMonthYearHeader(a,r,J,E,U,Z>0||yb>0,pa,Pa)+'</div><table class="ui-datepicker-calendar"><thead><tr>';var zb=u?'<th class="ui-datepicker-week-col">'+this._get(a,"weekHeader")+"</th>":"";for(va=0;va<7;va++){var Aa=(va+q)%7;zb+="<th"+((va+q+6)%7>=5?' class="ui-datepicker-week-end"':"")+'><span title="'+P[Aa]+'">'+L[Aa]+"</span></th>"}Ya+=zb+"</tr></thead><tbody>";zb=this._getDaysInMonth(J,r);if(J==a.selectedYear&&r==a.selectedMonth)a.selectedDay=
-Math.min(a.selectedDay,zb);va=(this._getFirstDayOfMonth(J,r)-q+7)%7;zb=F?6:Math.ceil((va+zb)/7);Aa=this._daylightSavingAdjust(new Date(J,r,1-va));for(var hb=0;hb<zb;hb++){Ya+="<tr>";var Tb=!u?"":'<td class="ui-datepicker-week-col">'+this._get(a,"calculateWeek")(Aa)+"</td>";for(va=0;va<7;va++){var Fa=ja?ja.apply(a.input?a.input[0]:null,[Aa]):[true,""],t=Aa.getMonth()!=r,x=t&&!bb||!Fa[0]||E&&Aa<E||U&&Aa>U;Tb+='<td class="'+((va+q+6)%7>=5?" ui-datepicker-week-end":"")+(t?" ui-datepicker-other-month":
-"")+(Aa.getTime()==Qb.getTime()&&r==a.selectedMonth&&a._keyEvent||Hb.getTime()==Aa.getTime()&&Hb.getTime()==Qb.getTime()?" "+this._dayOverClass:"")+(x?" "+this._unselectableClass+" ui-state-disabled":"")+(t&&!da?"":" "+Fa[1]+(Aa.getTime()==T.getTime()?" "+this._currentClass:"")+(Aa.getTime()==c.getTime()?" ui-datepicker-today":""))+'"'+((!t||da)&&Fa[2]?' title="'+Fa[2]+'"':"")+(x?"":' onclick="DP_jQuery_'+f+".datepicker._selectDay('#"+a.id+"',"+Aa.getMonth()+","+Aa.getFullYear()+', this);return false;"')+
-">"+(t&&!da?"&#xa0;":x?'<span class="ui-state-default">'+Aa.getDate()+"</span>":'<a class="ui-state-default'+(Aa.getTime()==c.getTime()?" ui-state-highlight":"")+(Aa.getTime()==T.getTime()?" ui-state-active":"")+(t?" ui-priority-secondary":"")+'" href="#">'+Aa.getDate()+"</a>")+"</td>";Aa.setDate(Aa.getDate()+1);Aa=this._daylightSavingAdjust(Aa)}Ya+=Tb+"</tr>"}r++;if(r>11){r=0;J++}Ya+="</tbody></table>"+(F?"</div>"+(v[0]>0&&yb==v[1]-1?'<div class="ui-datepicker-row-break"></div>':""):"");mb+=Ya}ca+=
-mb}ca+=j+(d.browser.msie&&parseInt(d.browser.version,10)<7&&!a.inline?'<iframe src="javascript:false;" class="ui-datepicker-cover" frameborder="0"></iframe>':"");a._keyEvent=false;return ca},_generateMonthYearHeader:function(a,c,g,j,n,q,v,r){var u=this._get(a,"changeMonth"),F=this._get(a,"changeYear"),T=this._get(a,"showMonthAfterYear"),E='<div class="ui-datepicker-title">',U="";if(q||!u)U+='<span class="ui-datepicker-month">'+v[c]+"</span>";else{v=j&&j.getFullYear()==g;var J=n&&n.getFullYear()==
-g;U+='<select class="ui-datepicker-month" onchange="DP_jQuery_'+f+".datepicker._selectMonthYear('#"+a.id+"', this, 'M');\" onclick=\"DP_jQuery_"+f+".datepicker._clickMonthYear('#"+a.id+"');\">";for(var X=0;X<12;X++)if((!v||X>=j.getMonth())&&(!J||X<=n.getMonth()))U+='<option value="'+X+'"'+(X==c?' selected="selected"':"")+">"+r[X]+"</option>";U+="</select>"}T||(E+=U+(q||!(u&&F)?"&#xa0;":""));if(q||!F)E+='<span class="ui-datepicker-year">'+g+"</span>";else{r=this._get(a,"yearRange").split(":");var P=
-(new Date).getFullYear();v=function(L){L=L.match(/c[+-].*/)?g+parseInt(L.substring(1),10):L.match(/[+-].*/)?P+parseInt(L,10):parseInt(L,10);return isNaN(L)?P:L};c=v(r[0]);r=Math.max(c,v(r[1]||""));c=j?Math.max(c,j.getFullYear()):c;r=n?Math.min(r,n.getFullYear()):r;for(E+='<select class="ui-datepicker-year" onchange="DP_jQuery_'+f+".datepicker._selectMonthYear('#"+a.id+"', this, 'Y');\" onclick=\"DP_jQuery_"+f+".datepicker._clickMonthYear('#"+a.id+"');\">";c<=r;c++)E+='<option value="'+c+'"'+(c==g?
-' selected="selected"':"")+">"+c+"</option>";E+="</select>"}E+=this._get(a,"yearSuffix");if(T)E+=(q||!(u&&F)?"&#xa0;":"")+U;E+="</div>";return E},_adjustInstDate:function(a,c,g){var j=a.drawYear+(g=="Y"?c:0),n=a.drawMonth+(g=="M"?c:0);c=Math.min(a.selectedDay,this._getDaysInMonth(j,n))+(g=="D"?c:0);j=this._restrictMinMax(a,this._daylightSavingAdjust(new Date(j,n,c)));a.selectedDay=j.getDate();a.drawMonth=a.selectedMonth=j.getMonth();a.drawYear=a.selectedYear=j.getFullYear();if(g=="M"||g=="Y")this._notifyChange(a)},
-_restrictMinMax:function(a,c){var g=this._getMinMaxDate(a,"min");a=this._getMinMaxDate(a,"max");c=g&&c<g?g:c;return a&&c>a?a:c},_notifyChange:function(a){var c=this._get(a,"onChangeMonthYear");if(c)c.apply(a.input?a.input[0]:null,[a.selectedYear,a.selectedMonth+1,a])},_getNumberOfMonths:function(a){a=this._get(a,"numberOfMonths");return a==null?[1,1]:typeof a=="number"?[1,a]:a},_getMinMaxDate:function(a,c){return this._determineDate(a,this._get(a,c+"Date"),null)},_getDaysInMonth:function(a,c){return 32-
-(new Date(a,c,32)).getDate()},_getFirstDayOfMonth:function(a,c){return(new Date(a,c,1)).getDay()},_canAdjustMonth:function(a,c,g,j){var n=this._getNumberOfMonths(a);g=this._daylightSavingAdjust(new Date(g,j+(c<0?c:n[0]*n[1]),1));c<0&&g.setDate(this._getDaysInMonth(g.getFullYear(),g.getMonth()));return this._isInRange(a,g)},_isInRange:function(a,c){var g=this._getMinMaxDate(a,"min");a=this._getMinMaxDate(a,"max");return(!g||c.getTime()>=g.getTime())&&(!a||c.getTime()<=a.getTime())},_getFormatConfig:function(a){var c=
-this._get(a,"shortYearCutoff");c=typeof c!="string"?c:(new Date).getFullYear()%100+parseInt(c,10);return{shortYearCutoff:c,dayNamesShort:this._get(a,"dayNamesShort"),dayNames:this._get(a,"dayNames"),monthNamesShort:this._get(a,"monthNamesShort"),monthNames:this._get(a,"monthNames")}},_formatDate:function(a,c,g,j){if(!c){a.currentDay=a.selectedDay;a.currentMonth=a.selectedMonth;a.currentYear=a.selectedYear}c=c?typeof c=="object"?c:this._daylightSavingAdjust(new Date(j,g,c)):this._daylightSavingAdjust(new Date(a.currentYear,
-a.currentMonth,a.currentDay));return this.formatDate(this._get(a,"dateFormat"),c,this._getFormatConfig(a))}});d.fn.datepicker=function(a){if(!d.datepicker.initialized){d(document).mousedown(d.datepicker._checkExternalClick).find("body").append(d.datepicker.dpDiv);d.datepicker.initialized=true}var c=Array.prototype.slice.call(arguments,1);if(typeof a=="string"&&(a=="isDisabled"||a=="getDate"||a=="widget"))return d.datepicker["_"+a+"Datepicker"].apply(d.datepicker,[this[0]].concat(c));if(a=="option"&&
-arguments.length==2&&typeof arguments[1]=="string")return d.datepicker["_"+a+"Datepicker"].apply(d.datepicker,[this[0]].concat(c));return this.each(function(){typeof a=="string"?d.datepicker["_"+a+"Datepicker"].apply(d.datepicker,[this].concat(c)):d.datepicker._attachDatepicker(this,a)})};d.datepicker=new m;d.datepicker.initialized=false;d.datepicker.uuid=(new Date).getTime();d.datepicker.version="1.8.6";window["DP_jQuery_"+f]=d})(jQuery);define("lib/jquery.ui",function(){});
+define('define/events', {
+
+    ACTIVATE_DESCRIPTION: 'activate-description',
+    DEACTIVATE_DESCRIPTION: 'deactivate-description',
+    
+    ACTIVATE_CATEGORY: 'activate-category',
+    SYNC_CATEGORY: 'sync-category',
+    
+    ACTIVATE_CRITERION: 'activate-criterion'   
+
+});
+var Base=function(){};Base.extend=function(a,b){var c=Base.prototype.extend;Base._prototyping=!0;var d=new this;c.call(d,a),d.base=function(){},delete Base._prototyping;var e=d.constructor,f=d.constructor=function(){if(!Base._prototyping)if(this._constructing||this.constructor==f)this._constructing=!0,e.apply(this,arguments),delete this._constructing;else if(arguments[0]!=null)return(arguments[0].extend||c).call(arguments[0],d)};f.ancestor=this,f.extend=this.extend,f.forEach=this.forEach,f.implement=this.implement,f.prototype=d,f.toString=this.toString,f.valueOf=function(a){return a=="object"?f:e.valueOf()},c.call(f,b),typeof f.init=="function"&&f.init();return f},Base.prototype={extend:function(a,b){if(arguments.length>1){var c=this[a];if(c&&typeof b=="function"&&(!c.valueOf||c.valueOf()!=b.valueOf())&&/\bbase\b/.test(b)){var d=b.valueOf();b=function(){var a=this.base||Base.prototype.base;this.base=c;var b=d.apply(this,arguments);this.base=a;return b},b.valueOf=function(a){return a=="object"?b:d},b.toString=Base.toString}this[a]=b}else if(a){var e=Base.prototype.extend;!Base._prototyping&&typeof this!="function"&&(e=this.extend||e);var f={toSource:null},g=["constructor","toString","valueOf"],h=Base._prototyping?0:1;while(i=g[h++])a[i]!=f[i]&&e.call(this,i,a[i]);for(var i in a)f[i]||e.call(this,i,a[i])}return this}},Base=Base.extend({constructor:function(){this.extend(arguments[0])}},{ancestor:Object,version:"1.1",forEach:function(a,b,c){for(var d in a)this.prototype[d]===undefined&&b.call(c,a[d],d,a)},implement:function(){for(var a=0;a<arguments.length;a++)typeof arguments[a]=="function"?arguments[a](this.prototype):this.prototype.extend(arguments[a]);return this},toString:function(){return String(this.valueOf())}})define("lib/base", function(){});
+define("rest/resource",["lib/base"],function(){Resource=Base.extend({url:"",dataType:"json",timeout:5e3,interval:15,uid:"id",_setup:function(a){if(this.loaded!==!0){var b=$.isArray(a)?[]:{};this._=$.extend(!0,b,a),this.store={},this.template&&(this.dom=this.render(this.template)),this.loaded=!0}},_fetch:function(){var a=this,b={type:"GET",url:this.url,dataType:this.dataType,success:function(b){a._setup(b)}};this.xhr=$.ajax(b)},ready:function(a){a=a||function(){};if(this.loaded)a.apply(this);else{attempts=arguments[1]||parseInt(this.timeout/this.interval),this.store&&!this.xhr&&this._setup(this.store),this.url&&!this.xhr&&this._fetch();if(!--attempts)throw new Error("Failed to get a response");var b=this;setTimeout(function(){b.ready(a,attempts)},15)}return this},render:function(a){arguments.length===1&&typeof a=="object"?(data=a,a=this.template):data=arguments[1]||this._,$.isArray(data)||(data=[data]),typeof a=="string"&&(a=$.jqotec(a));var b,c,d,e,f,g=[];for(var h=0,i=data.length;h<i;h++)e=data[h],c=$.jqote(a,e),d=$(c).data(e),b=this.uid?e[this.uid]:h,this.store[b]=d,g.push.apply(g,d.toArray());return $(g)},grep:function(a,b){var c=arguments[3]||this._;c=$.isArray(c)?c:[c];var d;this.ready(function(){d=$.grep(c,function(c,d){return $(c).data(a)===b})});return d}});return Resource})/*
+ * The categories, functionally, are proxies for the criterion objects that
+ * are the main interactive component.
+ *
+ * On Load:
+ * - request categories, cache in local datastore
+ *
+ * User Interactions:
+ * - on click, trigger an event that the category has been changed
+ *
+ * All events are in the 'category' namespace.
+ */
+
+define('define/categories', ['define/events', 'rest/resource'],
+
+    function(Events, Resource) {
+
+        var template = [
+            '<span id="tab-<%= this.name.toLowerCase() %>" ',
+                'class="tab" data-id="<%= this.id %>">',
+                '<div class="icon"></div>',
+                '<span><%= this.name %></span>',
+            '</span>'
+        ].join('');
+
+        var CategoryCollection;
+
+        $(function() {
+
+            var dom = {
+                categories: $('#categories'),
+                subcategories: $('#subcategories')
+            };
+
+            dom.categories.current = null;
+
+            CategoryCollection = new Resource({
+
+                url: dom.categories.data('uri'),
+                template: template
+
+            }).ready(function() {
+
+                dom.categories.html(this.dom);
+                this.dom.first().click();
+
+            });
+
+            /*
+             * Handles doing the necessary processing for 'activating' the
+             * defined category
+             */ 
+            dom.categories.bind(Events.ACTIVATE_CATEGORY,
+                    
+                function(evt, id) {
+
+                    // test cache
+                    if (dom.categories.current === id)
+                        return false;
+                    dom.categories.current = id;
+
+                    CategoryCollection.ready(function() {
+
+                        var target = this.store[id];
+                        target.addClass('active');
+                        target.siblings().removeClass('active');
+                        
+                        // check for associated criterion and trigger
+                        var state = target.data('_state');
+                        if (!!state && state.criterion)
+                            dom.categories.trigger(Events.ACTIVATE_CRITERION,
+                                [state.criterion]);
+
+                    });
+
+                }
+            );
+
+            /*
+             * When a criterion is activated, the id gets cached to be
+             * associated with the current category.
+             */ 
+            dom.categories.bind(Events.SYNC_CATEGORY,
+                    
+                function(evt, id, criterion_id) {
+
+                    CategoryCollection.ready(function() {
+
+                        var target = this.store[id];
+                        // stored in a 'hidden' object to not be mistakingly
+                        // associated with the actual data of the object
+                        target.data('_state', {criterion: criterion_id});
+                        dom.categories.trigger(Events.ACTIVATE_CATEGORY, [id]);
+
+                    });
+
+                    return false;
+                }
+            );
+
+            /*
+             * User-triggerable events
+             */
+            dom.categories.delegate('span.tab', 'click', function(evt) {
+
+                $(evt.currentTarget).trigger(Events.ACTIVATE_CATEGORY,
+                    [$(this).data('id')]);
+
+            });
+
+            dom.subcategories.delegate('span', 'click', function(evt) {
+
+                var target = $(this);
+                target.addClass('active').siblings().removeClass('active');
+                return false;
+
+            });
+
+        }); 
+
+        return CategoryCollection;
+    }
+);
+define('define/viewelement',["lib/base"], function(){
+    // This is the Abstract Base Class (it will throw exceptions if you don't implement updateElement, elementChanged, and render) for view elements.
+    // A view must contain at least one view element. There are two builtin view elements, forms, and charts. Custom view elements can be written and mixed,
+    // with the builtin ones to create a unified view.
+    var ViewElement = Base.extend({   
+        constructor : function(viewset, concept_pk){
+            this.state = "INIT";
+            this.ds = {};
+            this.viewset = viewset;
+            this.concept_pk = concept_pk;
+            this.dom = $();
+            this.render();
+            
+            // Whenever an element changes, call elementChanged
+            this.dom.delegate('input,select,textarea', 'change keyup', $.proxy(this.elementChanged, this));
+            
+            // Bind to events, but this will refer to the object, not the event target.
+            this.dom.bind('UpdateElementEvent', $.proxy(this.updateElement, this));
+            this.dom.bind('UpdateDSEvent', $.proxy(this.updateDS, this));
+            this.dom.bind('GainedFocusEvent', $.proxy(this.gainedFocus, this));
+            this.dom.bind('LostFocusEvent', $.proxy(this.lostFocus, this));
+            this.dom.bind('RegisterElementsEvent', $.proxy(this.registerElements, this));
+            this.dom.bind('HideDependentsEvent', $.proxy(this.hideDependents, this));
+            this.dom.bind('ShowDependentsEvent', $.proxy(this.showDependents, this));
+      },
+      render: function(){
+          // This function needs to set the "form" attribute of this object.
+          throw({
+              name: 'FunctionNotImplementedException',
+              message: 'This function needs to set the "dom" attribute of this object.'
+          });
+      },
+      elementChanged: function(evt){
+          // This function needs to trigger an ElementChangedEvent with the new value of the evt.target.
+          throw({
+              name: 'FunctionNotImplementedException',
+              message: 'This function needs to trigger an ElementChangedEvent with the new value of the evt.target.'
+          });
+      },
+      updateElement: function(evt, element) {
+          // This function needs to find the element whose name = element.name, and set its value to element.value.
+          throw({
+              name: 'FunctionNotImplementedException',
+              message: 'This function needs to find the element whose name = element.name, and set its value to element.value.'
+          });
+      },  
+      updateDS: function(evt, ds){
+          for (var key in ds){
+              this.updateElement("UpdateElementEvent", {name:key, value:ds[key]});
+          }
+          this.ds = ds;
+          this.dom.data("datasource", ds);
+      },
+      registerElements: function(evt) {
+          $("input,select", this.dom).change(); 
+      },
+      gainedFocus: function(){
+          this.state = "ONSCREEN";
+      },
+      lostFocus: function(){
+          this.state = "OFFSCREEN";
+      },
+      hideDependents: function(evt){
+         if ((this.dom[0] !== (evt.originalEvent ? evt.originalEvent.target : evt.target)) && (this.dom.has(evt.target).length === 0)){ 
+             $("input,select,label", this.dom).attr("disabled","true").change();
+         }
+      },
+      showDependents: function(evt){
+         if ((this.dom[0] !==  (evt.originalEvent ? evt.originalEvent.target : evt.target)) && (this.dom.has(evt.target).length === 0)){ 
+             $("input,select,label", this.dom).filter(":disabled").removeAttr("disabled").change();
+         }
+      }
+    });
+    return ViewElement;
+});define('define/form',["define/viewelement"], function(ViewElement) {
+    // Templates used by the form class
+    var decOperatorsTmpl = ['<option selected id="<%=this.field_id%>" value="range">is between</option>',
+                            '<option id="<%=this.field_id%>" value="-range">is not between</option>',
+                            '<option id="<%=this.field_id%>" value="lt">is less than</option>',
+                            '<option id="<%=this.field_id%>" value="gt">is greater than</option>',
+                            '<option id="<%=this.field_id%>" value="lte">is less than or equal to</option>',
+                            '<option id="<%=this.field_id%>" value="gte">is greater than or equal to</option>',
+                            '<option id="<%=this.field_id%>" value="exact">is equal to</option>',
+                            '<option id="<%=this.field_id%>" value="-exact">is not equal to</option>',
+                            '<option id="<%=this.field_id%>" value="isnull">is null</option>',
+                            '<option id="<%=this.field_id%>" value="-isnull">is not null</option>'];
+    var choiceOperatorsTmpl = ['<option selected value="in">is equal to</option>',
+                               '<option value="-in">is not equal to</option>'];
+    var freeTextOperatorsTmpl = ['<option selected value="iexact">is equal to</option>',
+                                 '<option value="-iexact">is not equal to</option>',
+                                 '<option value="in">is one of</option>',
+                                 '<option value="-in">is not one of</option>',
+                                 '<option value="icontains">contains</option>',
+                                 '<option value="-icontains">does not contain</option>'];
+
+    var Form  = ViewElement.extend({
+        constructor: function(viewset, concept_pk){
+            this.base(viewset, concept_pk);
+            // Add javascript date picker to date inputs
+            $('input[data-validate="date"]', this.dom).datepicker({
+                changeMonth: true,
+                changeYear: true
+            });
+        },
+        // For most cases we use the name attribute to constuct a unique id for all inputs (see field_id in the template context 
+        // object below). The format for it is <concept primary key>_<field primary key> with optional "_input[01]" to support datatypes that
+        // require ranges, and "_operator" to indicate the field represents an operator that can be changed by the users. With nothing appended to the 
+        // end of the name, this indicates a "choice" or "assertion" (which maps to a check box) datatype. There is one exception that complicates things:
+        // Some concepts include a field that is itself variable. That is to say that the user will supply some sort of value, for example, a decimal range,
+        // and then they will need to tell us which field in the database this range should be applied to. An example should clear this up. For Pure
+        // Tone Average (PTA), the user will select a range in the graph, and then below there will be a drop box that says "in the" and then a single choice
+        // dropdown. The choices in the dropdown ("both","better ear", "worse ear") will actually represent the fields that the PTA ranges are to be applied to.
+        // To indicate this type of a field, the concept description from the server will not contain a "pk" field for these types of fields. This will indicate 
+        // that the pk is determined by the user. Fields whose database field id are "variable" will have their name attribute set like this 
+        // <concept id>_tbd
+        
+        // A little bit about nullboolean vs boolean:
+        // boolean's can be represented two ways 
+        // Optional booleans have to be single select dropdowns with a blank option so 
+        // the user can choose to not select it.
+        // Required booleans are a checkbox. They can also be displayed as a pie chart.
+        // nullbooleans can also be charted as pie charts, or they can be displayed as a multi-select boxes,
+        // however they have an additional caveat. While they appear to be a "CHOICE" , in sql you cannot
+        // actually use booleans with the IN operator, so for this datatype, we have to generate a more complex query
+        // where it would be ITEM = TRUE or ITEM = null, etc.
+        render: function(){
+            var form_elements = {
+                      nullboolean: Form.nullboolean_tmpl,
+                      'boolean': Form.boolean_tmpl,
+                      date: Form.number_tmpl,
+                      'number': Form.number_tmpl,
+                      'string': Form.string_tmpl,
+                      'string-list': Form.stringlist_tmpl
+            };
+            var dom = this.dom = $('<span class="form_container"></span>');
+            var concept_pk = this.concept_pk;
+            $.each(this.viewset.fields, function(index,element){
+                 var input = [form_elements[element.datatype]];
+                 // Wrap each discrete element in <p>
+                 input.unshift($.jqotec("<p>"));
+                 input.push($.jqotec("</p>"));
+
+                 // Does this element contain a "pk" attribute? See large comment above for reason
+                 if (!element.hasOwnProperty("pk")){
+                     // Append additional dropdown for user to choose which field this applies to
+                     input.push(Form.pk_tmpl);
+                 }
+                 // TODO determine if this can go. Do we need to convert null to strings?
+                 $.each(['choices', 'pkchoices'], function(index, attr){
+                      element[attr] && $.each(element[attr], function(index, choice){
+                            // null needs to be "No Data"
+                            if ( element[attr][index][0] === null){
+                                 element[attr][index][0] = "null";
+                            }          
+                            if ( element[attr][index][1] === "None"){
+                                 element[attr][index][1] = "No Data";
+                            }           
+                      });
+                 });
+
+                 // The following scheme for generating name attributes will be used:
+                 // Elements that represent non-variable fields on the concept will have their name attribute constructed as follows:
+                 // <concept_id>_<field_id>
+                 // Elements that can be applied to a variable primary key will have their name attribute constructed as follows:
+                 // <concept_id>_<sorted list of possible field_ids separated by 'OR'>
+                 // Elements that represent the dropdown operator which will be used to determine the variable field ID will have their
+                 // name attribute constructed as follows
+                 // <sorted list of possible field_id choices contained within separated by 'OR'> 
+                 // This should be the same string that comes after the <concept_id> in the element that is dependent on this one
+
+                 var name_attribute = null;
+                 var pkchoice_name_attribute = null;
+                 if (element.hasOwnProperty("pk")){
+                     // Standard name scheme "<concept id>_<field id>"
+                     name_attribute = concept_pk + "_" + element.pk;
+                 }else{
+                     // Name scheme for field which the user choices the field it applies to
+                     var int_ids = $.map(element.pkchoices, function(element, index){
+                         return parseInt(element[0]);
+                     });
+                     int_ids.sort();
+                     pkchoice_name_attribute = int_ids.join("OR");
+                     name_attribute = concept_pk + "_" + pkchoice_name_attribute;
+                 }
+                 var $row = $($.jqote(input, {"datatype":element.datatype,
+                                              "choices":element.choices,
+                                              "field_id":name_attribute,
+                                              "label":element.name,
+                                              "pkchoices":element.pkchoices,
+                                              "pkchoice_label":element.pkchoice_label,
+                                              "pkchoice_id":pkchoice_name_attribute,
+                                              "optional": element.hasOwnProperty('optional') ? element.optional : false,
+                                              "default": element.hasOwnProperty('default') ? element["default"]: 0,
+                                              "pkchoice_default": element.hasOwnProperty('pkchoice_default') ? element["pkchoice_default"]: 0}));
+                 $row.children().not("span").wrap("<span/>");
+                 dom.append($row);
+           });
+        },
+        elementChanged: function(evt){
+             var $target = $(evt.target);
+             // This is bad, but there is a situtation where, when an element is 
+             // swapped out for another type of element (text input to textarea)
+             // a situation can occur where all the elements are populated with the datasource
+             // except text inputs whose value contains new lines which have to be skipped because the
+             // new lines will be stripped when you insert, you tell all elements to register with the 
+             // datasource, you swap out the text input, put in the textarea, update it,
+             // and then next the original input's update executes (out of luck of the order)
+             // and registers as being empty. This fixes this by not doing it if the element is no longer in the DOM
+
+             // TODO: This raises the question, after populating values from the datasource, we make all elements fire 
+             // as if they had changed (which shouldn't change anything except in the bug above) but causes them to 
+             // hide and show any fields that are dependent on the data (decimals that are dependent on operator, textarea or inputs
+             // that are dependent on operator.). Should the update view event be separated from the elementchangedevent?
+             if (!$.contains(this.dom.get(0), $target.get(0))) return;
+             var sendValue;
+             var ds;
+             var dom = this.dom;
+             var ref = this;
+             switch (evt.target.type){
+                     case "checkbox": sendValue = evt.target.checked;
+                                     sendValue = $target.is(":visible") && $target.is(":enabled") ? sendValue: undefined;
+                                     dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
+                                     break;
+                     case "select-one"      :
+                     case "select-multiple" : 
+                     case "select"          : var selected = [];
+                                              var $associated_inputs = null;
+                                              // If this is an operator for a free input text box, and the user has 
+                                              // just changed from an equals or not equals to in or not in, we are goin
+                                              // to change the input to be a text-area. Figure out if this an operator 
+                                              // and who the associated input is
+                                              var op_match = Form.opRe.exec($target.attr("name"));
+                                              if (op_match){
+                                                  // Get the associated text input
+                                                  $associated_inputs = $("[name^="+op_match[1]+"_"+op_match[2]+"]", dom).not($target).not("span");
+                                              }
+                                              $("option", $(evt.target)).each(function(index,opt){
+                                                  if  (opt.selected) {
+                                                     selected.push(opt.value);
+                                                     var cont_types = {decimal:1, number:1, date:1};
+                                                     if ($associated_inputs && $associated_inputs.attr("data-validate") in cont_types){
+                                                          // Do we need to show 1, 2, or no inputs?
+                                                          if (opt.value.search(/range/) >= 0){
+                                                              // two inputs
+                                                              $("input[name="+opt.id+"_input1]",dom).show().change();
+                                                              $("label[for="+opt.id+"_input1]",dom).show();
+                                                              // Trigger change on associated inputs because they need to work with a range operator now
+                                                              $("input[name="+opt.id+"_input0]",dom).show().change();
+                                                          } else if (opt.value.search(/null/) >= 0){
+                                                              // no inputs
+                                                              $("input[name="+opt.id+"_input1],", dom).hide().change();
+                                                              $("label[for="+opt.id+"_input1]", dom).hide();
+                                                              $("input[name="+opt.id+"_input0]", dom).hide().change();
+
+                                                          } else {
+                                                              // one input
+                                                              $("input[name="+opt.id+"_input1],", dom).hide().change();
+                                                              $("label[for="+opt.id+"_input1]", dom).hide();
+                                                              $("input[name="+opt.id+"_input0]", dom).show().change();
+                                                          }
+                                                      } else if ($associated_inputs && $associated_inputs.attr("type") in {"text":1, "textarea":1}){
+                                                          // The operator has associated inputs, and they are of type text or textarea:
+                                                          // This section takes care of modifying textinputs when the user changes the operator
+                                                          // to be an IN operator.
+                                                          // One of the convenience things we allows is the pasting of newline sepearate text so that
+                                                          // for example, someone can paste in an excel column of patient aliases.
+                                                          // If the user selects an IN operator, we switch the text input -> textarea and vice versa
+                                                          if (opt.value.search(/exact/) >= 0 && $associated_inputs.attr("type") === "textarea"){
+                                                              // The operator is of type exact, but the associated input is a text area, switch to text input
+                                                              $associated_inputs.data("switch").data("switch", $associated_inputs);
+                                                              $associated_inputs.before($associated_inputs.data("switch")).detach();
+                                                              $associated_inputs.data("switch").keyup();
+                                                              // Swap out textarea with text
+                                                          } else if (opt.value.search(/^-?in$/)>=0 && $associated_inputs.attr("type") === "text"){
+                                                              // The operator is of type in, but the associated input is a text input, switch to textarea
+                                                              if (!$associated_inputs.data("switch")){
+                                                                 // We have not yet done a switch, otherwise we would have saved it, so we have to actually create the
+                                                                 // textarea. This happens only once per input
+                                                                 var $mline = $('<textarea rows="8" id="'+$associated_inputs.attr("id")+'" name="'+$associated_inputs.attr("name")+'" cols="25"></textarea>').data("switch",$associated_inputs);
+                                                                 
+                                                                 $associated_inputs.before($mline).detach();
+                                                                 ds = dom.data("datasource")||{};
+                                                                 // We are in this code for one of 3 reasons
+
+                                                                 if (ds[$associated_inputs.attr('name')] instanceof Array) {
+                                                                     // #1. We are reloading the page, and switching the original text input to textarea
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:ds[$associated_inputs.attr('name')]});
+                                                                 } else if (typeof(ds[$associated_inputs.attr('name')])==="string") {
+                                                                     // #2. We typed something into the original text input, but then switched to textarea, populate it
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:[ds[$associated_inputs.attr('name')]]});
+                                                                 }else {
+                                                                     // #3. We never typed anything into the original text input, just switched to textara
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:[]});
+                                                                 }
+                                                                 $mline.keyup();
+                                                             }else{
+                                                                 // The alternative input has already been created, just use it.
+                                                                 $associated_inputs.data("switch").data("switch", $associated_inputs);
+                                                                 $associated_inputs.before($associated_inputs.data("switch")).detach();
+                                                                 $associated_inputs.data("switch").keyup();
+                                                             }
+                                                          }
+                                                      }
+                                                  }
+                                              });
+
+                                              // Since this code executes for select choices boxes as well as operators (which should
+                                              // never be plural), we make sure to send the correct type array, or single item
+                                              if (evt.target.type === "select-multiple"){
+                                                  var selected_prim = [];
+                                                  var l  = selected.length;
+                                                  for (var index = 0; index < l; index++) {
+                                                      var val = selected[index];
+                                                      selected_prim.push(val in Form.s_to_primative_map ? Form.s_to_primative_map[val] : val);
+                                                  }
+                                                  // If a select-multiple box is optional, and nothing is selected, send undefined so that it doesn't appear as empty in 
+                                                  // the datasource, eitherwise, we will throw an error if nothing is supplied;
+                                                  sendValue = selected_prim;
+                                              } else { 
+                                                  sendValue = selected[0] in Form.s_to_primative_map ? Form.s_to_primative_map[selected[0]] : selected[0];
+                                              }
+                                              
+                                              if ($target.is('[data-optional=true]')) {
+                                                 sendValue = $.type(sendValue) in {string:1, array:1} && sendValue.length === 0 ? undefined : sendValue;
+                                              }
+                                              
+                                              sendValue = (this.state === "INIT" && $target.css("display")!=="none") || 
+                                                          ($target.is(":visible") && $target.is(":enabled")) ? sendValue: undefined;
+                                              dom.trigger("ElementChangedEvent", [{name:evt.target.name, value:sendValue}]);
+                                              break;
+                     case "textarea": sendValue = (this.state === "INIT" && $target.css("display") !== "none") || 
+                                                  ($target.is(':visible') && $target.is(":enabled")) ? $target.val().split("\n") : undefined;
+                                      dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
+                                      break;
+                     default   : // This catches input boxes, if input boxes are not currently visible, send undefined for them
+                                 // Input boxes require an extra validation step because of the free form input
+
+                                 var associated_operator = $(evt.target).closest("p").find("select").val();
+                                 var name_prefix = evt.target.name.substr(0,evt.target.name.length-1);
+                                 // This one is a little tricky because it matters not just that the fields map to valid numbers
+                                 // but that in the case of a range style operator, the two numbers are sequential, and finally
+                                 // if fields have become hidden due to a change in operator, we no longer want to list that something
+                                 // is wrong with the field even if there is (because it doesn't matter)
+                                 switch ($target.attr('data-validate')){
+                                     case "number" :
+                                     case "decimal":
+                                     case "date"  : 
+                                                     var datatype = $target.attr('data-validate');
+                                                     var $input1 = $("input[name="+name_prefix+"0]",dom);
+                                                     var $input2 = $("input[name="+name_prefix+"1]",dom);
+                                                     var input_evt;
+                                                     if (datatype === "date"){
+                                                         var value1 = new Date($input1.val());
+                                                         var value2 = new Date($input2.val());
+                                                     }
+                                                     else {
+                                                         var value1 = parseFloat($input1.val());
+                                                         var value2 = parseFloat($input2.val());
+                                                     }
+
+                                                     if (datatype !== "date" && $target.is(":visible") && isNaN(Number($target.val()))) {
+                                                         // Field contains a non-number and is visible
+                                                         input_evt = $.Event("InvalidInputEvent");
+                                                         $target.trigger(input_evt);
+                                                     }else if ($(evt.target).hasClass('invalid')){ //TODO Don't rely on this
+                                                         // Field either contains a number or is not visible
+                                                         // Either way it was previously invalid
+                                                         input_evt = $.Event("InputCorrectedEvent");
+                                                         $target.trigger(input_evt);
+                                                     } else if ((associated_operator.search(/range/) >= 0) && (value1 > value2)) { // && ($input2.is(":visible"))) {
+                                                         // A range operator is in use, both fields are visible, and their values are not sequential
+                                                         input_evt = $.Event("InvalidInputEvent");
+                                                         input_evt.reason = "badrange";
+                                                         input_evt.message = "First input must be less than second input.";
+                                                         $target.parent().trigger(input_evt);
+                                                     } else if ($(evt.target).parent().hasClass('invalid_badrange') && (($input2.css("display") === "none")||(value1 < value2))){ //TODO Don't rely on this
+                                                         // A range operator is or was in use, and either a range operator is no longer in use, so we don't care, or 
+                                                         // its in use but the values are now sequential.
+                                                         input_evt = $.Event("InputCorrectedEvent");
+                                                         input_evt.reason = "badrange";
+                                                         $target.parent().trigger(input_evt);
+                                                     }   
+                                                     break;
+                                     default: break;
+                                 }
+                                 sendValue = (this.state === "INIT" && $target.css("display") !== "none") ||
+                                             ($target.is(':visible') && $target.is(":enabled")) ? $target.val() : undefined;
+                                 dom.trigger("ElementChangedEvent", [{name:evt.target.name,value:sendValue}]);
+                                 break;
+              }
+              evt.stopPropagation();
+        },
+        updateElement: function(evt, element){
+            // Find the element within our DOM
+            var $element = $("[name="+element.name+"]", this.dom);
+            // Also note that values that are not string or numbers need to 
+            // be converted to a string before being displayed to the user
+            // For example, you cannot set the value of an option tag to a boolean or null;
+            // it does not work.
+            
+            // Note: Just because we are here doesn't mean we contain the element
+            // to be updated, it may reside on another view within this concept
+            if ($element.length === 0) return;
+            var type = $element.attr("type");
+            switch (type){
+                case "checkbox": $element.attr("checked", element.value);
+                                 break;
+                case "select-multiple": var iterator = $.isArray(element.value) ? element.value : [element.value];
+                                        $("option", $element).each( function(index, opt){ // TODO can i somehow just set an array here ?
+                                            var vals = $.map(iterator, function(val, index){
+                                                return typeof val in {string:1, number:1} ? val : String(val);
+                                            });
+                                            if ($.inArray(opt.value, vals)!=-1){
+                                                opt.selected = true;
+                                            }else{
+                                                opt.selected = false;
+                                            }
+                                        });
+                                        break;
+                case "textarea": $element.val(element.value.join("\n"));
+                                 break;
+                default:  // This will catch inputs and singular selects
+                          if ($.isArray(element.value)) break; // If this is an array, we can't put it in single line input
+                                                               // Hold off until the operator swap causes this to become
+                                                               // a textarea
+                          $element.attr("value", typeof element.value in {string:1, number:1} ? element.value : String(element.value)); 
+                          break;
+            }
+        }
+    },
+    // Class instance variables
+    {   // jQote templates used by the form, on the Class instance
+        s_to_primative_map: {"true":true, "false":false, "null":null},
+        opRe: /^(\d*)_(\d+(?:OR\d+)*)_operator$/,
+        nullboolean_tmpl:  $.jqotec(['<label for="<%=this.field_id%>"><%=this.label%></label>',
+                                    '<select data-datatype="nullboolean"data-optional="<%=this.optional%>"  multiple id ="<%=this.field_id%>" name="<%=this.field_id%>">',
+                                        '<option <%=this["default"]===true?"selected":""%> value="true">Yes</option>',
+                                        '<option <%=this["default"]===false?"selected":""%> value="false">No</option>',
+                                        '<option <%=this["default"]===null?"selected":""%> value="null">No Data</option>',
+                                    '</select>'].join('')),
+        boolean_tmpl: $.jqotec( ['<%if (this.optional) {%>',
+                                     '<label for="<%=this.field_id%>"><%=this.label%></label>',
+                                     '<select data-datatype="boolean" data-optional="<%=this.optional%>" id ="<%=this.field_id%>" name="<%=this.field_id%>">',
+                                          '<option value="">No Preference</option>',
+                                          '<option <%=this["default"]===true?"selected":""%> value="true">Yes</option>',
+                                          '<option <%=this["default"]===false?"selected":""%> value="false">No</option>',
+                                     '</select>',
+                                 '<%} else {%>', 
+                                      '<input type="checkbox" name="<%=this.field_id%>" value="<%=this.field_id%>" <%= this["default"] ? "checked":""%>/>',
+                                      '<label for="<%=this.field_id%>"><%=this.label%></label>',
+                                 '<%}%>'].join('')),
+        number_tmpl:  $.jqotec(['<label for="<%=this.field_id%>"><%=this.label%></label>',
+                                '<select id="<%=this.field_id%>_operator" name="<%=this.field_id%>_operator">',
+                                   decOperatorsTmpl.join(''),
+                                '</select>',
+                                '<span class="input_association" name="<%=this.field_id%>_input_assoc">',
+                                '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input0" type="text" name="<%=this.field_id%>_input0" size="5">',
+                                '<label for="<%=this.field_id%>_input1">and</label>',
+                                '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input1" type="text" name="<%=this.field_id%>_input1" size="5">',
+                                '</span>'].join("")),
+        string_tmpl: $.jqotec([ '<% if (this.choices) {%>',
+                                     '<label for="<%=this.field_id%>"><%=this.label%></label>', // No defaults for this type, doesn't make sense
+                                         '<select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',
+                                            choiceOperatorsTmpl.join(''),
+                                         '</select>',
+                                     '<select multiple="multiple" id="<%=this.field_id%>-value" name="<%=this.field_id%>" size="3" data-optional="<%=this.optional%>" >',
+                                     '<% for (var index = 0; index < this.choices.length; index++) { %>',
+                                            '<option value="<%=this.choices[index][0]%>"><%=this.choices[index][1]%></option>',
+                                     '<%}%>',
+                                     '</select>',
+                                 '<%} else {%>',
+                                      '<label for="<%=this.field_id%>"><%=this.label%></label>', // No defaults for this type, doesn't make sense
+                                      '<select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',
+                                           freeTextOperatorsTmpl.join(''),
+                                      '</select>',
+                                      '<input data-optional="<%=this.optional%>" type="text" id="<%=this.field_id%>_text" name="<%=this.field_id%>" size = "10">',
+                                 '<%}%>'].join('')),
+        stringlist_tmpl: $.jqotec([ '<label for="<%=this.field_id%>"><%=this.label%></label>', // No defaults for this type, doesn't make sense
+                                    '<select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',
+                                           choiceOperatorsTmpl.join(''),
+                                     '</select>',
+                                     '<textarea data-optional="<%=this.optional%>" id="<%=this.field_id%>_text" name="<%=this.field_id%>" rows="8" cols="25"></textarea>'
+                                  ].join('')),
+        pk_tmpl: $.jqotec(['<p><label for="<%=this.pkchoice_id%>"><%=this.pkchoice_label%></label>',
+                            '<select id="<%=this.pkchoice_id%>" name="<%=this.pkchoice_id%>">',
+                            '<% for (index in this.pkchoices) { %>',     
+                                    '<option value="<%=this.pkchoices[index][0]%>" <%=this.pkchoices[index][0]==this.pkchoice_default ? "selected":""%>><%=this.pkchoices[index][1]%></option>',
+                            '<%}%>',
+                            '</select></p>'
+                          ].join(''))
+        
+    });
+    return Form;
+});
+(function(){function r(a){var b=[],c=[],d;for(d=0;d<a.length;d++)b[d]=a[d].plotX,c[d]=a[d].plotY;this.xdata=b,this.ydata=c,a=[],this.y2=[];var e=c.length;this.n=e,this.y2[0]=0,this.y2[e-1]=0,a[0]=0;for(d=1;d<e-1;d++){var f=b[d+1]-b[d-1];f=(b[d]-b[d-1])/f;var g=f*this.y2[d-1]+2;this.y2[d]=(f-1)/g,a[d]=(c[d+1]-c[d])/(b[d+1]-b[d])-(c[d]-c[d-1])/(b[d]-b[d-1]),a[d]=(6*a[d]/(b[d+1]-b[d-1])-f*a[d-1])/g}for(b=e-2;b>=0;b--)this.y2[b]=this.y2[b]*this.y2[b+1]+a[b]}function q(f,i){function bq(){var a="onreadystatechange";G||s.readyState=="complete"?(_(),br(f.series||[],function(a){p(a)}),bU.inverted=cp=e(cp,f.chart.inverted),bU.plotSizeX=cf=cp?ca:ce,bU.plotSizeY=cg=cp?ce:ca,bU.tracker=ch=new n(bU,f.tooltip),J(),br(co,function(a){a.translate(),a.setTooltipPoints()}),bU.render=bc,bc(),by(bU,"load"),i&&i(bU)):s.attachEvent(a,function(){s.detachEvent(a,arguments.callee),bq()})}function bp(){var a=co.length;bx(t,"unload",bp),bx(bU);for(br(cm,function(a){bx(a)});a--;)co[a].destroy();bQ.onmousedown=bQ.onmousemove=bQ.onmouseup=bQ.onclick=null,bQ.parentNode.removeChild(bQ),bQ=null,clearInterval(cs);for(a in bU)delete bU[a]}function bc(){var b,c=f.labels,d=f.credits,e=bv.borderWidth||0,g=bv.backgroundColor,h=bv.plotBackgroundColor,i=bv.plotBackgroundImage;b=2*e+(bv.shadow?8:0),(e||g)&&cq.rect(b/2,b/2,bS-b,bT-b,bv.borderRadius,e).attr({stroke:bv.borderColor,"stroke-width":e,fill:g||X}).add().shadow(bv.shadow),h&&cq.rect(bL,bC,ce,ca,0).attr({fill:h}).add().shadow(bv.plotShadow),i&&cq.image(i,bL,bC,ce,ca).add(),bv.plotBorderWidth&&cq.rect(bL,bC,ce,ca,0,bv.plotBorderWidth).attr({stroke:bv.plotBorderColor,"stroke-width":bv.plotBorderWidth,zIndex:4}).add(),cl&&br(cm,function(a){a.render()}),$(),c.items&&br(c.items,function(){var b=a(c.style,this.style),d=parseInt(b.left,10)+bL,e=parseInt(b.top,10)+bC+12;delete b.left,delete b.top,cq.text(this.html,d,e,b).attr({zIndex:2}).add()}),br(co,function(a){a.render()}),cj=bU.legend=new cv(bU),bU.toolbar||(bU.toolbar=k(bU)),d.enabled&&!bU.credits&&cq.text(d.text,bS-10,bT-5,d.style,0,"right").on("click",function(){location.href=d.href}).attr({zIndex:8}).add(),bU.hasRendered=!0,bO&&(bN.appendChild(bQ),l(bO))}function _(){bN=bv.renderTo,bR=U+K++,typeof bN=="string"&&(bN=s.getElementById(bN)),bN.innerHTML="",bN.offsetWidth||(bO=bN.cloneNode(0),g(bO,{position:R,top:"-9999px",display:""}),s.body.appendChild(bO));var b=(bO||bN).offsetHeight;bU.chartWidth=bS=bv.width||(bO||bN).offsetWidth||600,bU.chartHeight=bT=bv.height||(b>bC+bE?b:0)||400,bU.plotWidth=ce=bS-bL-bD,bU.plotHeight=ca=bT-bC-bE,bU.plotLeft=bL,bU.plotTop=bC,bU.container=bQ=h(Q,{className:"highcharts-container"+(bv.className?" "+bv.className:""),id:bR},a({position:S,overflow:T,width:bS+W,height:bT+W,textAlign:"left"},bv.style),bO||bN),bU.renderer=cq=bv.renderer=="SVG"?new bM(bQ,bS,bT):new bP(bQ,bS,bT)}function $(){var a=f.title,b=a.align,c=f.subtitle,d=c.align,e={left:0,center:bS/2,right:bS};a&&a.text&&cq.text(a.text,e[b]+a.x,a.y,a.style,0,b).attr({"class":"highcharts-title"}).add(),c&&c.text&&cq.text(c.text,e[d]+c.x,c.y,c.style,0,d).attr({"class":"highcharts-subtitle"}).add()}function V(){return bs(co,function(a){return a.selected})}function M(){var a=[];br(co,function(b){a=a.concat(bs(b.data,function(a){return a.selected}))});return a}function J(){var a=f.xAxis||{},b=f.yAxis||{},c;a=d(a),br(a,function(a,b){a.index=b,a.isX=!0}),b=d(b),br(b,function(a,b){a.index=b}),cm=a.concat(b),bU.xAxis=[],bU.yAxis=[],cm=bt(cm,function(a){c=new j(bU,a),bU[c.isXAxis?"xAxis":"yAxis"].push(c);return c}),r()}function F(a){var b,c,d;for(b=0;b<cm.length;b++)if(cm[b].options.id==a)return cm[b];for(b=0;b<co.length;b++)if(co[b].options.id==a)return co[b];for(b=0;b<co.length;b++){d=co[b].data;for(c=0;c<d.length;c++)if(d[c].id==a)return d[c]}return null}function D(){bz(b$,{opacity:0},{duration:f.loading.hideDuration,complete:function(){g(b$,{display:X})}}),b_=!1}function C(b){var c=f.loading;b$||(b$=h(Q,{className:"highcharts-loading"},a(c.style,{left:bL+W,top:bC+W,width:ce+W,height:ca+W,zIndex:10,display:X}),bQ),h("span",null,c.labelStyle,b$)),b_||(g(b$,{opacity:0,display:""}),b$.getElementsByTagName("span")[0].innerHTML=b||f.lang.loading,bz(b$,{opacity:c.style.opacity},{duration:c.showDuration}),b_=!0)}function B(){for(var a=bU.isDirty,b,c=co.length,d=c,e;d--;){e=co[d];if(e.isDirty&&e.options.stacking){b=!0;break}}if(b)for(d=c;d--;)e=co[d],e.options.stacking&&(e.isDirty=!0);br(co,function(b){b.isDirty&&(b.cleanData(),b.getSegments(),b.options.legendType=="point"&&(a=!0))}),cn=null,cl&&(br(cm,function(a){a.setScale()}),r(),br(cm,function(a){a.isDirty&&a.redraw()})),br(co,function(a){a.isDirty&&a.visible&&a.redraw()}),a&&cj.renderLegend&&(cj.renderLegend(),bU.isDirty=!1),ch&&ch.resetTracker&&ch.resetTracker(),by(bU,"redraw")}function r(){bv.alignTicks!==!1&&br(cm,function(a){a.adjustTickAmount()})}function q(a,b){var c;b=e(b,!0),by(bU,"addSeries",{options:a},function(){c=p(a),c.isDirty=!0,bU.isDirty=!0,b&&bU.redraw()});return c}function p(a){var b=a.type||bv.defaultSeriesType,c=bB[b],d=bU.hasRendered;d&&(cp&&b=="column"?c=bB.bar:!cp&&b=="bar"&&(c=bB.column)),b=new c,b.init(bU,a),!d&&b.inverted&&(cp=!0),b.isCartesian&&(cl=b.isCartesian),co.push(b);return b}function n(b,d){function k(){b.trackerGroup=ci=cq.g("tracker"),cp&&ci.attr({width:b.plotWidth,height:b.plotHeight}).invert(),ci.attr({zIndex:9}).translate(bL,bC).add()}function j(){var d=!0;bQ.onmousedown=function(a){a=e(a),a.preventDefault&&a.preventDefault(),b.mouseIsDown=bZ=!0,l=a.chartX,n=a.chartY,cl&&(s||u)&&(q||(q=cq.rect(bL,bC,v?1:ce,w?1:ca,0).attr({fill:"rgba(69,114,167,0.25)",zIndex:7}).add()))},bQ.onmousemove=function(a){a=e(a),a.returnValue=!1;var b=a.chartX,c=a.chartY,f=!bX(b-bL,c-bC);bZ?(p=Math.sqrt(Math.pow(l-b,2)+Math.pow(n-c,2))>10,v&&(a=b-l,q.attr({width:A(a),x:(a>0?0:a)+l})),w&&(c=c-n,q.attr({height:A(c),y:(c>0?0:c)+n}))):f||g(a),f&&!d&&(h(),i()),d=f;return!1},bQ.onmouseup=function(){i()},bQ.onclick=function(d){var g=b.hoverPoint;d=e(d),d.cancelBubble=!0;if(!p)if(g&&c(d.target,"isTracker")){var h=g.plotX,i=g.plotY;a(g,{pageX:ck.x+bL+(cp?ce-i:h),pageY:ck.y+bC+(cp?ca-h:i)}),by(b.hoverSeries||g.series,"click",a(d,{point:g})),g.firePointEvent("click",d)}else a(d,f(d)),bX(d.chartX-bL,d.chartY-bC)&&by(b,"click",d);p=!1}}function i(){if(q){var a={xAxis:[],yAxis:[]},c=q.getBBox(),d=c.x-bL,e=c.y-bC;p&&(br(cm,function(b){var f=b.translate,g=b.isXAxis,h=cp?!g:g,i=f(h?d:ca-e-c.height,!0);f=f(h?d+c.width:ca-e,!0),a[g?"xAxis":"yAxis"].push({axis:b,min:z(i,f),max:y(i,f)})}),by(b,"selection",a,ct)),q=q.destroy()}b.mouseIsDown=bZ=p=!1}function h(){var a=b.hoverSeries,c=b.hoverPoint;c&&c.onMouseOut(),a&&a.onMouseOut(),bY&&bY.hide()}function g(a){var c=b.hoverPoint,d=b.hoverSeries;d&&d.tracker&&((a=d.tooltipPoints[cp?a.chartY:a.chartX-bL])&&a!=c&&a.onMouseOver())}function f(a){var b={xAxis:[],yAxis:[]};br(cm,function(c){var d=c.translate,e=c.isXAxis,f=cp?!e:e;b[e?"xAxis":"yAxis"].push({axis:c,value:d(f?a.chartX-bL:ca-a.chartY+bC,!0)})});return b}function e(a){a=a||t.event,a.target||(a.target=a.srcElement);if(a.type!="mousemove"||t.opera)ck=o(bQ);E?(a.chartX=a.x,a.chartY=a.y):a.layerX===P?(a.chartX=a.pageX-ck.x,a.chartY=a.pageY-ck.y):(a.chartX=a.layerX,a.chartY=a.layerY);return a}var l,n,p,q,r=bv.zoomType,s=/x/.test(r),u=/y/.test(r),v=s&&!cp||u&&cp,w=u&&!cp||s&&cp;k(),d.enabled&&(b.tooltip=bY=m(d)),j(),cs=setInterval(function(){cr&&cr()},32),a(this,{zoomX:s,zoomY:u,resetTracker:h})}function m(a){function d(d){var f=d.series,g=a.borderColor||d.color||f.color||"#606060",m,n;n=d.tooltipText,m=d.tooltipPos,e=f,f=v(m?m[0]:cp?ce-d.plotY:d.plotX),d=v(m?m[1]:cp?ca-d.plotX:d.plotY),m=bX(f,d),n!==!1&&m?(j&&(o.show(),j=!1),q.attr({text:n}),n=q.getBBox(),k=n.width,l=n.height,p.attr({width:k+2*h,height:l+2*h,stroke:g}),g=f-k+bL-25,f=d-l+bC+10,g<7&&(g=7,f-=20),f<5?f=5:f+l>bT&&(f=bT-l-5),b(v(g-i),v(f-i))):c()}function c(){j=!0,o.hide()}function b(a,c){m=j?a:(2*m+a)/3,n=j?c:(n+c)/2,o.translate(m,n),cr=A(a-m)>1||A(c-n)>1?function(){b(a,c)}:null}var e,f=a.borderWidth,g=a.style,h=parseInt(g.padding,10),i=f+h,j=!0,k,l,m=0,n=0;g.padding=0;var o=cq.g("tooltip").attr({zIndex:8}).add(),p=cq.rect(i,i,0,0,a.borderRadius,f).attr({fill:a.backgroundColor,"stroke-width":f}).add(o).shadow(a.shadow),q=cq.text("",h+i,parseInt(g.fontSize,10)+h+i).attr({zIndex:1}).css(g).add(o);return{refresh:d,hide:c}}function k(){function b(a){l(c[a].element),c[a]=null}function a(a,b,d,e){c[a]||(b=cq.text(b,bL+ce-20,bC+30,f.toolbar.itemStyle,0,"right").on("click",e).attr({zIndex:20}).add(),c[a]=b)}var c={};return{add:a,remove:b}}function j(c,d){function F(a,b){K.categories=bY=a,br(_,function(a){a.translate(),a.setTooltipPoints(!0)}),K.isDirty=!0,e(b,!0)&&D()}function D(){ch.resetTracker&&ch.resetTracker(),B(),br(_,function(a){a.isDirty=!0})}function C(a){br([bN,bO],function(b){for(var c=0;c<b.length;c++)if(b[c].id==a){b.splice(c,1);break}}),B()}function B(){var a=d.title,c=d.alternateGridColor,e=d.minorTickWidth,f=d.lineWidth,g,k;g=_.length&&b(bp)&&b(bc),V?(V.empty(),W.empty()):(V=cq.g("axis").attr({zIndex:7}).add(),W=cq.g("grid").attr({zIndex:1}).add());if(g||bt){c&&br(bU,function(a,b){b%2===0&&a<bc&&i(a,bU[b+1]!==P?bU[b+1]:bc,c)}),br(bN,function(a){i(a.from,a.to,a.color)});if(bQ&&!bY)for(g=bp;g<=bc;g+=bQ)h(g,d.minorGridLineColor,d.minorGridLineWidth),e&&j(g,d.minorTickPosition,d.minorTickColor,e,d.minorTickLength);br(bU,function(a,b){k=a+b$,h(k,d.gridLineColor,d.gridLineWidth),j(a,d.tickPosition,d.tickColor,d.tickWidth,d.tickLength,(a!=bp||d.showFirstLabel)&&(a!=bc||d.showLastLabel),b)}),br(bO,function(a){h(a.value,a.color,a.width)})}!K.hasRenderedLine&&f&&(e=bL+(H?ce:0)+Q,g=bT-bE-(H?ca:0)+Q,cq.path(cq.crispLine([Y,I?bL:e,I?g:bC,Z,I?bS-bD:e,I?g:bT-bE],f)).attr({stroke:d.lineColor,"stroke-width":f,zIndex:7}).add(),K.hasRenderedLine=!0),!K.hasRenderedTitle&&!K.axisTitle&&a&&a.text&&(f=I?bL:bC,f=({low:f+(I?0:S),middle:f+S/2,high:f+(I?S:0)})[a.align],e=(I?bC+ca:bL)+(I?1:-1)*(H?-1:1)*a.margin-(E?parseInt(a.style.fontSize||12,10)/3:0),K.axisTitle=cq.text(a.text,(I?f:e+(H?ce:0)+Q)+(a.x||0),(I?e-(H?ca:0)+Q:f)+(a.y||0),a.style,a.rotation||0,({low:"left",middle:"center",high:"right"})[a.align]).attr({zIndex:7}).add(),K.hasRenderedTitle=!0),K.isDirty=!1}function A(a){var b=a.width,c=b?bO:bN;c.push(a),b?h(a.value,a.color,a.width):i(a.from,a.to,a.color)}function t(a){bp>a?a=bp:bc<a&&(a=bc);return g(a,0,1)}function s(){return{min:bp,max:bc,dataMin:X,dataMax:$}}function r(a,b,d){d=e(d,!0),by(K,"setExtremes",{min:a,max:b},function(){bY&&(a<0&&(a=0),b>bY.length-1&&(b=bY.length-1)),ba=a,bb=b,d&&c.redraw()})}function q(){var a,g,h,i=bp,j=bc;a=d.maxZoom;var l;f(),bp=e(ba,d.min,X),bc=e(bb,d.max,$),bt&&(l=c[G?"xAxis":"yAxis"][d.linkedTo],l=l.getExtremes(),bp=e(l.min,l.dataMin),bc=e(l.max,l.dataMax)),bc-bp<a&&(l=(a-bc+bp)/2,bp=y(bp-l,e(d.min,bp-l)),bc=z(bp+a,e(d.max,bp+a))),!bY&&!bA&&!bt&&b(bp)&&b(bc)&&(a=bc-bp||1,!b(d.min)&&!b(ba)&&bq&&(X<0||!bx)&&(bp-=a*bq),!b(d.max)&&!b(bb)&&bs&&($>0||!bz)&&(bc+=a*bs)),bP=bY||bp==bc?1:e(d.tickInterval,(bc-bp)*d.tickPixelInterval/S),!M&&!b(d.tickInterval)&&(bP=k(bP)),bQ=d.minorTickInterval==="auto"&&bP?bP/5:d.minorTickInterval,o(),T=S/(bc-bp||1),cn||(cn={x:0,y:0}),!M&&bU.length>cn[R]&&(cn[R]=bU.length);if(!G)for(g in J)for(h in J[g])J[g][h].cum=J[g][h].total;K.isDirty||(K.isDirty=bp!=i||bc!=j)}function p(){if(!M&&!bY){var a=bV,c=bU.length;bV=cn[R];if(c<bV){for(;bU.length<bV;)bU.push(m(bU[bU.length-1]+bP));T*=(c-1)/(bV-1)}b(a)&&bV!=a&&(K.isDirty=!0)}}function o(){M?l():n();var a=bU[0],b=bU[bU.length-1];d.startOnTick?bp=a:bp>a&&bU.shift(),d.endOnTick?bc=b:bc<b&&bU.pop()}function n(){var a;a=w(bp/bP)*bP;var b=x(bc/bP)*bP;bU=[];for(a=m(a);a<=b;)bU.push(a),a=m(a+bP);bY&&(bp-=.5,bc+=.5)}function m(a){var b=(bR<1?v(1/bR):1)*10;return v(a*b)/b}function l(){bU=[];var a,b=N.global.useUTC,c=1e3/L,e=6e4/L,f=36e5/L,g=864e5/L,h=6048e5/L,i=2592e6/L,j=31556952e3/L,l=[["second",c,[1,2,5,10,15,30]],["minute",e,[1,2,5,10,15,30]],["hour",f,[1,2,3,4,6,8,12]],["day",g,[1,2]],["week",h,[1,2]],["month",i,[1,2,3,4,6]],["year",j,null]],m=l[6],n=m[1],o=m[2];for(a=0;a<l.length;a++){m=l[a],n=m[1],o=m[2];if(l[a+1]){var p=(n*o[o.length-1]+l[a+1][1])/2;if(bP<=p)break}}n==j&&bP<5*n&&(o=[1,2,5]),l=k(bP/n,o);var q;o=new Date(bp*L),o.setMilliseconds(0),n>=c&&o.setSeconds(n>=e?0:l*w(o.getSeconds()/l)),n>=e&&o[bk](n>=f?0:l*w(o[be]()/l)),n>=f&&o[bl](n>=g?0:l*w(o[bf]()/l)),n>=g&&o[bm](n>=i?1:l*w(o[bh]()/l)),n>=i&&(o[bn](n>=j?0:l*w(o[bi]()/l)),q=o[bj]()),n>=j&&(q-=q%l,o[bo](q)),n==h&&o[bm](o[bh]()-o[bg]()+d.startOfWeek),a=1,q=o[bj](),c=o.getTime()/L,e=o[bi]();for(f=o[bh]();c<bc&&a<ce;)bU.push(c),n==j?c=bd(q+a*l,0)/L:n==i?c=bd(q,e+a*l)/L:b||n!=g&&n!=h?c+=n*l:c=bd(q,e,f+a*l*(n==g?1:7)),a++;bU.push(c),bW=d.dateTimeLabelFormats[m[0]]}function k(a,b){var c;bR=b?1:u.pow(10,w(u.log(a)/u.LN10)),c=a/bR,b||(b=[1,2,2.5,5,10],d.allowDecimals===!1&&(bR==1?b=[1,2,5,10]:bR<=.1&&(b=[1/bR])));for(var e=0;e<b.length;e++){a=b[e];if(c<=(b[e]+(b[e+1]||b[e]))/2)break}a*=bR;return a}function j(a,b,c,e,f,h,i){var j,k,l,m=d.labels;b=="inside"&&(f=-f),H&&(f=-f),b=k=g(a+b$)+U,j=l=bT-g(a+b$)-U,I?(j=bT-bE-(H?ca:0)+Q,l=j+f):(b=bL+(H?ce:0)+Q,k=b-f),e&&cq.path(cq.crispLine([Y,b,j,Z,k,l],e)).attr({stroke:c,"stroke-width":e}).add(V);if(h&&m.enabled)if((a=bX.call({index:i,isFirst:a==bU[0],isLast:a==bU[bU.length-1],dateTimeLabelFormat:bW,value:bY&&bY[a]?bY[a]:a}))||a===0)b=b+m.x-(b$&&I?b$*T*(bZ?-1:1):0),j=j+m.y-(b$&&!I?b$*T*(bZ?1:-1):0),cq.text(a,b,j,m.style,m.rotation,m.align).add(V)}function i(a,b,c){a=y(a,bp),b=z(b,bc);var d=(b-a)*T;h(a+(b-a)/2,c,d)}function h(a,b,c){if(c){var d,e,f;d=g(a);var h;a=e=d+U,d=f=bT-d-U;if(I){d=bC,f=bT-bE;if(a<bL||a>bL+ce)h=!0}else{a=bL,e=bS-bD;if(d<bC||d>bC+ca)h=!0}h||cq.path(cq.crispLine([Y,a,d,Z,e,f],c)).attr({stroke:b,"stroke-width":c}).add(W)}}function g(a,b,c){var d=1,e=0;c&&(d*=-1,e=S),bZ&&(d*=-1,e-=d*S),bp===P?a=null:b?(bZ&&(a=S-a),a=a/T+bp):a=d*(a-bp)*T+e;return a}function f(){var a=[],c;X=$=null,_=[],br(co,function(e){c=!1,br(["xAxis","yAxis"],function(a){e.isCartesian&&(a=="xAxis"&&G||a=="yAxis"&&!G)&&(e.options[a]==d.index||e.options[a]===P&&d.index===0)&&(e[a]=K,_.push(e),c=!0)}),!e.visible&&bv.ignoreHiddenSeries&&(c=!1);if(c){var f,g;G||(f=e.options.stacking,bA=f=="percent",f&&(g=a[e.type]||[],a[e.type]=g),bA&&(X=0,$=99)),e.isCartesian&&(br(e.data,function(a){var c=a.x,d=a.y;X===null&&(X=$=a[R]),G?c>$?$=c:c<X&&(X=c):b(d)&&(f&&(g[c]=g[c]?g[c]+d:d),a=g?g[c]:d,bA||(a>$?$=a:a<X&&(X=a)),f&&(J[e.type][c]={total:a,cum:a}))}),/(area|column|bar)/.test(e.type)&&!G&&(X<0?$<0&&($=0,bz=!0):(X=0,bx=!0)))}})}var G=d.isX,H=d.opposite,I=cp?!G:G,J={bar:{},column:{},area:{},areaspline:{},line:{}};d=bu(G?bF:bG,I?H?bK:bJ:H?bI:bH,d);var K=this,M=d.type=="datetime",Q=d.offset||0,R=G?"x":"y",S=I?ce:ca,T,U=I?bL:bE,V,W,X,$,_,ba,bb,bc=null,bp=null,bq=d.minPadding,bs=d.maxPadding,bt=b(d.linkedTo),bx,bz,bA,bB=d.events,bM,bN=d.plotBands||[],bO=d.plotLines||[],bP,bQ,bR,bU,bV,bW,bX=d.labels.formatter||function(){var a=this.value;return bW?O(bW,a):a},bY=d.categories||G&&c.columnCount,bZ=d.reversed,b$=bY&&d.tickmarkPlacement=="between"?.5:0;cp&&G&&bZ===P&&(bZ=!0),H||(Q*=-1),I&&(Q*=-1),a(K,{addPlotBand:A,addPlotLine:A,adjustTickAmount:p,categories:bY,getExtremes:s,getThreshold:t,isXAxis:G,options:d,render:B,setExtremes:r,setScale:q,setCategories:F,translate:g,redraw:D,removePlotBand:C,removePlotLine:C,reversed:bZ,stacks:J});for(bM in bB)bw(K,bM,bB[bM]);q()}bF=bu(bF,N.xAxis),bG=bu(bG,N.yAxis),N.xAxis=N.yAxis=null,f=bu(N,f);var bv=f.chart,bA=bv.margin;bA=typeof bA=="number"?[bA,bA,bA,bA]:bA;var bC=e(bv.marginTop,bA[0]),bD=e(bv.marginRight,bA[1]),bE=e(bv.marginBottom,bA[2]),bL=e(bv.marginLeft,bA[3]),bN,bO,bQ,bR,bS,bT,bU=this;bA=bv.events;var bV,bW,bX,bY,bZ,b$,b_,ca,ce,cf,cg,ch,ci,cj,ck,cl=bv.showAxes,cm=[],cn,co=[],cp,cq,cr,cs,ct,cu,cv=function(b){function i(){z=x,A=w,B=G=0,F||(F=cq.g("legend").attr({zIndex:7}).add()),L&&K.reverse(),br(K,function(a){a.options.showInLegend&&(a=a.options.legendType=="point"?a.data:[a],br(a,f))}),L&&K.reverse(),I=H||G,J=B-w+v;if(D||E)I+=2*t,J+=2*t,C?C.attr({height:J,width:I}):C=cq.rect(0,0,I,J,j.borderRadius,D||0).attr({stroke:j.borderColor,"stroke-width":D||0,fill:E||X}).add(F).shadow(j.shadow);for(var b=["left","right","top","bottom"],c,d=4;d--;)c=b[d],p[c]&&p[c]!="auto"&&(j[d<2?"align":"verticalAlign"]=c,j[d<2?"x":"y"]=parseInt(p[c],10)*(d%2?-1:1));var e=bW(a({width:I,height:J},j));F.translate(e.x,e.y),br(o,function(a){var b=a.checkbox;b&&g(b,{left:e.x+a.legendItemWidth+b.x-40+W,top:e.y+b.y-11+W})})}function f(a){var b,e,f=a.legendItem;e=a.series||a,f||(e=/^(bar|pie|area|column)$/.test(e.type),a.legendItem=f=cq.text(j.labelFormatter.call(a),0,0).css(a.visible?q:s).on("mouseover",function(){a.setState(bb),f.css(r)}).on("mouseout",function(){f.css(a.visible?q:s),a.setState()}).on("click",function(){var b="legendItemClick",c=function(){a.setVisible()};a.firePointEvent?a.firePointEvent(b,null,c):by(a,b,null,c)}).attr({zIndex:2}).add(F),!e&&a.options&&a.options.lineWidth&&(a.legendLine=cq.path([Y,-m-n,0,Z,-n,0]).attr({"stroke-width":a.options.lineWidth,zIndex:2}).add(F)),e?b=cq.rect(-m-n,-11,m,12,2).attr({"stroke-width":0,zIndex:3}).add(F):a.options&&a.options.marker&&a.options.marker.enabled&&(b=cq.symbol(a.symbol,-m/2-n,-4,a.options.marker.radius).attr(a.pointAttr[ba]).attr({zIndex:3}).add(F)),a.legendSymbol=b,c(a,a.visible),a.options&&a.options.showCheckbox&&(a.checkbox=h("input",{type:"checkbox",checked:a.selected,defaultChecked:a.selected},j.itemCheckboxStyle,bQ),bw(a.checkbox,"click",function(b){b=b.target,by(a,"checkboxClick",{checked:b.checked},function(){a.select()})}))),d(a,z,A),b=f.getBBox(),B=A,a.legendItemWidth=b=j.itemWidth||m+n+b.width+u,k?(z+=b,G=H||y(z-x,G),z-x+b>(H||bS-2*t-x)&&(z=x,A+=v)):(A+=v,G=H||y(b,G)),o.push(a)}function e(a){for(var b=o.length,c=a.checkbox;b--;)if(o[b]==a){o.splice(b,1);break}br(["legendItem","legendLine","legendSymbol"],function(b){a[b]&&a[b].destroy()}),c&&l(a.checkbox)}function d(a,b,c){var d=a.legendItem,e=a.legendLine,f=a.legendSymbol;a=a.checkbox,d&&d.attr({x:b,y:c}),e&&e.translate(b,c-4),f&&f.translate(b,c),a&&(a.x=b,a.y=c)}function c(a,b){var c=a.legendItem,d=a.legendLine,e=a.legendSymbol,f=s.color,g=b?j.itemStyle.color:f;a=b?a.color:f,c&&c.css({color:g}),d&&d.attr({stroke:a}),e&&e.attr({stroke:a,fill:a})}var j=b.options.legend;if(j.enabled){var k=j.layout=="horizontal",m=j.symbolWidth,n=j.symbolPadding,o=[],p=j.style,q=j.itemStyle,r=j.itemHoverStyle,s=j.itemHiddenStyle,t=parseInt(p.padding,10),u=20,v=j.lineHeight||16,w=18,x=4+t+m+n,z,A,B,C,D=j.borderWidth,E=j.backgroundColor,F,G,H=j.width,I,J,K=b.series,L=j.reversed;i();return{colorizeItem:c,destroyItem:e,renderLegend:i}}};bX=function(a,b){var c=0,d=0;return a>=c&&a<=c+ce&&b>=d&&b<=d+ca},cu=function(){by(bU,"selection",{resetSelection:!0},ct),bU.toolbar.remove("zoom")},ct=function(a){var b=N.lang;bU.toolbar.add("zoom",b.resetZoom,b.resetZoomTitle,cu),!a||a.resetSelection?br(cm,function(a){a.setExtremes(null,null,!1)}):br(a.xAxis.concat(a.yAxis),function(a){var b=a.axis;bU.tracker[b.isXAxis?"zoomX":"zoomY"]&&b.setExtremes(a.min,a.max,!1)}),B()},bW=function(a){var b=a.align,c=a.verticalAlign,d=a.x||0,e=a.y||0,f={x:d||0,y:e||0};/^(right|center)$/.test(b)&&(f.x=(bS-a.width)/({right:1,center:2})[b]+d),/^(bottom|middle)$/.test(c)&&(f.y=(bT-a.height)/({bottom:1,middle:2})[c]+e);return f},I=H=0,bw(t,"unload",bp);if(bA)for(bV in bA)bw(bU,bV,bA[bV]);bU.options=f,bU.series=co,bU.addSeries=q,bU.destroy=bp,bU.get=F,bU.getAlignment=bW,bU.getSelectedPoints=M,bU.getSelectedSeries=V,bU.hideLoading=D,bU.isInsidePlot=bX,bU.redraw=B,bU.showLoading=C,bq()}function p(){}function o(a){for(var b={x:a.offsetLeft,y:a.offsetTop};a.offsetParent;)a=a.offsetParent,b.x+=a.offsetLeft,b.y+=a.offsetTop,a!=s.body&&a!=s.documentElement&&(b.x-=a.scrollLeft,b.y-=a.scrollTop);return b}function n(a,b,c,d){var e=N.lang;a=a;var f=isNaN(b=A(b))?2:b;b=c===undefined?e.decimalPoint:c,d=d===undefined?e.thousandsSep:d,e=a<0?"-":"",c=parseInt(a=A(+a||0).toFixed(f),10)+"";var g=(g=c.length)>3?g%3:0;return e+(g?c.substr(0,g)+d:"")+c.substr(g).replace(/(\d{3})(?=\d)/g,"$1"+d)+(f?b+A(a-c).toFixed(f).slice(2):"")}function m(b,c){var d=function(){};d.prototype=new b,a(d.prototype,c);return d}function l(a){M||(M=h(Q)),a&&M.appendChild(a),M.innerHTML=""}function k(){return N}function j(a){N=bu(N,a),i();return N}function i(){var a=N.global.useUTC;bd=a?Date.UTC:function(a,b,c,d,f,g){return(new Date(a,b,e(c,1),e(d,0),e(f,0),e(g,0))).getTime()},be=a?"getUTCMinutes":"getMinutes",bf=a?"getUTCHours":"getHours",bg=a?"getUTCDay":"getDay",bh=a?"getUTCDate":"getDate",bi=a?"getUTCMonth":"getMonth",bj=a?"getUTCFullYear":"getFullYear",bk=a?"setUTCMinutes":"setMinutes",bl=a?"setUTCHours":"setHours",bm=a?"setUTCDate":"setDate",bn=a?"setUTCMonth":"setMonth",bo=a?"setUTCFullYear":"setFullYear"}function h(b,c,d,e,f){b=s.createElement(b),c&&a(b,c),f&&g(b,{padding:0,border:X,margin:0}),d&&g(b,d),e&&e.appendChild(b);return b}function g(b,c){E&&(c&&c.opacity!==P&&(c.filter="alpha(opacity="+c.opacity*100+")")),a(b.style,c)}function f(a){var b="",c;for(c in a)b+=bv(c)+":"+a[c]+";";return b}function e(){var a=arguments,c,d;for(c=0;c<a.length;c++){d=a[c];if(b(d))return d}}function d(a){if(!a||a.constructor!=Array)a=[a];return a}function c(a,c,d){var e,f="setAttribute",g;if(typeof c=="string")b(d)?a[f](c,d):a&&a.getAttribute&&(g=a.getAttribute(c));else if(b(c)&&typeof c=="object")for(e in c)a[f](e,c[e]);return g}function b(a){return a!==P&&a!==null}function a(a,b){a||(a={});for(var c in b)a[c]=b[c];return a}var s=document,t=window,u=Math,v=u.round,w=u.floor,x=u.ceil,y=u.max,z=u.min,A=u.abs,B=u.cos,C=u.sin,D=navigator.userAgent,E=/msie/i.test(D)&&!t.opera,F=/AppleWebKit/.test(D),G=t.SVGAngle||s.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure","1.1"),H,I,J={},K=0,L=1,M,N,O,P,Q="div",R="absolute",S="relative",T="hidden",U="highcharts-",V="visible",W="px",X="none",Y="M",Z="L",_="rgba(192,192,192,"+(G?1e-6:.002)+")",ba="",bb="hover",bc="select",bd,be,bf,bg,bh,bi,bj,bk,bl,bm,bn,bo,bp=t.HighchartsAdapter,bq=bp||{},br=bq.each,bs=bq.grep,bt=bq.map,bu=bq.merge,bv=bq.hyphenate,bw=bq.addEvent,bx=bq.removeEvent,by=bq.fireEvent,bz=bq.animate,bA=bq.stop;bq=bq.getAjax;var bB={};if(!bp&&t.jQuery){var bC=jQuery;br=function(a,b){for(var c=0,d=a.length;c<d;c++)if(b.call(a[c],a[c],c,a)===!1)return c},bs=bC.grep,bt=function(a,b){for(var c=[],d=0,e=a.length;d<e;d++)c[d]=b.call(a[d],a[d],d,a);return c},bu=function(){var a=arguments;return bC.extend(!0,null,a[0],a[1],a[2],a[3])},bv=function(a){return a.replace(/([A-Z])/g,function(a,b){return"-"+b.toLowerCase()})},bw=function(a,b,c){bC(a).bind(b,c)},bx=function(a,b,c){var d=s.removeEventListener?"removeEventListener":"detachEvent";s[d]&&!a[d]&&(a[d]=function(){}),bC(a).unbind(b,c)},by=function(b,c,d,e){var f=bC.Event(c),g="detached"+c;a(f,d),b[c]&&(b[g]=b[c],b[c]=null),bC(b).trigger(f),b[g]&&(b[c]=b[g],b[g]=null),e&&!f.isDefaultPrevented()&&e(f)},bz=function(a,b,c){a=bC(a),a.stop(),a.animate(b,c)},bA=function(a){bC(a).stop()},bq=function(a,b){bC.get(a,null,b)},bC.extend(bC.easing,{easeOutQuad:function(a,b,c,d,e){return-d*(b/=e)*(b-2)+c}});var bD=jQuery.fx.step._default,bE=jQuery.fx.prototype.cur;bC.fx.step._default=function(a){var b=a.elem;b.attr?b.attr(a.prop,a.now):bD.apply(this,arguments)},bC.fx.prototype.cur=function(){var a=this.elem;return a=a.attr?a.attr(this.prop):bE.apply(this,arguments)}}else!bp&&t.MooTools&&(br=$each,bt=function(a,b){return a.map(b)},bs=function(a,b){return a.filter(b)},bu=$merge,bv=function(a){return a.hyphenate()},bw=function(b,c,d){typeof c=="string"&&(c=="unload"&&(c="beforeunload"),b.addEvent||(b.nodeName?b=$(b):a(b,new Events)),b.addEvent(c,d))},bx=function(a,b,c){b&&(b=="unload"&&(b="beforeunload"),a.removeEvent(b,c))},by=function(b,c,d,e){c=new Event({type:c,target:b}),c=a(c,d),c.preventDefault=function(){e=null},b.fireEvent&&b.fireEvent(c.type,c),e&&e(c)},bz=function(b,c,d){var e=b.attr;e&&!b.setStyle&&(b.setStyle=b.getStyle=b.attr,b.$family=b.uid=!0),bA(b),d=new Fx.Morph(e?b:$(b),a(d,{transition:Fx.Transitions.Quad.easeInOut})),d.start(c),b.fx=d},bA=function(a){a.fx&&a.fx.cancel()},bq=function(a,b){(new Request({url:a,method:"get",onSuccess:b})).send()});bp={enabled:!0,align:"center",x:0,y:15,style:{color:"#666",fontSize:"11px"}},N={colors:["#4572A7","#AA4643","#89A54E","#80699B","#3D96AE","#DB843D","#92A8CD","#A47D7C","#B5CA92"],symbols:["circle","diamond","square","triangle","triangle-down"],lang:{loading:"Loading...",months:["January","February","March","April","May","June","July","August","September","October","November","December"],weekdays:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],decimalPoint:".",resetZoom:"Reset zoom",resetZoomTitle:"Reset zoom level 1:1",thousandsSep:","},global:{useUTC:!0},chart:{margin:[50,50,90,80],borderColor:"#4572A7",borderRadius:5,defaultSeriesType:"line",ignoreHiddenSeries:!0,style:{fontFamily:'"Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif',fontSize:"12px"},backgroundColor:"#FFFFFF",plotBorderColor:"#C0C0C0"},title:{text:"Chart title",x:0,y:20,align:"center",style:{color:"#3E576F",fontSize:"16px"}},subtitle:{text:"",x:0,y:40,align:"center",style:{color:"#6D869F"}},plotOptions:{line:{allowPointSelect:!1,showCheckbox:!1,animation:!0,events:{},lineWidth:2,shadow:!0,marker:{enabled:!0,lineWidth:0,radius:4,lineColor:"#FFFFFF",states:{hover:{},select:{fillColor:"#FFFFFF",lineColor:"#000000",lineWidth:2}}},point:{events:{}},dataLabels:bu(bp,{enabled:!1,y:-6,formatter:function(){return this.y}}),showInLegend:!0,states:{hover:{lineWidth:3,marker:{}},select:{marker:{}}},stickyTracking:!0}},labels:{style:{position:R,color:"#3E576F"}},legend:{enabled:!0,align:"center",layout:"horizontal",labelFormatter:function(){return this.name},borderWidth:1,borderColor:"#909090",borderRadius:5,shadow:!1,style:{padding:"5px"},itemStyle:{cursor:"pointer",color:"#3E576F"},itemHoverStyle:{cursor:"pointer",color:"#000000"},itemHiddenStyle:{color:"#C0C0C0"},itemCheckboxStyle:{position:R,width:"13px",height:"13px"},symbolWidth:16,symbolPadding:5,verticalAlign:"bottom",x:15,y:-15},loading:{hideDuration:100,labelStyle:{fontWeight:"bold",position:S,top:"1em"},showDuration:100,style:{position:R,backgroundColor:"white",opacity:.5,textAlign:"center"}},tooltip:{enabled:!0,formatter:function(){var a=this,c=a.series,d=c.xAxis,e=a.x;return"<b>"+(a.point.name||c.name)+"</b><br/>"+(b(e)?"X value: "+(d&&d.options.type=="datetime"?O(null,e):e)+"<br/>":"")+"Y value: "+a.y},backgroundColor:"rgba(255, 255, 255, .85)",borderWidth:2,borderRadius:5,shadow:!0,snap:10,style:{color:"#333333",fontSize:"12px",padding:"5px",whiteSpace:"nowrap"}},toolbar:{itemStyle:{color:"#4572A7",cursor:"pointer"}},credits:{enabled:!0,text:"Highcharts.com",href:"http://www.highcharts.com",style:{cursor:"pointer",color:"#909090",fontSize:"10px"}}};var bF={dateTimeLabelFormats:{second:"%H:%M:%S",minute:"%H:%M",hour:"%H:%M",day:"%e. %b",week:"%e. %b",month:"%b '%y",year:"%Y"},endOnTick:!1,gridLineColor:"#C0C0C0",labels:bp,lineColor:"#C0D0E0",lineWidth:1,max:null,min:null,minPadding:.01,maxPadding:.01,maxZoom:null,minorGridLineColor:"#E0E0E0",minorGridLineWidth:1,minorTickColor:"#A0A0A0",minorTickLength:2,minorTickPosition:"outside",minorTickWidth:1,showFirstLabel:!0,showLastLabel:!1,startOfWeek:1,startOnTick:!1,tickColor:"#C0D0E0",tickLength:5,tickmarkPlacement:"between",tickPixelInterval:100,tickPosition:"outside",tickWidth:1,title:{align:"middle",margin:35,style:{color:"#6D869F",fontWeight:"bold"}},type:"linear"},bG=bu(bF,{endOnTick:!0,gridLineWidth:1,tickPixelInterval:72,showLastLabel:!0,labels:{align:"right",x:-8,y:3},lineWidth:0,maxPadding:.05,minPadding:.05,startOnTick:!0,tickWidth:0,title:{margin:40,rotation:270,text:"Y-values"}}),bH={labels:{align:"right",x:-8,y:3},title:{rotation:270}},bI={labels:{align:"left",x:8,y:3},title:{rotation:90}},bJ={labels:{align:"center",x:0,y:14},title:{rotation:0}},bK=bu(bJ,{labels:{y:-5}});bp=N.plotOptions,bq=bp.line,bp.spline=bu(bq),bp.scatter=bu(bq,{lineWidth:0,states:{hover:{lineWidth:0}}}),bp.area=bu(bq,{}),bp.areaspline=bu(bp.area),bp.column=bu(bq,{borderColor:"#FFFFFF",borderWidth:1,borderRadius:0,groupPadding:.2,marker:null,pointPadding:.1,minPointLength:0,states:{hover:{brightness:.1,shadow:!1},select:{color:"#C0C0C0",borderColor:"#000000",shadow:!1}}}),bp.bar=bu(bp.column,{dataLabels:{align:"left",x:5,y:0}}),bp.pie=bu(bq,{borderColor:"#FFFFFF",borderWidth:1,center:["50%","50%"],colorByPoint:!0,legendType:"point",marker:null,size:"90%",slicedOffset:10,states:{hover:{brightness:.1,shadow:!1}}}),i();var bL=function(a){function e(a){f[3]=a;return this}function d(a){if(typeof a=="number"&&a!==0)for(var b=0;b<3;b++)f[b]+=parseInt(a*255,10),f[b]<0&&(f[b]=0),f[b]>255&&(f[b]=255);return this}function c(b){return b=f&&!isNaN(f[0])?b=="rgb"?"rgb("+f[0]+","+f[1]+","+f[2]+")":b=="a"?f[3]:"rgba("+f.join(",")+")":a}function b(a){if(g=/rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]?(?:\.[0-9]+)?)\s*\)/.exec(a))f=[parseInt(g[1],10),parseInt(g[2],10),parseInt(g[3],10),parseFloat(g[4],10)];else if(g=/#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(a))f=[parseInt(g[1],16),parseInt(g[2],16),parseInt(g[3],16),1]}var f=[],g;b(a);return{get:c,brighten:d,setOpacity:e}};O=function(a,c,d){function f(a){return a.toString().replace(/^([0-9])$/,"0$1")}if(!b(c)||isNaN(c))return"Invalid date";a=e(a,"%Y-%m-%d %H:%M:%S"),c=new Date(c*L);var g=c[bf](),h=c[bg](),i=c[bh](),j=c[bi](),k=c[bj](),l=N.lang,m=l.weekdays;l=l.months,c={a:m[h].substr(0,3),A:m[h],d:f(i),e:i,b:l[j].substr(0,3),B:l[j],m:f(j+1),y:k.toString().substr(2,2),Y:k,H:f(g),I:f(g%12||12),l:g%12||12,M:f(c[be]()),p:g<12?"AM":"PM",P:g<12?"am":"pm",S:f(c.getSeconds())};for(var n in c)a=a.replace("%"+n,c[n]);return d?a.substr(0,1).toUpperCase()+a.substr(1):a},p.prototype={init:function(a,b){this.element=s.createElementNS("http://www.w3.org/2000/svg",b),this.renderer=a},animate:function(a,b){bz(this,a,b)},attr:function(a,d){var e,f,g,h=this.element,i=h.nodeName,j=this.renderer,k,l=this.shadows,m,n=this;typeof a=="string"&&b(d)&&(e=a,a={},a[e]=d);if(typeof a=="string")e=a,i=="circle"?e=({x:"cx",y:"cy"})[e]||e:e=="strokeWidth"&&(e="stroke-width"),n=parseFloat(c(h,e)||this[e]||0);else for(e in a){d=a[e];if(e=="d")d&&d.join&&(d=d.join(" ")),/(NaN|  |^$)/.test(d)&&(d="M 0 0");else if(e=="x"&&i=="text")for(f=0;f<h.childNodes.length;f++)g=h.childNodes[f],c(g,"x")==c(h,"x")&&c(g,"x",d);else e=="fill"?d=j.color(d,h,e):i=="circle"?e=({x:"cx",y:"cy"})[e]||e:e=="translateX"||e=="translateY"?(this[e]=d,this.updateTransform(),k=!0):e=="stroke"?d=j.color(d,h,e):e=="isTracker"&&(this[e]=d);e=="strokeWidth"&&(e="stroke-width"),F&&e=="stroke-width"&&d===0&&(d=1e-6),this.symbolName&&/^(x|y|r|start|end|innerR)/.test(e)&&(m||(this.symbolAttr(a),m=!0),k=!0);if(l&&/^(width|height|visibility|x|y|d)$/.test(e))for(f=l.length;f--;)c(l[f],e,d);e=="text"?j.buildText(h,d):k||c(h,e,d)}return n},symbolAttr:function(a){var b=this;b.x=e(a.x,b.x),b.y=parseFloat(e(a.y,b.y)),b.r=e(a.r,b.r),b.start=e(a.start,b.start),b.end=e(a.end,b.end),b.width=e(a.width,b.width),b.height=parseFloat(e(a.height,b.height)),b.innerR=e(a.innerR,b.innerR),b.attr({d:b.renderer.symbols[b.symbolName](b.x,b.y,b.r,{start:b.start,end:b.end,width:b.width,height:b.height,innerR:b.innerR})})},clip:function(a){return this.attr("clip-path","url("+this.renderer.url+"#"+a.id+")")},css:function(b){var c=this;b&&b.color&&(b.fill=b.color),b=a(c.styles,b),c.attr({style:f(b)}),c.styles=b;return c},on:function(a,b){this.element["on"+a]=b;return this},translate:function(a,b){var c=this;c.translateX=a,c.translateY=b,c.updateTransform();return c},invert:function(){var a=this;a.inverted=!0,a.updateTransform();return a},updateTransform:function(){var a=this,b=a.translateX||0,d=a.translateY||0,e=a.inverted,f=[];e&&(b+=a.attr("width"),d+=a.attr("height")),(b||d)&&f.push("translate("+b+","+d+")"),e&&f.push("rotate(90) scale(-1,1)"),f.length&&c(a.element,"transform",f.join(" "))},toFront:function(){var a=this.element;a.parentNode.appendChild(a);return this},getBBox:function(){return this.element.getBBox()},show:function(){return this.attr({visibility:V})},hide:function(){return this.attr({visibility:T})},add:function(a){var d=this.renderer,e=a||d;d=e.element||d.box;var f=d.childNodes,g=this.element,h=c(g,"zIndex"),i;this.parentInverted=a&&a.inverted,h&&(e.handleZ=!0,h=parseInt(h,10));if(e.handleZ)for(i=0;i<f.length;i++){a=f[i],e=c(a,"zIndex");if(a!=g&&(parseInt(e,10)>h||!b(h)&&b(e))){d.insertBefore(g,a);return this}}d.appendChild(g);return this},destroy:function(){var a=this,b=a.element,c=a.shadows,d=b.parentNode,e;b.onclick=b.onmouseout=b.onmouseover=b.onmousemove=null,bA(a),d&&d.removeChild(b),c&&br(c,function(a){(d=a.parentNode)&&d.removeChild(a)});for(e in a)delete a[e];return null},empty:function(){for(var a=this.element,b=a.childNodes,c=b.length;c--;)a.removeChild(b[c])},shadow:function(a){var b=[],d,e=this.element,f=this.parentInverted?"(-1,-1)":"(1,1)";if(a){for(a=1;a<=3;a++)d=e.cloneNode(0),c(d,{isShadow:"true",stroke:"rgb(0, 0, 0)","stroke-opacity":.05*a,"stroke-width":7-2*a,transform:"translate"+f,fill:X}),e.parentNode.insertBefore(d,e),b.push(d);this.shadows=b}return this}};var bM=function(){this.init.apply(this,arguments)};bM.prototype={init:function(a,b,d){var e=s.createElementNS("http://www.w3.org/2000/svg","svg"),f=location;c(e,{width:b,height:d,xmlns:"http://www.w3.org/2000/svg",version:"1.1"}),a.appendChild(e),this.Element=p,this.box=e,this.url=E?"":f.href.replace(/#.*?$/,""),this.defs=this.createElement("defs").add()},createElement:function(a){var b=new this.Element;b.init(this,a);return b},buildText:function(a,b){b=b.toString().replace(/<(b|strong)>/g,'<span style="font-weight:bold">').replace(/<(i|em)>/g,'<span style="font-style:italic">').replace(/<a/g,"<span").replace(/<\/(b|strong|i|em|a)>/g,"</span>").split(/<br[^>]?>/g);for(var d=a.childNodes,e=/style="([^"]+)"/,f=/href="([^"]+)"/,h=c(a,"x"),i=d.length;i--;)a.removeChild(d[i]);br(b,function(b,d){var i,j=0;b=b.replace(/<span/g,"|||<span").replace(/<\/span>/g,"</span>|||"),i=b.split("|||"),br(i,function(b){if(b!==""||i.length==1){var k={},l=s.createElementNS("http://www.w3.org/2000/svg","tspan");e.test(b)&&c(l,"style",b.match(e)[1].replace(/(;| |^)color([ :])/,"$1fill$2")),f.test(b)&&(c(l,"onclick",'location.href="'+b.match(f)[1]+'"'),g(l,{cursor:"pointer"})),b=b.replace(/<(.|\n)*?>/g,""),l.appendChild(s.createTextNode(b||" ")),j?k.dx=3:k.x=h,d&&!j&&(k.dy=16),c(l,k),a.appendChild(l),j++}})})},crispLine:function(a,b){a[1]==a[4]&&(a[1]=a[4]=v(a[1])+b%2/2),a[2]==a[5]&&(a[2]=a[5]=v(a[2])+b%2/2);return a},path:function(a){return this.createElement("path").attr({d:a,fill:X})},circle:function(a,b,c){a=typeof a=="object"?a:{x:a,y:b,r:c};return this.createElement("circle").attr(a)},arc:function(a,b,c,d,e,f){typeof a=="object"&&(b=a.y,c=a.r,d=a.innerR,e=a.start,f=a.end,a=a.x);return this.symbol("arc",a||0,b||0,c||0,{innerR:d||0,start:e||0,end:f||0})},rect:function(b,c,d,e,f,g){if(arguments.length>1){var h=(g||0)%2/2;b=v(b||0)+h,c=v(c||0)+h,d=v((d||0)-2*h),e=v((e||0)-2*h)}h=typeof b=="object"?b:{x:b,y:c,width:y(d,0),height:y(e,0)};return this.createElement("rect").attr(a(h,{rx:f||h.r,ry:f||h.r,fill:X}))},g:function(a){return this.createElement("g").attr(b(a)&&{"class":U+a})},image:function(a,b,c,d,e){b=this.createElement("image").attr({x:b,y:c,width:d,height:e,preserveAspectRatio:X}),b.element.setAttributeNS("http://www.w3.org/1999/xlink","href",a);return b},symbol:function(b,c,d,e,f){var g,i=this.symbols[b];i=i&&i(c,d,e,f);var j=/^url\((.*?)\)$/;i?(g=this.path(i),a(g,{symbolName:b,x:c,y:d,r:e}),f&&a(g,f)):j.test(b)?(b=b.match(j)[1],g=this.image(b).attr({visibility:T}),h("img",{onload:function(){var a=this;a=J[a.src]||[a.width,a.height],g.attr({x:v(c-a[0]/2)+W,y:v(d-a[1]/2)+W,width:a[0],height:a[1],visibility:"inherit"})},src:b})):g=this.circle(c,d,e);return g},symbols:{square:function(a,b,c){c=.707*c;return[Y,a-c,b-c,Z,a+c,b-c,a+c,b+c,a-c,b+c,"Z"]},triangle:function(a,b,c){return[Y,a,b-1.33*c,Z,a+c,b+.67*c,a-c,b+.67*c,"Z"]},"triangle-down":function(a,b,c){return[Y,a,b+1.33*c,Z,a-c,b-.67*c,a+c,b-.67*c,"Z"]},diamond:function(a,b,c){return[Y,a,b-c,Z,a+c,b,a,b+c,a-c,b,"Z"]},arc:function(a,b,c,d){var e=Math.PI,f=d.start,g=d.end-1e-6,h=d.innerR,i=B(f),j=C(f),k=B(g);g=C(g),d=d.end-f<e?0:1;return[Y,a+c*i,b+c*j,"A",c,c,0,d,1,a+c*k,b+c*g,Z,a+h*k,b+h*g,"A",h,h,0,d,0,a+h*i,b+h*j,"Z"]}},clipRect:function(a,b,c,d){var e=U+K++,f=this.createElement("clipPath").attr({id:e}).add(this.defs);a=this.rect(a,b,c,d,0).add(f),a.id=e;return a},color:function(a,b,d){var e,f=/^rgba/;if(a&&a.linearGradient){var g=this;b="linearGradient",d=a[b];var h=U+K++,i,j,k;i=g.createElement(b).attr({id:h,gradientUnits:"userSpaceOnUse",x1:d[0],y1:d[1],x2:d[2],y2:d[3]}).add(g.defs),br(a.stops,function(a){f.test(a[1])?(e=bL(a[1]),j=e.get("rgb"),k=e.get("a")):(j=a[1],k=1),g.createElement("stop").attr({offset:a[0],"stop-color":j,"stop-opacity":k}).add(i)});return"url("+this.url+"#"+h+")"}if(f.test(a)){e=bL(a),c(b,d+"-opacity",e.get("a"));return e.get("rgb")}return a},text:function(b,c,d,g,h,i){g=g||{},i=i||"left",h=h||0;var j=g.color||"#000000",k=N.chart.style;c=v(e(c,0)),d=v(e(d,0)),a(g,{fontFamily:g.fontFamily||k.fontFamily,fontSize:g.fontSize||k.fontSize}),g=f(g),b={x:c,y:d,text:b,fill:j,style:g.replace(/"/g,"'")};if(h||i!="left")b=a(b,{"text-anchor":({left:"start",center:"middle",right:"end"})[i],transform:"rotate("+h+" "+c+" "+d+")"});return this.createElement("text").attr(b)}};var bN;if(!G){var bO=m(p,{init:function(a,b){var c=["<",b,' filled="f" stroked="f"'],d=["position: ",R,";"];(b=="shape"||b==Q)&&d.push("left:0;top:0;width:10px;height:10px"),c.push(' style="',d.join(""),'"/>'),b&&(c=b==Q||b=="span"||b=="img"?c.join(""):a.prepVML(c),this.element=h(c)),this.renderer=a},add:function(a){var b=this,c=b.renderer,d=b.element,e=c.box;c=a&&a.inverted,a=a?a.element||a:e,c&&(c=a.style,g(d,{flip:"x",left:parseInt(c.width,10)-10,top:parseInt(c.height,10)-10,rotation:-90})),a.appendChild(d);return b},attr:function(a,d){var f,h,i,j=this.element,k=j.style,l=j.nodeName,m=this.renderer,n=this.symbolName,o,p=this.shadows,q=s.documentMode,r,t=this;typeof a=="string"&&b(d)&&(f=a,a={},a[f]=d);if(typeof a=="string")f=a,t=f=="strokeWidth"||f=="stroke-width"?j.strokeweight:e(this[f],parseInt(k[({x:"left",y:"top"})[f]||f],10));else for(f in a){h=a[f],r=!1;if(n&&/^(x|y|r|start|end|width|height|innerR)/.test(f))o||(this.symbolAttr(a),o=!0),r=!0;else if(f=="d"){i=h.length;for(r=[];i--;)r[i]=typeof h[i]=="number"?v(h[i]*10)-5:h[i]=="Z"?"x":h[i];h=r.join(" ")||"x",j.path=h;if(p)for(i=p.length;i--;)p[i].path=h;r=!0}else if(f=="zIndex"||f=="visibility")k[f]=h,q==8&&f=="visibility"&&l=="DIV"&&br(j.childNodes,function(a){g(a,{visibility:h})}),r=!0;else if(/^(width|height)$/.test(f))k[f]=h,this.updateClipping&&this.updateClipping(),r=!0;else if(/^(x|y)$/.test(f))f=="y"&&j.tagName=="SPAN"&&j.lineHeight&&(h-=j.lineHeight),k[({x:"left",y:"top"})[f]]=h;else if(f=="class")j.className=h;else if(f=="stroke")h=m.color(h,j,f),f="strokecolor";else if(f=="stroke-width"||f=="strokeWidth")j.stroked=h?!0:!1,f="strokeweight",typeof h=="number"&&(h+=W);else if(f=="fill")l=="SPAN"?k.color=h:(j.filled=h!=X?!0:!1,h=m.color(h,j,f),f="fillcolor");else if(f=="translateX"||f=="translateY")this[f]=d,this.updateTransform(),r=!0;if(p&&f=="visibility")for(i=p.length;i--;)p[i].style[f]=h;f=="text"?j.innerHTML=h:r||(q==8?j[f]=h:c(j,f,h))}return t},clip:function(a){var b=this,c=a.members,d=c.length;c.push(b),b.destroyClip=function(){c.splice(d,1)};return b.css(a.getCSS(b.inverted))},css:function(a){var b=this;g(b.element,a);return b},destroy:function(){var a=this;a.destroyClip&&a.destroyClip(),p.prototype.destroy.apply(this)},empty:function(){var a=this.element;a=a.childNodes;for(var b=a.length,c;b--;)c=a[b],c.parentNode.removeChild(c)},getBBox:function(){var a=this.element,b,c=a.offsetWidth,d=a.parentNode;c||s.body.appendChild(a),b={x:a.offsetLeft,y:a.offsetTop,width:a.offsetWidth,height:a.offsetHeight},c||(d?d.appendChild(a):s.body.removeChild(a));return b},on:function(a,b){this.element["on"+a]=function(){var a=t.event;a.target=a.srcElement,b(a)};return this},updateTransform:function(){var a=this,b=a.translateX||0,c=a.translateY||0;(b||c)&&a.css({left:b,top:c})},shadow:function(a){var b=[],c=this.element,d=this.renderer,e,f=c.style,g,i=c.path;""+c.path==""&&(i="x");if(a){for(a=1;a<=3;a++)g=['<shape isShadow="true" strokeweight="',7-2*a,'" filled="false" path="',i,'" coordsize="100,100" style="',c.style.cssText,'" />'],e=h(d.prepVML(g),null,{left:parseInt(f.left,10)+1,top:parseInt(f.top,10)+1}),g=['<stroke color="black" opacity="',.05*a,'"/>'],h(d.prepVML(g),null,null,e),c.parentNode.insertBefore(e,c),b.push(e);this.shadows=b}return this}});bN=function(){this.init.apply(this,arguments)},bN.prototype=bu(bM.prototype,{isIE8:D.indexOf("MSIE 8.0")>-1,init:function(a,b,c){this.width=b,this.height=c,this.box=h(Q,null,{width:b+W,height:c+W},a),this.Element=bO,s.namespaces.hcv||(s.namespaces.add("hcv","urn:schemas-microsoft-com:vml"),s.createStyleSheet().cssText="hcv\\:fill, hcv\\:path, hcv\\:textpath, hcv\\:shape, hcv\\:stroke, hcv\\:line { behavior:url(#default#VML); display: inline-block; } ")},clipRect:function(b,c,d,e){var f=this.createElement();return a(f,{members:[],element:{style:{left:b,top:c,width:d,height:e}},getCSS:function(b){var c=f.element.style,d=c.top,e=c.left,g=e+c.width;c=d+c.height,d={clip:"rect("+(b?e:d)+"px,"+(b?c:g)+"px,"+(b?g:c)+"px,"+(b?d:e)+"px)"},!b&&s.documentMode==8&&a(d,{width:g+W,height:c+W});return d},updateClipping:function(){br(f.members,function(a){a.css(f.getCSS(a.inverted))})}})},color:function(a,b,c){var d,e=/^rgba/;if(!a||!a.linearGradient){if(e.test(a)){d=bL(a),c=["<",c,' opacity="',d.get("a"),'"/>'],h(this.prepVML(c),null,null,b);return d.get("rgb")}return a}var f,g,i=a.linearGradient,j,k,l,m;br(a.stops,function(a,b){e.test(a[1])?(d=bL(a[1]),f=d.get("rgb"),g=d.get("a")):(f=a[1],g=1),b?(l=f,m=g):(j=f,k=g)}),a=90-u.atan((i[3]-i[1])/(i[2]-i[0]))*180/u.PI,c=["<",c,' colors="0% ',j,",100% ",l,'" angle="',a,'" opacity="',m,'" o:opacity2="',k,'" type="gradient" focus="100%" />'],h(this.prepVML(c),null,null,b)},prepVML:function(a){var b="display:inline-block;behavior:url(#default#VML);",c=this.isIE8;try{a=a.join("")}catch(d){for(var e="",f=0;f<a.length;f++)e+=a[f];a=e}c?(a=a.replace("/>",' xmlns="urn:schemas-microsoft-com:vml" />'),a=a.indexOf('style="')==-1?a.replace("/>",' style="'+b+'" />'):a.replace('style="','style="'+b)):a=a.replace("<","<hcv:");return a},text:function(b,c,d,e,i,j){e=e||{},j=j||"left",i=i||0;var k=v(parseInt(e.fontSize||12,10)*1.2),l=N.chart.style;c=v(c),d=v(d),a(e,{color:e.color||"#000000",whiteSpace:"nowrap",fontFamily:e.fontFamily||l.fontFamily,fontSize:e.fontSize||l.fontSize});if(i){l=(i||0)*u.PI*2/360,i=B(l),l=C(l);var m=10;k=k*.3;var n=j=="left",o=j=="right",p=n?c:c-m*i;c=o?c:c+m*i,n=n?d:d-m*l,d=o?d:d+m*l,p+=k*l,c+=k*l,n-=k*i,d-=k*i,A(p-c)<.1&&(p+=.1),A(n-d)<.1&&(n+=.1),d=this.createElement("line").attr({from:p+", "+n,to:c+", "+d}),i=d.element,h("hcv:fill",{on:!0,color:e.color},null,i),h("hcv:path",{textpathok:!0},null,i),h('<hcv:textpath style="v-text-align:'+j+";"+f(e).replace(/"/g,"'")+'" on="true" string="'+b.toString().replace(/<br[^>]?>/g,"\n")+'">',null,null,i)}else d=this.createElement("span").attr({x:c,y:d-k,text:b}),i=d.element,i.lineHeight=k,g(i,e),j!="left"&&(b=d.getBBox().width,g(i,{left:c-b/({right:1,center:2})[j]+W}));return d},path:function(a){return this.createElement("shape").attr({coordsize:"100 100",d:a})},circle:function(a,b,c){return this.path(this.symbols.circle(a,b,c))},g:function(a){var b;a&&(b={className:U+a,"class":U+a});return a=this.createElement(Q).attr(b)},image:function(a,b,c,d,e){return this.createElement("img").attr({src:a}).css({left:b,top:c,width:d,height:e})},rect:function(a,b,c,d,e,f){if(arguments.length>1){var g=(f||0)%2/2;a=v(a||0)+g,b=v(b||0)+g,c=v((c||0)-2*g),d=v((d||0)-2*g)}typeof a=="object"&&(b=a.y,c=a.width,d=a.height,e=a.r,a=a.x);return this.symbol("rect",a||0,b||0,e||0,{width:c||0,height:d||0})},symbol:function(a,b,c){var d;d=/^url\((.*?)\)$/;return d=d.test(a)?this.createElement("img").attr({onload:function(){var a=this,d=[a.width,a.height];g(a,{left:v(b-d[0]/2),top:v(c-d[1]/2)})},src:a.match(d)[1]}):bM.prototype.symbol.apply(this,arguments)},symbols:{arc:function(a,b,c,d){var e=d.start,f=d.end,g=f-e==2*Math.PI?f-.001:f,h=B(e),i=C(e),j=B(g);g=C(g),d=d.innerR;if(f-e===0)return["x"];return["wa",a-c,b-c,a+c,b+c,a+c*h,b+c*i,a+c*j,b+c*g,"at",a-d,b-d,a+d,b+d,a+d*j,b+d*g,a+d*h,b+d*i,"x","e"]},circle:function(a,b,c){return["wa",a-c,b-c,a+c,b+c,a+c,b,a+c,b,"e"]},rect:function(a,b,c,d){var e=d.width;d=d.height;var f=a+e,g=b+d;c=z(c,e,d);return[Y,a+c,b,Z,f-c,b,"wa",f-2*c,b,f,b+2*c,f-c,b,f,b+c,Z,f,g-c,"wa",f-2*c,g-2*c,f,g,f,g-c,f-c,g,Z,a+c,g,"wa",a,g-2*c,a+2*c,g,a+c,g,a,g-c,Z,a,b+c,"wa",a,b,a+2*c,b+2*c,a,b+c,a+c,b,"x","e"]}}})}var bP=G?bM:bN,bQ=function(){};bQ.prototype={init:function(a,b){var c=this;c.series=a,c.applyOptions(b),c.pointAttr={},a.options.colorByPoint&&(a=a.chart.options.colors,c.options||(c.options={}),c.color=c.options.color=c.color||a[H++],H>=a.length&&(H=0));return c},applyOptions:function(b){var c=this,d=c.series;c.config=b,typeof b=="number"||b===null?c.y=b:typeof b=="object"&&typeof b.length!="number"?(a(c,b),c.options=b):typeof b[0]=="string"?(c.name=b[0],c.y=b[1]):typeof b[0]=="number"&&(c.x=b[0],c.y=b[1]),c.x===P&&(c.x=d.autoIncrement())},destroy:function(){var a=this,b;a==a.series.chart.hoverPoint&&a.onMouseOut(),bx(a),br(["dataLabel","graphic","tracker","group"],function(b){a[b]&&a[b].destroy()}),a.legendItem&&a.series.chart.legend.destroyItem(a);for(b in a)a[b]=null},select:function(a,b){var c=this,d=c.series;d=d.chart,c.selected=a=e(a,!c.selected),c.firePointEvent(a?"select":"unselect"),c.setState(a&&bc),b||br(d.getSelectedPoints(),function(a){a.selected&&a!=c&&(a.selected=!1,a.setState(ba),a.firePointEvent("unselect"))})},onMouseOver:function(){var a=this,b=a.series.chart,c=b.tooltip,d=b.hoverPoint;d&&d!=a&&d.onMouseOut(),a.firePointEvent("mouseOver"),c&&c.refresh(a),a.setState(bb),b.hoverPoint=a},onMouseOut:function(){var a=this;a.firePointEvent("mouseOut"),a.setState(ba),a.series.chart.hoverPoint=null},update:function(a,b){var c=this,d=c.series;b=e(b,!0),c.firePointEvent("update",{options:a},function(){c.applyOptions(a),d.isDirty=!0,b&&d.chart.redraw()})},remove:function(a){var b=this,c=b.series,d=c.chart,f=c.data,g=f.length;a=e(a,!0),b.firePointEvent("remove",null,function(){for(;g--;)if(f[g]==b){f.splice(g,1);break}b.destroy(),c.isDirty=!0,a&&d.redraw()})},firePointEvent:function(a,b,c){var d=this,e=this.series;e=e.options,(e.point.events[a]||d.options&&d.options.events&&d.options.events[a])&&this.importEvents(),a=="click"&&e.allowPointSelect&&(c=function(a){d.select(null,a.ctrlKey||a.metaKey||a.shiftKey)}),by(this,a,b,c)},importEvents:function(){if(!this.hasImportedEvents){var a=this,b=bu(a.series.options.point,a.options);b=b.events;var c;a.events=b;for(c in b)bw(a,c,b[c]);this.hasImportedEvents=!0}},setState:function(a){var b=this,c=b.series,d=c.options.states,e=c.options.marker,f=e&&!e.enabled,g=(e=e&&e.states[a])&&e.enabled===!1,h=c.chart,i=b.pointAttr;a||(a=ba),b.selected&&a!=bc||d[a]&&d[a].enabled===!1||a&&(g||f&&!e.enabled)||(a&&!b.graphic?(c.stateMarkerGraphic||(c.stateMarkerGraphic=h.renderer.circle(0,0,i[a].r).attr(i[a]).add(c.group)),c.stateMarkerGraphic.translate(b.plotX,b.plotY)):b.graphic&&b.graphic.attr(i[a]))},setTooltipText:function(){var a=this;a.tooltipText=a.series.chart.options.tooltip.formatter.call({series:a.series,point:a,x:a.category,y:a.y,percentage:a.percentage,total:a.total||a.stackTotal})}};var bR=function(){};bR.prototype={isCartesian:!0,type:"line",pointClass:bQ,pointAttrToOptions:{stroke:"lineColor","stroke-width":"lineWidth",fill:"fillColor",r:"radius"},init:function(b,c){var d=this,e,f=b.series.length;d.chart=b,c=d.setOptions(c),a(d,{index:f,options:c,name:c.name||"Series "+(f+1),state:ba,pointAttr:{},visible:c.visible!==!1,selected:c.selected===!0}),b=c.events;for(e in b)bw(d,e,b[e]);d.getColor(),d.getSymbol(),d.setData(c.data,!1)},autoIncrement:function(){var a=this,b=a.options,c=a.xIncrement;c=e(c,b.pointStart,0),a.pointInterval=e(a.pointInterval,b.pointInterval,1),a.xIncrement=c+a.pointInterval;return c},cleanData:function(){var a=this;a=a.data;var b;a.sort(function(a,b){return a.x-b.x});for(b=a.length-1;b>=0;b--)a[b-1]&&a[b-1].x==a[b].x&&a.splice(b-1,1)},getSegments:function(){var a=-1,b=[],c=this.data;br(c,function(d,e){d.y===null?(e>a+1&&b.push(c.slice(a+1,e)),a=e):e==c.length-1&&b.push(c.slice(a+1,e+1))}),this.segments=b},setOptions:function(a){var b=this.chart.options.plotOptions;return a=bu(b[this.type],b.series,a)},getColor:function(){var a=this.chart.options.colors;this.color=this.options.color||a[H++]||"#0000ff",H>=a.length&&(H=0)},getSymbol:function(){var a=this.chart.options.symbols,b=this.options.marker.symbol||a[I++];this.symbol=b,I>=a.length&&(I=0)},addPoint:function(a,b,c){var d=this,f=d.data;a=(new d.pointClass).init(d,a),b=e(b,!0),f.push(a),c&&f[0].remove(!1),d.isDirty=!0,b&&d.chart.redraw()},setData:function(a,c){var f=this,g=f.data,h=f.initialColor,i=g&&g.length||0;f.xIncrement=null,b(h)&&(H=h);for(a=bt(d(a||[]),function(a){return(new f.pointClass).init(f,a)});i--;)g[i].destroy();f.data=a,f.cleanData(),f.getSegments(),f.isDirty=!0,e(c,!0)&&f.chart.redraw()},remove:function(a){var b=this,c=b.chart;a=e(a,!0),b.isRemoving||(b.isRemoving=!0,by(b,"remove",null,function(){b.destroy(),c.isDirty=!0,a&&c.redraw()})),b.isRemoving=!1},translate:function(){for(var a=this,b=a.chart,c=a.options.stacking,d=a.xAxis.categories,e=a.yAxis,f=e.stacks[a.type],g=a.data,h=g.length;h--;){var i=g[h],j=i.x,k=i.y,l;i.plotX=a.xAxis.translate(j),c&&a.visible&&f[j]&&(l=f[j],j=l.total,l.cum=l=l.cum-k,k=l+k,c=="percent"&&(l=j?l*100/j:0,k=j?k*100/j:0),i.percentage=j?i.y*100/j:0,i.stackTotal=j,i.yBottom=e.translate(l,0,1)),k!==null&&(i.plotY=e.translate(k,0,1)),i.clientX=b.inverted?b.plotHeight-i.plotX:i.plotX,i.category=d&&d[i.x]!==P?d[i.x]:i.x}},setTooltipPoints:function(a){var b=this,c=b.chart,d=c.inverted,e=[],f=(d?c.plotTop:c.plotLeft)+c.plotSizeX,g,h,i=[];a&&(b.tooltipPoints=null),br(b.segments,function(a){e=e.concat(a)}),b.xAxis&&b.xAxis.reversed&&(e=e.reverse()),br(e,function(a,c){b.tooltipPoints||a.setTooltipText(),g=e[c-1]?e[c-1].high+1:0;for(h=a.high=e[c+1]?w((a.plotX+(e[c+1]?e[c+1].plotX:f))/2):f;g<=h;)i[d?f-g++:g++]=a}),b.tooltipPoints=i},onMouseOver:function(){var a=this,b=a.chart,c=b.hoverSeries,d=a.stateMarkerGraphic;b.mouseIsDown||(d&&d.show(),c&&c!=a&&c.onMouseOut(),a.options.events.mouseOver&&by(a,"mouseOver"),a.tracker&&a.tracker.toFront(),a.setState(bb),b.hoverSeries=a)},onMouseOut:function(){var a=this,b=a.options,c=a.chart,d=c.tooltip,e=c.hoverPoint;e&&e.onMouseOut(),a&&b.events.mouseOut&&by(a,"mouseOut"),d&&!b.stickyTracking&&d.hide(),a.setState(),c.hoverSeries=null},animate:function(a){var b=this,c=b.chart,d=b.clipRect;a?d.isAnimating||(d.attr("width",0),d.isAnimating=!0):(d.animate({width:c.plotSizeX},{complete:function(){d.isAnimating=!1},duration:1e3}),this.animate=null)},drawPoints:function(){var a=this,b,c=a.data,d=a.chart,f,g,h,i,j,k;if(a.options.marker.enabled)for(h=c.length;h--;)i=c[h],f=i.plotX,g=i.plotY,k=i.graphic,g!==P&&(b=i.pointAttr[i.selected?bc:ba],j=b.r,k?k.attr({x:f,y:g,r:j}):i.graphic=d.renderer.symbol(e(i.marker&&i.marker.symbol,a.symbol),f,g,j).attr(b).add(a.group))},convertAttribs:function(a,b,c,d){var f=this.pointAttrToOptions,g,h,i={};a=a||{},b=b||{},c=c||{},d=d||{};for(g in f)h=f[g],i[g]=e(a[h],b[g],c[g],d[g]);return i},getAttribs:function(){var a=this,c=a.options.marker||a.options,d=c.states,e=d[bb],f,g={},h=a.color,i=a.data,j=[],k,l=a.pointAttrToOptions;a.options.marker?(g={stroke:h,fill:h},e.radius=e.radius||c.radius+2,e.lineWidth=e.lineWidth||c.lineWidth+1):(g={fill:h},e.color=e.color||bL(e.color||h).brighten(e.brightness).get()),j[ba]=a.convertAttribs(c,g),br([bb,bc],function(b){j[b]=a.convertAttribs(d[b],j[ba])}),a.pointAttr=j;for(g=i.length;g--;){h=i[g],(c=h.options&&h.options.marker||h.options)&&c.enabled===!1&&(c.radius=0),f=!1;if(h.options)for(var m in l)b(c[l[m]])&&(f=!0);f?(k=[],d=c.states||{},f=d[bb]=d[bb]||{},a.options.marker||(f.color=bL(f.color||h.options.color).brighten(f.brightness||e.brightness).get()),k[ba]=a.convertAttribs(c,j[ba]),k[bb]=a.convertAttribs(d[bb],j[bb],k[ba]),k[bc]=a.convertAttribs(d[bc],j[bc],k[ba])):k=j,h.pointAttr=k}},destroy:function(){var a=this,b=a.chart,c=b.series,d=a.clipRect,e;bx(a),a.legendItem&&a.chart.legend.destroyItem(a),br(a.data,function(a){a.destroy()}),br(["area","graph","dataLabelsGroup","group","tracker"],function(b){a[b]&&a[b].destroy()}),d&&d!=a.chart.clipRect&&d.destroy(),b.hoverSeries==a&&(b.hoverSeries=null),br(c,function(b,d){b==a&&c.splice(d,1)});for(e in a)delete a[e]},drawDataLabels:function(){if(this.options.dataLabels.enabled){var a=this,b,c,d=a.data,f=a.options.dataLabels,g,h=a.dataLabelsGroup,i=a.chart,j=i.inverted,k=a.type,l,m;h||(h=a.dataLabelsGroup=i.renderer.g(U+"data-labels").attr({visibility:a.visible?V:T,zIndex:4}).translate(i.plotLeft,i.plotTop).add()),l=f.color,l=="auto"&&(l=null),f.style.color=e(l,a.color),br(d,function(d){var l=e(d.barX,d.plotX),n=d.plotY,o=d.tooltipPos,p=d.dataLabel;p&&(d.dataLabel=p.destroy()),g=f.formatter.call({x:d.x,y:d.y,series:a,point:d,percentage:d.percentage,total:d.total||d.stackTotal}),b=(j?i.plotWidth-n:l)+f.x,c=(j?i.plotHeight-l:n)+f.y,o&&(b=o[0]+f.x,c=o[1]+f.y),m=f.align,k=="column"&&(b+=({center:d.barW/2,right:d.barW})[m]||0),g&&(d.dataLabel=i.renderer.text(g,b,c,f.style,f.rotation,m).attr({zIndex:1,visibility:d.visible===!1?T:"inherit"}).add(h)),a.drawConnector&&a.drawConnector(d)})}},drawGraph:function(){var a=this,b=a.options,c=a.chart,d=a.graph,f=[],g=a.area,h=a.group,i=b.lineColor||a.color,j=b.lineWidth,k,l=c.renderer,m=a.yAxis.getThreshold(b.threshold||0),n=/^area/.test(a.type),o=[],p=[];br(a.segments,function(c){if(c.length>1){k=[],br(c,function(a,d){d<2&&k.push([Y,Z][d]),d&&b.step&&(d=c[d-1],k.push(a.plotX,d.plotY)),k.push(a.plotX,a.plotY)}),f=f.concat(k);if(n){var d=[],e,g=k.length;for(e=0;e<g;e++)d.push(k[e]);if(b.stacking&&a.type!="areaspline")for(e=c.length-1;e>=0;e--)d.push(c[e].plotX,c[e].yBottom);else d.push(c[c.length-1].plotX,m,c[0].plotX,m,"z");p=p.concat(d)}}else o.push(c[0])}),a.graphPath=f,a.singlePoints=o,n&&(c=e(b.fillColor,bL(a.color).setOpacity(b.fillOpacity||.75).get()),g?g.attr({d:p}):a.area=a.chart.renderer.path(p).attr({fill:c}).add(a.group)),d?d.attr({d:f}):j&&(a.graph=l.path(f).attr({stroke:i,"stroke-width":j+W}).add(h).shadow(b.shadow))},render:function(){var a=this,b=a.chart,c,d=a.options.animation&&a.animate;c=b.renderer,a.clipRect||(a.clipRect=!b.hasRendered&&b.clipRect?b.clipRect:c.clipRect(0,0,b.plotSizeX,b.plotSizeY),b.clipRect||(b.clipRect=a.clipRect)),a.group||(c=a.group=c.g("series"),b.inverted&&c.attr({width:b.plotWidth,height:b.plotHeight}).invert(),c.clip(a.clipRect).attr({visibility:a.visible?V:T,zIndex:3}).translate(b.plotLeft,b.plotTop).add()),a.drawDataLabels(),d&&a.animate(!0),a.getAttribs(),a.drawGraph&&a.drawGraph(),a.drawPoints(),a.options.enableMouseTracking!==!1&&a.drawTracker(),d&&a.animate(),a.isDirty=!1},redraw:function(){var a=this;a.translate(),a.setTooltipPoints(!0),a.render()},setState:function(a){var b=this,c=b.options,d=b.graph,e=c.states,f=b.stateMarkerGraphic;c=c.lineWidth,a=a||ba;if(b.state!=a){b.state=a;if(!e[a]||e[a].enabled!==!1)a?c=e[a].lineWidth||c:f&&f.hide(),d&&d.animate({"stroke-width":c},a?0:500)}},setVisible:function(a,b){var c=this,d=c.chart,e=c.legendItem,f=c.group,g=c.tracker,h=c.dataLabelsGroup,i,j=c.data,k=d.options.chart.ignoreHiddenSeries;i=c.visible,i=(c.visible=a=a===P?!i:a)?"show":"hide",a&&(c.isDirty=k),f&&f[i]();if(g)g[i]();else for(f=j.length;f--;)g=j[f],g.tracker&&g.tracker[i]();h&&h[i](),e&&d.legend.colorizeItem(c,a),k&&c.options.stacking&&br(d.series,function(a){a.options.stacking&&a.visible&&(a.isDirty=!0)}),b!==!1&&d.redraw(),by(c,i)},show:function(){this.setVisible(!0)},hide:function(){this.setVisible(!1)},select:function(a){var b=this;b.selected=a=a===P?!b.selected:a,b.checkbox&&(b.checkbox.checked=a),by(b,a?"select":"unselect")},drawTracker:function(){var a=this,b=a.options,c=a.graphPath,d=a.chart,e=d.options.tooltip.snap,f=a.tracker,g=b.cursor;g=g&&{cursor:g};var h=a.singlePoints,i,j;for(j=0;j<h.length;j++)i=h[j],c.push(Y,i.plotX-3,i.plotY,Z,i.plotX+3,i.plotY);f?f.attr({d:c}):a.tracker=d.renderer.path(c).attr({isTracker:!0,stroke:_,fill:X,"stroke-width":b.lineWidth+2*e,"stroke-linecap":"round",visibility:a.visible?V:T,zIndex:1}).on("mouseover",function(){d.hoverSeries!=a&&a.onMouseOver()}).on("mouseout",function(){b.stickyTracking||a.onMouseOut()}).css(g).add(d.trackerGroup)}},D=m(bR),bB.line=D,D=m(bR,{type:"area"}),bB.area=D,r.prototype={get:function(a){a||(a=50);var b=this.n;b=(this.xdata[b-1]-this.xdata[0])/(a-1);var c=[],d=[];c[0]=this.xdata[0],d[0]=this.ydata[0];for(var e=[{plotX:c[0],plotY:d[0]}],f=1;f<a;f++)c[f]=c[0]+f*b,d[f]=this.interpolate(c[f]),e[f]={plotX:c[f],plotY:d[f]};return e},interpolate:function(a){for(var b=this.n-1,c=0;b-c>1;){var d=(b+c)/2;this.xdata[w(d)]>a?b=d:c=d}b=w(b),c=w(c),d=this.xdata[b]-this.xdata[c];var e=(this.xdata[b]-a)/d;a=(a-this.xdata[c])/d;return e*this.ydata[c]+a*this.ydata[b]+((e*e*e-e)*this.y2[c]+(a*a*a-a)*this.y2[b])*d*d/6}},D=m(bR,{type:"spline",drawGraph:function(){var a=this,b=a.segments;a.splinedata=a.getSplineData(),a.segments=a.splinedata,bR.prototype.drawGraph.apply(a,arguments),a.segments=b},getSplineData:function(){var a=this,b=a.chart,c=[],d=b.plotSizeX,e;br(a.segments,function(b){a.xAxis.reversed&&(b=b.reverse());var f=[],g,h;br(b,function(a,c){g=b[c+2]||b[c+1]||a,h=b[c-2]||b[c-1]||a,g.plotX>=0&&h.plotX<=d&&f.push(a)}),f.length>1&&(e=v(y(d,f[f.length-1].clientX-f[0].clientX)/3)),c.push(b.length>1?e?(new r(f)).get(e):[]:b)});return c}}),bB.spline=D,D=m(D,{type:"areaspline"}),bB.areaspline=D;var bS=m(bR,{type:"column",pointAttrToOptions:{stroke:"borderColor","stroke-width":"borderWidth",fill:"color",r:"borderRadius"},init:function(){bR.prototype.init.apply(this,arguments);var a=this,b=a.chart;b.hasRendered&&br(b.series,function(b){b.type==a.type&&(b.isDirty=!0)})},translate:function(){var c=this,d=c.chart,f=0,g=c.xAxis.reversed,h=c.xAxis.categories,i;bR.prototype.translate.apply(c),br(d.series,function(a){a.type==c.type&&(a.options.stacking?(b(i)||(i=f++),a.columnIndex=i):a.columnIndex=f++)});var j=c.options,k=c.data,l=c.closestPoints;d=A(k[1]?k[l].plotX-k[l-1].plotX:d.plotSizeX/(h?h.length:1)),h=d*j.groupPadding,l=d-2*h,l=l/f;var m=j.pointWidth,n=b(m)?(l-m)/2:l*j.pointPadding,o=e(m,l-2*n);m=(g?f-c.columnIndex:c.columnIndex)||0;var p=n+(h+m*l-d/2)*(g?-1:1),q=c.yAxis.getThreshold(j.threshold||0),r=j.minPointLength;br(k,function(c){var d=c.plotY,e=c.plotX+p,f=x(z(d,q)),g=o,h=x(A((c.yBottom||q)-d)),i;A(h)<(r||5)&&(r&&(h=r,f=q-(d<=q?r:0)),i=f-3),a(c,{barX:e,barY:f,barW:g,barH:h}),c.shapeType="rect",c.shapeArgs={x:e,y:f,width:g,height:h,r:j.borderRadius},c.trackerArgs=b(i)&&bu(c.shapeArgs,{height:6,y:i})})},getSymbol:function(){},drawGraph:function(){},drawPoints:function(){var a=this,c=a.options,d=a.chart.renderer,e,f;br(a.data,function(g){b(g.plotY)&&(e=g.graphic,f=g.shapeArgs,e?e.attr(f):g.graphic=d[g.shapeType](f).attr(g.pointAttr[g.selected?bc:ba]).add(a.group).shadow(c.shadow))})},drawTracker:function(){var a=this,b=a.chart,d=b.renderer,e,f,g=+(new Date),h=a.options.cursor,i=h&&{cursor:h},j;br(a.data,function(h){f=h.tracker,e=h.trackerArgs||h.shapeArgs,f?f.attr(e):h.tracker=d[h.shapeType](e).attr({isTracker:g,fill:_,visibility:a.visible?V:T,zIndex:1}).on("mouseover",function(d){j=d.relatedTarget||d.fromElement,b.hoverSeries!=a&&c(j,"isTracker")!=g&&a.onMouseOver(),h.onMouseOver()}).on("mouseout",function(b){a.options.stickyTracking||(j=b.relatedTarget||b.toElement,c(j,"isTracker")!=g&&a.onMouseOut())}).css(i).add(b.trackerGroup)})},cleanData:function(){var a=this,b=a.data,c,d,e,f;bR.prototype.cleanData.apply(a);for(f=b.length-1;f>=0;f--)if(b[f-1]){c=b[f].x-b[f-1].x;if(d===P||c<d)d=c,e=f}a.closestPoints=e},animate:function(a){var b=this,c=b.data;a||(br(c,function(a){var c=a.graphic;c&&(c.attr({height:0,y:b.yAxis.translate(0,0,1)}),c.animate({height:a.barH,y:a.barY},{duration:1e3}))}),b.animate=null)},remove:function(){var a=this,b=a.chart;b.hasRendered&&br(b.series,function(b){b.type==a.type&&(b.isDirty=!0)}),bR.prototype.remove.apply(a,arguments)}});bB.column=bS,D=m(bS,{type:"bar",init:function(a){a.inverted=this.inverted=!0,bS.prototype.init.apply(this,arguments)}}),bB.bar=D,D=m(bR,{type:"scatter",translate:function(){var a=this;bR.prototype.translate.apply(a),br(a.data,function(b){b.shapeType="circle",b.shapeArgs={x:b.plotX,y:b.plotY,r:a.chart.options.tooltip.snap}})},drawTracker:function(){var a=this,b=a.options.cursor,c=b&&{cursor:b},d;br(a.data,function(b){(d=b.graphic)&&d.attr({isTracker:!0}).on("mouseover",function(){a.onMouseOver(),b.onMouseOver()}).on("mouseout",function(){a.options.stickyTracking||a.onMouseOut()}).css(c)})},cleanData:function(){}}),bB.scatter=D,D=m(bQ,{init:function(){bQ.prototype.init.apply(this,arguments);var b=this,c;a(b,{visible:b.visible!==!1,name:e(b.name,"Slice")}),c=function(){b.slice()},bw(b,"select",c),bw(b,"unselect",c);return b},setVisible:function(a){var b=this,c=b.series.chart,d;d=(b.visible=a=a===P?!b.visible:a)?"show":"hide",b.group[d](),b.tracker&&b.tracker[d](),b.dataLabel&&b.dataLabel[d](),b.legendItem&&c.legend.colorizeItem(b,a)},slice:function(a,c){var d=this,f=d.series;f=f.chart;var g=d.slicedTranslation;e(c,!0),a=d.sliced=b(a)?a:!d.sliced,d.group.animate({translateX:a?g[0]:f.plotLeft,translateY:a?g[1]:f.plotTop},100)}}),D=m(bR,{type:"pie",isCartesian:!1,pointClass:D,pointAttrToOptions:{stroke:"borderColor","stroke-width":"borderWidth",fill:"color"},getColor:function(){this.initialColor=H},translate:function(){var a=0,b=this,c=-.25,d=b.options,e=d.slicedOffset,f=d.center,g=b.chart,h=g.plotWidth,i=g.plotHeight,j,k,l;b=b.data;var m=2*u.PI,n,o=z(h,i),p;f.push(d.size,d.innerSize||0),f=bt(f,function(a,b){return(p=/%$/.test(a))?[h,i,o,o][b]*parseInt(a,10)/100:a}),br(b,function(b){a+=b.y}),br(b,function(b){n=a?b.y/a:0,j=c*m,c+=n,k=c*m,b.shapeType="arc",b.shapeArgs={x:f[0],y:f[1],r:f[2]/2,innerR:f[3]/2,start:j,end:k},l=(k+j)/2,b.slicedTranslation=bt([B(l)*e+g.plotLeft,C(l)*e+g.plotTop],v),b.tooltipPos=[f[0]+B(l)*f[2]*.35,f[1]+C(l)*f[2]*.35],b.percentage=n*100,b.total=a}),this.setTooltipPoints()},render:function(){var a=this;a.getAttribs(),this.drawPoints(),a.options.enableMouseTracking!==!1&&a.drawTracker(),this.drawDataLabels(),a.isDirty=!1},drawPoints:function(){var a=this,b=a.chart,c=b.renderer,d,e,f;br(a.data,function(a){e=a.graphic,f=a.shapeArgs,a.group||(d=a.sliced?a.slicedTranslation:[b.plotLeft,b.plotTop],a.group=c.g("point").attr({zIndex:3}).add().translate(d[0],d[1])),e?e.attr(f):a.graphic=c.arc(f).attr(a.pointAttr[ba]).add(a.group),a.visible===!1&&a.setVisible(!1)})},drawTracker:bS.prototype.drawTracker,getSymbol:function(){}}),bB.pie=D,t.Highcharts={Chart:q,dateFormat:O,getOptions:k,numberFormat:n,Point:bQ,Renderer:bP,seriesTypes:bB,setOptions:j,Series:bR,addEvent:bw,createElement:h,discardElement:l,css:g,each:br,extend:a,map:bt,merge:bu,pick:e,extendClass:m}})()define("lib/highcharts", function(){});
+define('define/chart',['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, ViewElement) {
+    // Base Class for all charts
+    var Chart = ViewElement.extend({
+        constructor: function(viewset, concept_pk){
+            this.options = {
+                 chart: {
+                     marginBottom:50,
+                     renderTo : null,
+                     zoomType:'',
+                     events:{}
+                 },
+                 tooltip:{
+                     formatter: null
+                 },
+                 events:{},
+                 plotOptions:{
+                     series:{
+                         point : {
+                             events:{}
+                         },
+                         events: {
+                             click : null
+                         }
+                     },
+                     line:{
+                         animation: true
+                     },
+                     pie:{
+                         dataLabels: {
+                             enabled: true,
+                             formatter: function() {
+                                 return this.point.name;
+                             }
+                         },
+                         borderColor: "#000000",
+                         borderWidth: 2,
+                         allowPointSelect: false,
+                         cursor: "pointer",
+                         enableMouseTracking: true,
+                         stickyTracking: false,
+
+                         states:{
+                             hover:{
+                                 brightness: -.1,
+                                 enabled:true
+                             }
+                         },
+                         point:{
+                             events:{
+                                 mouseOver : function(){},
+                                 mouseOut : function(){}
+                             }
+                         }
+                     },
+                     column:{
+                         dataLabels: {
+                             enabled: true
+                         },
+                         allowPointSelect:false,
+                         cursor:"pointer",
+                         enableMouseTracking:true,
+                         stickyTracking:false,
+                         states:{
+                              hover:{
+                                  brightness: -.1,
+                                  enabled:true
+                              }
+                         }
+                     } 
+                 },
+
+                 credits:{
+                     enabled: false
+                 },
+                 legend:{
+                     enabled: false
+                 },
+                 title: {
+                      text: null
+                 },
+                 series: [{
+                    name:null,
+                    data:null
+                 }]
+            };
+            this.base(viewset, concept_pk);
+        },
+        gainedFocus: function(){
+            this.chart.xAxis[0].isDirty = true;
+            this.chart.yAxis[0].isDirty = true;
+            this.chart.isDirty = true;
+            this.chart.series[0].isDirty = true;
+            this.updateChart();
+        },
+        updateChart : function(){}
+    },
+    {   // Colors used by all graphs
+        UNSELECTED_COLOR: "#C5C5C5",
+        SELECTED_COLOR: "#99BDF1",
+        EXCLUDE_COLOR: "#EE3A43",
+        INCLUDE_COLOR: "#99BDF1",
+        ALTERNATE_GRID_COLOR: "#FDFFD5",
+        MINIMUM_SLICE: 0.04,
+        // Utility functions
+        map_data_to_display: function(choices){
+            var map = {};
+            $.each(choices, function(index,element){
+                map[element[0]]=element[1];
+            });
+            return map;
+        },
+        map_display_to_data: function(choices){
+            var map = {};
+            $.each(choices, function(index,element){
+                map[element[1]]=element[0];
+            });
+            return map;
+        },
+        // Utility maps used to convert array operators for the null boolean type
+        nb_plural_to_singular_map: {"in":"exact", "-in":"-exact"},
+        nb_singular_to_plural_map: {"exact":"in", "-exact":"-in"} 
+    });
+    
+    // Base class for charts displaying discrete bins of data
+    var ChoiceChart = Chart.extend({
+        constructor:function(viewset, concept_pk){
+            // HighCharts cannot handle boolean values in the coordinates
+            this.selected = [];
+            var map = this.map = Chart.map_data_to_display(viewset.data.choices);
+            var unmap = this.unmap = Chart.map_display_to_data(viewset.data.choices);
+            this.negated = false;
+            this.range_form = new Form({fields:[{ datatype: "string",
+                                                  name: viewset.data.name,
+                                                  choices:viewset.data.choices,
+                                                  pk: viewset.data.pk}]}, concept_pk);
+            this.range_form = this.range_form.dom;
+            // The graph serves the purpose of multiple selector.
+            this.range_form.find('select[multiple]').hide();
+            this.range_form.find("input").css("margin","10px"); //TODO should not be here
+            
+            // Highcharts does not let us pass in null and true and false for coords
+            // Here we map all the choices to their string equivalents
+            //TODO don't do this, shouldn't change it 
+            $.each(viewset.data.coords, function(index,element){
+                 viewset.data.coords[index][0] = map[viewset.data.coords[index][0]];
+            });
+            this.base(viewset, concept_pk);
+        },
+        notify: function(){
+             this.dom.trigger("ElementChangedEvent", [{name:this.concept_pk+"_"+this.viewset.data.pk, value:this.selected}]);
+        },
+        elementChanged: function(evt, value){
+                 // We don't care about null values here because it means
+                 // the item was hidden
+                 // TODO i don't think this matters anymore ssince we removed negation
+                 if (value.value === null) return;
+                 if (value.value === "in"){
+                     this.negated = false;
+                 }else{
+                     this.negated = true;
+                 }
+                 this.updateChart();
+        },
+        updateDS: function(evt, ds){
+               this.selected = ds[this.concept_pk +  "_" + this.viewset.data.pk];
+               if (this.selected === undefined){
+                   this.selected = [];
+               } else if (!($.isArray(this.selected))){
+                   this.selected = [this.selected];
+               }
+               this.negated = ds[this.concept_pk + "_"+this.viewset.data.pk + "_operator"] === "-in";
+               this.range_form.triggerHandler(evt,[ds]);
+        },
+        updateElement: function(evt, element){
+             if (element.name === this.concept_pk+"_"+this.viewset.data.pk){
+                 this.selected = element.value;
+             } else { 
+                 if (element.name === this.concept_pk+"_"+this.viewset.data.pk+"_operator" && element.value==="in"){
+                     this.negated = false;
+                 }else{
+                     this.negated = true;
+                 }
+             }
+             // Gain focus will take care of updating graph
+             // Tell embedded form
+             this.range_form.triggerHandler(evt,[element]);
+        }, 
+        updateChart: function(){
+                var objRef = this;
+                $.map(this.chart.series[0].data, function(element,index){
+                    var category = element.name || element.category;
+                    if ($.inArray(objRef.unmap[category], objRef.selected) !==-1){
+                        if (objRef.negated){
+                            element.update({color:Chart.EXCLUDE_COLOR}, false);
+                        }else{
+                            element.update({color:Chart.SELECTED_COLOR}, false);    
+                        }
+                    }else{
+                        element.update({color:Chart.UNSELECTED_COLOR}, false);
+                    }
+                    
+                 });
+                 // We've potentially changed the color of columns, so redraw
+                 this.chart.redraw();
+                 
+                 // This is a hack to fix a bug in ie7 where bars that
+                 // have been moused over, vanish if the view is taken off
+                 // screen and then put back.
+                 $.map(this.chart.series[0].data, function(element,index){
+                      $(element.tracker.element).mouseover();
+                      $(element.tracker.element).mouseout();
+                 });
+        },  
+        seriesClick: function(event) {
+             var category = event.point.category || event.point.name;               
+             var index = $.inArray(this.unmap[category], this.selected);
+             if (index === -1) {
+                 if (this.negated){
+                     event.point.update({color:ChoiceChart.EXCLUDE_COLOR});
+                 }else{
+                     event.point.update({color:ChoiceChart.SELECTED_COLOR});
+                 }
+                 this.selected.push(this.unmap[category]);
+             }else{
+                 event.point.update({color:ChoiceChart.UNSELECTED_COLOR});
+                 this.selected.splice(index,1);
+             }
+             this.notify();
+             this.updateChart();
+             // This is a bug fix for HighCharts. Author has been informed of bug.
+             // Without it you cannot click on a bar that you just
+             // clicked on without moving off and then back on
+             this.chart.hoverPoint = event.point;
+             this.chart.hoverSeries = event.point.series;
+             
+        }
+    });
+    
+    var PieChart = ChoiceChart.extend({
+        constructor: function(viewset, concept_pk){
+           // We only use pie charts for series with <= 3 choices.
+           // Verify that no one piece is less than MINIMUM_SLICE of
+           // the whole thing 
+           
+           // TODO this should be replaced with lines and labels in the more recent version of highcharts
+           var coords = viewset.data.coords;
+           var data_store = this.data_store = {};
+           $.each(coords, function(index,element){
+               data_store[element[0]] = element[1];
+           });
+           
+           var sum = 0;
+           $.each(coords, function(index, element){
+              sum = sum + element[1];
+           });
+           
+           var min_slice_width = sum * Chart.MINIMUM_SLICE;
+           $.each(coords, function(index,element){
+              if (element[1] < min_slice_width){
+                  element[1] = min_slice_width;
+              }
+           });
+           
+           this.base(viewset, concept_pk);
+        },
+        render: function(){
+            // Add this instance's details
+            this.dom = $('<div class="chart"></div>');
+            this.options.chart.renderTo = this.dom.get(0);
+            var objRef = this;
+            this.options.tooltip.formatter = function(){
+                // We use unmap here because name refers potentially cleaned string, ("No", instead of false, etc)
+                return "" + objRef.data_store[objRef.unmap[this.point.name]];
+            };
+            this.options.chart.defaultSeriesType = 'pie';
+            this.options.series[0].name = this.viewset.data.title;
+            this.options.series[0].data = this.viewset.data.coords;
+            this.options.title.text = this.viewset.data.title;
+            this.options.plotOptions.series.events.click = $.proxy(this.seriesClick, this);
+            this.chart = new Highcharts.Chart(this.options);
+        },       
+        gainedFocus: function(evt){
+            this.base();
+            this.negated = false;  // is this even used anymore??
+        }
+    });
+ 
+     var BarChart = ChoiceChart.extend({
+         render: function(){
+             var objRef = this;
+             this.dom = $('<div class="chart"></div>');
+             this.options.chart.marginBottom = this.viewset.data.coords.length > 6 ? 100 : 50;
+             this.options.chart.renderTo =  this.dom.get(0);
+             this.options.chart.defaultSeriesType = 'column';
+             this.options.chart.events.redraw = $.proxy(this.redraw, this);
+             this.options.chart.events.load = $.proxy(this.load, this);
+             this.options.plotOptions.series.events.click = $.proxy(this.seriesClick,this);
+             this.options.title.text = this.viewset.data.title;
+             this.options.series[0].name = this.viewset.data.title;
+             this.options.series[0].data = $.map(this.viewset.data.coords, function(element, index){
+                    return element[1]; 
+             });
+             this.options.tooltip = {
+                    formatter:function(){
+                        return this.point.category + ", " + this.y;
+                    }
+             };
+             this.options.xAxis = {
+                categories: $.map(this.viewset.data.coords, function(element, index){
+                   return element[0]; 
+                }),
+                title: {
+                    text: this.viewset.data.xaxis,
+                    margin: this.viewset.data.coords.length > 6 ? 90 : 50
+                },
+                labels:{
+                    align: this.viewset.data.coords.length > 6 ? 'left' : 'center',
+                    y: this.viewset.data.coords.length > 6 ? 10 : 20,
+                    rotation: this.viewset.data.coords.length > 6 ? 50 : 0,
+                    formatter: function(){
+                        // Make words appear on separate lines unless they are rotated
+                        var value = this.value;
+                        
+                        // If there are more than 6 categories, they will be rotated
+                        // TODO this closure is not good
+                        if (objRef.viewset.data.coords.length > 6) { 
+                            if (value.length > 20){
+                                value = value.substr(0,18)+"..";
+                            }
+                        }else {
+                            // Values aren't rotated, put one word per line
+                            value = this.value.split(" ").join("<br/>");
+                        }
+                        return value;
+                    }
+                }
+             };
+             this.options.yAxis = {
+                min:0,
+                title: {
+                   text: this.viewset.data.yaxis
+                },
+                labels:{
+                     rotation: 45
+                }
+             
+             };
+             this.chart = new Highcharts.Chart(this.options);
+         },
+         redraw: function(event){
+               for (var index = 0; index < this.chart.series[0].data.length; index++){
+                    var col = this.chart.series[0].data[index];
+                    $(col.dataLabel.element).unbind(); // Prevent any double binding
+                    $(col.dataLabel.element).attr("fill", col.color);//chrome/firefox
+                    $(col.dataLabel.element).css("color", col.color);//ie
+                    $(col.dataLabel.element).hover(function(event){
+                        $(this).css("cursor","pointer");
+                    }, function(event){
+                        $(this).css("cursor","");
+                    });
+                    var objRef = this;
+                    $(col.dataLabel.element).click(function(c){
+                        return (function(event){
+                              c.series.chart.hoverPoint = c;
+                              c.series.chart.isDirty = true;
+                              var index = $.inArray(objRef.unmap[c.category], objRef.selected);
+                              if (index === -1) {
+                                  objRef.selected.push(objRef.unmap[c.category]);
+                              }else{
+                                  objRef.selected.splice(index,1);
+                              }
+                              objRef.notify();
+                              objRef.updateChart();
+                        });            
+                    }(col));
+               }
+          }
+     });    
+     // We have an embedded form in this chart, which is really
+     // the only thing that changes the datasource. The graph 
+     // monitors and changes the form
+     var LineChart = Chart.extend({
+         constructor: function(viewset, concept_pk){
+             var range_form = this.range_form = new Form({fields:[viewset.data]}, concept_pk).dom;
+             this.base(viewset, concept_pk);
+             var extremes = this.extremes = this.chart.xAxis[0].getExtremes();
+             // By default select the middle 1/3 of the chart
+             var xrange = extremes.max - extremes.min;
+             var third = (1/3) * xrange;
+             // Set the initial middle selected range in the form and in the graph.
+             // TODO Set these using events so as not to need to know internals.
+             $("input[name*=input0]", range_form).val((extremes.min+third).toFixed(1));
+             $("input[name*=input1]", range_form).val((extremes.min+2*third).toFixed(1));
+             
+             // Listen for changes in the form and make the chart reflect
+             // We are doing this here to prevent tons of unnecessary calls to manual_field_handler
+             this.range_form.bind("ElementChangedEvent", $.proxy(this.manual_field_handler, this));
+             this.manual_field_handler(null);
+         },
+         render: function(){
+             this.range_form.find("input").css("margin","10px");
+             var dom = this.dom = $('<div class="chart"></div>');
+
+             this.options.chart.renderTo = dom.get(0);
+             this.options.chart.defaultSeriesType = 'line';
+             this.options.chart.zoomType = 'x';
+             this.options.title.text = this.viewset.data.title;
+             // User selects range in chart
+             this.options.chart.events.selection = $.proxy(this.chartSelection, this);
+             // User selects single spot in chart;
+             this.options.chart.events.click = $.proxy(this.chartClick, this);
+             // User clicks on a point on the line
+             this.options.plotOptions.series.point.events.click = $.proxy(this.pointClick, this);
+
+             this.options.series[0].name = this.viewset.data.title;
+             this.options.series[0].data = this.viewset.data.coords;
+
+             this.options.tooltip.formatter = function() {
+                return "" + this.y;
+             };
+             this.options.xAxis =  {
+                 maxPadding:.05,
+                 startOnTick:false,
+                 title: {
+                     text: this.viewset.data.xaxis
+                 },
+                 labels:{
+                       align:"center",
+                       y:20
+                 }
+             };
+             this.options.yAxis = {
+                 min:0, 
+                 title: {
+                    style: {
+                        fontWeight: 'bold'
+                    },
+                    text:  this.viewset.data.yaxis,
+                    rotation : 270
+                 },
+                 labels:{
+                    rotation:45
+                 }
+             };
+             this.chart = new Highcharts.Chart(this.options);
+
+             // Add the form to the bottom of this chart widget
+             this.dom.append(this.range_form);
+         },
+         
+         // Create handler for updating graph whnen user changes min and max values
+         // in the form
+         manual_field_handler : function(event){
+             // TODO this gets called too many times, look into fixing.
+             // TODO try to shorten this up
+             var color = null;
+             // Depending on the value of the operator, clicking on the graph
+             // will have a different behavior
+             // For example, range and exclude:range will allow 
+             // selecting a region of the graph.
+             // All other operators will insert a line on click.
+             // the lt,gt,lte,gte, will insert a box after the user 
+             // clicks to indicate the selected region.
+             // The exact operators will insert a line.
+             var options = this.chart.options;
+
+             var min = parseFloat($("input[name*=input0]", this.range_form).val()).toFixed(1);
+             var max = parseFloat($("input[name*=input1]", this.range_form).val()).toFixed(1);
+
+             switch(this.range_form.find("select[name*=operator]").val()) {
+                 case "range": 
+                     color = Chart.INCLUDE_COLOR;
+                 case "-range":
+                     color =  color || Chart.EXCLUDE_COLOR; // did we drop through from range?
+                     if (options.chart.zoomType !== "x"){
+                             this.range_form.detach();
+                             this.chart.destroy();
+                             options.chart.zoomType = "x";
+                             options.plotOptions.line.animation = false;
+                             this.chart = new Highcharts.Chart(options);
+                             this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+                     if (min && max){     
+                            this.chart.xAxis[0].addPlotBand({
+                              from: min,
+                              to: max,
+                              color:color
+                            });
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     break;
+                 case "lt":
+                     color = Chart.INCLUDE_COLOR;
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+                     
+                     if (min){
+                         this.chart.xAxis[0].addPlotLine({
+                              value: min,
+                              color: Chart.EXCLUDE_COLOR,
+                              width: 3
+                         });
+                         this.chart.xAxis[0].addPlotBand({
+                              from: this.extremes.min,
+                              to: min,
+                              color:color
+                         });
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     break;
+                 case "gt":
+                     color = Chart.INCLUDE_COLOR;
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+                     
+                     if (min){
+                         this.chart.xAxis[0].addPlotLine({
+                                     value: min,
+                                     color: Chart.EXCLUDE_COLOR,
+                                     width: 3
+                         });
+                         this.chart.xAxis[0].addPlotBand({
+                              from: min,
+                              to: this.extremes.max,
+                              color:color
+                         });
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     break;
+                 case "lte":
+                     color = Chart.INCLUDE_COLOR;
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+                     
+                     if (min){
+                         this.chart.xAxis[0].addPlotBand({
+                              from: this.extremes.min,
+                              to: min,
+                              color:color
+                         });
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     break;
+                 case "gte":
+                     color = Chart.INCLUDE_COLOR;
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+                     
+                     if (min){
+                         this.chart.xAxis[0].addPlotBand({
+                              from: min,
+                              to: this.extremes.max,
+                              color:color
+                         });
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     break;
+                 case "exact":
+                     color = Chart.INCLUDE_COLOR;
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+
+                     if (min){
+                         this.chart.xAxis[0].addPlotLine({
+                                     value: min,
+                                     color: Chart.INCLUDE_COLOR,
+                                     width: 3
+                         });
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     break;
+                 case "-exact":
+                     color = Chart.INCLUDE_COLOR;
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+
+                     if (min){
+                         this.chart.xAxis[0].addPlotLine({
+                                     value: min,
+                                     color: Chart.EXCLUDE_COLOR,
+                                     width: 3
+                         });
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     break;
+                 case "isnull":
+                     color = Chart.EXCLUDE_COLOR;
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.chart.xAxis[0].removePlotBand();
+                     this.chart.xAxis[0].addPlotLine({
+                                from: this.extremes.min,
+                                to: this.extremes.max,
+                                color:color
+                     });
+                     this.dom.trigger("HideDependentsEvent");
+                     break;
+                 case "-isnull":
+                     if (options.chart.zoomType !== ""){
+                         this.range_form.detach();
+                         this.chart.destroy();
+                         options.chart.zoomType = "";
+                         options.plotOptions.line.animation = false;
+                         this.chart = new Highcharts.Chart(options);
+                         this.dom.append(this.range_form);
+                     }
+                     this.dom.trigger("ShowDependentsEvent");
+                     this.chart.xAxis[0].removePlotBand();
+                     break;
+             }
+         },
+         updateDSEvent : function(evt, ds){
+             // pass the datasource to the embedded form
+             this.range_form.triggerHandler(evt,[ds]);
+         },
+         elementChanged:function(){
+             
+         },
+         updateElement:  function(evt, element) {
+             // Use triggerHandler here because otherwise it will bubble back up
+             // the surround container (this object) and start an endless loop.
+             this.range_form.triggerHandler(evt,[element]);
+             //this.manual_field_handler(null);
+         },
+         registerElements :  function(evt) {
+             // We only need to change the operator because it will in turn change its dependent
+             // inputs
+             $('select', this.range_form).change();
+         },
+         gainedFocus: function(evt){
+             this.base();
+             this.range_form.triggerHandler(evt);
+         },
+         chartSelection: function(event){
+             var chart = event.target;
+             var color = this.range_form.find("select[name*=operator]").val() === "-range" ? LineChart.EXCLUDE_COLOR : LineChart.INCLUDE_COLOR;
+
+             var min = event.xAxis[0].min;
+             var max = event.xAxis[0].max;
+
+             min = min < this.extremes.min ? this.extremes.min : min;
+             max = max > this.extremes.max ? this.extremes.max : max;
+             min = parseFloat(min).toFixed(1);// TODO how are we going to handle this if they are fractions
+             max = parseFloat(max).toFixed(1);// TODO properly calculate extremes 
+
+             // Set the new values in the form and notify Avocado
+             $("input[name*=input0]", this.range_form).val(min).change();
+             $("input[name*=input1]", this.range_form).val(max).change();
+             // We are hijacking the zoom effect here
+             // TODO we should be able to do away with this by using the new draw API
+             event.preventDefault(); 
+         },
+         chartClick: function(event){
+             var chart = event.target;
+             if (this.chart.options.chart.zoomType){ 
+                 // If select is on we don't care about click
+                 return; 
+             }
+
+             var min = event.xAxis[0].value;
+
+             min = min < this.extremes.min ? this.extremes.min : min;
+             min = parseFloat(min).toFixed(1);// TODO how are we going to handle this if they are fractions
+
+             // Set the new values in the form and notify Avocado
+             $("input[name*=input0]", this.range_form).val(min).change();
+         },
+         pointClick: function(event){
+               if (this.chart.options.chart.zoomType){ // If select is on we don't care about click
+                   return; 
+               }
+               var min = event.target.x;
+
+               min = min < this.extremes.min ? this.extremes.min : min;
+                
+               // TODO how are we going to handle this if they are fractions
+               min = parseFloat(min).toFixed(1);
+
+               // Set the new values in the form and notify Avocado
+               $("input[name*=input0]", this.range_form).val(min).change();
+         }
+     });
+
+     return {
+         BarChart: BarChart,
+         LineChart: LineChart,
+         PieChart: PieChart
+     };
+});
+define('utils/frontdesk',['require','exports','module'],function(){function a(a){function l(){var a=0;for(var c in f)f[c]==="in"&&a++;return a+b}function k(a,b,c){var d=g[a];typeof b==="function"?b.apply(b,c):(typeof b==="string"||b instanceof String)&&d[b].apply(d,c)}function j(a){if(a&&typeof a==="object"&&typeof a.length==="number"&&!a.propertyIsEnumerable("length"))return!0;return!1}var b=0,c=[],d=[],e={},f={},g={},h=null,i=j(a);this.onEmpty=function(a){c.push(a)},this.onFull=function(a){d.push(a)},this.checkIn=function(c,h){var j,k=!1;if(c!==undefined){if(f[c]!=="in"){e[c]=[],f[c]="in",h!==undefined&&(g[c]=h),k=!0;if(i)for(j in a)if(f[j]!=="in"){k=!1;break}}}else b++;(l()===a||k)&&$.each(d,function(a,b){b()});return h},this.checkOut=function(a,d){if(l()!==0){if(a===undefined)b--;else if(f[a]==="in"){f[a]="out",d!==undefined&&(g[a]=d);for(var h=0,i=e[a].length;h<i;h++)k(a,e[a][h][0],e[a][h][1])}l()===0&&$.each(c,function(a,b){b()})}},this.leaveMessage=function(a,b){var c=Array.prototype.slice.call(arguments,2);f[a]==="in"?e[a].push([b,c]):k(a,b,c)}}return a})define('define/view',['define/chart','define/form','utils/frontdesk', 'lib/base'], function(Chart, Form, FrontDesk){
+     //  **View Class** is the base class for object that represents a tab within the main Cilantro screen. The base class
+     // supports construction of HTML forms as well as charts within those forms.
+     var View = Base.extend({
+            constructor: function(viewset, name){
+                // Save off the viewset 
+                this.viewset = viewset;
+                this.fd = new FrontDesk();
+                // DOM representation;
+                this.view = $('<div class="view"></div>');
+                this.name = name;
+                
+                var $view = this.view;
+                var $this = $(this);
+                
+                // Notify a view that the datasource has changed.
+                // Note that proxy is used here to so that the callbacks will have reference
+                // to their owning object.
+                $view.bind("UpdateElementEvent", jQuery.proxy(this.updateElement, this));
+                
+                // Notify the view that the dependent elements should be hidden or shown
+                // This is used in the situation where a user chooses that the main element 
+                // in a form should be equal to null. Anything that depends on it no longer
+                // matters.
+                $view.bind("HideDependentsEvent ShowDependentsEvent", jQuery.proxy(this.toggleDependents, this));
+                
+                // The view can choose to override this function and create the server-query object
+                // itself, or just tell the framework to use the datasource.
+                // If creating the server-query itself, the view must throw a "UpdateQueryEvent" with
+                // the associated-server query object
+                $view.bind("UpdateQueryButtonClicked", jQuery.proxy(this.constructQuery, this));
+                
+                // These events need to be passed to view elements
+                $view.bind("UpdateDSEvent GainedFocusEvent LostFocusEvent RegisterElementsEvent", jQuery.proxy(this.notifyChildren, this));
+                
+                // This makes it so we can trigger an event on the view object itself, and still have the
+                // DOM element respond to it.
+                $(this).bind("UpdateQueryButtonClicked GainedFocusEvent LostFocusEvent UpdateQueryButtonClicked " +      
+                             "HideDependentsEvent RegisterElementsEvent ShowDependentsEvent UpdateDSEvent", jQuery.proxy(this.eventPassThru, this));
+                
+                this.render(); 
+            },
+            render: function(){  // Iterate over elements of this view and create them, appending them as we go.
+                var viewset = this.viewset;
+                var view = this.view;
+                var fd = this.fd;
+                // Views without a first element that is a chart need a
+                // title created
+                if (viewset.elements[0].type !== "chart")
+                {
+                    view.append("<h2>"+this.name+"</h2>");
+                }
+                
+                $.each(this.viewset.elements, function(index, element) {
+                       var chart = null;
+                       switch (element.type) {
+                           case 'form':
+                               chart = new Form(element,viewset.concept_id);
+                               view.append(chart.dom);
+                               fd.checkIn(index,chart.dom);
+                               fd.checkOut(index);
+                               break;
+                           case 'chart':
+                               var datatype = element.data.datatype;
+                               if (datatype === 'number') {
+                                   chart = new Chart.LineChart(element, viewset.concept_id);
+                                   view.append(chart.dom); 
+                                   fd.checkIn(index,chart.dom);
+                                   fd.checkOut(index);
+                               } else if (datatype === 'nullboolean' || datatype === 'boolean'){
+                                   chart = new Chart.PieChart(element,  viewset.concept_id);
+                                   view.append(chart.dom);
+                                   fd.checkIn(index,chart.dom);
+                                   fd.checkOut(index);
+                               } else {
+                                   chart = new Chart.BarChart(element,  viewset.concept_id);
+                                   view.append(chart.dom);
+                                   fd.checkIn(index,chart.dom);
+                                   fd.checkOut(index);
+                               }
+                               break;
+                           case 'custom':
+                                if (element.css){
+                                    View.loadCss(element.css);
+                                }
+                                // We need to keep track of the number of outstanding requests here.
+                                // A bug could occur if we return, and updateDS is called before all
+                                // the children of the view are initiated.
+                                fd.checkIn(index);
+                                var offset = viewset.elements[0].type === "chart" ? 0 : 1;
+                                require([element.js], function (Plugin) {
+                                    var plugin = new Plugin(element, viewset.concept_id);
+                                    // We need to make sure we actually put this in the correct spot, as things may have
+                                    // changed since the request for the plugin was made.
+                                    if (view.children().length - 1 >= index + offset){
+                                        $(view.children()[index]).prepend(plugin.dom);
+                                    }else{
+                                        view.append(plugin.dom);
+                                    }
+                                    fd.checkOut(index,plugin.dom);
+                                });
+                                break;
+                           default:
+                                view.append($('<p>Undefined View!</p>'));                
+                       }
+                   });
+            },
+            updateElement: function(evt){
+                var fd = this.fd;
+                $.each(this.viewset.elements, function(index){
+                    fd.leaveMessage(index,"triggerHandler",evt);
+                });
+                evt.stopPropagation();   
+            },
+            toggleDependents: function(evt){
+                // We know that evt.target exists already because it fired the event.
+                var fd = this.fd;
+                if (evt.target === this.view.children().get(0)){
+                    $.each(this.viewset.elements, function(index){
+                        if (index === 0) return;
+                        fd.leaveMessage(index,"triggerHandler",evt);
+                    });
+                }
+                evt.stopPropagation();
+            },
+            constructQuery: function(evt){
+                this.view.trigger("ConstructQueryEvent");
+                evt.stopPropagation();
+            },
+            notifyChildren: function(evt,arg){
+              var fd = this.fd;
+              $.each(this.viewset.elements, function(index){
+                    fd.leaveMessage(index, "triggerHandler", evt, arg);
+              });
+              evt.stopPropagation();
+            },
+            eventPassThru: function(evt, arg){
+                this.view.triggerHandler(evt, arg);
+                evt.stopPropagation();
+            },
+            dom: function(){
+                return this.view;
+            }
+     },{
+            // Simple dynamic load CSS function (taken from http://requirejs.org/docs/faq-advanced.html#css)
+            loadCss: function(url) {
+                var link = document.createElement("link");
+                link.type = "text/css";
+                link.rel = "stylesheet";
+                link.href = url;
+                document.getElementsByTagName("head")[0].appendChild(link);
+            }
+     });
+     return View;
+});define('define/conceptmanager',['define/view'],
+    function(View) { 
+        /**
+          Sets up and manages the view sets for each criterion option.
+
+          On each request for a criterion option, the response returns an array
+          of hashes that contain the information necessary to construct the
+          content of the view. HTML forms and Charts (provided by the HighCharts
+          library are considered built-in views. Custom views (for example if one
+          wanted to some sort of tree-view to be selected from)
+          must be handled using view-specific JS or the view-set JS.
+
+          @class
+          @author <a href="mailto:millerjm1@email.chop.edu">Jeff Miller</a>
+          @param {jQuery} $container Represents the containing element which
+          encapulates all loaded views
+          @param {jQuery} $titleBar Represents the title bar to which the title of
+          the Criterion can be set
+          @param {jQuery} $tabsBar Represents the element that contains the tabs
+          associated with all currently loaded views
+          @param {jQuery} $contentBox Represents the content area within the
+          container that the active view is displayed
+          @param {jQuery} $staticBox Represents the content area within the container
+          that is common to all views (displays errors and the query button)
+        */
+
+        var Manager;
+
+        $(function() {
+            var $container = $('#plugin-panel'),
+                $titleBar = $('#plugin-title'),
+                $tabsBar = $('#plugin-tabs'),
+                $contentBox = $('#plugin-dynamic-content'),
+                $staticBox = $('#plugin-static-content');
+
+            Manager = (function() {
+
+                /**
+                  A hash with respect to criterion IDs of the objects fetched from
+                  the server to build the views.
+
+                  @private
+                  @type object
+                */
+                var cache = {};
+                
+                /**
+                  The standard template for the tab DOM elements
+
+                  @private
+                  @type string
+                */
+                var tab_tmpl = '<a class="tab" href="#"><%= this.tabname %></a> ';
+
+                /**
+                  The standard template for the "Add To Query Button"
+
+                  @private
+                  @type string
+                */
+                var add_query_tmpl = [
+                    '<div class="message success">Condition has been added.</div>',
+                    '<button id="add_to_query"></button>'
+                ].join('');
+
+                /**
+                  Holds the currently viewable/active concept/criterionconcept    
+
+                  @private
+                  @type int
+                */
+                var activeConcept = null;
+
+                /**
+                  Holds the currently viewable view of the currently active 
+                  concept/criterionconcept
+
+                  @private
+                  @type object
+                */
+                var activeView = null;
+                
+                /**
+                  Holds a reference to the addQueryButton for the activeConcept.
+                
+                 @private
+                 @type jquery object
+                */
+                var $addQueryButton = null;
+                
+                /**
+                  List of concepts currently in the users active query
+                  
+                  @private
+                  @type array
+                */
+                var concepts_in_query = [];
+                
+                // RegExes used by buildQuery
+                var binaryFieldRe = /^(\d+)_(\d+(?:OR\d+)*)_input([01])$/;
+                var fieldRe = /^(\d*)_(\d+(?:OR\d+)*)$/;
+                var opRe = /^(\d*)_(\d+(?:OR\d+)*)_operator$/;
+                var pkChoiceRe = /^\d+(?:OR\d+)+$/;
+                var negateRe = /-/;
+                
+                
+                // Map used to convert array operators for the null boolean type;
+                var nb_plural_to_singular_map = {"in":"exact", "-in":"-exact", "exact":"exact","-exact":"-exact"};
+                var nb_singular_to_plural_map = {"exact":"in", "-exact":"-in"};
+                
+                var s_to_primative_map = {"true":true, "false":false, "null":null};
+                
+                 /**
+                   Event listener for concepts added to the users query
+                   
+                   @private
+                */
+                function conceptAddedHandler(evt) {
+                    
+                    if ($.inArray(evt.concept_id, concepts_in_query) < 0 ) {
+                        concepts_in_query.push(parseInt(evt.concept_id));
+                    
+                        if (activeConcept === parseInt(evt.concept_id)) {
+                            $addQueryButton.html('<span class="icon refresh"/> <span>Update Condition</span>');
+                            $(".success", $staticBox).show();
+                        }
+                    }
+                    
+                    evt.stopPropagation();
+                }
+                
+                /**
+                   Event listener for concepts removed from the users query
+                   
+                   @private
+                */
+                function conceptDeletedHandler(evt){
+                    var index = $.inArray(parseInt(evt.concept_id), concepts_in_query);
+
+                    if (index >= 0 ){
+                        concepts_in_query.splice(index,1);
+                        if (activeConcept === parseInt(evt.concept_id)){
+                            $addQueryButton.html('<span class="icon plus"/> <span>Add Condition</span>');
+                              $(".success", $staticBox).hide();
+                        }
+                    }
+
+                    evt.stopPropagation();
+                }
+
+                /**
+                  This is a utility function that looks on the current view to find the
+                  datatype of a given field primary k. In the future it might use the server, 
+                  or search all cached concepts, but for now it only uses the activeView because
+                  it is only called from buildQuery, where the activeView is all that matters.
+                  
+                  @private
+                */
+                function getDataType(field_pk) {
+
+                    var elements = activeView.elements;
+                    var datatype = null;
+                    
+                    $.each(elements, function(index,element) {
+       
+                       if (element.type === "custom") {
+                            return element.datatype;
+                       }
+                       
+                       if (element.data){
+                           if (element.data.pk == field_pk){
+                               datatype = element.data.datatype;
+                               return false;
+                           }
+                           // Maybe we weren't given a pk for this one
+                           if (element.data.pkchoices && 
+                              $.inArray(field_pk,$.map(element.data.pkchoices, function(item, index){return item[0];}))>=0){
+                              datatype = element.data.datatype;
+                              return false;
+                           }
+                       } else {
+                           $.each(element.fields, function(index, field){
+                               if (field.pk == field_pk){
+                                   datatype = field.datatype;
+                                   return false;
+                               }
+                               if (field.pkchoices && 
+                                    $.inArray(field_pk,$.map(field.pkchoices, function(item, index){return item[0];}))>=0){
+                                    datatype = field.datatype;
+                                    return false;
+                               }
+                           });
+                           if (datatype !== null){
+                               return false;
+                           }
+                       }
+                    });
+                    return datatype;
+                }
+
+                /**
+                  This function is a utility function, currently called by the AddQueryButtonHandler,
+                  for concepts made of built-in views, the function will be responsible
+                  for analyzing the current concept's datasource and creating the 
+                  datastructure representing the proper query for the server to 
+                  perform.
+                  
+                  @private
+                */
+                function buildQuery(ds) {
+                    var fields={};
+                    // We need to analyze the current concept and the datasource and construct
+                    // the proper datastructure to represent this query on the server
+                    // Find all the different fields and their values in this concept
+                    for (var item in ds){
+                        if (!ds.hasOwnProperty(item)) continue;
+                        var m = fieldRe.exec(item); // Either a choice, assertion, or boolean
+                        if (m){
+                            if (fields.hasOwnProperty(m[2])){
+                                $.extend(fields[m[2]], {val0:ds[item], val1:undefined, op:undefined});
+                            }else{
+                                fields[m[2]] = {val0:ds[item], val1:undefined, op:undefined};
+                            }
+                            continue;
+                        }
+                        m = binaryFieldRe.exec(item); // decimal oor date
+                        if (m) {
+                            if (fields.hasOwnProperty(m[2])) {
+                                fields[m[2]]['val'+m[3]] = Number(ds[item]) || ds[item];
+                            }else{
+                                fields[m[2]] = {val0:undefined, val1:undefined, op:undefined};
+                                fields[m[2]]['val'+m[3]] = Number(ds[item]) || ds[item];
+                            }
+                            continue;
+                        }
+                        m = pkChoiceRe.exec(item); // field representing the field this concept needs to query against
+                        if (m) {
+                            if (fields.hasOwnProperty(m[0])){
+                                fields[m[0]]['pk'] = ds[item];
+                            }else{
+                                fields[m[0]] = {val0:undefined, val1:undefined, op:undefined, pk:ds[item]};
+                            }
+                        }
+                    }
+                    for (item in ds){
+                         if (!ds.hasOwnProperty(item)) continue;
+                         m = opRe.exec(item);
+                         
+                         // For optional fields, we may have an operator, 
+                         // but the value may not exist, so don't use it,
+                         // however if the operator contains null (null, -null)
+                         // the operator does take anything, so thats all wee need
+                         if ((m) && (fields[m[2]] || ds[item].match(/null/))) {
+                             if (!fields.hasOwnProperty(m[2])){
+                                 fields[m[2]] = {val0:undefined, val1:undefined, op:undefined};
+                             }
+                             fields[m[2]]['op'] = ds[item];
+                         }
+                    }
+                   
+                    // We now have the ds sorted into a sensible datastructure
+                    // based on the fields in the concept. Construct the server
+                    // required datastructure
+                    var nodes = [];
+                    for (var field_id in fields) {
+                        var field = fields[field_id];
+
+                        // if field_id represents a pkChoiceRe, it means it holds the PK value for this field
+                        var variable_pk = false;
+                        var pkChoices = null;
+                        if (pkChoiceRe.exec(field_id)) {
+                            pkChoices = field_id.split('OR');
+                            field_id = field.pk;
+                            variable_pk = true;
+                        }
+                        
+                        field_id = Number(field_id);
+                        if (field.val0===undefined && field.val1===undefined && field.op!==undefined){  // either "is null" or "is not null"
+                             nodes.push({
+                                             'operator' : field.op,
+                                             'id' : field_id,
+                                             'concept_id': activeConcept,
+                                             'value' : true,
+                                             'datatype':getDataType(field_id)
+                                        });
+                        }
+                        else if (field.val0!==undefined && field.val1!==undefined && field.op!==undefined) { // Decimal Binary Op
+                            nodes.push({
+                                            'operator' : field.op,
+                                            'id' : field_id,
+                                            'value' : [field.val0,field.val1],
+                                            'concept_id': activeConcept,
+                                            'datatype': getDataType(field_id)
+                                        });
+                        } else if (field.val0!==undefined && field.op!==undefined && !(field.val0 instanceof Array)){ // Decimal or boolean or free text
+                            nodes.push({                                                      // probably not boolean though because
+                                            'operator' : field.op,                            // a specific operator has been 
+                                            'id' : field_id,                                  // specified
+                                            'value' : field.val0,
+                                            'concept_id': activeConcept,
+                                            'datatype': getDataType(field_id)
+                                        });
+                        } else if (field.val0!==undefined && field.val0 instanceof Array){ // String choice, boolean (usually charted), or nullboolean, or was string-list, which is an array
+                            // if field.op is null, assume the query was the default, which is "in"
+                            // this one is a bit special, there is no avoiding that in this situation
+                            // we could be dealing with a string "choice" option, or a nullboolean
+                            // nullbooleans need to have an OR'd query specifically construct for them
+                            // because they cannot use the IN operator.
+                            field.op = field.op !== undefined ? field.op : "in";
+                            var datatype = getDataType(field_id);
+                            switch (datatype) {
+                                case "boolean"     :
+                                case "nullboolean" : var bool_list = [];
+                                                     var op = nb_plural_to_singular_map[field.op];
+                                                     $.each(field.val0, function(index,item){
+                                                            bool_list.push( {
+                                                                 'operator':op,
+                                                                 'id' : field_id,
+                                                                 // In case a plugin gave us strings for null, true or false, fix it
+                                                                 'value' : s_to_primative_map[item] !== undefined? s_to_primative_map[item]:item,
+                                                                 'concept_id': activeConcept,
+                                                                 'datatype':datatype
+                                                            });
+                                                     });
+                                                     if (bool_list.length > 1){
+                                                     nodes.push({
+                                                         'type': negateRe.test(field.op) ? "and" : "or",
+                                                         'children' : bool_list,
+                                                         'concept_id': activeConcept
+                                                     });
+                                                    }else{
+                                                        nodes.push(bool_list[0]);
+                                                    }
+                                                    break;
+                                         default  :  nodes.push({
+                                                            'operator' : field.op,
+                                                            'id' : field_id,
+                                                            'value' : field.val0,
+                                                            'concept_id': activeConcept
+                                                     });
+                                                     break;
+                            }
+                        } else if (field.val0 !== undefined && !(field.val0 instanceof Array) &&
+                                  field.val1 === undefined){ // boolean when operator not specified
+                             nodes.push({
+                                                'operator' : "exact",
+                                                'id' : field_id,
+                                                'value' : field.val0,
+                                                'concept_id': activeConcept
+                                        });
+                        } else {
+                            // Unable to determine what this field is ?
+                            throw "Unable to determine field " + field + " in concept " + activeConcept;
+                        }
+
+                        if (variable_pk){  
+                            // When we get this back from the server, we will need a way to tell
+                            // that the field pk was variable, and how to recreate the datastore
+                            // TODO would it be better to make the form responsible for this?
+                            nodes[nodes.length-1]['id_choices'] =  pkChoices;
+                        }
+                    }
+
+                    var server_query;
+                    if (nodes.length === 1){
+                        server_query = nodes[0];
+                    }else{
+                        server_query = {
+                                             'type':  activeView.join_by || "and", // TODO this should be on the concept
+                                             'children': nodes,
+                                             'concept_id':activeConcept
+                                       };
+                    }
+                    return server_query;
+                }
+
+                 /**
+                   This function takes an avocado query datastructure and 
+                   returns a datasource object for a concept. This is recursive.
+                   
+                   @private
+                 */ 
+                 function createDSFromQuery(parameter, recurse_ds){
+                     var ds = recurse_ds || {};
+                     var field_prefix;
+                     var field_portion;
+                     if (!parameter.hasOwnProperty("type")){
+                         if (parameter.hasOwnProperty("id_choices")){
+                             // I don't like this because it tightly couples the 
+                             // implementation of forms and datasources, but its the most
+                             // elegant solution I have at the moment
+                             field_portion = parameter['id_choices'].join("OR");
+                             ds[field_portion] = parameter.id;
+                         }else{
+                             // If it just does this branch of the if, it would be a lot less
+                             // coupled
+                             field_portion = parameter.id;
+                         }
+                         
+                         // determine values for this field.
+                         // if the operator contains null ("isnull" or "-isnull")
+                         // then there is no value. Any value in there would have been
+                         // put there explicitly for the server.
+                         field_prefix = parameter.concept_id+"_"+field_portion;
+                         if (!parameter.operator.match(/null/)) { 
+                            if (parameter.datatype  in {number:1, date:1}) {
+                                // make this an array either way, even if it was not a binary operator
+                                var iterator = parameter.value instanceof Array ? parameter.value : [parameter.value];
+                                for (var index=0; index < iterator.length; index++){
+                                    ds[field_prefix+"_input"+index] = iterator[index];
+                                }
+                            } else {
+                                if (ds.hasOwnProperty(field_prefix)){
+                                   if (ds[field_prefix] instanceof Array) {
+                                       ds[field_prefix].push(parameter.value);
+                                   }else{
+                                       ds[field_prefix] = [ds[field_prefix]];
+                                       ds[field_prefix].push(parameter.value);
+                                   }
+                                //  else if (parameter.datatype && parameter.datatype.indexOf("boolean")>=0){
+                                //   ds[field_prefix] = [parameter.value];
+                                } else {
+                                   // Operators containing null do not actually take a value, and in the scenario where
+                                   // a value is there, it was manufactured for the backend, and must be ignored 
+                                   ds[field_prefix] = parameter.value;
+                                }
+                            }
+                         }
+                         ds[field_prefix+"_"+"operator"] = ds[field_prefix] instanceof Array && parameter.datatype && parameter.datatype.indexOf("boolean")>=0 ? 
+                                                           nb_singular_to_plural_map[parameter.operator] : parameter.operator;
+                                                           
+                         
+                     } else {
+                        $.each(parameter.children, function(index, child){
+                            createDSFromQuery(child, ds);
+                        });
+                     }
+                     return ds;
+                 }
+
+                /**
+                  The handler for the 'ViewReadyEvent' event
+                  
+                  This event is fired by a concept plugin when it is ready 
+                  to be inserted into the DOM. $concept here should be a 
+                  jQuery wrapped set, ready to be placed into the DOM
+                  
+                  @private
+                */
+                function viewReadyHandler(evt, view) {
+                    activeView.contents = view;
+                    // As of right now IE 7 and 8 cannot seem to properly handle
+                    // creating VML rotated text in an object that is not in the DOM
+                    // In those conditions, the chart plugin inserts the graph into the
+                    // DOM and sets display to 0. We detect here if the element we were
+                    // passed is in the DOM or not, if not we inject it. The idea is to eventually
+                    // when we can do this outside the dom in all browsers, to be able to do 
+                    // this in the existing framework
+                    var activeViewDom = activeView.contents.dom();
+                    $contentBox.append(activeViewDom);
+                    activeViewDom.css("display","block");
+                    
+                    $(".chart", activeView.contents).css("display","block"); // Hack because of IE
+
+
+                    if (!activeView.loaded){
+                        // Give the view its datasource
+                        // This will also prevent re-populating datasources when the
+                        // user clicks on a criteria in the right panel but the concept 
+                        // has been shown before.
+                        $(view).trigger("UpdateDSEvent", [cache[activeConcept].ds]);
+                        $(view).trigger("RegisterElementsEvent");
+                    }
+                    
+                    $(view).trigger("GainedFocusEvent");
+
+                    activeView.loaded = true;
+                 }
+
+
+                /** 
+                  The handler for the 'ShowViewEvent' event
+                  
+                  This event is fired by the tab bar when a new view
+                  is to be displayed. tabIndex correlates to the view in the 
+                  activeConcept's views array that needs to be shown.
+                  
+                  @private
+                */
+                function showViewHandler(evt, tabIndex) {
+                    if (activeView !== null){
+                        activeView.contents.dom().css("display","none");
+                        $(activeView.contents).trigger("LostFocusEvent");
+                        activeView.contents.dom().detach();
+                    }
+
+                    activeView = cache[activeConcept].views[tabIndex];
+
+                    if (activeView.loaded) {
+                        viewReadyHandler(null, activeView.contents);
+                    } else {
+                        // We have to look at the type of view here, custom views are responsible
+                        // for triggering the viewReadyHandler once their code is executed,
+                        // built-in views will need to be taken care of code here
+                        var callback = null;
+                        activeView.concept_id = activeConcept;
+                        $container.trigger('ViewReadyEvent', [new View(activeView, cache[activeConcept].name)]);
+                    }
+                }    
+                /**
+                     The handler for the 'ViewErrorEvent' event
+
+                     This event is fired by a concept/concept plugin when
+                     an unrecoveralble error has been received. The framework
+                     can choose to show the 'Report Error' Panel
+
+                  @private
+                */
+
+                function viewErrorHandler(evt, details) {
+
+                }
+                
+                
+                /**
+                  The handler for the 'ElementChangedEvent' event
+                  
+                  This event is used by concepts to notify that the user
+                  has changed the value of an input
+                  
+                  @private
+               */  
+                
+                function elementChangedHandler(evt, element){
+                    // Update the concept datastore
+                    var ds = cache[activeConcept].ds;
+                    var missing_item = false;
+                    // Did anything actually change?
+                    if (!(element.value instanceof Array) && ds[element.name] === element.value) 
+                    {
+                        // item is not an array and the values are equal to each other
+                        return;
+                    }else if (element.value instanceof Array && ds[element.name] instanceof Array){
+                        for (var index = 0; index < element.value.length; index++){
+                            if ($.inArray(element.value[index],ds[element.name])==-1){
+                                // Element in one is not in the other
+                                missing_item = true;
+                                break;
+                            }
+                        }
+                        if ((missing_item === false)&&(element.value.length == ds[element.name].length)){
+                            // All elements in one are in the other, and the lists are same length
+                            return;
+                        }
+                    }
+                    
+                    // A field is no longer in use, most likely a field was hidden due to 
+                    // an operator change
+                    if (element.value === undefined){
+                        // Clear out this value in the datasource
+                        delete cache[activeConcept].ds[element.name];
+                    }else{
+                        // Update the datasource
+                        cache[activeConcept].ds[element.name] = element.value instanceof Array ? element.value.slice(0) : element.value;
+                    }
+                    // If other views on this concept are already instantiated
+                    // notify them of the change
+                    $.each(cache[activeConcept].views, function(index,view) {
+                        if (activeView !== view && view.contents) {
+                            view.contents.trigger("UpdateElementEvent",[element]);
+                        }
+                    });
+                }
+                
+                /**
+                  This function is used by the constructQueryHandler to scan
+                  the concept's datasource and verify is not empty and does
+                  not contain empty, undefined, or null objects. If using 
+                  the built-in query contructor, the datasource must contain
+                  only properly named attributes.
+                  @private
+                */
+
+                function postViewErrorCheck(ds){
+                    var empty = false;
+                    // Is the datasource an empty object?
+                    if ($.isEmptyObject(ds)) {
+                        empty = true;
+                    }else{
+                        // Is the datasource empty except for operators?
+                        empty = true;
+                        for (var key in ds){
+                            if (!ds.hasOwnProperty(key)) continue;
+                            // Note, the null operators can stand on their own.
+                            if (opRe.test(key)){
+                                if(ds[key] && ds[key].indexOf("isnull") >= 0){
+                                    empty = false;
+                                    break;
+                                }
+                            } else if (pkChoiceRe.test(key) || fieldRe.test(key) || binaryFieldRe.test(key)){
+                                empty = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (empty) return false;
+                    
+                    for (var key in ds){
+                        if (!ds.hasOwnProperty(key)) continue;
+                        
+                        if ((ds[key] === undefined) || (ds[key] === "")){
+                            return false;
+                        }
+                        if (($.isArray(ds[key])) && (ds[key].length === 0)){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                /**
+                  This is the main control function for built-in and custom views
+                  that will use the default query constructor. It calls the function 
+                  to verify the datasource, then calls the query contructor, and then
+                  finally triggers the UpdateQueryEvent up the DOM
+                  @private
+                */ 
+                function constructQueryHandler(event, ds){
+                    ds = ds || cache[activeConcept].ds;
+                    // Does this datasource contain valid values?
+                    if (!postViewErrorCheck(ds)){
+                        var evt = $.Event("InvalidInputEvent");
+                        evt.ephemeral = true;
+                        evt.message = "No value has been specified.";
+                        $(event.target).trigger(evt);
+                        return false;
+                    }
+                    var server_query =  buildQuery(ds);
+                    
+                    $(event.target).trigger("UpdateQueryEvent", [server_query]);
+                    return true;
+                }
+
+                /**
+                  This function is the handler for the "add to query" button.
+                  This button appears in the static content area for all concepts,
+                  builtin or not. This event passes the event to the current view.
+                  Builtin-views will be default listen for this event and call the 
+                  ConstructQueryEvent, which will prepare pass it along with an "UpdateQueryEvent"
+                  Custom plugins can either use this default behavior (which analyzes the datasource)
+                  to constuct the query, or they may listen for the UpdateQueryButton clicked and
+                  construct the query themselves and trigger UpdateQueryEvent.
+                  @private
+                */
+                function addQueryButtonHandler(event){
+                    $(activeView.contents).triggerHandler("UpdateQueryButtonClicked"); // This would be better if every view didn't need to handle this
+                }                                                                   // it should be concept level thing.
+                
+               /**
+                 This function notifies the framework that the user has entered invalid input. 
+                 The framework will only show the same error message once, and it will only show
+                 one error message per invalid field (the last one to be sent). By default if no
+                 error message is sent on the event, then a generic error message is displayed.
+                 If there are any error messages, the submit button will be disabled. 
+                 If the event object has a true ephemeral property however, the error will be
+                 displayed for 3 seconds, and faded-out, and the button will not be disabled
+                 (it is expected that ephemeral events are more notifications, and that the 
+                 code that sent it will prevent the action the error forbids.)
+                 @private
+               */
+                function badInputHandler(evt){
+                    evt.reason = evt.reason ? "_"+ evt.reason : "";
+                    var invalid_fields = cache[activeConcept].invalid_fields;
+                    var target_name = $(evt.target).attr("name");
+                    $.each(cache[activeConcept].views, function(index,view){
+                           view.contents && view.contents.dom().find("[name="+target_name+"]").addClass("invalid"+evt.reason);
+                           view.contents && view.contents.dom().find("[name="+target_name+"]").children().addClass("invalid"+evt.reason);
+                    });
+                    var message = evt.message ? evt.message : "This query contains invalid input, please correct any invalid fields.";
+                    var already_displayed = false;
+                    $.each($staticBox.find(".error"), function(index, warning) {
+                        warning = $(warning);
+                        var rc = warning.data("ref_count");
+                        if (warning.text() === message) {
+                            // We are already displaying this message
+                            already_displayed = true;
+                            if (evt.ephemeral){
+                                return;
+                            }
+                            else if (invalid_fields[target_name+evt.reason] === undefined){
+                                // This message has been displayed, but for another field, increase
+                                // the reference count
+                                invalid_fields[target_name+evt.reason] = warning;
+                                warning.data("ref_count", rc+1);
+                                
+                            } else if (warning.text() !== invalid_fields[target_name+evt.reason].text()){
+                                // This field already has an error message, but it's different,
+                                // swap them
+                                var field_rc = invalid_fields[target_name+evt.reason].data("ref_count");
+                                invalid_fields[target_name+evt.reason].data("ref_count", field_rc-1);
+                                if (invalid_fields[target_name+evt.reason].data("ref_count") === 0){
+                                    invalid_fields[target_name+evt.reason].remove();
+                                }
+                                invalid_fields[target_name+evt.reason] = warning;
+                                warning.data("ref_count", rc+1);
+                            }
+                        }
+                    });
+                    if (already_displayed) {
+                        return;
+                    }
+
+                    var warning = $('<div class="message error">'+message+'</div>');
+                    warning.data('ref_count',1);
+                    if (!evt.ephemeral){
+                        invalid_fields[target_name+evt.reason] = warning;
+                    }
+                    $staticBox.prepend(warning);
+                    // if the warning is ephemeral (meaning its should be flashed on
+                    // screen, but not kept there until a specific thing is fixed)
+                    // then fade out and then remove
+                    if (evt.ephemeral){
+                        warning.fadeOut(3000, function(){
+                            warning.remove();
+                        });
+                    }else{
+                        // if not ephemeral, disable the button
+                        $staticBox.find("#add_to_query").attr("disabled","true");
+                    }
+                }
+
+                /**
+                  This function notifies the framework that the user corrected an invalid field. 
+                  The framework will only show the same error message once, and it will only show
+                  one error message per invalid field (the last one to be sent). By default if no
+                  error message is sent on the event, then a generic error message is displayed.
+                  If there are any error messages, the submit button will be disabled.
+                  @private
+                */ 
+                function fixedInputHandler(evt){
+                    evt.reason = evt.reason ? "_"+ evt.reason : "";
+                    var invalid_fields = cache[activeConcept].invalid_fields;
+                    var target_name = $(evt.target).attr("name");
+                    $.each(cache[activeConcept].views, function(index,view){
+                        view.contents && view.contents.dom().find("[name="+target_name+"]").removeClass("invalid"+evt.reason);
+                        view.contents && view.contents.dom().find("[name="+target_name+"]").children().removeClass("invalid"+evt.reason);
+                    });
+                    var rc = invalid_fields[target_name+evt.reason].data('ref_count') - 1;
+                    if (rc === 0){
+                        invalid_fields[target_name+evt.reason].remove();
+                    }else{
+                        invalid_fields[target_name+evt.reason].data('ref_count',rc);
+                    }
+                    delete cache[activeConcept].invalid_fields[target_name+evt.reason];
+                    
+                    // Re-enable the button if there are no more errors.
+                    if ($.isEmptyObject(cache[activeConcept].invalid_fields)){
+                        $staticBox.find("#add_to_query").attr("disabled","");
+                    }
+                }
+                // Bind all framework events to their handler
+                $container.bind({
+                    'ViewReadyEvent': viewReadyHandler,
+                    'ViewErrorEvent': viewErrorHandler,
+                    'ShowViewEvent': showViewHandler,
+                    'ElementChangedEvent' : elementChangedHandler,
+                    'UpdateQueryButtonClicked' : addQueryButtonHandler,
+                    'InvalidInputEvent' : badInputHandler,
+                    'InputCorrectedEvent': fixedInputHandler,
+                    'ConstructQueryEvent': constructQueryHandler,
+                    'ConceptDeletedEvent': conceptDeletedHandler,
+                    'ConceptAddedEvent': conceptAddedHandler
+                });
+                
+                /**
+                  This function loads dependencies for the concept and for the any views.
+                  A callback does not have to be specified if the view is custom because
+                  the view code is responsible for firing the ViewReadyEvent.
+                  @private
+                */
+                function loadDependencies(deps, cb) {
+                    cb = cb || function(){};
+
+                    if (deps.css){
+                        View.loadCss(deps.css);
+                    }
+                 
+                    if (deps.js) {
+                         require([deps.js], function (plugin) {
+                             cb(deps);
+                         });
+                    } else {
+                        cb(deps);
+                    }
+                };
+                
+                /**
+                  This function handles all the administration of laoding a new concept.
+                  It registers with the fraemwork, sets some flags, prepares the 
+                  "add to query" button and displays the first view
+                  @private
+                */
+
+                function loadConcept(concept){;
+                    // If we got here, the globals for the current concept have been loaded
+                    // We will register it in our cache
+                    concept = register(concept);
+                    activeConcept = parseInt(concept.id);
+                    // Mark this concept as having its global dependencies loaded
+                    concept.globalsLoaded = true; 
+                    
+                    // Setup tabs objects and trigger viewing of the first one
+                    if (concept.views.length < 2) {
+                        $tabsBar.hide();
+                    } else {
+                        $tabsBar.show();
+                    }
+
+                    var tabs = $.jqote(tab_tmpl, concept.views);
+                    $tabsBar.html(tabs); 
+                    if (concept['static']){
+                        $staticBox.append(concept['static']);
+                        $addQueryButton = $staticBox.find("#add_to_query");
+                        
+                    }else{
+                        // Prepare the static concept box
+                        $staticBox.append(add_query_tmpl);
+                        $addQueryButton = $staticBox.find("#add_to_query");
+                        $addQueryButton.click(function(){
+                             var event = $.Event("UpdateQueryButtonClicked");
+                             $(this).trigger(event);
+                             return false; 
+                        });
+                    }
+                    // Make sure the button for this concept has the correct label
+                    if ($.inArray(activeConcept, concepts_in_query) >= 0) {
+                        $addQueryButton.html('<span class="icon refresh"/> <span>Update Condition</span>');
+                        $(".success",$staticBox).show();
+                        
+                    }else{
+                        $addQueryButton.html('<span class="icon plus"/> <span>Add Condition</span>');
+                         $(".success",$staticBox).hide();
+                    }
+                    // Regardless of whether the tabs are visible, load the first view
+                    $tabsBar.children(':first').click();
+                };
+
+                /**
+                  Set up the tabs bar for the plugin, we are using the live events to automatically
+                  create tabs for any <a> elements put into the target area.
+                  Clicking a tab, will fire a ConceptTabClickEvent, which will be caught by 
+                  tabClickedHandler. This will fire a 'ShowViewEvent' up the DOM to our listener
+                  
+                  @private
+                */
+                function tabClickedHandler(evt, tab){
+                    var index = $tabsBar.children().index(tab);
+                    $tabsBar.trigger('ShowViewEvent', index);
+                };
+                $tabsBar.bind('ConceptTabClickedEvent', tabClickedHandler);
+
+                $tabsBar.tabs(true, function(evt, $tab) {
+                    $tab.trigger('ConceptTabClickedEvent',$tab);
+                });
+
+
+
+                /**
+                  Registers a concept. This creates the concept object in the 
+                  framework cache and verifies it has all necessary properties.
+                  @private
+                */
+                function register(concept) {
+                    if (cache[concept.id] === undefined){
+                        cache[concept.id] = concept;
+                    }else{
+                        $.extend(cache[concept.id], concept);
+                        concept = cache[concept.id];
+                    }
+                    // Create a datasource for this concept if we don't have one
+                    if (!concept.ds){
+                        // If this concept already has a query associated with it, 
+                        // populate the datasource
+                        if (concept.query) {
+                            concept.ds = createDSFromQuery(concept.query);
+                        }else{
+                            // create empty datasource
+                            concept.ds = {};
+                        }
+                    }    
+                    // Add a spot to store invalid fields.
+                    if (!concept.invalid_fields){
+                        concept.invalid_fields = {};
+                    }
+                    return concept;
+                };  
+
+                // PUBLIC METHODS
+                /**
+                   Loads and makes a particular concept active and viewable
+                   @public
+                */
+                function show(concept, existing_query, index, target) {
+                   // Verify that we need to do anything.
+                   if (parseInt(concept.id) === activeConcept)
+                       return;
+                   
+                   // If we already have a query for this concept, set it 
+                   // on the concept
+                   if (existing_query) {
+                       concept.query = existing_query;
+                   }
+                   
+                   // If there is concept being displayed, save its static 
+                   // content
+                   if (activeConcept !== null){
+                       cache[activeConcept]['static'] = $staticBox.children().detach();
+                   }
+                   // Set the name of the concept in the title bar
+                   // $titleBar.text(concept.name);
+                   if (cache[concept.id] && cache[concept.id].globalsLoaded){
+                        loadConcept(concept);
+                   } else {
+                        loadDependencies(concept, loadConcept);
+                   }
+               }
+                
+                
+                // Manager public methods
+                return {
+                    show: show,
+                    isConceptLoaded: function(concept_id){
+                        return (concept_id in cache);
+                    },
+                    buildQuery: buildQuery,
+                    constructQueryHandler: constructQueryHandler
+               };
+
+            })();
+
+        });
+        
+        return Manager;
+    }
+);
+define('define/criteria',
+     
+    function() {
+
+        var tmpl = $.jqotec([
+            '<div data-uri="<%=this.uri%>" data-id="<%= this.pk %>" class="criterion clearfix">',
+                '<a href="#" class="remove-criterion"></a>',
+                '<a href="#" class="field-anchor">',
+                    '<%= this.description %>',
+                '</a>',
+            '</div>'
+        ].join(''));
+        
+        var Criteria = function(criteria_constraint, uri, english){
+            
+            var element = $($.jqote(tmpl, {pk:criteria_constraint.concept_id,
+                                           description:english,
+                                           uri:uri+criteria_constraint.concept_id}));
+            element.data("constraint", criteria_constraint);
+            
+            element.find(".remove-criterion").click(function(){
+                element.trigger("CriteriaRemovedEvent");
+                return false;
+            });
+            
+
+            // Display the concept in the main area when the user clicks on the description
+            element.click(function (evt) { 
+                element.trigger('activate-criterion',
+                    [criteria_constraint.concept_id]);
+                return false;
+            }); 
+
+            return element;
+        };
+
+        return {Criteria:Criteria};
+    }
+);
+define('define/criteriamanager',
+    
+    ['define/criteria'],
+    
+    function(criteria) {
+
+        var template = '<button id="submit-query"><span class="icon arrow-r"/> <span>Get Report</span></button>'; 
+        var Manager;
+        
+        $(function() {
+            var $panel = $('#user-criteria'); 
+
+            Manager = (function(){
+        
+                var criteria_cache = {};
+                
+                var $criteria_div = $panel.find("#criteria-list"),
+                    $run_query_div = $panel.find(".content"),
+                    $remove_criteria = $panel.find("#remove-criteria");
+                
+                var criteria_api_uri = $criteria_div.attr("data-uri");
+                var report_url = $criteria_div.attr("data-report");
+                var session_api_uri = $panel.attr("data-uri");
+                
+                
+                // Grab the contents of panel while it is empty and save off the 
+                // "No Criteria" indicator text
+                var $no_criteria_defined = $criteria_div.children();
+                
+                // Create the run query button
+                var $run_query = $(template);
+                
+                // Load any criteria on the session
+                $.getJSON(session_api_uri, function(data){
+                      if ((data.store === null) || $.isEmptyObject(data.store)){
+                          return;
+                      }
+                      if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
+                          $.each(data.store.children.reverse(), function(index, criteria_constraint){
+                              $panel.triggerHandler("UpdateQueryEvent", [criteria_constraint, true]);
+                          });
+                      }else{
+                          $panel.triggerHandler("UpdateQueryEvent", [data.store, true]);
+                      }
+                });
+
+                // Setup click even handlers
+                // run the query
+                $run_query.click(function(){
+                    var all_constraints = [];
+                    var server_query;
+                    for (var key in criteria_cache){
+                         if (criteria_cache.hasOwnProperty(key)){
+                           all_constraints.push(criteria_cache[key].data("constraint"));
+                         }
+                    }
+                    
+                    if (all_constraints.length < 2){
+                        server_query = all_constraints[0];
+                    }else{
+                        server_query = {type: "and", children : all_constraints};
+                    }
+                    $.putJSON(session_api_uri, JSON.stringify(server_query), function(){
+                        window.location=report_url;
+                    });
+                });
+                
+                // Hook into the remove all criteria link
+                $remove_criteria.click(function(){
+                   for (var key in criteria_cache){
+                       if (criteria_cache.hasOwnProperty(key)){
+                           criteria_cache[key].trigger("CriteriaRemovedEvent");
+                       }
+                   } 
+                });
+                
+                // Listen for new criteria as it is added
+                $panel.bind("UpdateQueryEvent", function(evt, criteria_constraint, page_is_loading){
+                    
+                    var pk = criteria_constraint.concept_id;
+                    var new_criteria;
+                    // If this is the first criteria to be added remove 
+                    // content indicating no criteria is defined, and add 
+                    // "run query button"
+                    if ($.isEmptyObject(criteria_cache)){
+                        $no_criteria_defined.detach();
+                        $run_query_div.append($run_query);
+                    }
+
+                    // Until this is validated by the server and we receive the english version of it
+                    // disable the query.
+                    $run_query.attr("disabled","true");
+                    $.postJSON(criteria_api_uri, JSON.stringify(criteria_constraint), function(english){
+                        $run_query.removeAttr("disabled");
+                        var was_empty = $.isEmptyObject(criteria_cache);
+                        // Is this an update?
+                        if (criteria_cache.hasOwnProperty(pk)){
+                            new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
+                            criteria_cache[pk].replaceWith(new_criteria);
+                            new_criteria.fadeTo(300, 0.5, function() {
+                                  new_criteria.fadeTo("fast", 1);
+                            });
+                        }else{
+                            new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
+                            if (page_is_loading){
+                                $criteria_div.prepend(new_criteria);
+                            }else{
+                                 $criteria_div.append(new_criteria);
+                            }
+                            var addEvent = $.Event("ConceptAddedEvent");
+                            addEvent.concept_id = pk;
+                            $panel.trigger(addEvent);
+                        }
+                        criteria_cache[pk] =  new_criteria;
+                        if (!page_is_loading){
+                            new_criteria.addClass("selected");
+                            new_criteria.siblings().removeClass("selected");
+                        }
+                        
+                        // If the cache used to be empty, show this one in the console.
+                        if (was_empty){
+                           $($criteria_div.children()[0]).find(".field-anchor").click();
+                        }
+                    }, "text");
+                });
+
+
+                // Listen for removed criteria
+                $panel.bind("CriteriaRemovedEvent", function(evt){
+                    var $target = $(evt.target);
+                    var constraint = $target.data("constraint");
+                    criteria_cache[constraint.concept_id].remove();
+                    delete criteria_cache[constraint.concept_id];
+                    
+                    var removedEvent = $.Event("ConceptDeletedEvent");
+                    removedEvent.concept_id = constraint.concept_id;
+                    $panel.trigger(removedEvent);
+                    
+                    // If this is the last criteria, remove "run query" button
+                    // and add back "No Criteria" indicator
+                    if ($.isEmptyObject(criteria_cache)){
+                        $criteria_div.append($no_criteria_defined);
+                        $run_query.detach();
+                    }
+                });
+                
+                // Listen to see if the user clicks on any of the criteria.
+                // Highlight the selected criteria to make it clear which one is
+                // displayed
+                $panel.bind("ShowConceptEvent", function (evt){
+                      var $target = $(evt.target);
+                      $criteria_div.children(".criterion").removeClass("selected");
+                      if  ($target.is(".criterion")){
+                          $target.addClass("selected");
+                      }else{
+                          // If the user clicked on the left-hand side, but we have this criteria
+                          // defined, highlight it.
+                          var id = evt.originalEvent.concept_id;
+                          criteria_cache[id] && criteria_cache[id].addClass("selected");
+                      }
+                });
+
+                return {
+                    retrieveCriteriaDS: function(concept_id) {
+                        var ds = null;
+                        concept_id && $.each($criteria_div.children(), function(index,element){
+                            if (!$(element).data("constraint")){
+                                return; // could just be text nodes
+                            }
+                            if ($(element).data("constraint").concept_id == concept_id){ // TODO cast to string for both
+                                ds = $(element).data("constraint");
+                            }
+                        });
+                        return ds;
+                    }
+                };
+            })();
+        });
+
+        return Manager;
+    }
+);
+define('define/description',
+
+    ['define/events'],
+
+    function(Events) {
+
+        $(function() {
+
+            var dom = {
+                description: $('<div id="description"></div>').appendTo('body')
+            };
+
+            dom.description.timeout = null;
+
+            dom.description.bind(Events.ACTIVATE_DESCRIPTION, function(evt) {
+                // TODO implement position
+
+                clearTimeout(dom.description.timeout);
+
+                var height, overflow,
+                    target = $(evt.target),
+                    offset = target.offset(),
+                    width = target.outerWidth(),
+                    description = target.children('.description').html();
+
+                // refresh contents before getting height
+                dom.description.html(description);
+
+                height = dom.description.outerHeight();
+                overflow = $(window).height() - (height + offset.top);
+
+                dom.description.css({
+                    left: offset.left + width + 20,
+                    top: offset.top + (overflow < 0 ? overflow : 0)
+                }).show();
+
+                return false;
+            });
+
+            dom.description.bind(Events.DEACTIVATE_DESCRIPTION, function(evt, timeout) {
+                timeout = timeout || 0;
+                dom.description.timeout = setTimeout(function() {
+                    dom.description.fadeOut(100);
+                }, timeout);
+                return false;
+
+            });
+
+            dom.description.bind({
+                'mouseover': function() {
+                    clearTimeout(dom.description.timeout);
+                },
+
+                'mouseout': function() {
+                    dom.description.trigger(Events.DEACTIVATE_DESCRIPTION, [200]);
+                }
+            });
+
+        });
+
+    }
+
+);
+/*
+ * The criterion objects provide the necessary data to render the interface
+ * for interaction by the user. Thus, by definition, everything roughly
+ * depends on which  criterion is currently active
+ *
+ * On Load:
+ * - request all criterion objects, cache in local datastore
+ *
+ * User Interactions:
+ * - on click, trigger an event that the criterion has changed
+ *
+ * All events are in the 'criterion' namespace.
+ */
+
+define('define/criteria2',
+
+    ['define/events', 'rest/resource', 'define/conceptmanager',
+        'define/criteriamanager', 'define/description'],
+
+    function(Events, Resource, ConceptManager, CriteriaManager) {
+
+        var template = [
+            '<div data-id="<%= this.id %>">',
+                '<span class="name"><%= this.name %></span>',
+                '<span class="description"><%= this.description %></span>',
+            '</div>'
+        ].join('');
+
+        var CriterionCollection;
+
+        $(function() {
+
+            var dom = {
+                criteria: $('#criteria'),
+                pluginPanel: $('#plugin-panel')
+            };
+
+            CriterionCollection = new Resource({
+
+                url: dom.criteria.data('uri'),
+                template: template
+
+            }).ready(function() {
+
+                dom.criteria.html(this.dom);
+                
+            });
+
+            /*
+             * When a new category is activated, the list of available criteria
+             * must be filtered to only represent those in that category.
+             */
+
+            dom.criteria.current = null;
+
+            dom.criteria.bind(Events.ACTIVATE_CATEGORY,
+
+                function(evt, id) {
+
+                    // find all criterion objects that are associated with the
+                    // category and show them
+                    CriterionCollection.ready(function() {
+
+                        $.each(this.store, function() {
+                            (this.data('category').id === id) ? this.show() : this.hide();
+                        });
+
+                    });
+                }
+            );
+
+            // temporary binding to ShowConceptEvent until internals are
+            // cleaned up
+            dom.criteria.bind(Events.ACTIVATE_CRITERION + ' ShowConceptEvent',
+                
+                function(evt, id) {
+
+                    if (dom.criteria.current === id)
+                        return false;
+                    dom.criteria.current = id;
+
+                    CriterionCollection.ready(function() {
+
+                        var target = this.store[id];
+                        target.addClass('active');
+                        target.siblings().removeClass('active');
+
+                        var data = target.data();
+                        dom.criteria.trigger(Events.SYNC_CATEGORY,
+                            [data.category.id, id]);
+
+                        var conditions = CriteriaManager.retrieveCriteriaDS(id);
+
+                        if (ConceptManager.isConceptLoaded(id)) {
+                            ConceptManager.show({id: id}, conditions);
+                        } else {
+                            $.ajax({
+                                url: target.data('uri'),
+                                dataType:'json',
+                                beforeSend: function() {
+                                    dom.pluginPanel.block();
+                                },
+                                complete: function() {
+                                    dom.pluginPanel.unblock();                                    
+                                },
+                                success: function(json) {
+                                    ConceptManager.show(json, conditions);
+                                }
+                            });
+                        }
+                    });
+                }
+            );
+
+
+            /*
+             * Delegation for handling the mouse hovering the '.info' element.
+             * This must notify the description box of the event
+             */
+            var timeout = null;
+            dom.criteria.delegate('div', 'mouseenter', function() {
+                clearTimeout(timeout);
+                var ref = this;
+                timeout = setTimeout(function() {
+                    $(ref).trigger(Events.ACTIVATE_DESCRIPTION, ['right']);
+                }, 700);
+            });
+
+            /*
+             * Delegation for handling the mouse leaving the '.info' element.
+             * This is necessary since the user may be going to interact with
+             * the description box.
+             */
+            dom.criteria.delegate('div', 'mouseleave', function() {
+                clearTimeout(timeout);
+                $(this).trigger(Events.DEACTIVATE_DESCRIPTION, [200]);
+            });
+
+            dom.criteria.delegate('div', 'click', function(evt) {
+                clearTimeout(timeout);
+                $(this).trigger(Events.ACTIVATE_CRITERION,
+                    [$(this).data('id')]);
+                $(this).trigger(Events.DEACTIVATE_DESCRIPTION);
+            });
+
+        });
+
+        return CriterionCollection;
+    }
+);
+/*
+ * The search interface performs a GET to the CriterionCollection
+ * resource with the ``q`` parameter, performing a filtering operation
+ * on the objects.
+ *
+ * The response is a list of criterion IDs which can be used to filter
+ * an existing list of criterion objects.
+ *
+ * On Load:
+ * - get all criterion objects from local datastore, render the results
+ *   box
+ *
+ * User Interactions:
+ * - on keyup, trigger the search-criterion
+ *
+ * All events are in the 'criterion' namespace.
+ */
+
+define('define/search',
+
+    ['define/events', 'define/criteria2', 'rest/resource'],
+
+    function(Events, CriterionCollection, Resource) {
+
+        var template = [
+            '<div data-id="<%= this.id %>">',
+                '<b><%= this.name %></b><br>',
+                '<span><%= this.category.name %></span>',
+            '</div>'
+        ].join('');
+
+        var ResultCollection;
+
+        $(function() {
+
+            var dom = {
+                search: $('#search'),
+                results: $('<div id="search-results"></div>').appendTo('body'),
+                noresults: $('<p style="font-style:italic">No Results Found</p>')
+            };
+
+            /*
+             * Sets the position of the search results div.
+             *
+             * Defined as a function since it is used once the results are
+             * populated, but also when the window is resized.
+             */
+            function setResultsPosition() {
+
+                var rWidth = dom.results.outerWidth(),
+                    sOffset = dom.search.offset(),
+                    sHeight = dom.search.outerHeight(),
+                    sWidth = dom.search.outerWidth();
+
+                dom.results.css({
+                    left: sOffset.left - (rWidth - sWidth) / 2.0,
+                    top: sOffset.top + sHeight + 5
+                });
+
+            };
+
+            // all this trouble of copying the original CriterionCollection
+            // to ensure there is no discrepancy between the search results
+            // and the available options. the scenario that would lead to
+            // confusion is if the server updated between the CriterionCollection
+            // being populated and the user searches.
+            CriterionCollection.ready(function() {
+
+                ResultCollection = new Resource({
+
+                    store: CriterionCollection._,
+                    template: template
+
+                }).ready(function() { 
+
+                    dom.results.html(this.dom);
+                    setResultsPosition();
+
+                });
+
+                /*
+                 * Performs a GET to the server for the IDs of all objects that
+                 * were a hit. The IDs are then iterated over and only those
+                 * objects are shown.
+                 */
+                dom.search.autocomplete2({
+                    success: function(value, json) {
+                        dom.noresults.detach();
+                        // show div, but hide results up front
+                        dom.results.show().children().hide();
+
+                        if (json.length) {
+                            $.each(json, function() {
+                                if (ResultCollection.store[this])
+                                    ResultCollection.store[this].show();
+                            });
+                        } else {
+                            dom.noresults.prependTo(dom.results);
+                        }
+                    }
+                }, null, 50);
+
+            });
+
+            dom.results.entered = false;
+
+            // this can be defined outside of the callback since nothing
+            // directly depends on the ResultCollection itself
+            dom.search.bind({
+
+                /*
+                 * When the search input loses focus, make sure the user is not
+                 * interacting with the results box before hiding it.
+                 *
+                 * TODO should this fire a custom event rather than relying on
+                 * 'mouseout'?
+                 */
+                'blur': function(evt) {
+                    dom.search.focused = false;
+                    if (!dom.results.entered)
+                        dom.results.trigger('mouseleave');
+                },
+                
+                /*
+                 * If the user performed a search previously, show the state of
+                 * the results as they were.
+                 */
+                'focus': function(evt) {
+                    dom.search.focused = true;
+                    var val = dom.search.val();
+                    if (val && val !== dom.search.attr('placeholder')) {
+                        dom.results.fadeIn('fast');
+                    }
+                }
+
+            });
+
+            dom.results.bind({
+
+                /*
+                 * When the mouse is on the search results, regardless if the
+                 * search input loses focus, the results should not hide.
+                 * Therefore this flag must be set.
+                 */
+                'mouseenter': function(evt) {
+                    dom.results.entered = true;
+                },
+
+                /*
+                 * Check to ensure the search input is not in focus before the
+                 * results magically go away.
+                 */
+                'mouseleave': function(evt) {
+                    dom.results.entered = false;
+                    if (!dom.search.focused)
+                        dom.results.fadeOut('fast');
+                }
+
+            });
+
+            /*
+             * Fire the ACTIVATE_CRITERION event when any of the results are
+             * clicked.
+             *
+             * TODO there has been discussion to whether the results box should
+             * hide once clicked, or stay open.
+             */
+            dom.results.delegate('div', 'click', function(evt) {
+
+                var target = $(this);
+                target.trigger(Events.ACTIVATE_CRITERION, [target.data('id')]);
+
+            });
+
+            /*
+             * This is definitely an edge case, but a user may be in the middle
+             * of searching and decided to resize the window so we need to reset
+             * the search results position (this is only noticable when the
+             * search input is in focus).
+             */
+            $(window).bind('resize', function(evt) {
+
+                setResultsPosition();
+
+            });
+
+        });
+
+        return ResultCollection;
+    }
+);
+define("utils/html5fix",function(){$(function(){Modernizr.input.placeholder||$("input[placeholder]").placeholder(),Modernizr.input.autofocus||$("input[autofocus]").focus()})})var OVERLAY=$("#overlay");$("body").bind({ajaxComplete:function(a,b,c){if(b.status===302){var d=$.parseJSON(b.responseText);d.redirect&&(window.location=d.redirect)}},ajaxError:function(a,b,c,d){}})define("utils/ajaxsetup", function(){});
+Array.prototype.map||(Array.prototype.map=function(a){var b=this.length>>>0;if(typeof a!="function")throw new TypeError;var c=Array(b),d=arguments[1];for(var e=0;e<b;e++)e in this&&(c[e]=a.call(d,this[e],e,this));return c}),function(a){a.extend({putJSON:function(b,c,d,e){return a.ajax({type:"PUT",url:b,contentType:"application/json",data:c,success:d,dataType:e})},postJSON:function(b,c,d,e){return a.ajax({type:"POST",url:b,contentType:"application/json",data:c,success:d,dataType:e})},log:function(a){window.console?console.log(a):alert(a)},jqoteobj:function(b,c,d){out=a.jqote(b,c,d);return a(out)}}),a.fn.placeholder=function(b){var c=this;c.each(function(){var d=a(this),e=d.css("color");b=b||d.attr("placeholder");if(!d.is("input")&&!d.is("textarea"))return c;(d.val()===""||d.val()===b)&&d.val(b).css("color","#999"),d.focus(function(){d.val()===b&&d.css("color",e).val("")}).blur(function(){d.css("color",e),d.val()===""&&d.css("color","#999").val(b)})});return this},a.fn.jdata=function(b,c){var d=a.grep(this,function(d){return a(d).data(b)==c});return a(d)},a.fn.autocomplete2=function(b,c,d,e){if(!this.is("input[type=text]")&&!this.is("input[type=search]"))throw new TypeError("A text or search field is required");c=c||null,d=d||300,e=e||!1;var f=a.extend({},b),g=f.success||function(){},h=f.error||function(){},i=f.start||function(){},j=f.end||function(){};f.data={};return this.each(function(b){var k=a(this),l,m,n,o=null,p=null,q=null,r=!1;l=k.closest("form").submit(function(a){return!1}),f.url=l.attr("action"),f.success=function(a,b,c){g(m,a,b,c),q==null&&e&&(q={resp:a,status:b,xhr:c}),n&&b=="success"&&(k.cache[m]=a),o=m,r=!1,f.end()},f.error=function(a,b,c){h(m,a,b,c),f.end()},f.start=function(){r=!0,i(m)},f.end=function(){r=!1,j()};var s="search-"+b;k.cache={},k.bind(s,function(b,g,h){n=h?!0:!1,m=g;n&&k.cache[m]?f.success(k.cache[m],"cached",null):(clearTimeout(p),c!==null&&m===c&&(m=""),m=m||"",m=SearchSanitizer.clean(m).toLowerCase(),m!==o?(r==!1&&f.start(),f.data.q=m,p=setTimeout(function(){e&&q?f.success(q.resp,q.status,q.xhr):a.ajax(f)},d)):f.end())}),k.keyup(function(a){k.trigger(s,[this.value]);return!1})})},a.fn.tabs=function(){var b={nextTab:function(a,b,c,d){b=b===undefined?a.data("tabindex"):b,c=c||a.attr("children").length,d=d===undefined?0:d+1;if(d==c)return null;if(c+1<=b)return this.nextTab(a,0,c,d);if(a.children(":nth("+b+")").hasClass("disabled"))return this.nextTab(a,b+1,c,d);return b},getTab:function(a,b){return a.children(":nth("+b+")")}},c={init:function(b,c,e){b.data("tabified",!0),c=c===!0?!0:!1,e=e||function(){};var f=b.children(".tab");c?a(".tab",b).live("click",d(e)):f.click(d(e)),f.filter(".active").length===0&&f.not(".disabled").filter(":first").click()},toggle:function(a,c){b.getTab(a,c).click(),a.data("tabindex",c)},disable:function(a,c){b.getTab(a,c).addClass("disabled").removeClass("active"),nindex=b.nextTab(a,c),nindex!==null&&this.toggle(a,nindex)},enable:function(a,c){b.getTab(a,c).removeClass("disabled")}},d=function(b){return function(c){c.preventDefault();var d=a(this).not(".disabled");if(d.length==0||d.hasClass("active"))return!1;var e=d.siblings(".tab");d.addClass("active"),e.removeClass("active"),b(c,d)}};return function(a,b){if(typeof a==="string"){if(this.data("tabified")===null)throw new TypeError("tabs have not been initialized yet");c[a](this,b)}else c.init(this,a,b);return this}}()}(jQuery)define("utils/extensions", function(){});
+var SearchSanitizer={regexes:{truncateWhiteSpace:[/\s{2,}/g," "],removeNonAlphaNumeric:[/[^\sA-Za-z0-9]/g,""],removeStopWords:[/\b(a|able|about|across|after|all|almost|also|am|among|an|and|any|are|as|at|be|because|been|but|by|can|cannot|could|dear|did|do|does|either|else|ever|every|for|from|get|got|had|has|have|he|her|hers|him|his|how|however|i|if|in|into|is|it|its|just|least|let|like|likely|may|me|might|most|must|my|neither|no|nor|not|of|off|often|on|only|or|other|our|own|rather|said|say|says|she|should|since|so|some|than|that|the|their|them|then|there|these|they|this|tis|to|too|twas|us|wants|was|we|were|what|when|where|which|while|who|whom|why|will|with|would|yet|you|your)\b/g,""],trimRightWhiteSpace:[/^\s+/,""],trimLeftWhiteSpace:[/\s+$/,""]},clean:function(a){for(var b in this.regexes){var c=this.regexes[b];a=a.replace(c[0],c[1])}return a}}define("utils/sanitizer", function(){});
+(function(a){a.bubbleproxy=function(b,c){return a(c||"body").bubbleproxy(b)},a.fn.bubbleproxy=function(b){b=b||{},typeof b=="string"&&(nconfig={},nconfig[arguments[0]]=arguments[1]||{},b=nconfig);var c=this;a.each(b,function(b,d){if(d.listeners){var e=a.map(d.listeners||[],function(b){return b.jquery?b:a(b)}),f=a.map(d.sources||[],function(a){return a.jquery?a.selector:a}),g=d.stopPropagation===undefined?!0:d.stopPropagation;c.bind(b,function(b){if(!!f.length){var c=!1,d=a(b.target);a.each(f,function(){c=!d.is(this);return c});if(!c)return}var h,i,j=Array.prototype.slice.call(arguments,1);a.each(e,function(){i=a.extend(a.Event(b.type),b),h=j.slice(0),h.unshift(i),g&&i.stopPropagation(),this.each(function(){a.event.trigger(i,h,this,!0)})})})}});return this}})(jQuery)define("lib/jquery.bubbleproxy", function(){});
+require(
+    // required modules
+    [
+        'define/events',
+        'define/categories',
+        'define/criteria2',
+        'define/search',
+        'define/criteriamanager',
+        'utils/html5fix',
+        'utils/ajaxsetup',
+        'utils/extensions',
+        'utils/sanitizer',
+        'lib/jquery.bubbleproxy'
+    ],
+    
+    function(Events, CategoryCollection, CriterionCollection, search, criteriamanager) {
+   
+        $(function() {
+
+            var config = {};
+
+            config[Events.ACTIVATE_CATEGORY] = {
+                listeners: ['#criteria', '#categories']
+            };
+
+            config[Events.ACTIVATE_CRITERION] = {
+                listeners: ['#criteria']
+            };
+
+            config[Events.SYNC_CATEGORY] = {
+                listeners: ['#categories']
+            };
+
+            config[Events.ACTIVATE_DESCRIPTION] = {
+                listeners: ['#description']
+            };
+
+            config[Events.DEACTIVATE_DESCRIPTION] = {
+                listeners: ['#description']
+            };
+
+            config['ConceptAddedEvent ConceptDeletedEvent'] = {
+                listeners: ['#plugin-panel']
+            };
+
+            config['UpdateQueryEvent'] = {
+                listeners: ['#user-criteria']
+            };
+
+            var body = $('body');
+            
+            body.bubbleproxy(config);
+
+//            var criteriaPanel = $('#user-criteria'),
+//                content = $('#content');
+
+            // The view manager needs to know where in the DOM to place certain things
+
+        
+            // Create an instance of the conceptManager object. Only do this once.
+//            var conceptManager = conceptmanager.manager(pluginPanel, pluginTitle, pluginTabs, pluginDynamicContent,
+//                pluginStaticContent);
+        
+//            var criteriaManager = criteriamanager.Manager(criteriaPanel);
+        
+//            content.bind('UpdateQueryEvent', function(evt, criteria_constraint) {
+//                criteriaPanel.triggerHandler("UpdateQueryEvent", [criteria_constraint]);
+//            });
+//        
+//            content.bind("ConceptAddedEvent ConceptDeletedEvent", function(evt){
+//                pluginPanel.trigger(evt);
+//            });
+        
+            // There are currently three ways this event can be triggered.
+            // 1) Clicking on concept in the left hand-side menu
+            //    a)  Slightly differently, a user can click on a concept in the left
+            //        hand panel while that concept is already part of a question in the
+            //        right-hand query panel, in which case, the data needs to be retrieved
+            //        from the query component. 
+            // 2) Clicking on a criteria from the query box on the right-hand side
+            // 3) Clicking on a tab where a concept has already been opened while on 
+            //    another tab. For example, if you were on Audiology Tab, selected ABR 1000,
+            //    and then moved to Imaging, and then clicked back on Audiology.
+//            body.bind('ShowConceptEvent activate-criterion', function(evt, id, conditions) {
+//                var target = criteria.src.criteria.get()[id];
+//                // notify the criteria manager so it can remove highlighted concepts if necessary
+////                if (!target.is(".criterion"))
+////                {
+////                    evt.concept_id = target.attr('data-id');
+////                    criteriaPanel.triggerHandler(evt);
+////                }else {
+////                    // deselect any highlighted criteria in the left hand side
+////                    criteria.children(".active").removeClass("active");
+////                
+////                }
+////                if (!existing_ds){
+////                    // Criteria manager will have constraints if this is already in the right side
+////                    // but they clicked on the concept in the left side
+////                    existing_ds = criteriaManager.retrieveCriteriaDS(id);
+////                }
+////
+//                if (conceptManager.isConceptLoaded(id)){
+//                    pluginPanel.fadeIn(100);
+//                    conceptManager.show({id: id}, conditions);
+//                } else {
+//                    $.ajax({
+//                        url: target.data('uri'),
+//                        dataType:'json',
+//                        success: function(json) {
+//                                pluginPanel.fadeIn(100);
+//                                conceptManager.show(json, conditions);
+//                        }
+//                    });
+//                }
+//            });
+        
+        });
+    }
+);
+define("define/main", function(){});

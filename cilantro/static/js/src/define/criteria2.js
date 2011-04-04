@@ -21,7 +21,6 @@ define('define/criteria2',
 
         var template = [
             '<div data-id="<%= this.id %>">',
-//                '<div class="icon info"></div>',
                 '<span class="name"><%= this.name %></span>',
                 '<span class="description"><%= this.description %></span>',
             '</div>'
@@ -32,7 +31,8 @@ define('define/criteria2',
         $(function() {
 
             var dom = {
-                criteria: $('#criteria')
+                criteria: $('#criteria'),
+                pluginPanel: $('#plugin-panel')
             };
 
             CriterionCollection = new Resource({
@@ -77,7 +77,7 @@ define('define/criteria2',
 
                     if (dom.criteria.current === id)
                         return false;
-                    dom.criteria.current = id
+                    dom.criteria.current = id;
 
                     CriterionCollection.ready(function() {
 
@@ -89,12 +89,6 @@ define('define/criteria2',
                         dom.criteria.trigger(Events.SYNC_CATEGORY,
                             [data.category.id, id]);
 
-                        var conditions = null;
-
-//                        CriteriaManager.
-
-                        // ideal API
-//                        ConceptManager.show(id);
                         var conditions = CriteriaManager.retrieveCriteriaDS(id);
 
                         if (ConceptManager.isConceptLoaded(id)) {
@@ -103,8 +97,14 @@ define('define/criteria2',
                             $.ajax({
                                 url: target.data('uri'),
                                 dataType:'json',
+                                beforeSend: function() {
+                                    dom.pluginPanel.block();
+                                },
+                                complete: function() {
+                                    dom.pluginPanel.unblock();                                    
+                                },
                                 success: function(json) {
-                                        ConceptManager.show(json, conditions);
+                                    ConceptManager.show(json, conditions);
                                 }
                             });
                         }

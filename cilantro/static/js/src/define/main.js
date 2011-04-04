@@ -50,11 +50,6 @@ require(
             var body = $('body');
             
             body.bubbleproxy(config);
-         
-            body.ajaxComplete(function() {
-                OVERLAY.fadeOut();
-            });
-
 
 //            var criteriaPanel = $('#user-criteria'),
 //                content = $('#content');

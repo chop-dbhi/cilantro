@@ -1,29 +1,101 @@
-@import "partials/constants";
+@import "partials/colors";
 @import "partials/mixins";
 @import "partials/shadows";
-@import "partials/reset";
-@import "partials/typography";
+@import "partials/boilerplate";
 @import "partials/container";
-@import "partials/extras";
-// leave for last to override everything else
-@import "partials/iecompat";
+@import "partials/jqueryui";
+@import "partials/sortable";
+@import "partials/icons";
 
+/**
+ * START reset overrides...
+ */
+
+html { overflow-y: auto; }
+
+::-moz-selection { background: inherit; color: inherit; }
+::selection { background: inherit; color: inherit; }
+
+/* j.mp/webkit-tap-highlight-color */
+a:link { -webkit-tap-highlight-color: inherit; }
+
+/**
+ * END reset overrides...
+ */
+ 
+ 
 
 body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: url(../img/linen_tile.png);
     -moz-user-select: none;
     -webkit-user-select: none;
     user-select: none;
 }
 
+h4, p {
+    margin-bottom: 5px;
+}
+
+b, strong {
+    font-weight: bolder;
+}
+
+i, em {
+    font-style: italic;
+}
+
+section {
+    @include inset(#fff);
+    @include radius(3px);
+    
+    border-color: #aaa;
+    padding: 10px;
+}
+
+input, textarea {
+    @include inset(#f6f6f6);
+    @include radius(2px);
+    
+    outline: none;
+    padding: 2px;
+    width: 150px;
+    border: 1px solid #aaa;
+
+    background-color: #fff;
+
+    &:disabled {
+        background-color: #f6f6f6;
+    }
+}
+
+textarea {
+    width: auto;
+}
+
+input[type=submit], input[type=button],
+input[type=radio], input[type=checkbox] {
+    width: auto;
+}
+
+// the first cell in each row (assuming it is a th) needs some padding
+// so it does not bump up against the next cell
+table tbody tr > th:first-child {
+    text-align: right;    
+    padding-right: 10px;
+}
+
 header {
     @include anchors(#666, #333);
-    @include dual-shadow(0 1px 3px darken($DEFAULT_COLOR, 20), 0 1px 3px #aaa inset);
+    @include dual-shadow(
+        0 1px 3px darken($DEFAULT_COLOR, 20),
+        inset 0 1px 3px #aaa
+    );
 
     color: #666;
     font-size: 0.85em;
 
-    position: position;
+    position: top;
     top: 0;
     left: 0;
     right: 0;
@@ -49,12 +121,12 @@ nav {
     @include anchors(#666, #333);
     
     ul {
-        color: #666;
+        @include letter-press(#666);
+        
         padding: 0;
         margin-bottom: 10px;
         list-style: none;
         font-size: 12px;
-        text-shadow: $LIGHT_TEXT_SHADOW;
         
         li {
             display: inline;
@@ -66,19 +138,18 @@ nav {
 }
 
 #content {
-    position: absolute;
-    top: 80px;
+    position: relative;
+    top: 30px;
     left: 50%;
     margin-left: -480px;
     width: 960px;
 }
 
 footer {
-    position: absolute;
-    bottom: 20px;
+    position: relative;
+    top: 70px;
     left: 0;
     right: 0;
-    z-index: -1;
 
     color: darken($DEFAULT_COLOR, 50);
     text-shadow: 0 1px 2px lighten($DEFAULT_COLOR, 100);
@@ -109,18 +180,10 @@ label {
     padding: 2px 0;
 }
 
-input {
-    @include inset(#f6f6f6);
-
-    &:disabled {
-        background-color: #f6f6f6;
-    }
-}
-
 input[type=button], input[type=submit], button {
     @include radius(3px);
-    @include floated(#ddd);
-    @include letterpress(#222);
+    @include raised(#ddd);
+    @include letter-press(#222);
 
     cursor: pointer;
     position: relative;
@@ -128,43 +191,44 @@ input[type=button], input[type=submit], button {
     padding: 2px 5px;
     font-weight: 600;
     font-size: 0.9em;
-    border: 1px solid #666;
 
-    > .icon {
-        margin-top: -4px;
-    }
+    border: 1px solid #666;
 
     &:hover {
         border-color: #222;
     }
 
     &:active {
-        @include vertical-gradient(#bbb, #ddd); 
         top: 1px;
     }
 
     &:disabled {    
-        @include vertical-gradient(#eee, #ccc);
         @include shadow(none);
+        @include letter-press(#999);
 
-        color: #999;
         border-color: #aaa;
-        cursor: auto;        
-        text-shadow: $LIGHT_TEXT_SHADOW;
+        cursor: auto;
 
         &:hover {
             border-color: #aaa;        
         }
 
         &:active {
-            @include vertical-gradient(#eee, #ccc);
+            @include letter-press(#999);
 
             top: 0;
-            color: #999;
             border-color: #aaa;
-            text-shadow: $LIGHT_TEXT_SHADOW;
         }     
     }
+}
+
+/**
+ * Some common helper classes..
+ */
+
+.block {
+    @include opacify(70);
+    background: #fff url(../img/loader.gif) no-repeat center;
 }
 
 .messages {
@@ -179,4 +243,16 @@ input[type=button], input[type=submit], button {
     &.warning { @include message(#653400, warning); }
     &.error { @include message(#500700, error); }
     &.information { @include message(#000F3C, info); }
+}
+
+.info {
+    font-size: 0.85em;
+    font-style: italic;
+    color: #666;
+}
+
+.ie7 {
+    header {
+        border-bottom: 1px solid darken($DEFAULT_COLOR, 10);
+    }
 }

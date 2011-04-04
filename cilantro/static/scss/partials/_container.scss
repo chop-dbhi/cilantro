@@ -1,21 +1,27 @@
 // defined as a mixin for other elements to extend from e.g. jQuery UI dialog
 @mixin container-title {
-    @include radius($BORDER_RADIUS $BORDER_RADIUS 0 0);
-    @include raised(#444, 2px);
-    @include letterpop(#eee);
+    @include radius(4px 4px 0 0);
+    @include letter-pop(#eee);
 
-    border-top: 1px solid #333;
-    border-bottom: 1px solid #fff;
-    padding: 5px 10px;
-    font-weight: 500;    
-    font-size: 1.1em; 
+    background-color: #444;
+    @include dual-shadow(
+        inset 0 1px 2px desaturate(lighten(#444, 30), 40),
+        inset 0 -1px 2px darken(#444, 10)
+    );
+
+    border: 1px solid darken(#444, 20);
+    padding: 4px 10px;
+    font-weight: 500;
+    font-size: 1.1em;
+    
+    &::after {
+        border-bottom: 1px solid #fff;
+    };
 }
 
 .container {
     @include shadow(0 1px 5px #777);	
-    @include radius($BORDER_RADIUS $BORDER_RADIUS 0 0);
-    
-	background-color: #fff;
+    @include radius(4px 4px 0 0);
 
     // container title bar
     > .title {
@@ -47,11 +53,13 @@
     }
     
     > .toolbar {
-        @include raised($DEFAULT_COLOR);
-        @include letterpress(#333, 1px);
+        @include raised(saturate($DEFAULT_COLOR, 30));
+        @include letter-press(#333, 1px);
 
-        border-top: 1px solid darken($DEFAULT_COLOR, 10);
-        border-bottom: 1px solid darken($DEFAULT_COLOR, 20);
+        border-right: none;
+        border-left: none;
+
+        border-bottom-color: darken($DEFAULT_COLOR, 30);
 
         font-size: 0.9em;
         padding: 3px 10px;
@@ -75,33 +83,34 @@
     > .info {
         @include shadow(0 2px 4px #ddd inset);
         
+        font-size: inherit;
         padding: 10px;
         background-color: #fff;
+        font-style: normal;
+        font-size: 0.9em;
         border-bottom: 1px solid #ccc;
     }
 
     // container content area, keep it simple...
     > .content {
-        @include shadow(0 -1px 3px #ddd inset);
-
-        background-color: #fff;
+        @include letter-press(#444);
+        
+        border-top: 1px solid #fff;
+        background-color: #eee;
         padding: 10px;
     }
 
     .tabs {
         padding: 7px 0 7px 10px;
         display: block;
-        background-color: #fff;
-        border-bottom: 1px solid #ccc;
 
         > .tab {
+            @include letter-press(#444);
             @include radius(10px);
             background-color: #fff;
             padding: 1px 10px;
             margin-right: 5px;
             border: 1px solid #fff;
-            color: #444;
-            text-shadow: $LIGHT_TEXT_SHADOW;
             text-decoration: none;
             font-weight: 500;
 
@@ -112,8 +121,8 @@
 
             &.active {
                 @include inset(darken($DEFAULT_COLOR, 40));
-                text-shadow: $DARK_TEXT_SHADOW;
-                color: #fff;
+                @include letter-pop(#fff);
+                
                 border-color: darken($DEFAULT_COLOR, 60);
                 cursor: auto;
                 text-decoration: none;
@@ -128,10 +137,30 @@
             }
         }
     }
+}
 
-    // for good measure...
+/*
+ * Begin IE fixes...
+ */
+
+.ie7 {
     .container {
-        @include shadow(none);
-        @include radius(0);
+        border: 1px solid #f9f9f9;
+
+        > .title button {
+            font-size: 0.7em;
+        }
+
+        > .toolbar, > .info {
+            border-right: 1px solid #aaa;
+            border-left: 1px solid #aaa;
+        }
+
+        > .content {
+            border-top: none;
+            border-bottom: 1px solid #aaa;
+            border-right: 1px solid #aaa;
+            border-left: 1px solid #aaa;
+        }
     }
 }

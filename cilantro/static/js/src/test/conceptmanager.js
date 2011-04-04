@@ -1,6 +1,4 @@
-require.def('test/conceptmanager',
-            ['define/conceptmanager'],
-            function(manager) {
+define('test/conceptmanager', ['define/conceptmanager'], function(manager) {
                 
     var equivalent = function(x,y)
     {   var p = null;
