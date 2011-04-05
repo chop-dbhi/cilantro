@@ -19,6 +19,10 @@ html { overflow-y: auto; }
 /* j.mp/webkit-tap-highlight-color */
 a:link { -webkit-tap-highlight-color: inherit; }
 
+input[type="checkbox"] {
+    vertical-align: middle;
+}
+
 /**
  * END reset overrides...
  */
