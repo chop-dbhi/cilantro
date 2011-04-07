@@ -9,12 +9,13 @@
 {% endblock %}
 
 {% block scripts %}
+    {{ block.super }}
     <script>
         window.api = {
             category: '{% url api:categories:read %}',
             criterion: '{% url api:criteria:read %}'
         };
-        require(['define/main']);
+        require(['main', 'define/main']);
     </script>
 {% endblock %}
 
@@ -26,10 +27,10 @@
         <div class="content">
             {% spaceless %}
             <div id="tabs">
-                <form method="get" action="{% url api:criteria:read %}">
-                    <input id="search" type="text" name="q" placeholder="Search...">
-                </form> 
                 <div id="categories" data-uri="{% url api:categories:read %}"></div>
+                <form method="get" action="{% url api:criteria:read %}">
+                    <input id="search" type="text" name="q" autocomplete="off" placeholder="Search...">
+                </form>
             </div>
  
 {#             <div id="subcategories" class="tabs"> #}
@@ -42,7 +43,7 @@
             <div id="center-pane" class="clearfix">
                 {# The "option-detail" panel displays information about a particular query option and the means #}
                 {# to interact with it.  #}
-                <div id="plugin-panel" class="container">
+                <section id="plugin-panel">
 
                     {# This toolbar will contain the dynamically generated tabs based on a query option's #}
                     {# initial response from the server. Tabs are context-specific and do not have cross #}
@@ -60,11 +61,11 @@
                         <div id="plugin-static-content"></div>
                 
                     </div>
-                </div>
+                </section>
                 
-                <div id="criteria" data-uri="{% url api:criteria:read %}">
+                <section id="criteria" data-uri="{% url api:criteria:read %}">
                     <em id="no-results"></em>
-                </div>
+                </section>
             </div>
         </div>
     </div>

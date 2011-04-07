@@ -7,15 +7,6 @@ import sys
 
 BASE_PACKAGE = 'cilantro'
 
-# FIXME: will not work on Windows
-# build the JS and CSS files prior to installing
-build_script = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-    'dist/run.sh')
-exit_code = os.system('sh %s' % build_script)
-
-if exit_code > 0:
-    sys.exit(exit_code)
-
 class osx_install_data(install_data):
     # On MacOS, the platform-specific lib dir is /System/Library/Framework/Python/.../
     # which is wrong. Python 2.5 supplied with MacOS 10.5 has an Apple-specific fix
@@ -77,10 +68,10 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
     for file_info in data_files:
         file_info[0] = '\\PURELIB\\%s' % file_info[0]
 
-version = __import__(BASE_PACKAGE).__version__
+version = __import__(BASE_PACKAGE).get_version()
 
 setup(
-    version = version.replace(' ', '-'),
+    version = version,
     name = 'django-cilantro',
     author = 'Byron Ruth',
     author_email = 'ruthb@email.chop.edu',

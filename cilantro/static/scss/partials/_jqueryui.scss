@@ -1,0 +1,31 @@
+// jQuery UI components
+.ui-dialog {
+    @extend .container;
+    @include shadow(0 5px 20px 3px #999);
+    
+    position: absolute;
+
+    .ui-dialog-content {
+        padding: 10px;
+        background-color: #eee;
+    }
+    
+    .ui-dialog-buttonpane {
+        padding: 10px;
+        text-align: right;
+        background-color: #eee;
+
+        button {
+            @extend button;
+            margin-left: 10px;
+        }    
+    }    
+
+    .ui-dialog-titlebar {
+        @include container-title;
+
+        .ui-dialog-titlebar-close {
+            display: none;
+        }
+    }
+}

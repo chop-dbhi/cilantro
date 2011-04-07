@@ -121,7 +121,7 @@ define('define/criteriamanager',
                         if (was_empty){
                            $($criteria_div.children()[0]).find(".field-anchor").click();
                         }
-                    }, "text/plain");
+                    }, "text");
                 });
 
 

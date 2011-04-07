@@ -1,4 +1,4 @@
-define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
+define(["define/viewelement"], function(ViewElement) {
     // Templates used by the form class
     var decOperatorsTmpl = ['<option selected id="<%=this.field_id%>" value="range">is between</option>',
                             '<option id="<%=this.field_id%>" value="-range">is not between</option>',
@@ -141,6 +141,7 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
              var sendValue;
              var ds;
              var dom = this.dom;
+             var ref = this;
              switch (evt.target.type){
                      case "checkbox": sendValue = evt.target.checked;
                                      sendValue = $target.is(":visible") && $target.is(":enabled") ? sendValue: undefined;
@@ -202,20 +203,20 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                                  // We have not yet done a switch, otherwise we would have saved it, so we have to actually create the
                                                                  // textarea. This happens only once per input
                                                                  var $mline = $('<textarea rows="8" id="'+$associated_inputs.attr("id")+'" name="'+$associated_inputs.attr("name")+'" cols="25"></textarea>').data("switch",$associated_inputs);
-                                                                 $mline.bind("keyup", $associated_inputs.data("events").keyup[0].handler);
+                                                                 
                                                                  $associated_inputs.before($mline).detach();
                                                                  ds = dom.data("datasource")||{};
                                                                  // We are in this code for one of 3 reasons
 
                                                                  if (ds[$associated_inputs.attr('name')] instanceof Array) {
                                                                      // #1. We are reloading the page, and switching the original text input to textarea
-                                                                     updateElement(null, {name:$associated_inputs.attr('name'), value:ds[$associated_inputs.attr('name')]});
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:ds[$associated_inputs.attr('name')]});
                                                                  } else if (typeof(ds[$associated_inputs.attr('name')])==="string") {
                                                                      // #2. We typed something into the original text input, but then switched to textarea, populate it
-                                                                     updateElement(null, {name:$associated_inputs.attr('name'), value:[ds[$associated_inputs.attr('name')]]});
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:[ds[$associated_inputs.attr('name')]]});
                                                                  }else {
                                                                      // #3. We never typed anything into the original text input, just switched to textara
-                                                                     updateElement(null, {name:$associated_inputs.attr('name'), value:[]});
+                                                                     ref.updateElement(null, {name:$associated_inputs.attr('name'), value:[]});
                                                                  }
                                                                  $mline.keyup();
                                                              }else{
@@ -240,15 +241,15 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
                                                   }
                                                   // If a select-multiple box is optional, and nothing is selected, send undefined so that it doesn't appear as empty in 
                                                   // the datasource, eitherwise, we will throw an error if nothing is supplied;
-                                                  if ($target.is('[data-optional=true]')) {
-                                                     sendValue = selected_prim.length ? selected_prim : undefined;
-                                                  } else {
-                                                     sendValue = selected_prim; 
-                                                  }
+                                                  sendValue = selected_prim;
                                               } else { 
                                                   sendValue = selected[0] in Form.s_to_primative_map ? Form.s_to_primative_map[selected[0]] : selected[0];
                                               }
-
+                                              
+                                              if ($target.is('[data-optional=true]')) {
+                                                 sendValue = $.type(sendValue) in {string:1, array:1} && sendValue.length === 0 ? undefined : sendValue;
+                                              }
+                                              
                                               sendValue = (this.state === "INIT" && $target.css("display")!=="none") || 
                                                           ($target.is(":visible") && $target.is(":enabled")) ? sendValue: undefined;
                                               dom.trigger("ElementChangedEvent", [{name:evt.target.name, value:sendValue}]);
@@ -366,7 +367,7 @@ define(["define/viewelement","lib/jquery.ui"], function(ViewElement) {
         boolean_tmpl: $.jqotec( ['<%if (this.optional) {%>',
                                      '<label for="<%=this.field_id%>"><%=this.label%></label>',
                                      '<select data-datatype="boolean" data-optional="<%=this.optional%>" id ="<%=this.field_id%>" name="<%=this.field_id%>">',
-                                          '<option value=""></option>',
+                                          '<option value="">No Preference</option>',
                                           '<option <%=this["default"]===true?"selected":""%> value="true">Yes</option>',
                                           '<option <%=this["default"]===false?"selected":""%> value="false">No</option>',
                                      '</select>',

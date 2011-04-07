@@ -3,10 +3,9 @@ define('define/views/criterion', ['define/views/base'],
     function(base) {
 
         var template = _.template([
-            '<div class="icon info"></div>',
             '<span class="name"><%= name %></span>',
             '<span class="description"><%= description %></span>'
-        ].join(''))
+        ].join(''));
 
         /*
          * Class: CriterionView
@@ -60,7 +59,7 @@ define('define/views/criterion', ['define/views/base'],
 
             jq: $('#criteria'),
 
-            modelView: CriterionView,
+            modelView: CriterionView
 
         });
 
