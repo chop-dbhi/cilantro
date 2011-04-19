@@ -1,16 +1,4 @@
 
-lib/json2.js
-----------------
-lib/json2.js
-
-lib/modernizr.js
-----------------
-lib/modernizr.js
-
-lib/require-jquery.js
-----------------
-lib/require-jquery.js
-
 main.js
 ----------------
 lib/jquery.ui.js
