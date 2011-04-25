@@ -75,6 +75,7 @@ input, textarea {
 
 textarea {
     width: auto;
+    display: block; // webkit.. http://stackoverflow.com/questions/4457398/why-do-webkit-browsers-render-the-following-with-extra-padding-margin-on-the-bott
 }
 
 input[type=submit], input[type=button],
