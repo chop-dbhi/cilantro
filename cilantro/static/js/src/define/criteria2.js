@@ -12,10 +12,8 @@
  * All events are in the 'criterion' namespace.
  */
 
-define('define/criteria2',
-
-    ['define/events', 'rest/resource', 'define/conceptmanager',
-        'define/criteriamanager', 'define/description'],
+define(['cilantro/define/events', 'cilantro/rest/resource', 'cilantro/define/conceptmanager',
+        'cilantro/define/criteriamanager', 'cilantro/define/description'],
 
     function(Events, Resource, ConceptManager, CriteriaManager) {
 

@@ -1,4 +1,4 @@
-define(["define/viewelement"], function(ViewElement) {
+define(["cilantro/define/viewelement"], function(ViewElement) {
     // Templates used by the form class
     var decOperatorsTmpl = ['<option selected id="<%=this.field_id%>" value="range">is between</option>',
                             '<option id="<%=this.field_id%>" value="-range">is not between</option>',

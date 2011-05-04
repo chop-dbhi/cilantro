@@ -1,4 +1,4 @@
-define('define/events', {
+define({
 
     ACTIVATE_DESCRIPTION: 'activate-description',
     DEACTIVATE_DESCRIPTION: 'deactivate-description',

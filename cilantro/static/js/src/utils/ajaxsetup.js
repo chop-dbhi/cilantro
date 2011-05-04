@@ -3,17 +3,13 @@
  * window location. This is mainly useful for session timeouts.
  */
 
-var OVERLAY = $('#overlay');
-
-$('body').bind({
-    ajaxComplete: function(evt, xhr, options) {
-        if (xhr.status === 302) {
-            var json = $.parseJSON(xhr.responseText);
-            if (json.redirect)
+$.ajaxSetup({
+    statusCode: {
+        302: function(xhr) {
+            try {
+                var json = $.parseJSON(xhr.responseText);
                 window.location = json.redirect;
+            } catch(e) {}
         }
-    },
-    ajaxError: function(evt, xhr, options, err) {
-        //window.location = $('#support-form').attr('href');
     }
 });

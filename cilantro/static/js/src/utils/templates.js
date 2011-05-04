@@ -16,10 +16,7 @@
  * </div>
  */
 
-define('utils/templates',
-    
-    ['lib/jquery.jqote2'],
-    
+define(
     function() {
         $(function() {
             var templates = {},

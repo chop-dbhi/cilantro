@@ -1,6 +1,4 @@
-define('define/description',
-
-    ['define/events'],
+define(['cilantro/define/events'],
 
     function(Events) {
 

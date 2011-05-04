@@ -1,6 +1,4 @@
-define('define/criteriamanager',
-    
-    ['define/criteria'],
+define(['cilantro/define/criteria'],
     
     function(criteria) {
 

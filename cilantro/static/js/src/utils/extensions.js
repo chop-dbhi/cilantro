@@ -71,6 +71,68 @@ if (!Array.prototype.map) {
             */
             out = $.jqote(template, data, tag);
             return $(out);
+        },
+        
+        scrape: function(exclude) {
+            // start with doctype
+            var page = '<!doctype html>';
+
+            // build the html tag since this cannot be captured as a child
+            // node
+            page += '<html';
+            $.each($('html')[0].attributes, function() { 
+                page += ' ' + this.name + '="' + this.value + '"';
+            });                                               
+            page += '>';
+        
+            // ensure all user-entered values are set as hard attributes
+            $(':text').each(function() {
+                var e = $(this);
+                e.attr('defaultValue', e.val());
+            });
+
+            $('textarea').each(function() {
+                var e = $(this);
+                e.attr('innerText', e.val());
+            });
+
+            $('select').each(function() {
+                var options = $('option', this);
+
+                options.each(function() {
+                    var e = $(this);
+                    if (e.attr('selected'))
+                        this.setAttribute('selected', '');
+                    else
+                        e.removeAttr('selected');
+                });
+            });
+
+            $(':checkbox, :radio').each(function() {
+                var e = $(this);
+                if (e.attr('checked'))
+                    this.setAttribute('checked', '');
+                else
+                    e.removeAttr('checked');
+            });
+
+            var clone = $('html').clone();
+
+            // remove all scripts so the current state does not get altered
+            // when this HTML is re-rendered
+            $('script', clone).remove();
+
+            // remove additional elements
+            if (exclude) $(exclude, clone).remove();
+
+            // replace all anchors with hashes and set their onclick handlers
+            // to not do anything
+            $('a', clone).attr({
+                'href': '#',
+                'onClick': 'return false'
+            });
+
+            return page + clone.html() + '</html>';            
         }
     });
 

@@ -1,4 +1,4 @@
-define(['define/chart','define/form','utils/frontdesk', 'lib/base'], function(Chart, Form, FrontDesk){
+define(['cilantro/define/chart','cilantro/define/form','cilantro/utils/frontdesk', 'cilantro/lib/base'], function(Chart, Form, FrontDesk){
      //  **View Class** is the base class for object that represents a tab within the main Cilantro screen. The base class
      // supports construction of HTML forms as well as charts within those forms.
      var View = Base.extend({

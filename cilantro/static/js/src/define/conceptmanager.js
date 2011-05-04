@@ -1,4 +1,4 @@
-define( ['define/view'],
+define(['cilantro/define/view'],
     function(View) { 
         /**
           Sets up and manages the view sets for each criterion option.

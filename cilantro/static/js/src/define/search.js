@@ -16,9 +16,7 @@
  * All events are in the 'criterion' namespace.
  */
 
-define('define/search',
-
-    ['define/events', 'define/criteria2', 'rest/resource'],
+define(['cilantro/define/events', 'cilantro/define/criteria2', 'cilantro/rest/resource'],
 
     function(Events, CriterionCollection, Resource) {
 

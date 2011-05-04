@@ -1,6 +1,6 @@
 // report/templates
 
-define('report/templates', function() {
+define(function() {
     return {
         columns: $.jqotec([
             '<div data-model="category" data-id="<%= this.id %>">',
@@ -31,7 +31,6 @@ define('report/templates', function() {
 
         row: $.jqotec([
             '<tr>',
-//                    '<td><input type="checkbox"></td>',
                 '<% for(var k=1; k<this.length; k++) { %>',
                     '<td><%= this[k] %></td>',
                 '<% } %>',
@@ -65,7 +64,7 @@ define('report/templates', function() {
                 '<% } %>',
                 '<span><a href="#<%= this.num_pages %>">Last</a> &raquo;</span>',
             '<% } %>'
-        
+    
         ].join(''))
     };
 }); 

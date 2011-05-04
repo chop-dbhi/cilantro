@@ -2,7 +2,7 @@
  * Resource - a ``resource`` provides an interface for retrieving and
  * interacting with some data.
  */
-define('rest/resource', ['lib/base'],
+define(['cilantro/lib/base'],
 
     function() {
 

@@ -1,6 +1,6 @@
 // rest/renderer
 
-define('rest/renderer', ['rest/basext'], function(BaseExt) {
+define(['cilantro/rest/basext'], function(BaseExt) {
     /*
      * The base renderer class. A renderer takes data and uses it to act
      * on other objects, whether be DOM elements or other JS objects.

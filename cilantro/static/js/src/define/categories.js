@@ -11,7 +11,7 @@
  * All events are in the 'category' namespace.
  */
 
-define('define/categories', ['define/events', 'rest/resource'],
+define(['cilantro/define/events', 'cilantro/rest/resource'],
 
     function(Events, Resource) {
 

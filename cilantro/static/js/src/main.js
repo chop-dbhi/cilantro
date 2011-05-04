@@ -1,5 +1,20 @@
-define('main', ['lib/jquery.ui', 'lib/jquery.block', 'lib/jquery.jqote2'], function() {
-    $.block.defaults.message = null;
-    $.block.defaults.css = {};
-    $.block.defaults.overlayCSS = {};
-});
+require(
+    [
+        'cilantro/lib/jquery.ui',
+        'cilantro/lib/jquery.block',
+        'cilantro/lib/jquery.jqote2',
+        'cilantro/utils/ajaxsetup',
+        'cilantro/utils/extensions',
+        'cilantro/utils/html5fix',
+        'cilantro/utils/sanitizer'
+    ],
+    
+    function() {
+        if (!window.JSON)
+            require(['cilantro/lib/json2']);
+            
+        $.block.defaults.message = null;
+        $.block.defaults.css = {};
+        $.block.defaults.overlayCSS = {};
+    }
+);

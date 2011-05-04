@@ -1,16 +1,12 @@
-require(
+define(
     // required modules
     [
-        'define/events',
-        'define/categories',
-        'define/criteria2',
-        'define/search',
-        'define/criteriamanager',
-        'utils/html5fix',
-        'utils/ajaxsetup',
-        'utils/extensions',
-        'utils/sanitizer',
-        'lib/jquery.bubbleproxy'
+        'cilantro/define/events',
+        'cilantro/define/categories',
+        'cilantro/define/criteria2',
+        'cilantro/define/search',
+        'cilantro/define/criteriamanager',
+        'cilantro/lib/jquery.bubbleproxy'
     ],
     
     function(Events, CategoryCollection, CriterionCollection, search, criteriamanager) {

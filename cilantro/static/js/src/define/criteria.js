@@ -1,5 +1,4 @@
-define('define/criteria',
-     
+define(
     function() {
 
         var tmpl = $.jqotec([

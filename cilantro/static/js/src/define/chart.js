@@ -1,4 +1,4 @@
-define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, ViewElement) {
+define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/lib/highcharts'], function(Form, ViewElement) {
     // Base Class for all charts
     var Chart = ViewElement.extend({
         constructor: function(viewset, concept_pk){
@@ -41,7 +41,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
 
                          states:{
                              hover:{
-                                 brightness: -.1,
+                                 brightness: -0.1,
                                  enabled:true
                              }
                          },
@@ -62,7 +62,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                          stickyTracking:false,
                          states:{
                               hover:{
-                                  brightness: -.1,
+                                  brightness: -0.1,
                                   enabled:true
                               }
                          }
@@ -419,7 +419,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                 return "" + this.y;
              };
              this.options.xAxis =  {
-                 maxPadding:.05,
+                 maxPadding: 0.05,
                  startOnTick:false,
                  title: {
                      text: this.viewset.data.xaxis

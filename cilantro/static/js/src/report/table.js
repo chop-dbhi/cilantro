@@ -1,6 +1,6 @@
 // report/table
 
-define('report/table', ['rest/datasource', 'rest/renderer', 'report/templates'],
+define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/templates'],
 
     function(m_datasource, m_renderer, m_templates) {
 
