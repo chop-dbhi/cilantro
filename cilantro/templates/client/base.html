@@ -37,10 +37,32 @@
         {# standard global footer #}        
         {% include "snippets/footer.html" %}
 
+        {% block extra_content %}{% endblock %}
+
+        <script>
+            var require = {
+                // everything should be relative to the project's javascript
+                // url for convenience. Cilantro is namespaced within the
+                // project anyway
+                baseUrl: '{{ JS_URL }}',
+
+                // define the absolute path for cilantro since everything is
+                // namespaced under 'cilantro'
+                paths: {
+                    'cilantro': '{{ CILANTRO_JS_URL }}'
+                },
+                
+                // bootstrap script containing the most used libraries
+                deps: ['cilantro/main']
+            };
+
+            {% block requirejs_config %}
+            {% endblock %}
+        </script>
+
+        <script src="{{ CILANTRO_JS_URL }}lib/require-jquery.js"></script>
+
         {% block scripts %}
-            <script>var require = { baseUrl: '{{ CILANTRO_JS_URL }}' };</script>
-            <script src="{{ CILANTRO_JS_URL }}lib/require-jquery.js"></script>
-            <script>if (!window.JSON) require(['{{ CILANTRO_JS_URL }}lib/json2.js']);</script>
         {% endblock %}
     </body>
 </html>
