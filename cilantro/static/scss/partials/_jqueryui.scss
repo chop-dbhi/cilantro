@@ -1,31 +1,62 @@
 // jQuery UI components
+.ui-datepicker.ui-widget {
+    font-size: 0.9em;
+}
+
 .ui-dialog {
-    @extend .container;
-    @include shadow(0 5px 20px 3px #999);
+    @include shadow(0 5px 20px 0 #666);
     
     position: absolute;
 
-    .ui-dialog-content {
-        padding: 10px;
-        background-color: #eee;
+    > .container {
+        @include shadow(none);
     }
-    
+
+    &.ui-corner-all {
+        @include radius(0);
+    }
+
+    &.ui-widget-content, > .ui-widget-content {
+        border: none;
+        background-image: none;
+        color: inherit;
+    }
+
+    &.ui-widget {
+        font: inherit;
+    }
+
+    > .ui-dialog-titlebar.ui-widget-header {
+        @include container-title;
+        background-image: none;
+
+        .ui-dialog-title {
+            text-shadow: 0 1px 2px #3B3B3B;
+        }
+
+        .ui-dialog-titlebar-close {
+            display: none;
+        }
+    }
+
+    .ui-dialog-content, .ui-dialog-content > .content {
+        background: #eee;
+    }
+
+    .container.ui-dialog-content {
+        padding: 0;
+    }
+
     .ui-dialog-buttonpane {
-        padding: 10px;
+        margin: 0 !important;
+        padding: 0 10px 10px 10px !important;
         text-align: right;
         background-color: #eee;
+        border: none !important;
 
         button {
             @extend button;
             margin-left: 10px;
         }    
-    }    
-
-    .ui-dialog-titlebar {
-        @include container-title;
-
-        .ui-dialog-titlebar-close {
-            display: none;
-        }
     }
 }
