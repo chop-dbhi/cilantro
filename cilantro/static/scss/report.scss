@@ -5,7 +5,7 @@
 #search {
     @include search-box;
     width: 360px;
-    margin-bottom: 10px;
+    margin: 5px 0;
 }
 
 .container {
@@ -106,13 +106,13 @@
         display: none;
     }
    
-    > section {
+    .content > div {
         @include inline-block;
 
-        padding: 10px 10px 0 10px;
+        margin: 0;
         vertical-align: top;
-        width: 410px;
-        height: 510px;
+        width: 433px;
+//        height: 500px;
 
         &:first-child {
             margin-right: 10px;
@@ -151,12 +151,18 @@
 #columns, #active-columns {
     @include vertical-thin-scrollbar;
     overflow: auto;
+    height: 405px;
+    margin: 0;
 
     > div {
-        margin-top: 10px;
+        margin-top: 20px;
+
+        &:first-child {
+            margin-top: 0;
+        }
 
         h4 {
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
     }       
 
@@ -188,11 +194,9 @@
 }
 
 #columns {
-    height: 380px;
 }
 
 #active-columns {
-    height: 394px;
 }
 
 #active-columns li.placeholder {

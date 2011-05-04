@@ -17,7 +17,7 @@
         }, 
         URLS = { define: '{% url define %}' };
 
-        require(['main', 'report/main']);
+        require(['cilantro/report/main']);
     </script>
 {% endblock %}
 
@@ -87,57 +87,62 @@
         </div>
     </div>
 
-    <div id="columns-dialog" class="clearfix">
-        <section>
-            <h4>Available Columns</h4>
+    <div id="columns-dialog" class="container clearfix">
+        <div class="content">
+            <div>
+                <h4>Available Columns</h4>
 
-            <p class="info">Below are the columns of data that are available for
-            viewing. Note that depending on which columns are added to your report,
-            the the <em>number of rows</em> may change, but the <em>number of
-            patients</em> will stay constant.</p>
+                <p class="info">Below are the columns of data that are available for
+                viewing. Note that depending on which columns are added to your report,
+                the the <em>number of rows</em> may change, but the <em>number of
+                patients</em> will stay constant.</p>
 
-            <form method="get" action="{% url api:columns:read %}">
-                <input id="search" class="search" type="text" name="q" autocomplete="off" placeholder="Search...">
-            </form>
+                <form method="get" action="{% url api:columns:read %}">
+                    <input id="search" class="search" type="text" name="q" autocomplete="off" placeholder="Search...">
+                </form>
 
-            <div id="columns">
-                {% for category in columns %} 
-                    <div data-model="category" data-id="{{ category.id }}">
-                        <h4>{{ category.name }} <a class="ht add-all" href="#{{ category.id }}">Add All</a></h4>
-                        <ul>
+                <section id="columns">
+                    {% for category in columns %} 
+                        <div data-model="category" data-id="{{ category.id }}">
+                            <h4>{{ category.name }} <a class="ht add-all" href="#{{ category.id }}">Add All</a></h4>
+                            <ul>
+                                {% for column in category.columns %}
+
+                                    <li class="active clearfix" data-model="column" data-id="{{ column.id }}">
+                                        <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
+                                        <span class="name">{{ column.name }}</span>
+                                        <span class="description">{{ column.description|safe }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </section>
+            </div>
+
+            <div>
+                <h4>Selected Columns</h4>
+
+                <p class="info">The order below (top-bottom) defines the order they will be
+                displayed (left-right). To change the order simply click and drag any of the
+                columns to the desired location and release in the visible drop zone.</p>
+
+                <p style="margin-top: 10px"><a class="ht st remove-all" href="#">Clear All</a></p>
+
+                <section>
+                    <ul id="active-columns">
+                        {% for category in columns %} 
                             {% for column in category.columns %}
-
-                                <li class="active clearfix" data-model="column" data-id="{{ column.id }}">
-                                    <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
+                                <li class="clearfix" data-model="column" data-id="{{ column.id }}">
+                                    <a class="remove-column" href="#{{ column.id }}"><span class="icon x"></span> Remove</a>
                                     <span class="name">{{ column.name }}</span>
-                                    <span class="description">{{ column.description|safe }}</span>
                                 </li>
                             {% endfor %}
-                        </ul>
-                    </div>
-                {% endfor %}
+                        {% endfor %} 
+                    </ul>
+                </section>
             </div>
-        </section>
-
-        <section>
-            <h4>Selected Columns</h4>
-
-            <p class="info">The order below (top-bottom) defines the order they will be
-            displayed (left-right). To change the order simply click and drag any of the
-            columns to the desired location and release in the visible drop zone.</p>
-
-            <a class="ht st remove-all" href="#">Clear All</a>
-            <ul id="active-columns">
-                {% for category in columns %} 
-                    {% for column in category.columns %}
-                        <li class="clearfix" data-model="column" data-id="{{ column.id }}">
-                            <a class="remove-column" href="#{{ column.id }}"><span class="icon x"></span> Remove</a>
-                            <span class="name">{{ column.name }}</span>
-                        </li>
-                    {% endfor %}
-                {% endfor %} 
-            </ul>
-        </section>
+        </div>
     </div>
 
 {% endblock %}
