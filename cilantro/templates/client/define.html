@@ -4,13 +4,12 @@
 
 {% block styles %}
     {{ block.super }}
+    <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/aristo/jquery-ui.css">
     <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/define.css">
-    <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/jquery-ui.css">
 {% endblock %}
 
 {% block scripts %}
-    {{ block.super }}
-    <script>require(['main', 'define/main']);</script>
+    <script>require(['cilantro/define/main']);</script>
 {% endblock %}
 
 {% block content %}
