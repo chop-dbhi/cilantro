@@ -61,6 +61,7 @@ input {
 
 #categories {
     @include inline-block;
+    @include opacify(0);
 
     font-size: 13px;
     font-weight: 600;
@@ -146,7 +147,8 @@ input {
     padding: 5px 1px;
     max-height: 500px;
     overflow: auto;
-    
+    display: none;
+
     > div {
         @include radius(3px);
         @include shadow(0 1px 1px #fdfdfd);
@@ -234,6 +236,7 @@ input {
     float: right;
     width: 520px;
     margin-bottom: 0;
+    display: none;
     
     .content {
         @include shadow(none);
