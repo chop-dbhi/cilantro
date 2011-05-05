@@ -37,7 +37,9 @@
         {# standard global footer #}        
         {% include "snippets/footer.html" %}
 
-        {% block extra_content %}{% endblock %}
+        {# any extra markup that needs to be included in the page for #}
+        {# additional functionality, templates, hidden elements, etc. #}
+        {% block extra_markup %}{% endblock %}
 
         <script>
             var require = {
@@ -52,7 +54,8 @@
                     'cilantro': '{{ CILANTRO_JS_URL }}'
                 },
                 
-                // bootstrap script containing the most used libraries
+                // bootstrap script containing the shared libraries for each
+                // page
                 deps: ['cilantro/main']
             };
 
@@ -62,7 +65,6 @@
 
         <script src="{{ CILANTRO_JS_URL }}lib/require-jquery.js"></script>
 
-        {% block scripts %}
-        {% endblock %}
+        {% block scripts %}{% endblock %}
     </body>
 </html>
