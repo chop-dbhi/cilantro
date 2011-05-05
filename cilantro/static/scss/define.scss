@@ -42,16 +42,15 @@ input {
 
 #tabs {
     border-bottom: 1px solid #aaa;
+    height: 37px;
 
     > * {
         vertical-align: bottom;
     }
 
     form {
-        @include inline-block;
         padding: 7px 0 5px 0;
-        position: absolute;
-        right: 10px;
+        float: right;
     }
 
     input {
