@@ -41,6 +41,8 @@
         {# additional functionality, templates, hidden elements, etc. #}
         {% block extra_markup %}{% endblock %}
 
+        {# the configuration for RequireJS which ensures the paths are #}
+        {# correctly setup and able to be extended. #}
         <script>
             var require = {
                 // everything should be relative to the project's javascript
@@ -59,7 +61,7 @@
                 deps: ['cilantro/main']
             };
 
-            {% block requirejs_config %}
+            {% block require_config %}
             {% endblock %}
         </script>
 
