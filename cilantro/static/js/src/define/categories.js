@@ -29,7 +29,8 @@ define(['cilantro/define/events', 'cilantro/rest/resource'],
 
             var dom = {
                 categories: $('#categories'),
-                subcategories: $('#subcategories')
+                subcategories: $('#subcategories'),
+                pluginPanel: $('#plugin-panel')
             };
 
             dom.categories.current = null;
@@ -41,7 +42,11 @@ define(['cilantro/define/events', 'cilantro/rest/resource'],
 
             }).ready(function() {
 
-                dom.categories.html(this.dom);
+                // this needs to be done in order to retain the inline-block
+                // display.
+                dom.categories.html(this.dom).animate({
+                    opacity: 1
+                });
                 this.dom.first().click();
 
             });
@@ -67,9 +72,13 @@ define(['cilantro/define/events', 'cilantro/rest/resource'],
                         
                         // check for associated criterion and trigger
                         var state = target.data('_state');
-                        if (!!state && state.criterion)
+                        if (!!state && state.criterion) {
+                            dom.pluginPanel.show();
                             dom.categories.trigger(Events.ACTIVATE_CRITERION,
                                 [state.criterion]);
+                        } else {
+                            dom.pluginPanel.hide();
+                        }
 
                     });
 

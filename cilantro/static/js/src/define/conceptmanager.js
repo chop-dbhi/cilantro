@@ -24,7 +24,7 @@ define(['cilantro/define/view'],
           that is common to all views (displays errors and the query button)
         */
 
-        var Manager;
+        var Manager = {};
 
         $(function() {
             var $container = $('#plugin-panel'),
@@ -33,7 +33,7 @@ define(['cilantro/define/view'],
                 $contentBox = $('#plugin-dynamic-content'),
                 $staticBox = $('#plugin-static-content');
 
-            Manager = (function() {
+            (function() {
 
                 /**
                   A hash with respect to criterion IDs of the objects fetched from
@@ -504,7 +504,7 @@ define(['cilantro/define/view'],
                         // built-in views will need to be taken care of code here
                         var callback = null;
                         activeView.concept_id = activeConcept;
-                        $container.trigger('ViewReadyEvent', [new View(activeView, cache[activeConcept].name)]);
+                        $container.fadeIn().trigger('ViewReadyEvent', [new View(activeView, cache[activeConcept].name)]);
                     }
                 }    
                 /**
@@ -901,6 +901,7 @@ define(['cilantro/define/view'],
                    @public
                 */
                 function show(concept, existing_query, index, target) {
+                    $container.fadeIn();
                    // Verify that we need to do anything.
                    if (parseInt(concept.id) === activeConcept)
                        return;
@@ -927,14 +928,12 @@ define(['cilantro/define/view'],
                 
                 
                 // Manager public methods
-                return {
-                    show: show,
-                    isConceptLoaded: function(concept_id){
-                        return (concept_id in cache);
-                    },
-                    buildQuery: buildQuery,
-                    constructQueryHandler: constructQueryHandler
-               };
+                Manager.show = show;
+                Manager.isConceptLoaded = function(concept_id) {
+                    return (concept_id in cache);
+                };
+                Manager.buildQuery = buildQuery;
+                Manager.constructQueryHandler = constructQueryHandler;
 
             })();
 

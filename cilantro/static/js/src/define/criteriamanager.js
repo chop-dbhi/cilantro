@@ -3,12 +3,12 @@ define(['cilantro/define/criteria'],
     function(criteria) {
 
         var template = '<button id="submit-query"><span class="icon arrow-r"/> <span>Get Report</span></button>'; 
-        var Manager;
+        var Manager = {};
         
         $(function() {
             var $panel = $('#user-criteria'); 
 
-            Manager = (function(){
+            (function(){
         
                 var criteria_cache = {};
                 
@@ -158,19 +158,17 @@ define(['cilantro/define/criteria'],
                       }
                 });
 
-                return {
-                    retrieveCriteriaDS: function(concept_id) {
-                        var ds = null;
-                        concept_id && $.each($criteria_div.children(), function(index,element){
-                            if (!$(element).data("constraint")){
-                                return; // could just be text nodes
-                            }
-                            if ($(element).data("constraint").concept_id == concept_id){ // TODO cast to string for both
-                                ds = $(element).data("constraint");
-                            }
-                        });
-                        return ds;
-                    }
+                Manager.retrieveCriteriaDS = function(concept_id) {
+                    var ds = null;
+                    concept_id && $.each($criteria_div.children(), function(index,element){
+                        if (!$(element).data("constraint")){
+                            return; // could just be text nodes
+                        }
+                        if ($(element).data("constraint").concept_id == concept_id){ // TODO cast to string for both
+                            ds = $(element).data("constraint");
+                        }
+                    });
+                    return ds;
                 };
             })();
         });

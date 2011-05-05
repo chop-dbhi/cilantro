@@ -24,7 +24,9 @@ define(['cilantro/define/events', 'cilantro/rest/resource', 'cilantro/define/con
             '</div>'
         ].join('');
 
-        var CriterionCollection;
+        var CriterionCollection = new Resource({
+            template: template
+        });
 
         $(function() {
 
@@ -33,14 +35,12 @@ define(['cilantro/define/events', 'cilantro/rest/resource', 'cilantro/define/con
                 pluginPanel: $('#plugin-panel')
             };
 
-            CriterionCollection = new Resource({
 
-                url: dom.criteria.data('uri'),
-                template: template
+            CriterionCollection.url = dom.criteria.data('uri');
 
-            }).ready(function() {
+            CriterionCollection.ready(function() {
 
-                dom.criteria.html(this.dom);
+                dom.criteria.html(this.dom).fadeIn();
                 
             });
 
