@@ -20,7 +20,7 @@ define(
             };
 
             config[Events.ACTIVATE_CRITERION] = {
-                listeners: ['#criteria']
+                listeners: ['#criteria', '#criteria-list']
             };
 
             config[Events.SYNC_CATEGORY] = {
