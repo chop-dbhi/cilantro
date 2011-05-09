@@ -23,109 +23,103 @@ define(['cilantro/define/events', 'cilantro/rest/resource'],
             '</span>'
         ].join('');
 
-        var CategoryCollection;
+        var dom = {
+            categories: $('#categories'),
+            subcategories: $('#subcategories'),
+            pluginPanel: $('#plugin-panel')
+        };
 
-        $(function() {
+        dom.categories.current = null;
 
-            var dom = {
-                categories: $('#categories'),
-                subcategories: $('#subcategories'),
-                pluginPanel: $('#plugin-panel')
-            };
+        var CategoryCollection = new Resource({
 
-            dom.categories.current = null;
+            url: dom.categories.data('uri'),
+            template: template
 
-            CategoryCollection = new Resource({
+        }).ready(function() {
 
-                url: dom.categories.data('uri'),
-                template: template
-
-            }).ready(function() {
-
-                // this needs to be done in order to retain the inline-block
-                // display.
-                dom.categories.html(this.dom).animate({
-                    opacity: 1
-                });
-                this.dom.first().click();
-
+            // this needs to be done in order to retain the inline-block
+            // display.
+            dom.categories.html(this.dom).animate({
+                opacity: 1
             });
+            this.dom.first().click();
 
-            /*
-             * Handles doing the necessary processing for 'activating' the
-             * defined category
-             */ 
-            dom.categories.bind(Events.ACTIVATE_CATEGORY,
-                    
-                function(evt, id) {
+        });
 
-                    // test cache
-                    if (dom.categories.current === id)
-                        return false;
-                    dom.categories.current = id;
+        /*
+         * Handles doing the necessary processing for 'activating' the
+         * defined category
+         */ 
+        dom.categories.bind(Events.ACTIVATE_CATEGORY,
+                
+            function(evt, id) {
 
-                    CategoryCollection.ready(function() {
-
-                        var target = this.store[id];
-                        target.addClass('active');
-                        target.siblings().removeClass('active');
-                        
-                        // check for associated criterion and trigger
-                        var state = target.data('_state');
-                        if (!!state && state.criterion) {
-                            dom.pluginPanel.show();
-                            dom.categories.trigger(Events.ACTIVATE_CRITERION,
-                                [state.criterion]);
-                        } else {
-                            dom.pluginPanel.hide();
-                        }
-
-                    });
-
-                }
-            );
-
-            /*
-             * When a criterion is activated, the id gets cached to be
-             * associated with the current category.
-             */ 
-            dom.categories.bind(Events.SYNC_CATEGORY,
-                    
-                function(evt, id, criterion_id) {
-
-                    CategoryCollection.ready(function() {
-
-                        var target = this.store[id];
-                        // stored in a 'hidden' object to not be mistakingly
-                        // associated with the actual data of the object
-                        target.data('_state', {criterion: criterion_id});
-                        dom.categories.trigger(Events.ACTIVATE_CATEGORY, [id]);
-
-                    });
-
+                // test cache
+                if (dom.categories.current === id)
                     return false;
-                }
-            );
+                dom.categories.current = id;
 
-            /*
-             * User-triggerable events
-             */
-            dom.categories.delegate('span.tab', 'click', function(evt) {
+                CategoryCollection.ready(function() {
 
-                $(evt.currentTarget).trigger(Events.ACTIVATE_CATEGORY,
-                    [$(this).data('id')]);
+                    var target = this.store[id];
+                    target.addClass('active');
+                    target.siblings().removeClass('active');
+                    
+                    // check for associated criterion and trigger
+                    var state = target.data('_state');
+                    if (!!state && state.criterion) {
+                        dom.pluginPanel.show();
+                        dom.categories.trigger(Events.ACTIVATE_CRITERION,
+                            [state.criterion]);
+                    } else {
+                        dom.pluginPanel.hide();
+                    }
 
-            });
+                });
 
-            dom.subcategories.delegate('span', 'click', function(evt) {
+            }
+        );
 
-                var target = $(this);
-                target.addClass('active').siblings().removeClass('active');
+        /*
+         * When a criterion is activated, the id gets cached to be
+         * associated with the current category.
+         */ 
+        dom.categories.bind(Events.SYNC_CATEGORY,
+                
+            function(evt, id, criterion_id) {
+
+                CategoryCollection.ready(function() {
+
+                    var target = this.store[id];
+                    // stored in a 'hidden' object to not be mistakingly
+                    // associated with the actual data of the object
+                    target.data('_state', {criterion: criterion_id});
+                    dom.categories.trigger(Events.ACTIVATE_CATEGORY, [id]);
+
+                });
+
                 return false;
+            }
+        );
 
-            });
+        /*
+         * User-triggerable events
+         */
+        dom.categories.delegate('span.tab', 'click', function(evt) {
 
-        }); 
+            $(evt.currentTarget).trigger(Events.ACTIVATE_CATEGORY,
+                [$(this).data('id')]);
+
+        });
+
+        dom.subcategories.delegate('span', 'click', function(evt) {
+
+            var target = $(this);
+            target.addClass('active').siblings().removeClass('active');
+            return false;
+
+        });
 
         return CategoryCollection;
     }
