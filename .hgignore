@@ -2,3 +2,6 @@ syntax: glob
 .sass-cache
 .DS_Store
 *.pyc
+
+syntax: regexp
+cilantro/static/js/min/build.txt
