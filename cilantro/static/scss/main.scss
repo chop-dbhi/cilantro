@@ -197,6 +197,10 @@ input[type=button], input[type=submit], button {
 
     border: 1px solid #666;
 
+    > span {
+        vertical-align: middle;
+    }
+
     &:hover {
         border-color: #222;
     }

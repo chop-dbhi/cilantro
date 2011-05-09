@@ -67,10 +67,12 @@
         </div>
 
         <div class="content">
-            <table id="table" class="sortable">
-                <thead><tr></tr></thead>
-                <tbody></tbody>
-            </table>
+            <div id="table-wrap">
+                <table id="table" class="sortable">
+                    <thead><tr></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
         <div class="toolbar footer clearfix">
@@ -90,44 +92,51 @@
     <div id="columns-dialog" class="container clearfix">
         <div class="content">
             <div>
-                <h4>Available Columns</h4>
 
-                <p class="info">Below are the columns of data that are available for
-                viewing. Note that depending on which columns are added to your report,
-                the the <em>number of rows</em> may change, but the <em>number of
-                patients</em> will stay constant.</p>
+                <div class="instructions">
+                    <h4>Available Columns</h4>
 
-                <form method="get" action="{% url api:columns:read %}">
-                    <input id="search" class="search" type="text" name="q" autocomplete="off" placeholder="Search...">
-                </form>
+                    <p class="info">Below are the columns of data that are available for
+                    viewing. Note that depending on which columns are added to your report,
+                    the the <em>number of rows</em> may change, but the <em>number of
+                    patients</em> will stay constant.</p>
 
-                <section id="columns">
-                    {% for category in columns %} 
-                        <div data-model="category" data-id="{{ category.id }}">
-                            <h4>{{ category.name }} <a class="ht add-all" href="#{{ category.id }}">Add All</a></h4>
-                            <ul>
-                                {% for column in category.columns %}
+                    <form method="get" action="{% url api:columns:read %}">
+                        <input id="search" class="search" type="text" name="q" autocomplete="off" placeholder="Search...">
+                    </form>
+                </div>
 
-                                    <li class="active clearfix" data-model="column" data-id="{{ column.id }}">
-                                        <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
-                                        <span class="name">{{ column.name }}</span>
-                                        <span class="description">{{ column.description|safe }}</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endfor %}
+                <section>
+                    <div id="columns">
+                        {% for category in columns %} 
+                            <div data-model="category" data-id="{{ category.id }}">
+                                <h4>{{ category.name }} <a class="ht add-all" href="#{{ category.id }}">Add All</a></h4>
+                                <ul>
+                                    {% for column in category.columns %}
+
+                                        <li class="active clearfix" data-model="column" data-id="{{ column.id }}">
+                                            <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
+                                            <span class="name">{{ column.name }}</span>
+                                            <span class="description">{{ column.description|safe }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </section>
             </div>
 
             <div>
-                <h4>Selected Columns</h4>
+                <div class="instructions">
+                    <h4>Selected Columns</h4>
 
-                <p class="info">The order below (top-bottom) defines the order they will be
-                displayed (left-right). To change the order simply click and drag any of the
-                columns to the desired location and release in the visible drop zone.</p>
+                    <p class="info">The order below (top-bottom) defines the order they will be
+                    displayed (left-right). To change the order simply click and drag any of the
+                    columns to the desired location and release in the visible drop zone.</p>
 
-                <p style="margin-top: 10px"><a class="ht st remove-all" href="#">Clear All</a></p>
+                    <div style="text-align: right"><button class="ht st remove-all">Remove All</button></div>
+                </div>
 
                 <section>
                     <ul id="active-columns">

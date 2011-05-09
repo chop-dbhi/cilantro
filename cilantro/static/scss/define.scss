@@ -23,7 +23,7 @@ input {
 
 #center-pane {
     min-height: 300px;
-    padding: 10px 0;
+    padding-top: 10px;
     position: relative;
     overflow: auto;
 }
@@ -132,19 +132,22 @@ input {
             @include shadow(0 2px 5px darken($BLUE, 15) inset);
         }
     }
-
 }
 
 /*
  * List of criteria
  */
+#criteria-wrap {
+    padding: 2px;
+    width: 170px;
+    margin: 0;
+}
+
 #criteria {
     @include vertical-thin-scrollbar;
 
     margin: 0;
     font-size: 0.9em;
-    width: 170px;
-    padding: 5px 1px;
     max-height: 500px;
     overflow: auto;
     display: none;
