@@ -1,4 +1,4 @@
-require(
+define(
     [
         'cilantro/lib/jquery.ui',
         'cilantro/lib/jquery.block',
