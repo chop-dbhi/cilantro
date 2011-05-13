@@ -5,7 +5,7 @@ def media(request):
         None)
 
     if CILANTRO_MEDIA_URL is None:
-        CILANTRO_MEDIA_URL = settings.MEDIA_URL + 'client/'
+        CILANTRO_MEDIA_URL = settings.MEDIA_URL + 'cilantro/'
 
     _dir = 'src' if settings.DEBUG else 'min'
     CILANTRO_JS_URL = '%sjs/%s/' % (CILANTRO_MEDIA_URL, _dir)
