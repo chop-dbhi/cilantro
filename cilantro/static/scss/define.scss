@@ -23,7 +23,7 @@ input {
 
 #center-pane {
     min-height: 300px;
-    padding: 10px 0;
+    padding-top: 10px;
     position: relative;
     overflow: auto;
 }
@@ -49,10 +49,8 @@ input {
     }
 
     form {
-        @include inline-block;
         padding: 7px 0 5px 0;
-        position: absolute;
-        right: 10px;
+        float: right;
     }
 
     input {
@@ -63,6 +61,7 @@ input {
 
 #categories {
     @include inline-block;
+    @include opacify(0);
 
     font-size: 13px;
     font-weight: 600;
@@ -133,23 +132,26 @@ input {
             @include shadow(0 2px 5px darken($BLUE, 15) inset);
         }
     }
-
 }
 
 /*
  * List of criteria
  */
+#criteria-wrap {
+    padding: 2px;
+    width: 170px;
+    margin: 0;
+}
+
 #criteria {
     @include vertical-thin-scrollbar;
 
     margin: 0;
     font-size: 0.9em;
-    font-weight: 500;
-    width: 170px;
-    padding: 5px 1px;
     max-height: 500px;
     overflow: auto;
-    
+    display: none;
+
     > div {
         @include radius(3px);
         @include shadow(0 1px 1px #fdfdfd);
@@ -237,6 +239,7 @@ input {
     float: right;
     width: 520px;
     margin-bottom: 0;
+    display: none;
     
     .content {
         @include shadow(none);

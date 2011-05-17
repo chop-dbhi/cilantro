@@ -1,4 +1,4 @@
-define('rest/datasource', ['rest/basext'], function(BaseExt) {
+define(['cilantro/rest/basext'], function(BaseExt) {
     
     var DataSource = BaseExt.extend({});
 

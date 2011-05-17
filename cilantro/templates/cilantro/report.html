@@ -1,0 +1,157 @@
+{% extends "base_nav.html" %}
+
+{% block title %}{{ block.super }} : Report{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ CILANTRO_MEDIA_URL }}css/report.css">
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        var API_URLS = {
+            scope: '{% url api:scope:session %}',
+            perspective: '{% url api:perspectives:session %}',
+            report: '{% url api:reports:session %}'
+        }, 
+        URLS = { define: '{% url define %}' };
+
+        require(['cilantro/report/main']);
+    </script>
+{% endblock %}
+
+{% block navigation %}
+    <li><span class="iconic arrow-left"></span> <a href="{% url define %}">Refine Conditions</a></li>
+{% endblock %}
+
+{% block content %}
+
+    <div id="report" class="container">
+
+        <div class="title">Report</div>
+
+        <div id="report-info" class="info">
+
+            {# this is here because it is floated to the right #}
+            <div id="actions">
+                {% spaceless %}
+                {% block report_buttons %}
+                    <button id="data-columns">Add/Remove Columns...</button>
+                    <button id="export-data">Export to CSV</button>
+                {% endblock %}
+                {% endspaceless %}
+            </div>
+
+            <ul id="stats">
+                <li><b id="count"></b> rows</li>
+                <li><b id="unique-count"></b> unique patients</li>
+            </ul>
+
+            <ul id="details">
+                <li><em>No conditions were defined for this report</em></li>
+            </ul>
+        </div>
+
+        <div class="toolbar header clearfix">
+            <span>
+                <span class="page-links"></span>
+                <select class="per-page">
+                    <option value=""># rows</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </span>
+        </div>
+
+        <div class="content">
+            <div id="table-wrap">
+                <table id="table" class="sortable">
+                    <thead><tr></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="toolbar footer clearfix">
+            <span>
+                <span class="page-links"></span>
+                <select class="per-page">
+                    <option value=""># rows</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </span>
+        </div>
+    </div>
+
+    <div id="columns-dialog" class="container clearfix">
+        <div class="content">
+            <div>
+
+                <div class="instructions">
+                    <h4>Available Columns</h4>
+
+                    <p class="info">Below are the columns of data that are available for
+                    viewing. Note that depending on which columns are added to your report,
+                    the the <em>number of rows</em> may change, but the <em>number of
+                    patients</em> will stay constant.</p>
+
+                    <form method="get" action="{% url api:columns:read %}">
+                        <input id="search" class="search" type="text" name="q" autocomplete="off" placeholder="Search...">
+                    </form>
+                </div>
+
+                <section>
+                    <div id="columns">
+                        {% for category in columns %} 
+                            <div data-model="category" data-id="{{ category.id }}">
+                                <h4>{{ category.name }} <a class="ht add-all" href="#{{ category.id }}">Add All</a></h4>
+                                <ul>
+                                    {% for column in category.columns %}
+
+                                        <li class="active clearfix" data-model="column" data-id="{{ column.id }}">
+                                            <a class="add-column" href="#{{ column.id }}"><span class="icon plus"></span> Add</a>
+                                            <span class="name">{{ column.name }}</span>
+                                            <span class="description">{{ column.description|safe }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+
+            <div>
+                <div class="instructions">
+                    <h4>Selected Columns</h4>
+
+                    <p class="info">The order below (top-bottom) defines the order they will be
+                    displayed (left-right). To change the order simply click and drag any of the
+                    columns to the desired location and release in the visible drop zone.</p>
+
+                    <div style="text-align: right"><button class="ht st remove-all">Remove All</button></div>
+                </div>
+
+                <section>
+                    <ul id="active-columns">
+                        {% for category in columns %} 
+                            {% for column in category.columns %}
+                                <li class="clearfix" data-model="column" data-id="{{ column.id }}">
+                                    <a class="remove-column" href="#{{ column.id }}"><span class="icon x"></span> Remove</a>
+                                    <span class="name">{{ column.name }}</span>
+                                </li>
+                            {% endfor %}
+                        {% endfor %} 
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

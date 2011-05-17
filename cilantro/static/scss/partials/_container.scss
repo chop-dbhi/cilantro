@@ -30,16 +30,16 @@
         // container title bar buttons
         button {
             @include radius(3px);
-            @include shadow(0 0 1px #fff);
+            @include shadow(none);
             @include vertical-gradient(#444, #222);
             
             color: #ddd;
             float: right;
-            margin-top: -1px;
             text-shadow: none;
             border-color: #000;
             font-size: 0.8em;
-            padding: 2px 3px;
+            padding: 1px 3px;
+            font-weight: 100;
             
             &:hover {
                 color: #fff;

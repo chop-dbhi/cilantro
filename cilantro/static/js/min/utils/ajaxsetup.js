@@ -1,0 +1,1 @@
+$.ajaxSetup({statusCode:{302:function(a){try{var b=$.parseJSON(a.responseText);window.location=b.redirect}catch(c){}}}})

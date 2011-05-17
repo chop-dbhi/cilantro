@@ -1,5 +1,4 @@
-define('define/criteria',
-     
+define(
     function() {
 
         var tmpl = $.jqotec([
@@ -10,6 +9,12 @@ define('define/criteria',
                 '</a>',
             '</div>'
         ].join(''));
+
+        var criteriaList = $('#criteria-list');
+
+        criteriaList.bind('activate-criterion', function(evt, id) {
+            criteriaList.children().removeClass('selected').filter('[data-id='+id+']').addClass('selected');
+        });
         
         var Criteria = function(criteria_constraint, uri, english){
             

@@ -1,4 +1,4 @@
-define(["lib/base"], function(){
+define(["cilantro/lib/base"], function(){
     // This is the Abstract Base Class (it will throw exceptions if you don't implement updateElement, elementChanged, and render) for view elements.
     // A view must contain at least one view element. There are two builtin view elements, forms, and charts. Custom view elements can be written and mixed,
     // with the builtin ones to create a unified view.

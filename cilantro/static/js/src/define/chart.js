@@ -1,4 +1,4 @@
-define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, ViewElement) {
+define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/lib/highcharts'], function(Form, ViewElement) {
     // Base Class for all charts
     var Chart = ViewElement.extend({
         constructor: function(viewset, concept_pk){
@@ -41,7 +41,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
 
                          states:{
                              hover:{
-                                 brightness: -.1,
+                                 brightness: -0.1,
                                  enabled:true
                              }
                          },
@@ -58,11 +58,13 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                          },
                          allowPointSelect:false,
                          cursor:"pointer",
+                         borderColor:"#303030",
+                         borderWidth:1,
                          enableMouseTracking:true,
                          stickyTracking:false,
                          states:{
                               hover:{
-                                  brightness: -.1,
+                                  brightness: -0.1,
                                   enabled:true
                               }
                          }
@@ -95,6 +97,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
         updateChart : function(){}
     },
     {   // Colors used by all graphs
+        SELECTED_BAR_COLOR: "005DA8",
         UNSELECTED_COLOR: "#C5C5C5",
         SELECTED_COLOR: "#99BDF1",
         EXCLUDE_COLOR: "#EE3A43",
@@ -191,18 +194,18 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                     var category = element.name || element.category;
                     if ($.inArray(objRef.unmap[category], objRef.selected) !==-1){
                         if (objRef.negated){
-                            element.update({color:Chart.EXCLUDE_COLOR}, false);
+                            element.update({color:objRef.EXCLUDE_COLOR}, false);
                         }else{
-                            element.update({color:Chart.SELECTED_COLOR}, false);    
+                            element.update({color:objRef.SELECTED_COLOR}, false);    
                         }
                     }else{
-                        element.update({color:Chart.UNSELECTED_COLOR}, false);
+                        element.update({color:objRef.UNSELECTED_COLOR}, false);
                     }
-                    
+
                  });
                  // We've potentially changed the color of columns, so redraw
                  this.chart.redraw();
-                 
+
                  // This is a hack to fix a bug in ie7 where bars that
                  // have been moused over, vanish if the view is taken off
                  // screen and then put back.
@@ -216,13 +219,13 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
              var index = $.inArray(this.unmap[category], this.selected);
              if (index === -1) {
                  if (this.negated){
-                     event.point.update({color:ChoiceChart.EXCLUDE_COLOR});
+                     event.point.update({color:this.EXCLUDE_COLOR});
                  }else{
-                     event.point.update({color:ChoiceChart.SELECTED_COLOR});
+                     event.point.update({color:this.SELECTED_COLOR});
                  }
                  this.selected.push(this.unmap[category]);
              }else{
-                 event.point.update({color:ChoiceChart.UNSELECTED_COLOR});
+                 event.point.update({color:this.UNSELECTED_COLOR});
                  this.selected.splice(index,1);
              }
              this.notify();
@@ -282,7 +285,10 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
         gainedFocus: function(evt){
             this.base();
             this.negated = false;  // is this even used anymore??
-        }
+        },
+        SELECTED_COLOR:Chart.SELECTED_COLOR,
+        UNSELECTED_COLOR:Chart.UNSELECTED_COLOR,
+        EXCLUDE_COLOR:Chart.EXCLUDE_COLOR
     });
  
      var BarChart = ChoiceChart.extend({
@@ -371,10 +377,12 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                               }
                               objRef.notify();
                               objRef.updateChart();
-                        });            
+                        });
                     }(col));
                }
-          }
+          },
+          SELECTED_COLOR:Chart.SELECTED_BAR_COLOR,
+          UNSELECTED_COLOR:"#999999"
      });    
      // We have an embedded form in this chart, which is really
      // the only thing that changes the datasource. The graph 
@@ -419,7 +427,7 @@ define(['define/form', 'define/viewelement', 'lib/highcharts'], function(Form, V
                 return "" + this.y;
              };
              this.options.xAxis =  {
-                 maxPadding:.05,
+                 maxPadding: 0.05,
                  startOnTick:false,
                  title: {
                      text: this.viewset.data.xaxis

@@ -11,8 +11,6 @@
  * START reset overrides...
  */
 
-html { overflow-y: auto; }
-
 ::-moz-selection { background: inherit; color: inherit; }
 ::selection { background: inherit; color: inherit; }
 
@@ -75,6 +73,8 @@ input, textarea {
 
 textarea {
     width: auto;
+    display: block; // webkit.. http://stackoverflow.com/questions/4457398/why-do-webkit-browsers-render-the-following-with-extra-padding-margin-on-the-bott
+    resize: vertical;
 }
 
 input[type=submit], input[type=button],
@@ -197,6 +197,10 @@ input[type=button], input[type=submit], button {
     font-size: 0.9em;
 
     border: 1px solid #666;
+
+    > span {
+        vertical-align: middle;
+    }
 
     &:hover {
         border-color: #222;
