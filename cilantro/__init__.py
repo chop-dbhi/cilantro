@@ -1,7 +1,7 @@
-VERSION = (2, 1, 2, 'final')
+VERSION = (2, 1, 5, 'final')
 
 def get_version():
-    version = 'v%s.%s' % VERSION[:2]
+    version = '%s.%s' % VERSION[:2]
     if version[2]:
         version = '%s.%s' % (version, VERSION[2])
 

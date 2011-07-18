@@ -78,14 +78,24 @@
     }
     
     // nested tables
-    table {
+    .sortable, table {
+        margin: 0;
+
         thead, tfoot {
             td, th {
                 @include shadow(none);
-                background-color: #eee;
-                border-color: #ddd;
+                background-color: transparent;
+                border: none;
                 font-weight: 500;
             }
+        }
+
+        thead {
+            td, th { border-bottom: 1px solid #ccc }
+        }
+
+        tfoot {
+            td, th { border-top: 1px solid #ccc }
         }
     }
 }

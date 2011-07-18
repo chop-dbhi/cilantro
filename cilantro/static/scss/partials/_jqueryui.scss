@@ -23,6 +23,7 @@
     }
 
     &.ui-widget {
+        @include radius(4px 4px 0 0);
         font: inherit;
     }
 
