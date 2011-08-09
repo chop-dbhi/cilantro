@@ -1,0 +1,26 @@
+@import "partials/mixins";
+@import "partials/shadows";
+
+h2 {
+    font-size: 1.3em;
+}
+
+.col {
+    @include inline-block;
+    width: 460px;
+
+    &:first-child {
+        margin-right: 15px;
+    }
+}
+
+section ul {
+    margin-left: 0;
+    list-style: none;
+}
+
+#session-scope, #session-perspective {
+    font-size: 0.9em;
+    margin-left: 2em;
+    list-style: disc;
+}

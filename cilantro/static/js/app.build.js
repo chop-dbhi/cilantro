@@ -29,6 +29,10 @@
 
     }, {
 
+        name: 'workspace/main'
+
+    }, {
+
         name: 'define/main'
 
     }, {

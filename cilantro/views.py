@@ -3,6 +3,10 @@ from django.template import RequestContext
 
 from serrano.api.resources import ColumnResourceCollection
 
+def workspace(request):
+    return render_to_response('workspace.html',
+        context_instance=RequestContext(request))
+
 def define(request):
     return render_to_response('define.html',
         context_instance=RequestContext(request))
