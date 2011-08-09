@@ -13,7 +13,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 };
 define('cilantro/define/main', ['cilantro/main'], function() {
   var App, CollectionView, Concept, ConceptCollection, ConceptCollectionView, ConceptView, Domain, DomainCollection, DomainCollectionView, DomainView, Report, ReportView, StateView, Subdomain, SubdomainCollection, SubdomainCollectionView, SubdomainView;
-  if (!window.App) {
+  App = window.App;
+  if (!App) {
     window.App = App = {};
   }
   App.hub = new PubSub;
@@ -242,7 +243,7 @@ define('cilantro/define/main', ['cilantro/main'], function() {
       DomainCollection.__super__.constructor.apply(this, arguments);
     }
     DomainCollection.prototype.model = Domain;
-    DomainCollection.prototype.url = '/apps/audgendb/api/domains/';
+    DomainCollection.prototype.url = App.urls.domains;
     DomainCollection.prototype.initialize = function() {
       App.State.bind('change:_domain', this.changeDomain);
       App.State.bind('change:_subdomain', this.changeSubdomain);
@@ -429,7 +430,7 @@ define('cilantro/define/main', ['cilantro/main'], function() {
       ConceptCollection.__super__.constructor.apply(this, arguments);
     }
     ConceptCollection.prototype.model = Concept;
-    ConceptCollection.prototype.url = '/apps/audgendb/api/criteria/';
+    ConceptCollection.prototype.url = App.urls.criteria;
     ConceptCollection.prototype.initialize = function() {
       App.State.bind('change:concept', this.changeConcept);
       return App.State.bind('change:domain', this.changeDomain);
@@ -524,7 +525,7 @@ define('cilantro/define/main', ['cilantro/main'], function() {
     function Report() {
       Report.__super__.constructor.apply(this, arguments);
     }
-    Report.prototype.url = '/apps/audgendb/api/reports/session/';
+    Report.prototype.url = App.urls.session.report;
     Report.prototype.defaults = {
       description: 'Add a description...'
     };

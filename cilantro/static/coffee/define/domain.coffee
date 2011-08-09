@@ -58,7 +58,7 @@
     ###
     class DomainCollection extends Backbone.Collection
         model: Domain
-        url: '/apps/audgendb/api/domains/'
+        url: App.urls.domains
 
         initialize: ->
             App.State.bind 'change:_domain', @changeDomain

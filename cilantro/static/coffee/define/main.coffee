@@ -1,6 +1,7 @@
 define 'cilantro/define/main', ['cilantro/main'], ->
 
-    if not window.App
+    App = window.App
+    if not App
         window.App = App = {}
 
     App.hub = new PubSub

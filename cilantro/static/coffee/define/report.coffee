@@ -1,5 +1,5 @@
     class Report extends Backbone.Model
-        url: '/apps/audgendb/api/reports/session/'
+        url: App.urls.session.report
 
         defaults:
             description: 'Add a description...'

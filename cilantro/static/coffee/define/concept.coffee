@@ -13,7 +13,7 @@
 
     class ConceptCollection extends Backbone.Collection
         model: Concept
-        url: '/apps/audgendb/api/criteria/'
+        url: App.urls.criteria
 
         initialize: ->
             App.State.bind 'change:concept', @changeConcept

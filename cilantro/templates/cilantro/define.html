@@ -10,6 +10,20 @@
 
 {% block scripts %}
     {{ block.super }}
+    <script>
+        var App = {
+            urls: {
+                session: {
+                    scope: '{% url api:scope:session %}',
+                    perspective: '{% url api:perspectives:session %}',
+                    report: '{% url api:reports:session %}'
+                },
+                reports: '{% url api:reports:read %}',
+                domains: '{% url api:categories:read %}',
+                criteria: '{% url api:criteria:read %}'
+            }
+        };
+    </script>
     <script>require(['cilantro/define/main']);</script>
 {% endblock %}
 
