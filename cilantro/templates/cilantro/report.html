@@ -22,7 +22,10 @@
 {% endblock %}
 
 {% block navigation %}
-    <li><span class="iconic arrow-left"></span> <a href="{% url define %}">Refine Conditions</a></li>
+    <span class="previous">
+        <a href="{% url define %}">Refine Conditions</a>
+        <a href="{% url workspace %}">Workspace</a>
+    </span>
 {% endblock %}
 
 {% block content %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_nav.html" %}
 
 {% block title %}{{ block.super }} : Define{% endblock %}
 
@@ -11,6 +11,11 @@
 {% block scripts %}
     {{ block.super }}
     <script>require(['cilantro/define/main']);</script>
+{% endblock %}
+
+{% block navigation %}
+    <span class="next"><a href="{% url report %}">View Report</a></span>
+    <span class="previous"><a href="{% url workspace %}">Workspace</a></span>
 {% endblock %}
 
 {% block content %}
@@ -27,11 +32,7 @@
                 <div id="categories" data-uri="{% url api:categories:read %}"></div>
             </div>
  
-             <div id="subcategories" class="tabs">
-                <span class="tab active">All</span>
-                <span class="tab">Sub-Category 1</span>
-                <span class="tab">Sub-Category 2</span>
-            </div>
+            <div id="subdomains" class="tabs"></div>
             {% endspaceless %}
         
             <div id="center-pane" class="clearfix">
@@ -67,6 +68,14 @@
     </div>
 
     <div id="right-pane" class="clearfix">
+
+        <div id="report-info">
+            <h2></h2>
+            <p><input name="name"></p>
+            <p><em></em></p>
+            <textarea name="description"></textarea>
+        </div>
+
         <div id="user-criteria" class="container" data-uri="{% url api:scope:session %}">
 
             <div class="title">
