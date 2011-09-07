@@ -1,0 +1,4 @@
+.sass-cache
+.DS_Store
+*.pyc
+cilantro/static/js/min/build.txt
