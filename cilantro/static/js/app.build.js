@@ -19,7 +19,8 @@
     // here to route 'cilantro' to the baseUrl to ensure the "url" routes
     // to the correct file system location.
     paths: {
-        'cilantro': '.'
+        'cilantro': '.',
+        'common': './common'
     },
     
     // an array of modules to compile
