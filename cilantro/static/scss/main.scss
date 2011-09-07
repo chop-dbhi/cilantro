@@ -1,14 +1,14 @@
 @import "partials/colors";
 @import "partials/mixins";
-@import "partials/shadows";
 @import "partials/boilerplate";
+@import "partials/shadows";
 @import "partials/container";
 @import "partials/jqueryui";
 @import "partials/sortable";
 @import "partials/icons";
 
 /**
- * START reset overrides...
+ * START boilerplate overrides...
  */
 
 ::-moz-selection { background: inherit; color: inherit; }
@@ -17,39 +17,32 @@
 /* j.mp/webkit-tap-highlight-color */
 a:link { -webkit-tap-highlight-color: inherit; }
 
-input[type="checkbox"] {
-    vertical-align: middle;
-}
-
 /**
  * END reset overrides...
  */
- 
- 
+
+h2 {
+    color: #8f1916;
+}
+
+input[type="checkbox"] { vertical-align: middle; }
+
+hr { margin: 5px 0; border-color: #ddd; }
+
+ul {
+    margin-left: 0;
+    padding-left: 15px;
+}
 
 body {
+    @include user-select(none);
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: url(../img/linen_tile.png);
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-h4, p {
-    margin: 5px 0;
-}
-
-b, strong {
-    font-weight: bolder;
-}
-
-i, em {
-    font-style: italic;
 }
 
 section {
     @include inset(#fff);
-    @include radius(3px);
+    @include border-radius(3px);
     
     border-color: #aaa;
     padding: 10px;
@@ -57,7 +50,7 @@ section {
 
 input, textarea {
     @include inset(#f6f6f6);
-    @include radius(2px);
+    @include border-radius(3px);
     
     outline: none;
     padding: 2px;
@@ -91,7 +84,7 @@ table tbody tr > th:first-child {
 
 header {
     @include anchors(#666, #333);
-    @include dual-shadow(
+    @include box-shadow(
         0 1px 3px darken($DEFAULT_COLOR, 20),
         inset 0 1px 3px #aaa
     );
@@ -121,6 +114,7 @@ header {
     }
 }
 
+/*
 nav {
     @include anchors(darken(#588dc4, 40), darken(#588dc4, 40));
     @extend .clearfix;
@@ -129,8 +123,8 @@ nav {
     margin-bottom: 10px;
     
     a {
-        @include letter-press(darken(#588dc4, 40));
-        @include dual-shadow(inset 0 2px 2px lighten(#588dc4, 30), inset 0 -2px 2px darken(#588dc4, 10));
+        @include text-shadow(inset darken(#588dc4, 40));
+        @include box-shadow(inset 0 2px 2px lighten(#588dc4, 30), inset 0 -2px 2px darken(#588dc4, 10));
         border: 1px solid darken(#588dc4, 20);
         background-color: lighten(#588dc4, 10);
         padding: 3px 5px;
@@ -149,7 +143,7 @@ nav {
         }
 
         > :first-child {
-            @include radius(15px 0 0 15px);
+            @include border-radius(15px 0 0 15px);
         }
 
         > :last-child {
@@ -170,11 +164,12 @@ nav {
         }
 
         > :last-child {
-            @include radius(0 15px 15px 0);
+            @include border-radius(0 15px 15px 0);
         }
 
     }    
 }
+*/
 
 #content {
     position: relative;
@@ -182,11 +177,6 @@ nav {
     left: 50%;
     margin-left: -480px;
     width: 960px;
-}
-
-#report-info {
-    input, textarea { display: none; }
-    margin-bottom: 10px;
 }
 
 footer {
@@ -225,49 +215,9 @@ label {
 }
 
 input[type=button], input[type=submit], button {
-    @include radius(3px);
-    @include raised(#ddd);
-    @include letter-press(#222);
-
-    cursor: pointer;
-    position: relative;
-
-    padding: 2px 5px;
-    font-weight: 600;
-    font-size: 0.9em;
-
-    border: 1px solid #666;
-
-    > span {
-        vertical-align: middle;
-    }
-
-    &:hover {
-        border-color: #222;
-    }
-
-    &:active {
-        top: 1px;
-    }
-
-    &:disabled {    
-        @include shadow(none);
-        @include letter-press(#999);
-
-        border-color: #aaa;
-        cursor: auto;
-
-        &:hover {
-            border-color: #aaa;        
-        }
-
-        &:active {
-            @include letter-press(#999);
-
-            top: 0;
-            border-color: #aaa;
-        }     
-    }
+    @include clean-gray;
+    width: auto;
+    padding: 3px 5px;
 }
 
 /**
@@ -275,7 +225,7 @@ input[type=button], input[type=submit], button {
  */
 
 .block {
-    @include opacify(70);
+    @include opacity(70);
     background: #fff url(../img/loader.gif) no-repeat center;
 }
 
@@ -294,9 +244,14 @@ input[type=button], input[type=submit], button {
 }
 
 .info {
-    font-size: 0.85em;
+    font-size: 11px;
     font-style: italic;
     color: #666;
+}
+
+.placeholder {
+    color: #aaa;
+    font-style: italic;
 }
 
 .ie7 {

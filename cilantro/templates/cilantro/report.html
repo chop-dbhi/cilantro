@@ -10,12 +10,18 @@
 {% block scripts %}
     {{ block.super }}
     <script>
-        var API_URLS = {
-            scope: '{% url api:scope:session %}',
-            perspective: '{% url api:perspectives:session %}',
-            report: '{% url api:reports:session %}'
-        }, 
-        URLS = { define: '{% url define %}' };
+        var App = {
+            urls: {
+                session: {
+                    scope: '{% url api:scope:session %}',
+                    perspective: '{% url api:perspectives:session %}',
+                    report: '{% url api:reports:session %}'
+                },
+                reports: '{% url api:reports:read %}',
+                domains: '{% url api:categories:read %}',
+                criteria: '{% url api:criteria:read %}'
+            }
+        };
 
         require(['cilantro/report/main']);
     </script>
@@ -32,9 +38,11 @@
 
     <div id="report" class="container">
 
-        <div class="title">Report</div>
+        {% include "snippets/report-title.html" %}
 
         <div id="report-info" class="info">
+            <p role="description"></p>
+            <textarea name="description"></textarea>
 
             {# this is here because it is floated to the right #}
             <div id="actions">
@@ -46,15 +54,14 @@
                 {% endspaceless %}
             </div>
 
-            <ul id="stats">
-                <li><b id="count"></b> rows</li>
-                <li><b id="unique-count"></b> unique patients</li>
-            </ul>
+            <div class="stat"><span id="report-count"></span>rows</div>
+            <div class="stat"><span id="report-unique"></span>patients</div>
 
             <ul id="details">
                 <li><em>No conditions were defined for this report</em></li>
             </ul>
         </div>
+
 
         <div class="toolbar header clearfix">
             <span>

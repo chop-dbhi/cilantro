@@ -16,7 +16,7 @@
             text-align: center;
             font-weight: 500;
         	padding: 5px 7px;
-            @include letter-press(#444);        	
+            @include text-shadow(inset, #444);        	
         }       
 
         .desc, .asc {
@@ -83,7 +83,7 @@
 
         thead, tfoot {
             td, th {
-                @include shadow(none);
+                @include box-shadow(none);
                 background-color: transparent;
                 border: none;
                 font-weight: 500;

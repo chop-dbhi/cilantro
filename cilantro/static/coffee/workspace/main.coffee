@@ -1,125 +1,85 @@
-define 'cilantro/workspace/main', ['cilantro/main'], ->
+define ['common/models/polling', 'common/views/collection', 'vendor/synapse'], (polling, collectionview) ->
 
     App = window.App
-
     if not App
         window.App = App = {}
 
-    App.hub = new PubSub
 
-    class CollectionView extends Backbone.View
+    class Reports extends polling.Collection
+        url: App.urls.reports
+
+
+    class ReportListItem extends Backbone.View
+        el: '<li><strong role="name"></strong> - modified '
+            '<span role="modified"></span><span role="timesince"></span></li>'
+
+        elements:
+            '[role=name]': 'name'
+            '[role=modified]': 'modified'
+            '[role=timesince]': 'timesince'
+
+        render: ->
+            Synapse(@model).notify(@name).notify(@modified)
+
+
+    class ReportList extends collectionview.View
+        el: '#reports ul'
+        viewClass: ReportListItem
+
+
+    class SessionReport extends polling.Model
+        url: App.urls.session.report
+
+
+    class ReportView extends Backbone.View
+        el: '#session-report'
+
+        elements:
+            '[role=modified]': 'modified'
+            '[role=timesince]': 'timesince'
+
+        events:
+            'click .timestamp': 'toggleTime'
+
         initialize: ->
-            @childViews = {}
-            @collection.bind 'add', @add
-            @collection.bind 'reset', @reset
-            @collection.bind 'remove', @remove
-            @collection.bind 'destroy', @destroy
+            @model.bind 'change', @render
 
-        add: (model) =>
-            # the view for this model has already been rendered, simply
-            # re-attach it to the DOM
-            if model.cid in @childViews
-                view = @childViews[model.cid]
-                # clear destroy timer from stack
-                clearTimeout(view.dtimer)
-            # create a new view representing this model
-            else
-                view = @childViews[model.cid] = (new @viewClass model: model).render()
-            @el.append view.el
-
-        # the collection has been reset, so create views for each new model
-        reset: (collection, options) =>
-            collection.each @add
-            if options.initial then @el.animate opacity: 100, 500
-
-        # detach the DOM element. this is intended to be temporary
-        remove: (model) =>
-            view = @childViews[model.cid]
-            view.el.detach()
-            # since this should be temporary, we set a timer to destroy the
-            # element after some time to prevent memory leaks. note: this has no
-            # impact on the underlying model
-            view.dtimer = _.delay @destroy, 1000 * 10
-
-        # remove the DOM element and all bound data completely
-        destroy: (model) =>
-            @childViews[model.cid].el.remove()
+        render: =>
+            @modified.text @model.get('modified')
+            @timesince.text @model.get('timesince')
 
 
-    class PollingCollection extends Backbone.Collection
-        interval: 1000 * 10
-        initialize: ->
-            @poll()
-
-        poll: ->
-            setInterval =>
-                @fetch()
-            , @interval
+        toggleTime: ->
+            @modified.toggle()
+            @timesince.toggle()
 
 
-    class PollingModel extends Backbone.Model
-        interval: 1000 * 10
-        initialize: ->
-            @poll()
-
-        poll: ->
-            setInterval =>
-                @fetch()
-            , @interval
-
-
-    class SessionScope extends PollingModel
-        url: App.urls.session.scope
 
 
     class ScopeView extends Backbone.View
         el: '#session-scope'
 
         initialize: ->
-            @model.bind 'change', @render
+            @model.bind 'change:scope', @render
 
-        render: => @el.html @model.get('text') or ''
-
-
-    class SessionPerspective extends PollingModel
-        url: App.urls.session.perspective
+        render: => @el.html @model.get('scope').text or '<li class="info">No conditions have been defined</li>'
 
 
     class PerspectiveView extends Backbone.View
         el: '#session-perspective'
 
         initialize: ->
-            @model.bind 'change', @render
+            @model.bind 'change:perspective', @render
 
         render: =>
             @el.empty()
-            for col in @model.get('header')
+            for col in @model.get('perspective').header
                 @el.append "<li>#{col.name} <span class=\"info\">(#{col.direction})</span></li>"
 
 
-    class ActivityStream extends Backbone.Collection
-    class SystemStatusStream extends Backbone.Collection
+#    class SystemStatusStream extends Backbone.Collection
 
-
-    class Reports extends PollingCollection
-        url: App.urls.reports
-
-
-    class ReportListItem extends Backbone.View
-        el: '<li><strong role="name"></strong> - modified <span role="modified"></span></li>'
-
-        elements:
-            '[role=name]': 'name'
-            '[role=modified]': 'modified'
-
-        render: ->
-            Synapse(@model).notify(@name).notify(@modified)
-
-
-    class ReportList extends CollectionView
-        el: '#reports ul'
-        viewClass: ReportListItem
-
+#    class ActivityStream extends Backbone.Collection
 
     $ ->
 
@@ -131,14 +91,15 @@ define 'cilantro/workspace/main', ['cilantro/main'], ->
         App.reports.fetch()
 
         App.session =
-            scope: new SessionScope
-            perspective: new SessionPerspective 
+            report: new SessionReport
 
         App.SessionScope = new ScopeView
-            model: App.session.scope
+            model: App.session.report
 
         App.SessionPerspective = new PerspectiveView
-            model: App.session.perspective
+            model: App.session.report
 
-        App.session.scope.fetch()
-        App.session.perspective.fetch()
+        App.SessionReport = new ReportView
+            model: App.session.report
+
+        App.session.report.fetch()

@@ -1,27 +1,22 @@
 // defined as a mixin for other elements to extend from e.g. jQuery UI dialog
 @mixin container-title {
-    @include radius(4px 4px 0 0);
-    @include letter-pop(#eee);
+    @include border-radius(3px 3px 0 0);
+    @include text-shadow(#eee);
 
-    background-color: #444;
-    @include dual-shadow(
-        inset 0 1px 2px desaturate(lighten(#444, 30), 40),
-        inset 0 -1px 2px darken(#444, 10)
-    );
-
-    border: 1px solid darken(#444, 20);
+    @include box-shadow(inset 0 1px 2px #666, inset 0 -1px 2px #111);
+    background-color: #333;
+    border: 1px solid #111;
     padding: 4px 10px;
-    font-weight: 500;
     font-size: 1.1em;
     
     &::after {
         border-bottom: 1px solid #fff;
-    };
+    }
 }
 
 .container {
-    @include shadow(0 1px 5px #777);	
-    @include radius(4px 4px 0 0);
+    @include box-shadow(0 1px 5px #777);	
+    @include border-radius(4px 4px 0 0);
 
     // container title bar
     > .title {
@@ -29,16 +24,21 @@
 
         // container title bar buttons
         button {
-            @include radius(3px);
-            @include shadow(none);
-            @include vertical-gradient(#444, #222);
+            @include border-radius(3px);
+            @include box-shadow(none);
+            @include linear-gradient(#444, #222);
             
             color: #ddd;
             float: right;
             text-shadow: none;
             border-color: #000;
             font-size: 0.8em;
-            padding: 1px 3px;
+
+            padding: {
+                top: 3px;
+                bottom: 3px;
+            }
+
             font-weight: 100;
             
             &:hover {
@@ -46,7 +46,7 @@
             }
             
             &:active {
-                @include vertical-gradient(#222, #444);
+                @include linear-gradient(#222, #444);
                 background-color: #444;
             }
         }
@@ -54,7 +54,7 @@
     
     > .toolbar {
         @include raised(saturate($DEFAULT_COLOR, 30));
-        @include letter-press(#333, 1px);
+        @include text-shadow(inset, #333, 1px);
 
         border-right: none;
         border-left: none;
@@ -81,7 +81,7 @@
     }
     
     > .info {
-        @include shadow(0 2px 4px #ddd inset);
+        @include box-shadow(0 2px 4px #ddd inset);
         
         font-size: inherit;
         padding: 10px;
@@ -93,11 +93,20 @@
 
     // container content area, keep it simple...
     > .content {
-        @include letter-press(#444);
+        @include text-shadow(inset, #444);
         
         border-top: 1px solid #fff;
         background-color: #eee;
         padding: 10px;
+
+        // ensure elements don't expand the edges..
+        > :first-child {
+            margin-top: 0;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
     }
 
     .tabs {
@@ -105,8 +114,8 @@
         display: block;
 
         > .tab {
-            @include letter-press(#444);
-            @include radius(10px);
+            @include text-shadow(inset, #444);
+            @include border-radius(10px);
             background-color: #fff;
             padding: 1px 10px;
             margin-right: 5px;
@@ -121,7 +130,7 @@
 
             &.active {
                 @include inset(darken($DEFAULT_COLOR, 40));
-                @include letter-pop(#fff);
+                @include text-shadow(#fff);
                 
                 border-color: darken($DEFAULT_COLOR, 60);
                 cursor: auto;

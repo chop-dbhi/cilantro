@@ -24,53 +24,55 @@
     <script>require(['cilantro/workspace/main']);</script>
 {% endblock %}
 
-{% block navigation %}
-    <span class="next"><a href="{% url define %}">Resume Session</a></span>
-{% endblock %}
-
 {% block content %}
 
     <div class="container">
-        <div class="title">Workspace</div>
 
         <div class="content">
 
             <div class="col">
-                <h2>Session Overview</h2>
+                <h2>What You Were Working On Last</h2>
 
                 <p class="info">This is a quick overview of your last session.</p> 
 
-                <section>
-                    <strong>Conditions</strong>
-                    <ul id="session-scope"></ul>
+                <section id="session-report">
+                    <div>
+                        <strong>Conditions</strong>
+                        <ul id="session-scope"></ul>
+                    </div>
 
-                    <strong>Columns</strong>
-                    <ul id="session-perspective"></ul>
+                    <div>
+                        <strong>Columns</strong>
+                        <ul id="session-perspective"></ul>
+                    </div>
+                    <hr>
+                    <p class="timestamp info">modified <span role="modified"></span><span role="timesince"></span></p>
                 </section>
 
+                <!--
                 <h2>Activity Stream</h2>
                 
                 <section id="activity-stream">
                 <ul><li class="info">There is no activity to report.</li></ul>
                 </section>
-
+                -->
             </div>
 
 
             <div class="col">
 
                 <h2>Reports</h2>
-                
+                <p class="info">Lists all your saved reports.</p>
                 <section id="reports">
                 <ul><li class="info">No reports have been saved. <a href="#">Learn More</a></li></ul>
                 </section>
-
+<!--
                 <h2>System Status</h2>
                 
                 <section id="system-status">
                 <ul><li class="info">The system status is not currently enabled.</li></ul>
                 </section>
-
+                -->
 
             </div>
 

@@ -2,6 +2,11 @@
 @import "partials/mixins";
 @import "partials/shadows";
 
+@import "partials/toolbar";
+@import "partials/report";
+
+
+
 #search {
     @include search-box;
     width: 405px;
@@ -12,10 +17,6 @@
     > .info {
         border-bottom: none;
         
-        > * {
-            @include inline-block;
-            vertical-align: top;
-        }
     }
     
     .toolbar {
@@ -140,7 +141,7 @@
     }
 
     li {
-        @include shadow(0 1px 1px #fdfdfd);
+        @include box-shadow(0 1px 1px #fdfdfd);
 
         display: none;
         padding: 7px;
@@ -211,7 +212,7 @@
 }
 
 #active-columns li.placeholder {
-    @include radius(0);
+    @include border-radius(0);
     display: block;
     background-color: #fff;
     border: 1px dashed #ccc;
@@ -219,7 +220,7 @@
 
 #description {
     @include raised-drop-shadow;
-    @include radius(5px);
+    @include border-radius(5px);
     @include vertical-thin-scrollbar;
     
     padding: 5px 10px;

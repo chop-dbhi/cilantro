@@ -1,1 +1,1 @@
-var controller;controller=new Backbone.Model({_domain:null,domain:null,subdomain:null,concept:null})
+App.State=new Backbone.Model

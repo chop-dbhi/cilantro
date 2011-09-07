@@ -1,7 +1,9 @@
 @import "partials/colors";
 @import "partials/mixins";
 @import "partials/shadows";
-@import "partials/icons";
+@import "partials/popover";
+@import "partials/toolbar";
+@import "partials/report";
 
 $BLUE: hsl(207, 100, 33);
 
@@ -15,6 +17,8 @@ $BLUE: hsl(207, 100, 33);
     top: 0;
     left: 0;
     background-color: #eee;
+
+    .content { border: { left: 1px solid #999; right: 1px solid #999} }
 }
 
 #center-pane {
@@ -26,7 +30,7 @@ $BLUE: hsl(207, 100, 33);
 #right-pane {
     position: absolute;
     vertical-align: top;
-    top: 23px;
+    top: 0;
     right: 0;
     width: 200px;
 }
@@ -54,9 +58,9 @@ $BLUE: hsl(207, 100, 33);
     }
 } 
 
-#categories {
+#domains {
     @include inline-block;
-    @include opacify(0);
+    @include opacity(0);
 
     font-size: 13px;
     font-weight: 600;
@@ -66,11 +70,11 @@ $BLUE: hsl(207, 100, 33);
 
     // the tabs themselves
     > span {
-        @include dual-shadow(
+        @include box-shadow(
             inset 0 -1px 4px lighten(#e6e6e6, 20),
             inset 0 1px 4px darken(#e6e6e6, 20)
         );
-        @include letter-press(#444);
+        @include text-shadow(inset, #444);
 
         background-color: #e6e6e6;
         height: 26px;
@@ -94,7 +98,7 @@ $BLUE: hsl(207, 100, 33);
     }
     
     > .active {
-        @include shadow(0 -5px 10px #eee inset);
+        @include box-shadow(0 -5px 10px #eee inset);
 
         color: $BLUE;
         border-color: #999;
@@ -117,6 +121,7 @@ $BLUE: hsl(207, 100, 33);
 }
 
 #subdomains {
+    border-bottom: 1px solid #aaa;
     font-size: 0.9em;
     padding-right: 0;
     padding-left: 0;
@@ -126,11 +131,12 @@ $BLUE: hsl(207, 100, 33);
         cursor: pointer;
         padding: 2px 5px;
         margin-right: 10px;
-        @include radius(5px);
+        @include border-radius(10px);
 
         &.active {
-            @include shadow(0 2px 5px darken($BLUE, 15) inset);
-            @include letter-pop(#fff);
+            @include box-shadow(inset 0 2px 5px darken($BLUE, 15));
+            color: #fff;
+            text-shadow: 0 1px 2px darken($BLUE, 20);
             background-color: $BLUE;
         }
     }
@@ -142,13 +148,12 @@ $BLUE: hsl(207, 100, 33);
 #criteria-wrap {
     padding: 2px;
     width: 170px;
-    margin: 0;
+    margin-top: 5px;
 }
 
 #criteria {
     @include vertical-thin-scrollbar;
 
-    margin: 0;
     font-size: 0.9em;
     max-height: 500px;
     overflow: auto;
@@ -161,8 +166,8 @@ $BLUE: hsl(207, 100, 33);
     }
 
     > div {
-        @include radius(3px);
-        @include shadow(0 1px 1px #fdfdfd);
+        @include border-radius(3px);
+        @include box-shadow(0 1px 1px #fdfdfd);
 
         padding: 7px;
         border-top: 1px solid transparent;
@@ -172,7 +177,8 @@ $BLUE: hsl(207, 100, 33);
         
         &.active {
             @include raised($BLUE);
-            @include letter-pop(#fff);
+            color: #fff;
+            text-shadow: 0px 1px 2px darken($BLUE, 20);
 
             &:hover {
                 color: #fff;
@@ -191,49 +197,43 @@ $BLUE: hsl(207, 100, 33);
 }
 
 /* Other standalone elements */
-#description, #search-results {
-    @include raised-drop-shadow;
-    @include radius(5px);
-    @include vertical-thin-scrollbar;
-    
-    padding: 5px 10px;
-    z-index: 1000;
-    position: absolute;
-    display: none;
-    background-color: #fff;
-    border: 1px solid #666;
-    width: 300px;
-    max-height: 400px;
-    overflow: auto;
-    white-space: pre-line;
-}
-
-#description {
-    max-height: 300px;
-
-    > p {
-        margin: 5px 0;
+#concept-description {
+    .inner {
+        width: 300px;
+        padding: 3px;
     }
-}
 
-#search-results {
-    padding: 5px 0px;
-    font-size: 0.9em;
-    width: 200px;
+    .content { 
+        padding: 5px 14px;
+        max-height: 300px;
+        overflow: auto;
 
-    > * {
-        padding: 5px 10px;
-        margin: 0;
-
-        > span {
-            font-variant: italic;
+        > p {
+            margin: 5px 0;
         }
     }
+}
 
-    > div:hover {
-        color: #000;
-        background-color: #dfdfdf;
-        cursor: pointer;
+#concept-search-results {
+    .inner {
+        width: 200px;
+        padding: 3px;
+    }
+
+    .content {
+        overflow: auto;
+        max-height: 400px;
+        padding: 0;
+ 
+        > div {
+            padding: 5px 14px;
+
+            &:hover {
+                color: #000;
+                background-color: #dfdfdf;
+                cursor: pointer;
+            }
+        }
     }
 }
 
@@ -250,7 +250,7 @@ $BLUE: hsl(207, 100, 33);
     display: none;
     
     .content {
-        @include shadow(none);
+        @include box-shadow(none);
         padding: 0;
     }
 }
@@ -303,26 +303,6 @@ $BLUE: hsl(207, 100, 33);
     }
 }
 
-// Report Info
-#report-info {
-    @include radius(3px);
-    @include dual-shadow(inset 0 1px 1px lighten(#fffddf, 10), 0 2px 3px #aaa);
-    border: 1px solid darken(#fffddf, 55);
-    border-top: 5px solid darken(#fffddf, 60);
-    background-color: #fffddf;
-    padding: 5px;
-
-    input, textarea { width: 182px; }
-
-    h2, input { font-size: 1.1em; }
-
-    p {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-}
-
 /*
  * User-defined criteria
  */
@@ -331,13 +311,13 @@ $BLUE: hsl(207, 100, 33);
     $yellow: #FFFBB3;
 
     > .content {
-        @include vertical-gradient(#f3f3f3, #eee);
+        @include linear-gradient(#f3f3f3, #eee);
         background-color: #f3f3f3;
     }
 
     .criterion {
-        @include radius(3px);
-        @include shadow(0 1px 1px #fdfdfd);
+        @include border-radius(3px);
+        @include box-shadow(0 1px 1px #fdfdfd);
 
         padding: 7px;
         cursor: pointer;
@@ -346,8 +326,8 @@ $BLUE: hsl(207, 100, 33);
         border: 1px solid #ccc;
         
         &.selected {
-            @include shadow(0 1px 2px darken($yellow, 60));
-            @include vertical-gradient($yellow, darken($yellow, 5));
+            @include box-shadow(0 1px 2px darken($yellow, 60));
+            @include linear-gradient($yellow, darken($yellow, 5));
             border-color: darken($yellow, 50);
             color: #fff;
             background-color: $yellow;
@@ -376,7 +356,7 @@ $BLUE: hsl(207, 100, 33);
     .criterion {
 
 
-        @include radius(3px);
+        @include border-radius(3px);
 
 
         border: 1px solid #bbb;
@@ -386,7 +366,7 @@ $BLUE: hsl(207, 100, 33);
         cursor: pointer;
         
         &:hover, &.selected {
-            @include dual-shadow(0 1px 3px darken($yellow, 40) inset, 0 -1px 3px #fff);
+            @include box-shadow(0 1px 3px darken($yellow, 40) inset, 0 -1px 3px #fff);
 
             border-color: darken($yellow, 50);
             background-color: $yellow;

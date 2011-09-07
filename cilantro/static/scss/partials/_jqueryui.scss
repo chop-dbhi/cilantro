@@ -4,16 +4,16 @@
 }
 
 .ui-dialog {
-    @include shadow(0 5px 20px 0 #666);
+    @include box-shadow(0 5px 20px 0 #666);
     
     position: absolute;
 
     > .container {
-        @include shadow(none);
+        @include box-shadow(none);
     }
 
     &.ui-corner-all {
-        @include radius(0);
+        @include border-radius(0);
     }
 
     &.ui-widget-content, > .ui-widget-content {
@@ -23,7 +23,7 @@
     }
 
     &.ui-widget {
-        @include radius(4px 4px 0 0);
+        @include border-radius(4px 4px 0 0);
         font: inherit;
     }
 

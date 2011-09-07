@@ -1,60 +1,39 @@
-@mixin inline-block {
-    vertical-align: top;
-    display: inline-block;
-    // IE7 fix
-    *display: inline;
-    zoom: 1;
+@import "bourbon/bourbon";
+@import "partials/buttons";
+
+@mixin user-select($value: text) {
+    -webkit-user-select: $value;
+    -khtml-user-select: $value;
+    -moz-user-select: $value;
+    -o-user-select: $value;
+    user-select: $value;
 }
+
 
 // adds a letter "press" effect to the text. this effects only works if the
 // surrounding color is lighter than the text color
-@mixin letter-press($color, $blur: 2px) {
+@mixin text-shadow($inset, $color: none, $blur: 2px) {
+    $bgcolor: none;
+    // shift arguments
+    @if $inset == inset {
+        $bgcolor: lighten($color, 70);
+    } @else {
+        $blur: $color;
+        $color: $inset;
+        $bgcolor: darken($color, 70);
+    }
+
     color: $color;
-    text-shadow: 0 1px $blur lighten($color, 70);
-}
-
-// adds a letter "pop" effect to the text. this effects only works if the
-// surrounding color is darken than the text color
-@mixin letter-pop($color, $blur: 2px) {
-    color: $color;
-    text-shadow: 0 1px $blur darken($color, 70);
-}
-
-// renders a single cross-browser shadow
-@mixin shadow($s) {
-	-moz-box-shadow: $s; 
-	-webkit-box-shadow: $s;
-	box-shadow: $s;
-}
-
-// renders two shadows
-@mixin dual-shadow($s1, $s2) {
-	-moz-box-shadow: $s1, $s2;
-	-webkit-box-shadow: $s1, $s2;
-	box-shadow: $s1, $s2;
-}
-
-// renders three shadows
-@mixin tri-shadow($s1, $s2, $s3) {
-	-moz-box-shadow: $s1, $s2, $s3;
-	-webkit-box-shadow: $s1, $s2, $s3;
-	box-shadow: $s1, $s2, $s3;
+    text-shadow: 0 1px $blur $bgcolor;
 }
 
 // sets the opacity of an element. this is not to be confused with
 // the official Sass function that "opacifies" a color
-@mixin opacify($p) {
+@mixin opacity($p) {
     filter:alpha(opacity=$p);
     -moz-opacity: $p/100;
     opacity: $p/100;
 }
-
-// sets the border radius of an element
-@mixin radius($r) {
-    -moz-border-radius: $r;
-    border-radius: $r;
-}
-
 
 // shorcut to set anchor colors for each pseudo state
 @mixin anchors($c1, $c2) {
@@ -64,24 +43,11 @@
     }
 }
 
-// sets the background of an element with a vertical linear gradient
-@mixin vertical-gradient($c1, $c2) {
-    background: $c1;
-    background-image: -moz-linear-gradient(-90deg, $c1, $c2);
-    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from($c1), to($c2));
-    /*    
-    // IE5.5+
-    filter: progid:DXImageTransform.Microsoft.Gradient(startColorstr='#{$c1}', endColorstr='#{$c2}');
-    // IE8+
-    -ms-filter: "progid:DXImageTransform.Microsoft.Gradient(startColorstr='#{$c1}', endColorstr='#{$c2}')";
-    */
-}
-
 // adds a "raised" appearance to the element
 @mixin raised($color, $blur: 2px) {
     background-color: $color;
     border: 1px solid darken($color, 20);
-    @include tri-shadow(
+    @include box-shadow(
         inset 0 1px $blur desaturate(lighten($color, 30), 40),
         inset 0 -1px $blur darken($color, 10),
         0 1px $blur desaturate(darken($color, 20), 40)
@@ -92,7 +58,7 @@
 @mixin inset($color, $blur: 2px) {
     background-color: $color;
     border: 1px solid darken($color, 20);
-    @include dual-shadow(
+    @include box-shadow(
         inset 0 1px $blur darken($color, 20),
         0 1px $blur lighten($color, 80)
     );
@@ -136,8 +102,8 @@
 // sets the appearance of an input element to have the Mac OS X-style
 // search boxes
 @mixin search-box {
-    @include radius(15px);
-    @include shadow(inset 2px 2px 3px #ccc);
+    @include border-radius(15px);
+    @include box-shadow(inset 2px 2px 3px #ccc);
     
     background: #fff url(../img/icons/search.png) no-repeat 3px;
     padding: 2px 5px 2px 21px;

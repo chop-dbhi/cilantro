@@ -1,3 +1,4 @@
+define ['common/models/state', 'common/views/state', 'common/views/collection'], (statemodel, stateview, collectionview) ->
     ###
     Concepts are the data-driven entry points for constructing their
     self-contained interfaces. Every concept must be "contained" within
@@ -5,7 +6,7 @@
     (or sub-domain) will become active as well.
     ###
 
-    class Concept extends Backbone.Model
+    class Concept extends statemodel.Model
 
     ###
     The ConceptCollection encapsulates cross-instance logic.
@@ -16,33 +17,129 @@
         url: App.urls.criteria
 
         initialize: ->
-            App.State.bind 'change:concept', @changeConcept
-            App.State.bind 'change:domain', @changeDomain
+            # when a domain is activated, only the concepts under that
+            # domain are made visible
+            App.hub.subscribe 'domain/active', @toggleEnableByDomain
+            App.hub.subscribe 'subdomain/active', @toggleEnableByDomain
 
-        changeConcept: (state, model, options) =>
-            # deactivate the previous concept if one exists
-            if (previous = state.previous 'concept')
-                previous.trigger 'deactivate'
-            # set the domain of this concept on the model then activate
-            # this concept
-            if model 
-                model.trigger 'activate'
-                state.set 'domain', App.domains.get model.get('domain').id
+            # on every reset, regroup all concepts by their respective domain
+            @bind 'reset', @groupByDomain
 
-        changeDomain: (state, model, options) =>
-            # iterate over each conceptfor the parent domain and 'show' them
-            @each (obj) ->
-                domain = obj.get('domain')
-                parent = domain.parent
-                # if the concept domain is this domain or the concept's
-                # domain's parent is this domain
-                if domain.id is model.id or parent and parent.id is model.id
-                    obj.trigger 'show'
+            @bind 'active', @activate
+            @bind 'inactive', @inactivate
+
+            App.hub.subscribe 'concept/request', (id) =>
+                concept = @get id
+                if concept
+                    # send a request to make known
+                    App.hub.publish 'domain/request', concept.get('domain').id
+                    # finally make the requested concept active
+                    concept.activate()
+
+
+            # the last active concept relative to each domain. in this context,
+            # the subdomains are treated independent of their parent domain
+            @_activeByDomain = {}
+            @_activeDomain = null
+
+        # which concepts can be active and deactivated depend on the domain
+        # they are associated with. only concepts within the domain need
+        # to be deactivated since the other domains are not visible
+        groupByDomain: ->
+            @_byDomain = {}
+            @_bySubdomain = {}
+
+            @each (model) =>
+                domain = model.get('domain')
+                if domain.parent
+                    (@_bySubdomain[domain.id] ?= []).push model
+                    (@_byDomain[domain.parent.id] ?= []).push model
                 else
-                    obj.trigger 'hide'
+                    (@_byDomain[domain.id] ?= []).push model
+
+        # enables/disables concepts given their domain. the last concept that was
+        # active from the newly visible concepts is re-activated. a concept can be
+        # enabled if their domain or domain parent is activated.
+        toggleEnableByDomain: (id) =>
+            @_activeDomain = id
+            concepts = @_bySubdomain[id] or @_byDomain[id]
+
+            @map (model) ->
+                if model in concepts
+                    model.enable()
+                    # we need to inactivate the model here since it is
+                    # potentially being re-used with the "All" subdomain
+                    model.inactivate()
+                else
+                    model.disable()
+
+            # finally activate the last active concept for this domain if one
+            # exists
+            if (model = @_activeByDomain[id]) then model.activate()
+
+        # performs some collection-level handling for the newly active model.
+        # all concepts within the same domain as the current model are
+        # deactivated
+        activate: (model) ->
+            @_activeByDomain[@_activeDomain] = model
+            concepts = @_bySubdomain[@_activeDomain] or @_byDomain[@_activeDomain]
+            _(concepts).without(model).map (model) -> model.inactivate()
+
+        inactivate: (model) ->
 
 
-    class ConceptView extends App.Views.State
+    class ConceptDescriptionPopover extends Backbone.View
+        el: '#concept-description'
+
+        noDescription: '<span class="info">No description available</span>'
+
+        events:
+            'mouseenter': 'mouseenter'
+            'mouseleave': 'mouseleave'
+
+        elements:
+            '.title': 'title'
+            '.content': 'content'
+
+        show: (view) ->
+            clearTimeout @_hoverTimer
+            @_hoverTimer = setTimeout =>
+                @title.text view.model.get('name')
+                @content.html view.model.get('description') or @noDescription
+
+                rHeight = @el.outerHeight()
+                vOffset = view.el.offset()
+                vHeight = view.el.outerHeight()
+                vWidth = view.el.outerWidth()
+
+                @el.animate
+                    top: vOffset.top - (rHeight - vHeight) / 2.0
+                    left: vOffset.left + vWidth + 5.0
+                , 400, 'easeOutQuint'
+
+                @el.fadeIn()
+            , 200
+
+        hide: (immediately=false) ->
+            clearTimeout @_hoverTimer
+            if immediately
+                @el.fadeOut()
+            else if not @entered
+                @_hoverTimer = setTimeout =>
+                    @el.fadeOut()
+                , 100
+
+        mouseenter: (view) ->
+            clearTimeout @_hoverTimer
+            @entered = true
+
+        mouseleave: ->
+            clearTimeout @_hoverTimer
+            @entered = false
+            @hide()
+
+
+    class ConceptView extends stateview.View
         template: _.template '<span class="name"><%= name %></span>
             <span class="description"><%= description %></span>'
 
@@ -51,49 +148,62 @@
 
         render: ->
             @el.html @template @model.toJSON()
+            @el.data cid: @model.cid
             @
 
-        click: (event) ->
-            # this trigger should not invoke the auto-scroll since it was
-            # invoked via the UI i.e. it must have already been in view
-            App.State.set
-                concept: @model
-            , noscroll: true
-            # no bubbles..
-            return false
+        click: ->
+            @model.activate local: true
 
 
-    class ConceptCollectionView extends App.Views.Collection
+    class ConceptCollectionView extends collectionview.View
         el: '#criteria'
         viewClass: ConceptView
 
+        events:
+            'mouseenter div': 'mouseenter'
+            'mouseleave div': 'mouseleave'
+            'click div': 'click'
+
         initialize: ->
             super
-            @collection.bind 'activate', @activate
+            @collection.bind 'active', @activate
+            @description = new ConceptDescriptionPopover
 
         # convenience method for auto-scrolling to a particular concept within
         # this collection view.
         scrollToConcept: (model) =>
             view = @childViews[model.cid]
-            @el.scrollTo view.el, 250, 
+            @el.scrollTo view.el,
+                duration: 800
                 axis: 'y'
                 offset:
                     top: @el.outerHeight() / -2
+                easing: 'easeOutQuint'
 
-        # activate this concept
-        activate: (collection, model, options) =>
-            if model 
-                # when all said and done.. this is the final UI update that
-                # must happen when a concept has been switched to
-                if not options.noscroll then _.defer(@scrollToConcept, model)
+        # if this model has been activated not from a local context,
+        # scroll to the concept in case it may be out of view in the UI
+        activate: (model, options) =>
+            if not options?.local then _.defer @scrollToConcept, model
+
+        # do not show the description unless the hover is sustained for some
+        # time.
+        mouseenter: (event) ->
+            cid = $(event.currentTarget).data 'cid'
+            view = @childViews[cid]
+
+            @description.show(view)
+
+        mouseleave: ->
+            @description.hide()
+
+        # on click, immediately hide the description, so description does not
+        # disturb lateral movement
+        click: -> @description.hide(true)
 
 
-
-    # references
-    App.Models.Concept = Concept
-    App.Collections.Concept = ConceptCollection
-    App.Views.Concept = ConceptView
-    App.Views.ConceptCollection = ConceptCollectionView
-
-    # create collection
-    App.concepts = new App.Collections.Concept
+    return {
+        Model: Concept
+        Collection: ConceptCollection
+        View: ConceptView
+        CollectionView: ConceptCollectionView
+    }

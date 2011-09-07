@@ -1,0 +1,88 @@
+#toolbar {
+    @include anchors(#aaa, #fff);
+    @include box-shadow(inset 0 1px 2px #666, inset 0 -1px 2px #111, 0 1px 2px #999);
+
+    background-color: #333;
+    padding: 3px 0 5px 0;
+    border: 1px solid #111;
+
+    font-size: 0.9em;
+
+    > :first-child {
+        border-left: none;
+    }
+
+    > a {
+        text-decoration: none;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &:active {
+            @include box-shadow(none);
+            background-color: #111;
+        }
+    }
+
+    > span {
+        &.selected {
+            @include box-shadow(none);
+            background-color: #111;
+            .workspace {
+                background-position: 0 -13px;
+            }
+            .databrowse {
+                background-position: 0 -12px;
+            }
+            .query {
+                background-position: 0 -13px;
+            }
+        }
+    }
+
+    > a, > span {
+        @include text-shadow(#ddd);
+        padding: 4px 10px;
+
+        border: {
+            right: 1px solid #111;
+            left: 1px solid #444;
+        }
+
+        .icon {
+            @include inline-block;
+            position: relative;
+            top: 1px;
+            width: 14px;
+        }
+
+        .workspace {
+            background: transparent url(../img/icons/workspace.png) no-repeat 0 0;
+            height: 12px;
+        }
+
+        .databrowse {
+            background: transparent url(../img/icons/databrowse.png) no-repeat 0 0;
+            height: 11px;
+        }
+
+        .query {
+            background: transparent url(../img/icons/query.png) no-repeat 0 0;
+            top: 2px;
+            height: 13px;
+        }
+
+        &:hover, &:active {
+            .workspace {
+                background-position: 0 -13px;
+            }
+            .databrowse {
+                background-position: 0 -12px;
+            }
+            .query {
+                background-position: 0 -13px;
+            }
+        }
+    }
+}

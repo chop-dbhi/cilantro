@@ -1,12 +1,32 @@
 {% extends "base.html" %}
 
-{% block _navigation %}
-    <nav>
-        <ul>
+{% block _toolbar %}
+    <nav id="toolbar">
         {% spaceless %}
-            {% block navigation %}
+            {% block toolbar %}
+                {% url workspace as current_path %} 
+                {% if current_path == request.path %}
+                    <span class="selected"><span class="icon workspace"></span> Workspace</span>
+                {% else %}
+                    <a href="{% url workspace %}"><span class="icon workspace"></span> Workspace</a>
+                {% endif %}
+
+                {% url define as current_path %} 
+                {% if current_path == request.path %}
+                    <span class="selected"><span class="icon query"></span> Query</span>
+                {% else %}
+                    <a href="{% url define %}"><span class="icon query"></span> Query</a>
+                {% endif %}
+
+                {% url report as current_path %} 
+                {% if current_path == request.path %}
+                    <span class="selected"><span class="icon databrowse"></span> Report</span>
+                {% else %}
+                    <a href="{% url report %}"><span class="icon databrowse"></span> Report</a>
+                {% endif %}
             {% endblock %}
         {% endspaceless %}
-        </ul>
     </nav>    
 {% endblock %}
+
+

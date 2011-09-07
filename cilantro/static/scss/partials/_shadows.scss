@@ -1,5 +1,5 @@
 @mixin drop-shadow {
-    @include dual-shadow(
+    @include box-shadow(
         0 1px 4px rgba(0, 0, 0, 0.3),
         inset 0 0 40px rgba(0, 0, 0, 0.1)
     );
@@ -14,7 +14,7 @@
 
 @mixin raised-drop-shadow {
     @include drop-shadow;
-    @include tri-shadow(
+    @include box-shadow(
         0 15px 10px -10px rgba(0, 0, 0, 0.5),
         0 1px 4px rgba(0, 0, 0, 0.3),
         inset 0 0 40px rgba(0, 0, 0, 0.1)
@@ -25,7 +25,7 @@
     @include drop-shadow;
 
     &:before {
-        @include shadow(0 0 15px rgba(0, 0, 0, 0.6));
+        @include box-shadow(0 0 15px rgba(0, 0, 0, 0.6));
         
         top: 10px;
         bottom: 10px;
@@ -38,7 +38,7 @@
     @include curves-drop-shadow;
     
     &:before {
-        @include radius(10px / 100px);
+        @include border-radius(10px / 100px);
     }
 }
 
@@ -46,6 +46,6 @@
     @include curves-drop-shadow;
 
     &:before {
-        @include radius(100px / 10px);
+        @include border-radius(100px / 10px);
     }
 }

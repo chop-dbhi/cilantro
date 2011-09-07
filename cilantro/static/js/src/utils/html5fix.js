@@ -3,16 +3,12 @@
  * support of the feature's behavior using JavaScript rather than natively.
  */
 
-define(function() {
+$(function() {
+    
+    if (!Modernizr.input.placeholder)
+        $('input[placeholder]').placeholder();
 
-    $(function() {
-        
-        if (!Modernizr.input.placeholder)
-            $('input[placeholder]').placeholder();
- 
-        if (!Modernizr.input.autofocus)
-            $('input[autofocus]').focus();
-
-    });    
+    if (!Modernizr.input.autofocus)
+        $('input[autofocus]').focus();
 
 });
