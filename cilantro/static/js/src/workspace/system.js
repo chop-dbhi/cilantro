@@ -1,4 +1,3 @@
-var SystemStatusStream;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -7,10 +6,13 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   child.__super__ = parent.prototype;
   return child;
 };
-SystemStatusStream = (function() {
-  __extends(SystemStatusStream, Backbone.Collection);
-  function SystemStatusStream() {
-    SystemStatusStream.__super__.constructor.apply(this, arguments);
-  }
-  return SystemStatusStream;
-})();
+define(function() {
+  var SystemStatusStream;
+  return SystemStatusStream = (function() {
+    __extends(SystemStatusStream, Backbone.Collection);
+    function SystemStatusStream() {
+      SystemStatusStream.__super__.constructor.apply(this, arguments);
+    }
+    return SystemStatusStream;
+  })();
+});
