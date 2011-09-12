@@ -11,7 +11,7 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   }
   return -1;
 };
-define(['common/models/state', 'common/views/state', 'common/views/collection'], function(statemodel, stateview, collectionview) {
+define(['common/models/state', 'common/views/state', 'common/views/collection', 'cilantro/modules/views/popover'], function(statemodel, stateview, collectionview, popover) {
   /*
       Concepts are the data-driven entry points for constructing their
       self-contained interfaces. Every concept must be "contained" within
@@ -95,62 +95,6 @@ define(['common/models/state', 'common/views/state', 'common/views/collection'],
     ConceptCollection.prototype.inactivate = function(model) {};
     return ConceptCollection;
   })();
-  ConceptDescriptionPopover = (function() {
-    __extends(ConceptDescriptionPopover, Backbone.View);
-    function ConceptDescriptionPopover() {
-      ConceptDescriptionPopover.__super__.constructor.apply(this, arguments);
-    }
-    ConceptDescriptionPopover.prototype.el = '#concept-description';
-    ConceptDescriptionPopover.prototype.noDescription = '<span class="info">No description available</span>';
-    ConceptDescriptionPopover.prototype.events = {
-      'mouseenter': 'mouseenter',
-      'mouseleave': 'mouseleave'
-    };
-    ConceptDescriptionPopover.prototype.elements = {
-      '.title': 'title',
-      '.content': 'content'
-    };
-    ConceptDescriptionPopover.prototype.show = function(view) {
-      clearTimeout(this._hoverTimer);
-      return this._hoverTimer = setTimeout(__bind(function() {
-        var rHeight, vHeight, vOffset, vWidth;
-        this.title.text(view.model.get('name'));
-        this.content.html(view.model.get('description') || this.noDescription);
-        rHeight = this.el.outerHeight();
-        vOffset = view.el.offset();
-        vHeight = view.el.outerHeight();
-        vWidth = view.el.outerWidth();
-        this.el.animate({
-          top: vOffset.top - (rHeight - vHeight) / 2.0,
-          left: vOffset.left + vWidth + 5.0
-        }, 400, 'easeOutQuint');
-        return this.el.fadeIn();
-      }, this), 200);
-    };
-    ConceptDescriptionPopover.prototype.hide = function(immediately) {
-      if (immediately == null) {
-        immediately = false;
-      }
-      clearTimeout(this._hoverTimer);
-      if (immediately) {
-        return this.el.fadeOut();
-      } else if (!this.entered) {
-        return this._hoverTimer = setTimeout(__bind(function() {
-          return this.el.fadeOut();
-        }, this), 100);
-      }
-    };
-    ConceptDescriptionPopover.prototype.mouseenter = function(view) {
-      clearTimeout(this._hoverTimer);
-      return this.entered = true;
-    };
-    ConceptDescriptionPopover.prototype.mouseleave = function() {
-      clearTimeout(this._hoverTimer);
-      this.entered = false;
-      return this.hide();
-    };
-    return ConceptDescriptionPopover;
-  })();
   ConceptView = (function() {
     __extends(ConceptView, stateview.View);
     function ConceptView() {
@@ -174,6 +118,19 @@ define(['common/models/state', 'common/views/state', 'common/views/collection'],
       });
     };
     return ConceptView;
+  })();
+  ConceptDescriptionPopover = (function() {
+    __extends(ConceptDescriptionPopover, popover.Popover);
+    function ConceptDescriptionPopover() {
+      ConceptDescriptionPopover.__super__.constructor.apply(this, arguments);
+    }
+    ConceptDescriptionPopover.prototype.el = '#concept-description';
+    ConceptDescriptionPopover.prototype.defaultContent = '<span class="info">No description available</span>';
+    ConceptDescriptionPopover.prototype.update = function(view) {
+      this.title.text(view.model.get('name'));
+      return this.content.html(view.model.get('description') || this.defaultContent);
+    };
+    return ConceptDescriptionPopover;
   })();
   ConceptCollectionView = (function() {
     __extends(ConceptCollectionView, collectionview.View);
@@ -215,7 +172,7 @@ define(['common/models/state', 'common/views/state', 'common/views/collection'],
       var cid, view;
       cid = $(event.currentTarget).data('cid');
       view = this.childViews[cid];
-      return this.description.show(view);
+      return this.description.show(view, 'right');
     };
     ConceptCollectionView.prototype.mouseleave = function() {
       return this.description.hide();

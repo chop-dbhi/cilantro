@@ -15,7 +15,6 @@ require [
 
         $ ->
 
-
             App.DomainTabs = new domain.CollectionView
                 collection: domains
 

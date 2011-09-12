@@ -1,4 +1,4 @@
-define ['common/models/state', 'common/views/state', 'common/views/collection'], (statemodel, stateview, collectionview) ->
+define ['common/models/state', 'common/views/state', 'common/views/collection', 'cilantro/modules/views/popover'], (statemodel, stateview, collectionview, popover) ->
     ###
     Concepts are the data-driven entry points for constructing their
     self-contained interfaces. Every concept must be "contained" within
@@ -88,56 +88,6 @@ define ['common/models/state', 'common/views/state', 'common/views/collection'],
         inactivate: (model) ->
 
 
-    class ConceptDescriptionPopover extends Backbone.View
-        el: '#concept-description'
-
-        noDescription: '<span class="info">No description available</span>'
-
-        events:
-            'mouseenter': 'mouseenter'
-            'mouseleave': 'mouseleave'
-
-        elements:
-            '.title': 'title'
-            '.content': 'content'
-
-        show: (view) ->
-            clearTimeout @_hoverTimer
-            @_hoverTimer = setTimeout =>
-                @title.text view.model.get('name')
-                @content.html view.model.get('description') or @noDescription
-
-                rHeight = @el.outerHeight()
-                vOffset = view.el.offset()
-                vHeight = view.el.outerHeight()
-                vWidth = view.el.outerWidth()
-
-                @el.animate
-                    top: vOffset.top - (rHeight - vHeight) / 2.0
-                    left: vOffset.left + vWidth + 5.0
-                , 400, 'easeOutQuint'
-
-                @el.fadeIn()
-            , 200
-
-        hide: (immediately=false) ->
-            clearTimeout @_hoverTimer
-            if immediately
-                @el.fadeOut()
-            else if not @entered
-                @_hoverTimer = setTimeout =>
-                    @el.fadeOut()
-                , 100
-
-        mouseenter: (view) ->
-            clearTimeout @_hoverTimer
-            @entered = true
-
-        mouseleave: ->
-            clearTimeout @_hoverTimer
-            @entered = false
-            @hide()
-
 
     class ConceptView extends stateview.View
         template: _.template '<span class="name"><%= name %></span>
@@ -153,6 +103,16 @@ define ['common/models/state', 'common/views/state', 'common/views/collection'],
 
         click: ->
             @model.activate local: true
+
+
+    class ConceptDescriptionPopover extends popover.Popover
+        el: '#concept-description'
+        defaultContent: '<span class="info">No description available</span>'
+
+        update: (view) ->
+            # update the popover's title and content
+            @title.text view.model.get('name')
+            @content.html view.model.get('description') or @defaultContent
 
 
     class ConceptCollectionView extends collectionview.View
@@ -191,7 +151,7 @@ define ['common/models/state', 'common/views/state', 'common/views/collection'],
             cid = $(event.currentTarget).data 'cid'
             view = @childViews[cid]
 
-            @description.show(view)
+            @description.show view, 'right'
 
         mouseleave: ->
             @description.hide()
