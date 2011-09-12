@@ -118,7 +118,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             var src = {
                 perspective: new m_datasource.ajax({
                     ajax: {
-                        url: API_URLS.perspective,
+                        url: App.urls.session.perspective,
                         success: function(json) {
                             if (json.store) {
                                 var rcols = json.store.columns;

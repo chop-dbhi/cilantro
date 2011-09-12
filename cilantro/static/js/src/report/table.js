@@ -6,7 +6,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
         // TODO remove hardcoded URL
         var EMPTY_RESULTS = '<div style="text-align: center; display: inline;" class="message warning">No results match your conditions. ' +
-            '<a href="' + URLS.define + '">Refine your conditions</a>.</div>';
+            '<a href="' + App.urls.define + '">Refine your conditions</a>.</div>';
 
         function init() {
             var firstRequest = true;
@@ -67,7 +67,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             var src = {
                 scope_info: new m_datasource.ajax({
                     ajax: {
-                        url: API_URLS.scope,
+                        url: App.urls.session.scope,
                         success: function(json) {
                             if (json.text) { 
                                 var t = '';
@@ -86,7 +86,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
                 table_header: new m_datasource.ajax({
                     ajax: {
-                        url: API_URLS.perspective,
+                        url: App.urls.session.perspective,
                         success: function(json) {
     //                        rnd.table_header.target.html('<th><input type="checkbox"></th>');
                             rnd.table_header.render(json.header);
@@ -96,7 +96,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
                 table_rows: new m_datasource.ajax({
                     ajax: {
-                        url: API_URLS.report,
+                        url: App.urls.session.report,
                         beforeSend: function() {
                             report.block();
                         },
@@ -199,7 +199,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             });
 
             body.bind('update.perspective', function(evt, params) {
-                $.putJSON(API_URLS.perspective, JSON.stringify(params), function() {
+                $.putJSON(App.urls.session.perspective, JSON.stringify(params), function() {
                     body.trigger('update.report');
                     if ('columns' in params)
                         src.table_header.get(null, true); 
