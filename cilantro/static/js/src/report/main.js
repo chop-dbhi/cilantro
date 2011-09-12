@@ -13,7 +13,7 @@ define(['cilantro/report/table', 'cilantro/report/columns'],
 
             e.bind('click', function() {
                 e.attr('disabled', true);
-                window.location = API_URLS.report + '?f=csv';
+                window.location = App.urls.session.report + '?f=csv';
                 setTimeout(function() {
                     e.attr('disabled', false);
                 }, 5000);
