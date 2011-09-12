@@ -71,10 +71,12 @@ define ['common/models/polling', 'common/views/collection', 'vendor/synapse'], (
         initialize: ->
             @model.bind 'change:perspective', @render
 
+        template: _.template '<li><%= name %><% if (direction) { %> <span class=\"info\">(direction})</span><% } %></li>'
+
         render: =>
             @el.empty()
             for col in @model.get('perspective').header
-                @el.append "<li>#{col.name} <span class=\"info\">(#{col.direction})</span></li>"
+                @el.append @template col
 
 
 #    class SystemStatusStream extends Backbone.Collection

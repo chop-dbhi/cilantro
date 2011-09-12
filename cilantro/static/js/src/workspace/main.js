@@ -106,6 +106,7 @@ define(['common/models/polling', 'common/views/collection', 'vendor/synapse'], f
     PerspectiveView.prototype.initialize = function() {
       return this.model.bind('change:perspective', this.render);
     };
+    PerspectiveView.prototype.template = _.template('<li><%= name %><% if (direction) { %> <span class=\"info\">(direction})</span><% } %></li>');
     PerspectiveView.prototype.render = function() {
       var col, _i, _len, _ref, _results;
       this.el.empty();
@@ -113,7 +114,7 @@ define(['common/models/polling', 'common/views/collection', 'vendor/synapse'], f
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         col = _ref[_i];
-        _results.push(this.el.append("<li>" + col.name + " <span class=\"info\">(" + col.direction + ")</span></li>"));
+        _results.push(this.el.append(this.template(col)));
       }
       return _results;
     };
