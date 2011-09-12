@@ -41,7 +41,7 @@ define(['common/models/polling'], function(polling) {
     PerspectiveView.prototype.initialize = function() {
       return this.model.bind('change:perspective', this.render);
     };
-    PerspectiveView.prototype.template = _.template('<li><%= name %><% if (direction) { %> <span class=\"info\">(direction})</span><% } %></li>');
+    PerspectiveView.prototype.template = _.template('<li><%= name %><% if (direction) { %> <span class=\"info\">(direction)</span><% } %></li>');
     PerspectiveView.prototype.render = function() {
       var col, _i, _len, _ref, _results;
       this.el.empty();
