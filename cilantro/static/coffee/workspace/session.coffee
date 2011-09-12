@@ -19,7 +19,7 @@ define ['common/models/polling'], (polling) ->
         initialize: ->
             @model.bind 'change:perspective', @render
 
-        template: _.template '<li><%= name %><% if (direction) { %> <span class=\"info\">(direction)</span><% } %></li>'
+        template: _.template '<li><%= name %><% if (direction) { %> <span class=\"info\">(<%= direction %>)</span><% } %></li>'
 
         render: =>
             @el.empty()
