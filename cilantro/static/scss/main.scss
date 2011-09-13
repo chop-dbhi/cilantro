@@ -114,62 +114,18 @@ header {
     }
 }
 
-/*
-nav {
-    @include anchors(darken(#588dc4, 40), darken(#588dc4, 40));
-    @extend .clearfix;
-
-    font-size: 0.85em;
-    margin-bottom: 10px;
+#messages {
+    position: relative;
+    margin: 0 auto;
+    text-align: center;
     
-    a {
-        @include text-shadow(inset darken(#588dc4, 40));
-        @include box-shadow(inset 0 2px 2px lighten(#588dc4, 30), inset 0 -2px 2px darken(#588dc4, 10));
-        border: 1px solid darken(#588dc4, 20);
-        background-color: lighten(#588dc4, 10);
-        padding: 3px 5px;
-        text-decoration: none;
-        font-weight: 600;
-
-        &:hover {
-            background-color: lighten(#588dc4, 15);
-        }
+    .message-block {
+        &.success { @include message-block(#b4eb87, success); }
+        &.warning { @include message-block(#f9f482, warning); }
+        &.error { @include message-block(#efa2a1, error); }
+        &.information { @include message-block(#aad8fb, info); }
     }
-
-    .previous {
-
-        > a {
-            border-right: none;
-        }
-
-        > :first-child {
-            @include border-radius(15px 0 0 15px);
-        }
-
-        > :last-child {
-            border-right: 1px solid darken(#588dc4, 30);
-        }
-
-    }
-
-    .next {
-        float: right;
-
-        > a {
-            border-left: none;
-        }
-
-        > :first-child {
-            border-left: 1px solid darken(#588dc4, 30);
-        }
-
-        > :last-child {
-            @include border-radius(0 15px 15px 0);
-        }
-
-    }    
 }
-*/
 
 #content {
     position: relative;
@@ -230,17 +186,17 @@ input[type=button], input[type=submit], button {
 }
 
 .messages {
-    .success { @include message(#002E24, success); }
-    .warning { @include message(#653400, warning); }
-    .error { @include message(#500700, error); }
-    .information { @include message(#000F3C, info); }
+    .success { @include message(#b4eb87, success); }
+    .warning { @include message(#f9f482, warning); }
+    .error { @include message(#efa2a1, error); }
+    .information { @include message(#aad8fb, info); }
 }
 
 .message {
-    &.success { @include message(#002E24, success); }
-    &.warning { @include message(#653400, warning); }
-    &.error { @include message(#500700, error); }
-    &.information { @include message(#000F3C, info); }
+    &.success { @include message(#b4eb87, success); }
+    &.warning { @include message(#f9f482, warning); }
+    &.error { @include message(#efa2a1, error); }
+    &.information { @include message(#aad8fb, info); }
 }
 
 .info {

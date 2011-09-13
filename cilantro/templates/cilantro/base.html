@@ -35,6 +35,11 @@
             <span class="message error">JavaScript must be enabled. Turn it on and refresh the page.</span>
         </noscript>
 
+        {# general area for display messages #}
+        {% block messages %}
+            <div id="messages"></div>
+        {% endblock %}
+
         {# primary area for displaying page content. override CSS for a page specific style #}
         <div id="content">
             {# navigation proxy, use "base_nav.html" to implement #}

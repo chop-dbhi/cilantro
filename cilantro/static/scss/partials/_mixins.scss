@@ -65,12 +65,46 @@
 }
 
 // shorcut to define a message color scheme
-@mixin message($color, $image) {
-    color: $color;
-	padding: 3px 0 3px 23px;
-	background-image: url(../img/icons/#{$image}.png);
-    background-repeat: no-repeat;
-    background-position-y: center;
+@mixin message($bgcolor, $image) {
+    font-weight: 500;
+    color: darken($bgcolor, 60);
+	padding: 0 0 0 23px;
+    background: $bgcolor url(../img/icons/#{$image}.png) no-repeat 0px;
+}
+
+@mixin message-block($bgcolor, $image) {
+    @include border-radius(0 0 3px 3px);
+    @include box-shadow(inset 0 -2px 5px darken($bgcolor, 20), inset 0 1px 5px #999, 0 2px 5px #ccc);
+    @include inline-block;
+    background: $bgcolor url(../img/icons/#{$image}.png) no-repeat 10px;
+    height: 42px;
+    color: darken($bgcolor, 60);
+    text-shadow: 0 1px 1px lighten($bgcolor, 40);
+    border: 1px solid darken($bgcolor, 40);
+    border-top: 0;
+
+    > .content {
+        @include inline-block;
+        padding: 5px 10px 5px 33px;
+    }
+
+    > .action {
+        @include inline-block;
+        @include border-radius(0 0 3px 0);
+        @include box-shadow(inset 0 -2px 5px $bgcolor, inset 0 1px 5px #aaa);
+        font-weight: 500;
+        cursor: pointer;
+        text-shadow: 0 1px 1px #fff;
+        vertical-align: top;
+        height: 18px;
+        padding: 12px 10px;
+        background-color: rgba(#fff, 0.5);
+        border-left: 1px solid darken($bgcolor, 40);
+
+        &:hover {
+            background-color: rgba(#fff, 0.8);
+        }
+    }
 }
 
 
