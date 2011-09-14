@@ -16,7 +16,7 @@
 
 .container {
     @include box-shadow(0 1px 5px #777);	
-    @include border-radius(4px 4px 0 0);
+    @include border-radius(3px 3px 0 0);
 
     // container title bar
     > .title {
@@ -51,7 +51,7 @@
             }
         }
     }
-    
+
     > .toolbar {
         @include raised(saturate($DEFAULT_COLOR, 30));
         @include text-shadow(inset, #333, 1px);
@@ -90,6 +90,8 @@
         font-size: 0.9em;
         border-bottom: 1px solid #ccc;
     }
+
+    &.no-title > .content { @include border-radius(3px 3px 0 0); }
 
     // container content area, keep it simple...
     > .content {
