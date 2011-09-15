@@ -2,7 +2,7 @@ define(['cilantro/define/criteria'],
     
     function(criteria) {
 
-        var template = '<button id="submit-query"><span class="icon arrow-r"/> <span>Get Report</span></button>'; 
+        var template = '<button id="submit-query">Get Report</button>'; 
         
         var $panel = $('#user-criteria'); 
 
@@ -35,6 +35,7 @@ define(['cilantro/define/criteria'],
                   });
               }else{
                   $panel.triggerHandler("UpdateQueryEvent", [data.store, true]);
+                  console.log(data.store)
               }
         });
 

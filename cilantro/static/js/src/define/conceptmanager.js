@@ -118,7 +118,7 @@ define(['cilantro/define/view'],
                 concepts_in_query.push(parseInt(evt.concept_id, 10));
             
                 if (activeConcept === parseInt(evt.concept_id, 10)) {
-                    $addQueryButton.html('<span class="icon refresh"/> <span>Update Condition</span>');
+                    $addQueryButton.html('<span>Update Condition</span>');
                     $(".success", $staticBox).show();
                 }
             }

@@ -30,11 +30,11 @@
 
     }, {
 
-        name: 'workspace/main'
+        name: 'pages/workspace/main'
 
     }, {
 
-        name: 'define/main'
+        name: 'pages/define/main'
 
     }, {
         

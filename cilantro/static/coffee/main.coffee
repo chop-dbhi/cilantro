@@ -1,20 +1,21 @@
 define [
-    'common/utils'
-    'cilantro/lib/jquery.ui'
-    'cilantro/lib/jquery.block'
-    'cilantro/lib/jquery.jqote2'
-    'cilantro/lib/jquery.scrollto'
-    'cilantro/vendor/underscore'
-    'cilantro/vendor/backbone'
-    'cilantro/vendor/pubsub'
-    'cilantro/utils/ajaxsetup'
-    'cilantro/utils/extensions'
-    'cilantro/utils/sanitizer'
-    ]
+        'common/utils'
+        'cilantro/utils/logging'
+        'cilantro/lib/jquery.ui'
+        'cilantro/lib/jquery.block'
+        'cilantro/lib/jquery.jqote2'
+        'cilantro/lib/jquery.scrollto'
+        'cilantro/vendor/underscore'
+        'cilantro/vendor/backbone'
+        'cilantro/vendor/pubsub'
+        'cilantro/utils/ajaxsetup'
+        'cilantro/utils/extensions'
+        'cilantro/utils/sanitizer'
+    ],
 
-    (utils) ->
+    (utils, Logging) ->
 
-        # IE 7... this will load JSON and attach to window
+        # IE 7...
         if not window.JSON then require ['cilantro/lib/json2']
             
         # configure jQuery block plugin..
@@ -29,5 +30,14 @@ define [
         # initialize a pub/sub hub
         attrs.hub = new PubSub
 
+        attrs.Models = {}
+        attrs.Collections = {}
+        attrs.Views = {}
+
         # finally, initialize the App object for the page
-        window.App = new utils.App attrs
+        App = new utils.App attrs
+        # post-init App setup
+        App.Log = new Logging.Log
+        App.LogView = new Logging.LogView
+
+        window.App = App

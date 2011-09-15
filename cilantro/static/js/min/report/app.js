@@ -1,1 +1,0 @@
-$(function(){App.report=new Report;return App.report.fetch({success:function(a){return App.ReportName=new ReportName({model:a})}})})

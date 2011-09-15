@@ -24,7 +24,7 @@
             }
         };
     </script>
-    <script>require(['cilantro/define/main']);</script>
+    <script>require(['cilantro/pages/define/main']);</script>
 {% endblock %}
 
 {% block content %}
@@ -80,17 +80,15 @@
 
     <div id="right-pane" class="clearfix">
 
-        <div id="user-criteria" class="container" data-uri="{% url api:scope:session %}">
+        <div id="condition-list-pane" class="container">
 
             <div class="title">
-                <button id="remove-criteria">Clear</button>
+                <button id="clear-conditions">Clear</button>
                 Conditions
             </div>
 
             <div class="content">
-                <div id="criteria-list" data-report="{% url report %}"  data-uri="{% url api:criteria:read %}">
-                    <div id="no-conditions" class="message warning">No Conditions Have Been Added Yet!</div>
-                </div>
+                <div id="condition-list"></div>
             </div>
         </div>
 

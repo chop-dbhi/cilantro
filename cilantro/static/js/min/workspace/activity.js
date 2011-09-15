@@ -1,1 +1,0 @@
-var ActivityStream,__hasProp=Object.prototype.hasOwnProperty,__extends=function(a,b){function d(){this.constructor=a}for(var c in b)__hasProp.call(b,c)&&(a[c]=b[c]);d.prototype=b.prototype,a.prototype=new d,a.__super__=b.prototype;return a};ActivityStream=function(){function a(){a.__super__.constructor.apply(this,arguments)}__extends(a,Backbone.Collection);return a}()

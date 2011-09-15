@@ -13,32 +13,14 @@
  */
 
 define(['cilantro/define/events', 'cilantro/rest/resource', 'cilantro/define/conceptmanager',
-        'cilantro/define/criteriamanager', 'cilantro/define/description'],
+        'cilantro/define/criteriamanager'],
 
     function(Events, Resource, ConceptManager, CriteriaManager) {
-
-        var template = [
-            '<div data-id="<%= this.id %>">',
-                '<span class="name"><%= this.name %></span>',
-                '<span class="description"><%= this.description %></span>',
-            '</div>'
-        ].join('');
 
         var dom = {
             criteria: $('#criteria'),
             pluginPanel: $('#plugin-panel')
         };
-
-        var CriterionCollection = new Resource({
-
-            template: template,
-            url: dom.criteria.data('uri')
-
-        }).ready(function() {
-
-            dom.criteria.html(this.dom).fadeIn();
-            
-        });
 
         /*
          * When a new category is activated, the list of available criteria
@@ -46,22 +28,6 @@ define(['cilantro/define/events', 'cilantro/rest/resource', 'cilantro/define/con
          */
 
         dom.criteria.current = null;
-
-        dom.criteria.bind(Events.ACTIVATE_CATEGORY,
-
-            function(evt, id) {
-
-                // find all criterion objects that are associated with the
-                // category and show them
-                CriterionCollection.ready(function() {
-
-                    $.each(this.store, function() {
-                        (this.data('category').id === id) ? this.show() : this.hide();
-                    });
-
-                });
-            }
-        );
 
         // temporary binding to ShowConceptEvent until internals are
         // cleaned up
@@ -105,30 +71,6 @@ define(['cilantro/define/events', 'cilantro/rest/resource', 'cilantro/define/con
                 });
             }
         );
-
-
-        /*
-         * Delegation for handling the mouse hovering the '.info' element.
-         * This must notify the description box of the event
-         */
-        var timeout = null;
-        dom.criteria.delegate('div', 'mouseenter', function() {
-            clearTimeout(timeout);
-            var ref = this;
-            timeout = setTimeout(function() {
-                $(ref).trigger(Events.ACTIVATE_DESCRIPTION, ['right']);
-            }, 700);
-        });
-
-        /*
-         * Delegation for handling the mouse leaving the '.info' element.
-         * This is necessary since the user may be going to interact with
-         * the description box.
-         */
-        dom.criteria.delegate('div', 'mouseleave', function() {
-            clearTimeout(timeout);
-            $(this).trigger(Events.DEACTIVATE_DESCRIPTION, [200]);
-        });
 
         dom.criteria.delegate('div', 'click', function(evt) {
             clearTimeout(timeout);

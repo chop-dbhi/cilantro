@@ -97,6 +97,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                 table_rows: new m_datasource.ajax({
                     ajax: {
                         url: App.urls.session.report,
+                        data: {data: 1},
                         beforeSend: function() {
                             report.block();
                         },

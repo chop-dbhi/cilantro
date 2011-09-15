@@ -9,7 +9,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 define(['common/utils'], function(utils) {
   var Mixin, PollingCollection, PollingModel;
   Mixin = {
-    pollInterval: 1000 * 30,
+    pollInterval: 1000 * 10,
     initialize: function() {
       return this.startPolling();
     },
