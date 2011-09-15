@@ -16,7 +16,7 @@
 
 .container {
     @include box-shadow(0 1px 5px #777);	
-    @include border-radius(3px 3px 0 0);
+    @include border-radius(3px);
 
     // container title bar
     > .title {
@@ -76,6 +76,7 @@
         // itself. to ensure the bottom border stands out, the color is
         // darkened
         &.footer {
+            @include border-radius(0 0 3px 3px);
             border-bottom-color: darken($DEFAULT_COLOR, 30);
         }
     }
@@ -91,11 +92,10 @@
         border-bottom: 1px solid #ccc;
     }
 
-    &.no-title > .content { @include border-radius(3px 3px 0 0); }
-
     // container content area, keep it simple...
     > .content {
         @include text-shadow(inset, #444);
+        @include border-radius(0 0 3px 3px);
         
         border-top: 1px solid #fff;
         background-color: #eee;

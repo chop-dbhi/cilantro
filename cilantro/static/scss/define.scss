@@ -18,7 +18,12 @@ $BLUE: hsl(207, 100, 33);
     left: 0;
     background-color: #eee;
 
-    .content { border: { left: 1px solid #999; right: 1px solid #999} }
+    > .content {
+        border: {
+            left: 1px solid #999;
+            right: 1px solid #999;
+        }
+    }
 }
 
 #center-pane {
@@ -121,11 +126,11 @@ $BLUE: hsl(207, 100, 33);
 }
 
 #subdomains {
-    border-bottom: 1px solid #aaa;
     font-size: 0.9em;
     padding-right: 0;
     padding-left: 0;
     height: 14px;
+    margin-top: 5px;
 
     > span {
         cursor: pointer;
@@ -243,10 +248,9 @@ $BLUE: hsl(207, 100, 33);
 }
 
 #plugin-panel {
-    margin: 0;
+    margin-top: 5px;
     float: right;
     width: 520px;
-    margin-bottom: 0;
     display: none;
     
     .content {
@@ -307,7 +311,7 @@ $BLUE: hsl(207, 100, 33);
  * User-defined criteria
  */
 
-#user-criteria {
+#condition-list-pane {
     $yellow: #FFFBB3;
 
     > .content {
@@ -315,7 +319,7 @@ $BLUE: hsl(207, 100, 33);
         background-color: #f3f3f3;
     }
 
-    .criterion {
+    .condition {
         @include border-radius(3px);
         @include box-shadow(0 1px 1px #fdfdfd);
 
@@ -324,6 +328,7 @@ $BLUE: hsl(207, 100, 33);
         font-size: 0.9em;
         margin-bottom: 10px;
         border: 1px solid #ccc;
+        background-color: #f9f9f9;
         
         &.selected {
             @include box-shadow(0 1px 2px darken($yellow, 60));
@@ -342,7 +347,7 @@ $BLUE: hsl(207, 100, 33);
             text-decoration: none;    
         }
         
-        .remove-criterion {
+        > .remove {
             background: transparent url(../img/x.png) no-repeat;
             height: 32px;
             width: 32px;
@@ -351,30 +356,6 @@ $BLUE: hsl(207, 100, 33);
             margin-top: -20px;
         }    
     }
-
-    /*
-    .criterion {
-
-
-        @include border-radius(3px);
-
-
-        border: 1px solid #bbb;
-        font-size: 12px;
-        margin-bottom: 10px;
-        padding: 4px 5px;
-        cursor: pointer;
-        
-        &:hover, &.selected {
-            @include box-shadow(0 1px 3px darken($yellow, 40) inset, 0 -1px 3px #fff);
-
-            border-color: darken($yellow, 50);
-            background-color: $yellow;
-        }
-        
-
-    }
-    */
 }
 
 // IE fixes

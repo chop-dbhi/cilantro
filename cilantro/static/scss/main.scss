@@ -129,10 +129,9 @@ header {
 
 #content {
     position: relative;
-    top: 30px;
-    left: 50%;
-    margin-left: -480px;
+    top: 20px;
     width: 960px;
+    margin: 0 auto;
 }
 
 footer {
@@ -207,6 +206,11 @@ input[type=button], input[type=submit], button {
 
 .placeholder {
     color: #aaa;
+    font-style: italic;
+}
+
+.expand {
+    font-size: 11px;
     font-style: italic;
 }
 
