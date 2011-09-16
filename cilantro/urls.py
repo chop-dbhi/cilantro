@@ -1,7 +1,8 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('',
-    url(r'^workspace/$', 'cilantro.views.workspace', name='workspace'),
-    url(r'^define/$', 'cilantro.views.define', name='define'),
-    url(r'^report/$', 'cilantro.views.report', name='report'),
+urlpatterns = patterns('cilantro.views',
+    url(r'^redirect/$', 'login_redirect', name='login-redirect'),
+    url(r'^workspace/$', 'workspace', name='workspace'),
+    url(r'^define/$', 'define', name='define'),
+    url(r'^report/$', 'report', name='report'),
 )
