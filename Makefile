@@ -20,6 +20,7 @@ all: sass compile optimize
 
 sass:
 	@@echo 'Compiling Sass...'
+	@@mkdir -p ${CSS_DIR}
 	@@rm -rf ${SASS_DIR}/bourbon
 	${BOURBON_GEN}
 	@@mv ${STATIC_DIR}/bourbon/bourbon ${SASS_DIR}/bourbon
@@ -36,5 +37,6 @@ optimize:
 
 clean:
 	@@rm -rf ${OPTIMIZED_DIR}
+	@@rm -rf ${CSS_DIR}
 
 .PHONY: all sass coffee optimize clean
