@@ -1,22 +1,21 @@
 define [
-        'cilantro/types/report/models'
-        'cilantro/types/scope/models'
-        'cilantro/types/perspective/models'
-        'cilantro/types/report/views'
+        'cilantro/types/report/main'
+        'cilantro/types/scope/main'
+        'cilantro/types/perspective/main'
         'cilantro/pages/workspace/session'
     ],
 
-    (Report, Scope, Perspective, ReportViews, Views) ->
+    (Report, Scope, Perspective, Views) ->
 
-        reports = new Report.Collection
+        reports = new Report.Models.Collection
 
-        sessionReport = new Report.Session
-        sessionScope = new Scope.Session
-        sessionPerspective = new Perspective.Session
+        sessionReport = new Report.Models.Session
+        sessionScope = new Scope.Models.Session
+        sessionPerspective = new Perspective.Models.Session
 
         $ ->
 
-            ReportList = new ReportViews.List
+            ReportList = new Report.Views.List
                 collection: reports
 
             SessionScope = new Views.Scope

@@ -1,10 +1,10 @@
 define [
         'common/views/collection'
         'cilantro/utils/logging'
-        'cilantro/types/report/messages'
+        'cilantro/types/report/main'
     ],
 
-    (CollectionViews, Logging, Messages) ->
+    (CollectionViews, Logging, Report) ->
 
         class ScopeView extends CollectionViews.ExpandableList
             el: '#session-scope'
@@ -41,7 +41,7 @@ define [
 
 
         class UnsavedReport extends Logging.MessageView
-            template: _.template Messages.UnsavedReportTemplate
+            template: _.template Report.Messages.UnsavedReportTemplate
 
 
         class ReportView extends Backbone.View

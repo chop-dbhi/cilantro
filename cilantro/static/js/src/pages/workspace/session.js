@@ -6,7 +6,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   child.__super__ = parent.prototype;
   return child;
 };
-define(['common/views/collection', 'cilantro/utils/logging', 'cilantro/types/report/messages'], function(CollectionViews, Logging, Messages) {
+define(['common/views/collection', 'cilantro/utils/logging', 'cilantro/types/report/main'], function(CollectionViews, Logging, Report) {
   var PerspectiveView, ReportView, ScopeView, UnsavedReport;
   ScopeView = (function() {
     __extends(ScopeView, CollectionViews.ExpandableList);
@@ -60,7 +60,7 @@ define(['common/views/collection', 'cilantro/utils/logging', 'cilantro/types/rep
     function UnsavedReport() {
       UnsavedReport.__super__.constructor.apply(this, arguments);
     }
-    UnsavedReport.prototype.template = _.template(Messages.UnsavedReportTemplate);
+    UnsavedReport.prototype.template = _.template(Report.Messages.UnsavedReportTemplate);
     return UnsavedReport;
   })();
   ReportView = (function() {

@@ -1,9 +1,9 @@
-require(['cilantro/types/report/models', 'cilantro/types/report/views', 'cilantro/types/scope/models', 'cilantro/types/domain/models', 'cilantro/types/domain/views', 'cilantro/types/concept/models', 'cilantro/types/concept/views', 'cilantro/pages/define/search', 'cilantro/pages/define/condition', 'cilantro/pages/define/interface'], function(Report, ReportViews, Scope, Domain, DomainViews, Concept, ConceptViews, Search, Condition, Interface) {
+require(['cilantro/types/report/main', 'cilantro/types/scope/main', 'cilantro/types/domain/main', 'cilantro/types/concept/main', 'cilantro/pages/define/search', 'cilantro/pages/define/condition', 'cilantro/pages/define/interface'], function(Report, Scope, Domain, Concept, Search, Condition, Interface) {
   var conceptResults, concepts, conditions, domains, sessionReport;
-  domains = new Domain.Collection;
-  concepts = new Concept.Collection;
+  domains = new Domain.Models.Collection;
+  concepts = new Concept.Models.Collection;
+  sessionReport = new Report.Models.Session;
   conditions = new Condition.Collection;
-  sessionReport = new Report.Session;
   conceptResults = new Search.ResultCollection;
   App.pending = 2;
   App.session = {};
@@ -13,10 +13,10 @@ require(['cilantro/types/report/models', 'cilantro/types/report/views', 'cilantr
   return $(function() {
     var conceptInterface, conceptList, conceptResultList, conditionList, conditionListPane, domainTabs, reportName;
     conceptInterface = new Interface.ConceptInterfaceView;
-    domainTabs = new DomainViews.DomainCollectionView({
+    domainTabs = new Domain.Views.DomainCollectionView({
       collection: domains
     });
-    conceptList = new ConceptViews.CollectionView({
+    conceptList = new Concept.Views.CollectionView({
       collection: concepts
     });
     conceptResultList = new Search.ResultListView({
@@ -28,7 +28,7 @@ require(['cilantro/types/report/models', 'cilantro/types/report/views', 'cilantr
     conditionListPane = new Condition.ListPane({
       list: conditionList
     });
-    reportName = new ReportViews.Name({
+    reportName = new Report.Views.Name({
       model: sessionReport
     });
     domains.fetch({
@@ -44,6 +44,7 @@ require(['cilantro/types/report/models', 'cilantro/types/report/views', 'cilantr
       }
     });
     conceptResults.fetch();
+    conditions.fetch();
     return sessionReport.fetch();
   });
 });
