@@ -3,9 +3,10 @@ define [
         'cilantro/types/scope/main'
         'cilantro/types/perspective/main'
         'cilantro/pages/workspace/session'
+        'cilantro/types/report/help'
     ],
 
-    (Report, Scope, Perspective, Views) ->
+    (Report, Scope, Perspective, Views, ReportHelp) ->
 
         reports = new Report.Models.Collection
 
@@ -26,6 +27,9 @@ define [
 
             SessionReport = new Views.Report
                 model: sessionReport
+
+            App.ReportHelp = new ReportHelp.Modal
+                trigger: '#open-report-help'
 
             reports.fetch()
             sessionReport.fetch()

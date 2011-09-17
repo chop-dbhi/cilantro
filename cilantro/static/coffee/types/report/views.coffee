@@ -35,7 +35,7 @@ define [
             viewClass: ReportItem
 
             defaultContent: '<div class="info">You have no saved reports.
-                <a href="#">Learn about saved reports</a>.</div>'
+                <a id="open-report-help" href="#">Learn more</a>.</div>'
 
         # include the expandable list functionality..
         utils.include ReportList, CollectionViews.ExpandableListMixin

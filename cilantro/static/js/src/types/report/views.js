@@ -44,7 +44,7 @@ define(['common/utils', 'common/views/collection'], function(utils, CollectionVi
     ReportList.prototype.el = '#report-list';
     ReportList.prototype.viewClass = ReportItem;
     ReportList.prototype.defaultContent = '<div class="info">You have no saved reports.\
-                <a href="#">Learn about saved reports</a>.</div>';
+                <a id="open-report-help" href="#">Learn more</a>.</div>';
     return ReportList;
   })();
   utils.include(ReportList, CollectionViews.ExpandableListMixin);
