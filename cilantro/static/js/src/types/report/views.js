@@ -13,26 +13,41 @@ define(['common/utils', 'common/views/collection'], function(utils, CollectionVi
     function ReportItem() {
       ReportItem.__super__.constructor.apply(this, arguments);
     }
-    ReportItem.prototype.el = '<div><strong role="name"></strong>\
-                <span class="info">- modified <span role="modified"></span>\
-                <span role="timesince"></span></span></div>';
+    ReportItem.prototype.el = '<div>\
+                    <strong role="name"></strong>\
+                    <span class="info">- <span role="unique-count"></span> unique patients</span>\
+                    <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>\
+                    <div role="description">\
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque bibendum luctus tempus. Maecenas nec felis sed lectus rhoncus porta vel non ligula.\
+                    </div>\
+                    <div class="controls"><button>Cancel</button> <button>Save</button></div>\
+                </div>';
     ReportItem.prototype.events = {
-      'click .info': 'toggleTime'
+      'click': 'toggleDescription',
+      'click .time': 'toggleTime'
     };
     ReportItem.prototype.elements = {
       '[role=name]': 'name',
+      '[role=unique-count]': 'uniqueCount',
       '[role=modified]': 'modified',
-      '[role=timesince]': 'timesince'
+      '[role=timesince]': 'timesince',
+      '[role=description]': 'description'
     };
     ReportItem.prototype.render = function() {
       this.name.text(this.model.get('name'));
       this.modified.text(this.model.get('modified'));
       this.timesince.text(this.model.get('timesince'));
+      this.uniqueCount.text(this.model.get('unique_count'));
       return this;
     };
     ReportItem.prototype.toggleTime = function() {
       this.modified.toggle();
-      return this.timesince.toggle();
+      this.timesince.toggle();
+      return false;
+    };
+    ReportItem.prototype.toggleDescription = function() {
+      this.description.toggle();
+      return false;
     };
     return ReportItem;
   })();

@@ -6,27 +6,42 @@ define [
     (utils, CollectionViews) ->
 
         class ReportItem extends Backbone.View
-            el: '<div><strong role="name"></strong>
-                <span class="info">- modified <span role="modified"></span>
-                <span role="timesince"></span></span></div>'
+            el: '<div>
+                    <strong role="name"></strong>
+                    <span class="info">- <span role="unique-count"></span> unique patients</span>
+                    <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
+                    <div role="description">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque bibendum luctus tempus. Maecenas nec felis sed lectus rhoncus porta vel non ligula.
+                    </div>
+                    <div class="controls"><button>Cancel</button> <button>Save</button></div>
+                </div>'
 
             events:
-                'click .info': 'toggleTime'
+                'click': 'toggleDescription'
+                'click .time': 'toggleTime'
 
             elements:
                 '[role=name]': 'name'
+                '[role=unique-count]': 'uniqueCount'
                 '[role=modified]': 'modified'
                 '[role=timesince]': 'timesince'
+                '[role=description]': 'description'
 
             render: ->
                 @name.text @model.get 'name'
                 @modified.text @model.get 'modified'
                 @timesince.text @model.get 'timesince'
+                @uniqueCount.text @model.get 'unique_count'
                 @
 
             toggleTime: ->
                 @modified.toggle()
                 @timesince.toggle()
+                return false
+
+            toggleDescription: ->
+                @description.toggle()
+                return false
 
 
         class ReportList extends CollectionViews.View

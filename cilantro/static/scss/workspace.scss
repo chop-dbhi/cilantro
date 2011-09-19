@@ -38,3 +38,34 @@
     font-size: 0.9em;
     list-style: disc;
 }
+
+#report-list {
+    > div {
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid transparent;
+
+        &:hover {
+            @include box-shadow(0 1px 3px #bbb);
+            @include border-radius(3px);
+            border-color: #ccc;
+            background-color: #fff;
+        }
+    }
+
+    [role='description'] {
+        @extend .info;
+        display: none;
+        padding: 5px;
+        margin-top: 5px;
+        background-color: #eee;
+        font-size: 0.9em;
+
+    }
+
+    .controls {
+        display: none;
+        margin-top: 5px;
+        text-align: right;
+    }
+}
