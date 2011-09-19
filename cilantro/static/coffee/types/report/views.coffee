@@ -5,20 +5,43 @@ define [
             
     (utils, CollectionViews) ->
 
+        class ReportEditor extends Backbone.View
+            el: '<div id="report-editor">
+                <input type="text" name="name" placeholder="Name...">
+                <textarea name="description" placeholder="Description..."></textarea>
+                <div class="controls">
+                    <button class="delete">Delete</button>
+                    <button class="cancel">Cancel</button>
+                    <button class="save">Save</button>
+                </div>
+            </div>'
+
+            initialize: ->
+                @el.appendTo('body').dialog
+                    dialogClass: 'ui-dialog-simple'
+                    autoOpen: false
+                    modal: true
+                    resizable: false
+                    draggable: true
+                    position: ['center', 150]
+                    width: 500
+
         class ReportItem extends Backbone.View
             el: '<div>
                     <strong role="name"></strong>
                     <span class="info">- <span role="unique-count"></span> unique patients</span>
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
-                    <div role="description">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque bibendum luctus tempus. Maecenas nec felis sed lectus rhoncus porta vel non ligula.
-                    </div>
-                    <div class="controls"><button>Cancel</button> <button>Save</button></div>
+                    <div role="description"></div>
+                    <div class="controls"><button class="edit">Edit</button> <button class="copy">Copy</button></div>
                 </div>'
 
             events:
-                'click': 'toggleDescription'
                 'click .time': 'toggleTime'
+                'click .edit': 'edit'
+                'click .copy': 'copy'
+                'mouseenter': 'showControls'
+                'mouseleave': 'hideControls'
+                'click': 'toggleDescription'
 
             elements:
                 '[role=name]': 'name'
@@ -26,21 +49,50 @@ define [
                 '[role=modified]': 'modified'
                 '[role=timesince]': 'timesince'
                 '[role=description]': 'description'
+                '.controls': 'controls'
 
             render: ->
                 @name.text @model.get 'name'
                 @modified.text @model.get 'modified'
                 @timesince.text @model.get 'timesince'
+                @description.text @model.get 'description'
                 @uniqueCount.text @model.get 'unique_count'
                 @
 
-            toggleTime: ->
+            toggleTime: (evt) ->
                 @modified.toggle()
                 @timesince.toggle()
+                evt.stopPropagation()
+
+            toggleDescription: (evt) ->
+                if not evt.isPropagationStopped()
+                    @description.toggle()
+
+            showControls: (evt) ->
+                @_controlsTimer = setTimeout =>
+                    @controls.slideDown(300)
+                , 300
                 return false
 
-            toggleDescription: ->
-                @description.toggle()
+            hideControls: (evt) ->
+                clearTimeout @_controlsTimer
+                @controls.slideUp(300)
+                return false
+
+            showEditor: (model=@model) ->
+                @editor.el.find('[name=name]').val model.get 'name'
+                @editor.el.find('[name=description]').val model.get 'description'
+                @editor.el.dialog 'open'
+
+            edit: (evt) ->
+                @showEditor()
+                return false
+
+            copy: (evt) ->
+                copy = @model.clone()
+                copy.set 'name', copy.get('name') + ' (copy)'
+                @showEditor copy
+                @editor.el.find('[name=name]').select()
                 return false
 
 
@@ -51,6 +103,15 @@ define [
 
             defaultContent: '<div class="info">You have no saved reports.
                 <a id="open-report-help" href="#">Learn more</a>.</div>'
+
+            initialize: ->
+                @editor = new ReportEditor
+                super
+
+            add: (model) ->
+                view = super
+                view.editor = @editor
+                return view
 
         # include the expandable list functionality..
         utils.include ReportList, CollectionViews.ExpandableListMixin

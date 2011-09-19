@@ -46,13 +46,14 @@ define(['common/utils'], function(utils) {
       var view;
       if (this.childViews[model.id || model.cid]) {
         view = this.childViews[model.id || model.cid];
-        return clearTimeout(view._destroyTimer);
+        clearTimeout(view._destroyTimer);
       } else {
         view = this.childViews[model.id || model.cid] = (new this.viewClass({
           model: model
         })).render();
-        return this.insertChild(view);
+        this.insertChild(view);
       }
+      return view;
     };
     CollectionView.prototype.reset = function(collection, options) {
       collection.each(this.add);

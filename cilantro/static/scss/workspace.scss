@@ -46,8 +46,8 @@
         border: 1px solid transparent;
 
         &:hover {
-            @include box-shadow(0 1px 3px #bbb);
             @include border-radius(3px);
+            @include box-shadow(0 1px 1px #fff);
             border-color: #ccc;
             background-color: #fff;
         }
@@ -66,6 +66,26 @@
     .controls {
         display: none;
         margin-top: 5px;
+        text-align: right;
+    }
+}
+
+#report-editor {
+    @extend .clearfix;
+
+    input[name="name"] {
+        font-size: 22px;
+        width: 473px;
+        margin-bottom: 10px;
+    }
+
+    textarea {
+        width: 473px;
+        height: 100px;
+    }
+
+    .controls {
+        margin-top: 10px;
         text-align: right;
     }
 }

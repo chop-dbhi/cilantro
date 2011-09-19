@@ -7,7 +7,34 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   return child;
 }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 define(['common/utils', 'common/views/collection'], function(utils, CollectionViews) {
-  var ReportItem, ReportList, ReportName;
+  var ReportEditor, ReportItem, ReportList, ReportName;
+  ReportEditor = (function() {
+    __extends(ReportEditor, Backbone.View);
+    function ReportEditor() {
+      ReportEditor.__super__.constructor.apply(this, arguments);
+    }
+    ReportEditor.prototype.el = '<div id="report-editor">\
+                <input type="text" name="name" placeholder="Name...">\
+                <textarea name="description" placeholder="Description..."></textarea>\
+                <div class="controls">\
+                    <button>Delete</button>\
+                    <button>Save</button>\
+                    <button>Cancel</button>\
+                </div>\
+            </div>';
+    ReportEditor.prototype.initialize = function() {
+      return this.el.appendTo('body').dialog({
+        dialogClass: 'ui-dialog-simple',
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        draggable: true,
+        position: ['center', 150],
+        width: 500
+      });
+    };
+    return ReportEditor;
+  })();
   ReportItem = (function() {
     __extends(ReportItem, Backbone.View);
     function ReportItem() {
@@ -17,36 +44,72 @@ define(['common/utils', 'common/views/collection'], function(utils, CollectionVi
                     <strong role="name"></strong>\
                     <span class="info">- <span role="unique-count"></span> unique patients</span>\
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>\
-                    <div role="description">\
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque bibendum luctus tempus. Maecenas nec felis sed lectus rhoncus porta vel non ligula.\
-                    </div>\
-                    <div class="controls"><button>Cancel</button> <button>Save</button></div>\
+                    <div role="description"></div>\
+                    <div class="controls"><button class="edit">Edit</button> <button class="copy">Copy</button></div>\
                 </div>';
     ReportItem.prototype.events = {
-      'click': 'toggleDescription',
-      'click .time': 'toggleTime'
+      'click .time': 'toggleTime',
+      'click .edit': 'edit',
+      'click .copy': 'copy',
+      'mouseenter': 'showControls',
+      'mouseleave': 'hideControls',
+      'click': 'toggleDescription'
     };
     ReportItem.prototype.elements = {
       '[role=name]': 'name',
       '[role=unique-count]': 'uniqueCount',
       '[role=modified]': 'modified',
       '[role=timesince]': 'timesince',
-      '[role=description]': 'description'
+      '[role=description]': 'description',
+      '.controls': 'controls'
     };
     ReportItem.prototype.render = function() {
       this.name.text(this.model.get('name'));
       this.modified.text(this.model.get('modified'));
       this.timesince.text(this.model.get('timesince'));
+      this.description.text(this.model.get('description'));
       this.uniqueCount.text(this.model.get('unique_count'));
       return this;
     };
-    ReportItem.prototype.toggleTime = function() {
+    ReportItem.prototype.toggleTime = function(evt) {
       this.modified.toggle();
       this.timesince.toggle();
+      return evt.stopPropagation();
+    };
+    ReportItem.prototype.toggleDescription = function(evt) {
+      if (!evt.isPropagationStopped()) {
+        return this.description.toggle();
+      }
+    };
+    ReportItem.prototype.showControls = function(evt) {
+      this._controlsTimer = setTimeout(__bind(function() {
+        return this.controls.slideDown(300);
+      }, this), 300);
       return false;
     };
-    ReportItem.prototype.toggleDescription = function() {
-      this.description.toggle();
+    ReportItem.prototype.hideControls = function(evt) {
+      clearTimeout(this._controlsTimer);
+      this.controls.slideUp(300);
+      return false;
+    };
+    ReportItem.prototype.showEditor = function(model) {
+      if (model == null) {
+        model = this.model;
+      }
+      this.editor.el.find('[name=name]').val(model.get('name'));
+      this.editor.el.find('[name=description]').val(model.get('description'));
+      return this.editor.el.dialog('open');
+    };
+    ReportItem.prototype.edit = function(evt) {
+      this.showEditor();
+      return false;
+    };
+    ReportItem.prototype.copy = function(evt) {
+      var copy;
+      copy = this.model.clone();
+      copy.set('name', copy.get('name') + ' (copy)');
+      this.showEditor(copy);
+      this.editor.el.find('[name=name]').select();
       return false;
     };
     return ReportItem;
@@ -60,6 +123,16 @@ define(['common/utils', 'common/views/collection'], function(utils, CollectionVi
     ReportList.prototype.viewClass = ReportItem;
     ReportList.prototype.defaultContent = '<div class="info">You have no saved reports.\
                 <a id="open-report-help" href="#">Learn more</a>.</div>';
+    ReportList.prototype.initialize = function() {
+      this.editor = new ReportEditor;
+      return ReportList.__super__.initialize.apply(this, arguments);
+    };
+    ReportList.prototype.add = function(model) {
+      var view;
+      view = ReportList.__super__.add.apply(this, arguments);
+      view.editor = this.editor;
+      return view;
+    };
     return ReportList;
   })();
   utils.include(ReportList, CollectionViews.ExpandableListMixin);

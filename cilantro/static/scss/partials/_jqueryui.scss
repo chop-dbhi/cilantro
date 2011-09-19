@@ -3,8 +3,18 @@
     font-size: 0.9em;
 }
 
+.ui-widget-overlay {
+    @include opacity(60);
+    background-color: #333;
+    // this seems to not be necessary normally, but something else is throwing
+    // off the positioning..
+    position: fixed;
+    top: 0;
+}
+
 .ui-dialog {
-    @include box-shadow(0 5px 20px 0 #666);
+    @include box-shadow(0 2px 5px #444);
+    border: 1px solid #444;
     
     position: absolute;
 
@@ -13,7 +23,7 @@
     }
 
     &.ui-corner-all {
-        @include border-radius(0);
+        @include border-radius(4px);
     }
 
     &.ui-widget-content, > .ui-widget-content {
@@ -23,8 +33,24 @@
     }
 
     &.ui-widget {
-        @include border-radius(4px 4px 0 0);
+        @include border-radius(4px);
         font: inherit;
+
+        &.ui-dialog-simple {
+            @include box-shadow(0 2px 5px #444);
+            @include border-radius(4px);
+
+            border: 1px solid #444;
+
+            .ui-dialog-content {
+                @include border-radius(4px);
+                padding: 10px;
+            }
+
+            .ui-dialog-titlebar {
+                display: none;
+            }
+        }
     }
 
     > .ui-dialog-titlebar.ui-widget-header {
@@ -50,6 +76,7 @@
     }
 
     .ui-dialog-buttonpane {
+        @include border-radius(0 0 4px 4px);
         margin: 0 !important;
         padding: 0 10px 10px 10px !important;
         text-align: right;
