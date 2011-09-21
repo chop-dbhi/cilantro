@@ -5,3 +5,6 @@
 [submodule "cilantro/static/bourbon"]
 	path = cilantro/static/bourbon
 	url = git://github.com/thoughtbot/bourbon.git
+[submodule "cilantro/static/highcharts"]
+	path = cilantro/static/highcharts
+	url = git://github.com/highslide-software/highcharts.com.git
