@@ -6,8 +6,6 @@ JS_MIN_DIR = ${STATIC_DIR}/js/min
 SASS_DIR = ${STATIC_DIR}/scss
 CSS_DIR = ${STATIC_DIR}/css
 
-BOURBON_GEN = cd ${STATIC_DIR}/bourbon && ./generate-bourbon.sh
-
 COMPILE_SASS = `which sass` \
 			   --scss \
 			   --style=compressed \
@@ -21,9 +19,6 @@ all: sass compile optimize
 sass:
 	@@echo 'Compiling Sass...'
 	@@mkdir -p ${CSS_DIR}
-	@@rm -rf ${SASS_DIR}/bourbon
-	${BOURBON_GEN}
-	@@mv ${STATIC_DIR}/bourbon/bourbon ${SASS_DIR}/bourbon
 	${COMPILE_SASS}
 
 coffee:

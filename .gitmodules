@@ -2,6 +2,3 @@
 [submodule "cilantro/static/coffee/common"]
 	path = cilantro/static/coffee/common
 	url = git://github.com/bruth/backbone-common.git
-[submodule "cilantro/static/bourbon"]
-	path = cilantro/static/bourbon
-	url = git://github.com/thoughtbot/bourbon.git
