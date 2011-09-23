@@ -10,7 +10,7 @@ COMPILE_SASS = `which sass` \
 			   --scss \
 			   --style=compressed \
 			   --watch ${SASS_DIR}:${CSS_DIR} \
-			   -r ${STATIC_DIR}/bourbon/lib/bourbon.rb
+			   -r ${STATIC_DIR}/scss/bourbon/lib/bourbon.rb
 COMPILE_COFFEE = `which coffee` -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
 REQUIRE_OPTIMIZE = `which node` bin/r.js -o cilantro/static/js/app.build.js
 
