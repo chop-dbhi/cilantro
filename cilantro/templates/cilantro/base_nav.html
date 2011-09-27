@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block _toolbar %}
-    <nav id="toolbar">
+{% block _navigation %}
+    <nav id="main-nav">
         {% spaceless %}
-            {% block toolbar %}
+            {% block navigation %}
                 {% url workspace as current_path %} 
                 {% if current_path == request.path %}
                     <span class="selected"><span class="icon workspace"></span> Workspace</span>

@@ -29,7 +29,7 @@
         {% include "snippets/header.html" %}
 
         {# navigation proxy, use "base_nav.html" to implement #}
-        {% block _toolbar %}{% endblock %}
+        {% block _navigation %}{% endblock %}
 
         <noscript>
             <span class="message error">JavaScript must be enabled. Turn it on and refresh the page.</span>
@@ -42,8 +42,6 @@
 
         {# primary area for displaying page content. override CSS for a page specific style #}
         <div id="content">
-            {# navigation proxy, use "base_nav.html" to implement #}
-            {% block _navigation %}{% endblock %}
             {% block content %}{% endblock %}
         </div>
 
