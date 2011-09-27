@@ -16,6 +16,18 @@ define [
                 </div>
             </div>'
 
+            elements:
+                '[name=name]': 'name'
+                '[name=description]': 'description'
+                '.save': 'saveButton'
+                '.delete': 'deleteButton'
+                '.cancel': 'cancelButton'
+
+            events:
+                'click .save': 'save'
+                'click .delete': 'delete'
+                'click .cancel': 'cancel'
+
             initialize: ->
                 @el.appendTo('body').dialog
                     dialogClass: 'ui-dialog-simple'
@@ -25,6 +37,23 @@ define [
                     draggable: true
                     position: ['center', 150]
                     width: 500
+
+            save: ->
+                @activeModel.set
+                    name: @name.val()
+                    description: @description.val()
+                @activeModel.save()
+                delete @activeModel
+                @el.dialog('close')
+
+            cancel: ->
+                delete @activeModel
+                @el.dialog('close')
+
+            delete: ->
+                @activeModel.destroy()
+                delete @activeModel
+                @el.dialog('close')
 
         class ReportItem extends Backbone.View
             el: '<div>
@@ -70,7 +99,7 @@ define [
 
             showControls: (evt) ->
                 @_controlsTimer = setTimeout =>
-                    @controls.slideDown(300)
+                    @controls.slideDown(200)
                 , 300
                 return false
 
@@ -80,8 +109,10 @@ define [
                 return false
 
             showEditor: (model=@model) ->
-                @editor.el.find('[name=name]').val model.get 'name'
-                @editor.el.find('[name=description]').val model.get 'description'
+                if not model.id then @editor.deleteButton.hide() else @editor.deleteButton.show()
+                @editor.name.val model.get 'name'
+                @editor.description.val model.get 'description'
+                @editor.activeModel = model
                 @editor.el.dialog 'open'
 
             edit: (evt) ->
@@ -90,9 +121,10 @@ define [
 
             copy: (evt) ->
                 copy = @model.clone()
+                copy.set('id', null)
                 copy.set 'name', copy.get('name') + ' (copy)'
                 @showEditor copy
-                @editor.el.find('[name=name]').select()
+                @editor.name.select()
                 return false
 
 
