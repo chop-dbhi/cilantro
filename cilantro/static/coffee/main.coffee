@@ -35,9 +35,8 @@ define [
         attrs.Views = {}
 
         # finally, initialize the App object for the page
-        App = new utils.App attrs
+        window.App = App = new utils.App attrs
+
         # post-init App setup
         App.Log = new Logging.Log
         App.LogView = new Logging.LogView
-
-        window.App = App
