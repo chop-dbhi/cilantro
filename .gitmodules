@@ -2,9 +2,6 @@
 [submodule "cilantro/static/coffee/common"]
 	path = cilantro/static/coffee/common
 	url = git://github.com/bruth/backbone-common.git
-[submodule "cilantro/static/scss"]
-	path = cilantro/static/scss
-	url = git://github.com/cbmi/cilantro-sass.git
 [submodule "cilantro/static/highcharts"]
 	path = cilantro/static/highcharts
 	url = git://github.com/highslide-software/highcharts.com.git
