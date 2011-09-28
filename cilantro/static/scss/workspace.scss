@@ -1,0 +1,94 @@
+@import "coriander/main";
+
+.col {
+    @include inline-block;
+    vertical-align: top;
+    width: 460px;
+
+    &:first-child {
+        margin-right: 15px;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+}
+
+[role='modified'] {
+    display: none;
+}
+
+.timestamp {
+    margin: 0;
+    cursor: default;
+    text-align: right;
+}
+
+#session-report {
+    > div {
+        @include inline-block;
+        vertical-align: top;
+        width: 217px;
+    }
+}
+
+#session-scope, #session-perspective {
+    font-size: 0.9em;
+    list-style: disc;
+}
+
+#report-list {
+    > div {
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid transparent;
+
+        &:hover {
+            @include border-radius(3px);
+            @include box-shadow(0 1px 1px #fff);
+            border-color: #ccc;
+            background-color: #fff;
+        }
+    }
+
+    [role='description'] {
+        @extend .info;
+        display: none;
+        padding: 5px;
+        margin-top: 5px;
+        background-color: #eee;
+        font-size: 0.9em;
+
+    }
+
+    .controls {
+        @include box-shadow(inset 0 2px 2px #ccc);
+        @include border-radius(3px);
+        display: none;
+        background-color: #eee;
+        border: 1px solid #bbb;
+        margin-top: 5px;
+        text-align: right;
+        padding: 3px;
+    }
+}
+
+#report-editor {
+    @extend .clearfix;
+
+    input[name="name"] {
+        font-size: 22px;
+        width: 473px;
+        margin-bottom: 10px;
+    }
+
+    textarea {
+        width: 473px;
+        height: 100px;
+    }
+
+    .controls {
+        margin-top: 10px;
+        text-align: right;
+    }
+}
