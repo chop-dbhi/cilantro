@@ -31,7 +31,7 @@
 }
 
 #tabs {
-    border-bottom: 1px solid #aaa;
+    border-bottom: 1px solid #999;
     height: 37px;
 
     > * {
@@ -70,7 +70,7 @@
         background-color: #e6e6e6;
         height: 26px;
         padding: 5px 12px;
-        border-bottom: 1px solid #aaa;
+        border-bottom: 1px solid #999;
         border-left: 1px dotted #777;
         display: inline-block;
         cursor: pointer;
@@ -93,7 +93,7 @@
 
         color: #005cab;
         border-color: #999;
-        border-bottom-color: #eee;
+        border-bottom: 1px solid #eee;
         background: #fff;
 
         text-shadow: none;
@@ -112,18 +112,23 @@
 }
 
 #subdomains {
-    $bgcolor: hsl(211, 36%, 92%);
+    $bgcolor: hsl(0, 0%, 80%);
 
-    @include border-radius(3px);
     @include box-shadow(inset 0 2px 3px darken($bgcolor, 20));
 
     height: 14px;
     padding: 5px;
-    margin-top: 5px;
     font-size: 0.9em;
     font-weight: 600;
-    border: 1px solid darken($bgcolor, 30);
+    border: 1px solid darken($bgcolor, 20);
+    border-top: none;
     background-color: $bgcolor;
+
+    // when visible, this will cover up the single pixel bottom
+    // border of the active domain, thus making it appear flush with
+    // the rest of the domain tabs
+    position: relative;
+    top: -1px;
 
     > span {
         @include border-radius(10px);
