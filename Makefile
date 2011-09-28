@@ -2,6 +2,7 @@ STATIC_DIR = cilantro/static
 COFFEE_DIR = ${STATIC_DIR}/coffee
 JS_SRC_DIR = ${STATIC_DIR}/js/src
 JS_MIN_DIR = ${STATIC_DIR}/js/min
+PID_FILE = /tmp/cilantro-watch
 
 HIGHCHARTS_SM = ${STATIC_DIR}/highcharts
 
@@ -20,27 +21,39 @@ HIGHCHARTS_TAG = v2.1.6
 
 all: sass coffee highcharts optimize
 
+watch: unwatch
+	@echo 'Watching in the background...'
+	@${COMPILE_COFFEE} &> /dev/null & echo $$! > ${PID_FILE}
+	@${COMPILE_SASS} &> /dev/null & echo $$! >> ${PID_FILE}
+
+unwatch:
+	@if [ -f ${PID_FILE} ]; then \
+		echo 'Watchers stopped'; \
+		for pid in `cat ${PID_FILE}`; do kill -9 $$pid; done; \
+		rm ${PID_FILE}; \
+	fi;
+
 sass:
-	@@echo 'Compiling Sass...'
-	@@mkdir -p ${CSS_DIR}
-	${COMPILE_SASS}
+	@echo 'Compiling Sass...'
+	@mkdir -p ${CSS_DIR}
+	@${COMPILE_SASS}
 
 coffee:
-	@@echo 'Compiling CoffeeScript...'
-	${COMPILE_COFFEE} > /dev/null
+	@echo 'Compiling CoffeeScript...'
+	@${COMPILE_COFFEE} > /dev/null
 
 highcharts:
-	@@echo 'Updating HighCharts...'
-	@@cd ${HIGHCHARTS_SM} && git checkout ${HIGHCHARTS_TAG}
-	@@cp ${HIGHCHARTS_SM}/js/highcharts.src.js ${JS_SRC_DIR}/lib/highcharts.js
+	@echo 'Updating HighCharts...'
+	@cd ${HIGHCHARTS_SM} && git checkout ${HIGHCHARTS_TAG}
+	@cp ${HIGHCHARTS_SM}/js/highcharts.src.js ${JS_SRC_DIR}/lib/highcharts.js
 
 optimize:
-	@@echo 'Optimizing...'
-	@@mkdir -p ${JS_MIN_DIR}
-	${REQUIRE_OPTIMIZE} > /dev/null
+	@echo 'Optimizing...'
+	@mkdir -p ${JS_MIN_DIR}
+	@${REQUIRE_OPTIMIZE} > /dev/null
 
 clean:
-	@@rm -rf ${OPTIMIZED_DIR}
-	@@rm -rf ${CSS_DIR}
+	@rm -rf ${OPTIMIZED_DIR}
+	@rm -rf ${CSS_DIR}
 
-.PHONY: all sass coffee optimize clean
+.PHONY: all watch unwatch sass coffee optimize clean
