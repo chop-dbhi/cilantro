@@ -14,3 +14,5 @@ Fancy Makefile
 - Optimize JavaScript - ``make optimize``
 - Remove compiled code - ``make clean``, note this does not currently remove
 the raw JavaScript files since not all code has been ported to CoffeeScript
+- Watch/Unwatch - ``make watch``, starts the coffee and sass processes (node
+and ruby) in the background, use ``make unwatch`` to stop these processes
