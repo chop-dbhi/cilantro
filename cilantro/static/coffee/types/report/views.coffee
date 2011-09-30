@@ -55,6 +55,21 @@ define [
                 delete @activeModel
                 @el.dialog('close')
 
+
+        ReportEditorMixin =
+            showEditor: (model=@model) ->
+                if not model.id then @editor.deleteButton.hide() else @editor.deleteButton.show()
+                @editor.name.val model.get 'name'
+                @editor.description.val model.get 'description'
+                @editor.activeModel = model
+                @editor.el.dialog 'open'
+
+            edit: (evt) ->
+                @showEditor()
+                return false
+
+
+
         class ReportItem extends Backbone.View
             el: '<div>
                     <strong role="name"></strong>
@@ -108,17 +123,6 @@ define [
                 @controls.slideUp(300)
                 return false
 
-            showEditor: (model=@model) ->
-                if not model.id then @editor.deleteButton.hide() else @editor.deleteButton.show()
-                @editor.name.val model.get 'name'
-                @editor.description.val model.get 'description'
-                @editor.activeModel = model
-                @editor.el.dialog 'open'
-
-            edit: (evt) ->
-                @showEditor()
-                return false
-
             copy: (evt) ->
                 copy = @model.clone()
                 copy.set('id', null)
@@ -136,8 +140,8 @@ define [
             defaultContent: '<div class="info">You have no saved reports.
                 <a id="open-report-help" href="#">Learn more</a>.</div>'
 
-            initialize: ->
-                @editor = new ReportEditor
+            initialize: (options) ->
+                @editor = options.editor
                 super
 
             add: (model) ->
@@ -145,88 +149,42 @@ define [
                 view.editor = @editor
                 return view
 
-        # include the expandable list functionality..
-        utils.include ReportList, CollectionViews.ExpandableListMixin
-
-
         # view representing primary element for the session's report name
         class ReportName extends Backbone.View
             el: '#report-name'
 
             events:
-                'click span': 'edit'
-                'blur [name=name]': 'show'
-                'keypress [name=name]': 'enter'
+                'click': 'edit'
+                'mouseover': 'hover'
+                'mouseout': 'hover'
 
-            elements:
-                'span': 'name'
-                '[name=name]': 'nameInput'
-
-            initialize: ->
-                @model.bind 'change', @render
+            initialize: (options) ->
+                @editor = options.editor
+                @model.bind 'change:name', @render
+                @hoverText = $('<span class="info">click to edit</span>');
 
             render: =>
                 if (name = @model.get 'name')
-                    @name.removeClass 'placeholder'
+                    @el.removeClass 'placeholder'
+                    @el.append(@hoverText.hide())
                 else
-                    @name.addClass 'placeholder'
+                    @el.addClass 'placeholder'
                     name = @model.defaults.name
+                    @hoverText.detach()
 
-                @name.text name
+                # add a space between the hover text and the name
+                @el.prepend name + ' '
 
-            edit: =>
-                # temporarily stop polling, so the user's input does not get overriden
-                @model.stopPolling()
+            hover: -> @hoverText.toggle()
 
-                @name.hide()
-                @nameInput.show().select()
-
-            show: (event) =>
-                # ensure it's a non-empty, non-all whitespace value
-                if (name = @nameInput.val()) and not /^\s*$/.test name
-                    @model.set name: name
-                    @render()
-
-                @name.show()
-                @nameInput.hide()
-
-                # resume polling
-                @model.startPolling()
-
-            enter: (event) =>
-                @show() if event.which is 13
-
-        # view representing primary element for the session's report name
-#        class ReportInfo extends Backbone.View
-#            el: '#report-info'
-#
-#            events:
-#                'click p': 'editDescription'
-#                'blur [name=description]': 'showDescription'
-#
-#            elements:
-#                'p': 'description'
-#                '[name=description]': 'descriptionInput'
-#
-#            initialize: ->
-#                if @model.id and @model.get('has_changed') then @el.addClass 'unsaved'
-#
-#            editDescription: =>
-#                @description.hide()
-#                @descriptionInput.show().select()
-#
-#            showDescription: =>
-#                if not @model.get 'description'
-#                    @model.set description: @model.defaults.description
-#                    @description.addClass 'placeholder'
-#                else
-#                    @description.removeClass 'placeholder'
-#
-#                @description.show()
-#                @descriptionInput.hide()
+        # include various mixins into defined classes...
+        utils.include ReportItem, ReportEditorMixin
+        utils.include ReportList, CollectionViews.ExpandableListMixin
+        utils.include ReportName, ReportEditorMixin
 
         return {
             Name: ReportName
             Item: ReportItem
             List: ReportList
+            Editor: ReportEditor
         }

@@ -25,25 +25,28 @@ require [
 
         $ ->
 
-            conceptInterface = new Interface.ConceptInterfaceView
+            ConceptInterface = new Interface.ConceptInterfaceView
 
-            domainTabs = new Domain.Views.DomainCollectionView
+            DomainTabs = new Domain.Views.DomainCollectionView
                 collection: domains
 
-            conceptList = new Concept.Views.CollectionView
+            ConceptList = new Concept.Views.CollectionView
                 collection: concepts
 
-            conceptResultList = new Search.ResultListView
+            ConceptResultList = new Search.ResultListView
                 collection: conceptResults
 
-            conditionList = new Condition.ListView
+            ConditionList = new Condition.ListView
                 collection: conditions
 
-            conditionListPane = new Condition.ListPane
-                list: conditionList
+            ConditionListPane = new Condition.ListPane
+                list: ConditionList
 
-            reportName = new Report.Views.Name
+            ReportEditor = new Report.Views.Editor
+
+            ReportName = new Report.Views.Name
                 model: sessionReport
+                editor: ReportEditor
 
             domains.fetch
                 initial: true
