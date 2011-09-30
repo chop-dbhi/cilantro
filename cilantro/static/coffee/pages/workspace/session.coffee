@@ -17,7 +17,8 @@ define [
             render: =>
                 conditions = @model.get 'conditions'
                 if conditions
-                    text = '<li>' + conditions.conditions.join('</li><li>') + '</li>'
+                    text = ''
+                    _.map(conditions, (node) -> text += "<li>#{node.condition}</li>")
                     @el.html text
                 @collapse()
 
