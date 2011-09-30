@@ -16,12 +16,10 @@ define [
 
         $ ->
 
-            # TODO make this pub/sub based
             ReportEditor = new Report.Views.Editor
 
             ReportList = new Report.Views.List
                 collection: reports
-                editor: ReportEditor
 
             SessionScope = new Views.Scope
                 model: sessionScope

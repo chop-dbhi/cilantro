@@ -46,7 +46,6 @@ require [
 
             ReportName = new Report.Views.Name
                 model: sessionReport
-                editor: ReportEditor
 
             domains.fetch
                 initial: true

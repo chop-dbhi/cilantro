@@ -10,7 +10,6 @@ define [
                 <input type="text" name="name" placeholder="Name...">
                 <textarea name="description" placeholder="Description..."></textarea>
                 <div class="controls">
-                    <button class="delete">Delete</button>
                     <button class="cancel">Cancel</button>
                     <button class="save">Save</button>
                 </div>
@@ -20,15 +19,15 @@ define [
                 '[name=name]': 'name'
                 '[name=description]': 'description'
                 '.save': 'saveButton'
-                '.delete': 'deleteButton'
                 '.cancel': 'cancelButton'
 
             events:
                 'click .save': 'save'
-                'click .delete': 'delete'
                 'click .cancel': 'cancel'
 
             initialize: ->
+                App.hub.subscribe 'report/edit', @editHandler
+
                 @el.appendTo('body').dialog
                     dialogClass: 'ui-dialog-simple'
                     autoOpen: false
@@ -37,6 +36,12 @@ define [
                     draggable: true
                     position: ['center', 150]
                     width: 500
+
+            editHandler: (model) =>
+                @name.val model.get 'name'
+                @description.val model.get 'description'
+                @activeModel = model
+                @el.dialog 'open'
 
             save: ->
                 @activeModel.set
@@ -50,22 +55,10 @@ define [
                 delete @activeModel
                 @el.dialog('close')
 
-            delete: ->
-                @activeModel.destroy()
-                delete @activeModel
-                @el.dialog('close')
-
 
         ReportEditorMixin =
-            showEditor: (model=@model) ->
-                if not model.id then @editor.deleteButton.hide() else @editor.deleteButton.show()
-                @editor.name.val model.get 'name'
-                @editor.description.val model.get 'description'
-                @editor.activeModel = model
-                @editor.el.dialog 'open'
-
-            edit: (evt) ->
-                @showEditor()
+            edit: (evt, model=@model) ->
+                App.hub.publish 'report/edit', model
                 return false
 
 
@@ -76,13 +69,18 @@ define [
                     <span class="info">- <span role="unique-count"></span> unique patients</span>
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
                     <div role="description"></div>
-                    <div class="controls"><button class="edit">Edit</button> <button class="copy">Copy</button></div>
+                    <div class="controls">
+                        <button class="delete">Delete</button>
+                        <button class="edit">Edit</button>
+                        <button class="copy">Copy</button>
+                    </div>
                 </div>'
 
             events:
                 'click .time': 'toggleTime'
                 'click .edit': 'edit'
                 'click .copy': 'copy'
+                'click .delete': 'delete'
                 'mouseenter': 'showControls'
                 'mouseleave': 'hideControls'
                 'click': 'toggleDescription'
@@ -127,9 +125,12 @@ define [
                 copy = @model.clone()
                 copy.set('id', null)
                 copy.set 'name', copy.get('name') + ' (copy)'
-                @showEditor copy
-                @editor.name.select()
+                # XXX a bit of a hack to get the ``url`` method
+                copy.collection = @model.collection
+                @edit evt, copy
                 return false
+
+            delete: -> @model.destroy()
 
 
         class ReportList extends CollectionViews.View
@@ -140,14 +141,6 @@ define [
             defaultContent: '<div class="info">You have no saved reports.
                 <a id="open-report-help" href="#">Learn more</a>.</div>'
 
-            initialize: (options) ->
-                @editor = options.editor
-                super
-
-            add: (model) ->
-                view = super
-                view.editor = @editor
-                return view
 
         # view representing primary element for the session's report name
         class ReportName extends Backbone.View
@@ -159,7 +152,6 @@ define [
                 'mouseout': 'hover'
 
             initialize: (options) ->
-                @editor = options.editor
                 @model.bind 'change:name', @render
                 @hoverText = $('<span class="info">click to edit</span>');
 
