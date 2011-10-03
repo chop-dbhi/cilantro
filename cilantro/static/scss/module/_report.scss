@@ -60,27 +60,32 @@
 }
 
 #report-list {
-    > div {
+    .report {
+        @include transition((box-shadow, border), 0.5s, ease-in-out);
+        @include border-radius(3px);
         cursor: pointer;
         padding: 5px;
-        border: 1px solid transparent;
+        margin-bottom: 10px;
+        border: 1px solid #aaa;
+        background-color: #fff;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
 
         &:hover {
-            @include border-radius(3px);
-            @include box-shadow(0 1px 1px #fff);
-            border-color: #ccc;
-            background-color: #fff;
+            @include box-shadow(0 1px 3px #aaa);
+            border-color: #999;
         }
     }
 
     [role='description'] {
         @extend .info;
-        display: none;
+        @include border-radius(3px);
         padding: 5px;
         margin-top: 5px;
         background-color: #eee;
         font-size: 0.9em;
-
     }
 
     .controls {

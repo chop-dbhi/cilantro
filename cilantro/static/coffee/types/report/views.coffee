@@ -64,8 +64,8 @@ define [
 
 
         class ReportItem extends Backbone.View
-            el: '<div>
-                    <strong role="name"></strong>
+            el: '<section class="report">
+                    <a role="name"></a>
                     <span class="info">- <span role="unique-count"></span> unique patients</span>
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
                     <div role="description"></div>
@@ -74,7 +74,7 @@ define [
                         <button class="edit">Edit</button>
                         <button class="copy">Copy</button>
                     </div>
-                </div>'
+                </section>'
 
             events:
                 'click .time': 'toggleTime'
@@ -83,7 +83,6 @@ define [
                 'click .delete': 'delete'
                 'mouseenter': 'showControls'
                 'mouseleave': 'hideControls'
-                'click': 'toggleDescription'
 
             elements:
                 '[role=name]': 'name'
@@ -95,9 +94,12 @@ define [
 
             render: ->
                 @name.text @model.get 'name'
+                @name.attr 'href', @model.get 'url'
                 @modified.text @model.get 'modified'
                 @timesince.text @model.get 'timesince'
-                @description.text @model.get 'description'
+                if not (description = @model.get 'description')
+                    description = 'No description provided'
+                @description.text description
                 @uniqueCount.text @model.get 'unique_count'
                 @
 
@@ -105,10 +107,6 @@ define [
                 @modified.toggle()
                 @timesince.toggle()
                 evt.stopPropagation()
-
-            toggleDescription: (evt) ->
-                if not evt.isPropagationStopped()
-                    @description.toggle()
 
             showControls: (evt) ->
                 @_controlsTimer = setTimeout =>
@@ -125,6 +123,8 @@ define [
                 copy = @model.clone()
                 copy.set('id', null)
                 copy.set 'name', copy.get('name') + ' (copy)'
+                # set a 'hidden' id of the reference
+                copy.set '_id', @model.id
                 # XXX a bit of a hack to get the ``url`` method
                 copy.collection = @model.collection
                 @edit evt, copy
@@ -153,9 +153,10 @@ define [
 
             initialize: (options) ->
                 @model.bind 'change:name', @render
-                @hoverText = $('<span class="info">click to edit</span>');
+                @hoverText = $('<span class="info">click to edit</span>')
 
             render: =>
+                @el.text ''
                 if (name = @model.get 'name')
                     @el.removeClass 'placeholder'
                     @el.append(@hoverText.hide())
