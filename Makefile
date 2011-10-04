@@ -17,7 +17,7 @@ COMPILE_SASS = `which sass` \
 COMPILE_COFFEE = `which coffee` -w -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
 REQUIRE_OPTIMIZE = `which node` bin/r.js -o cilantro/static/js/app.build.js
 
-HIGHCHARTS_TAG = v2.1.6
+HIGHCHARTS_TAG = 4a32faec62d449a67ff3343f985d62a8d2dfcb74
 
 all: sass coffee highcharts optimize
 
