@@ -1,34 +1,19 @@
 define(
     function() {
-
-        var tmpl = $.jqotec([
-            '<div data-uri="<%=this.uri%>" data-id="<%= this.pk %>" class="criterion clearfix">',
-                '<a href="#" class="remove-criterion"></a>',
-                '<a href="#" class="field-anchor">',
-                    '<%= this.description %>',
-                '</a>',
-            '</div>'
-        ].join(''));
-
-        var criteriaList = $('#criteria-list');
+        var tmpl = _.template('<div class="condition clearfix"><a href="#" class="remove"></a><%= condition %></div>'); 
+        var criteriaList = $('#condition-list');
 
         criteriaList.bind('activate-criterion', function(evt, id) {
-            criteriaList.children().removeClass('selected').filter('[data-id='+id+']').addClass('selected');
+            //criteriaList.children().removeClass('selected').filter('[data-id='+id+']').addClass('selected');
         });
-        
-        var Criteria = function(criteria_constraint, uri, english){
-            
-            var element = $($.jqote(tmpl, {pk:criteria_constraint.concept_id,
-                                           description:english,
-                                           uri:uri+criteria_constraint.concept_id}));
+
+        var Criteria = function(criteria_constraint, uri, server_resp){
+            var element =  $(tmpl(server_resp));
             element.data("constraint", criteria_constraint);
-            
-            element.find(".remove-criterion").click(function(){
-                element.trigger("CriteriaRemovedEvent");
+            element.find(".remove").click(function(){
+                App.hub.publish("CriteriaRemovedEvent", element);
                 return false;
             });
-            
-
             // Display the concept in the main area when the user clicks on the description
             element.click(function (evt) { 
                 element.trigger('activate-criterion',

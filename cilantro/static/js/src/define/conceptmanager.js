@@ -633,8 +633,7 @@ define(['cilantro/define/view'],
                 return false;
             }
             var server_query =  buildQuery(ds);
-            
-            $(event.target).trigger("UpdateQueryEvent", [server_query]);
+            App.hub.publish("UpdateQueryEvent", server_query);
             return true;
         }
 

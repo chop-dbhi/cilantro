@@ -22,9 +22,11 @@ define [
                 'click': 'click'
                 'click .remove': 'remove'
 
-            template: _.template '<div class="condition clearfix">
-                    <a href="#" class="remove"></a>
+            template: _.template '<div class="criterion clearfix">
+                    <a href="#" class="remove-criterion"></a>
+                    <a href="#" class="field-anchor">
                     <%= condition %>
+                    </a>
                 </div>'
 
             render: ->
@@ -59,7 +61,7 @@ define [
             
             viewClass: ConditionView
 
-            defaultContent: '<div class="message warning">You have not defined any conditions</div>'
+            #defaultContent: '<div class="message warning">You have not defined any conditions</div>'
 
 
         return {
