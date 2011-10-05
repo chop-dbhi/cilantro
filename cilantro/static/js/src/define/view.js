@@ -35,7 +35,7 @@ define(['cilantro/define/chart','cilantro/define/form','cilantro/utils/frontdesk
                 
                 // This makes it so we can trigger an event on the view object itself, and still have the
                 // DOM element respond to it.
-                $(this).bind("UpdateQueryButtonClicked GainedFocusEvent LostFocusEvent UpdateQueryButtonClicked " +      
+                $(this).bind("GainedFocusEvent LostFocusEvent UpdateQueryButtonClicked " +      
                              "HideDependentsEvent RegisterElementsEvent ShowDependentsEvent UpdateDSEvent", jQuery.proxy(this.eventPassThru, this));
                 
                 this.render(); 

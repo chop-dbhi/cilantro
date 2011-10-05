@@ -15,7 +15,11 @@ require [
         domains = new Domain.Models.Collection
         concepts = new Concept.Models.Collection
         sessionReport = new Report.Models.Session
-        conditions = new Condition.Collection
+        conditions =  
+            bind:->
+            fetch:->
+
+        #conditions = new Condition.Collection
 
         conceptResults = new Search.ResultCollection
 

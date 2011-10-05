@@ -1,25 +1,22 @@
 define(['cilantro/define/criteria'],
-    
     function(criteria) {
 
         var template = '<button id="submit-query">Get Report</button>'; 
-        
-        var $panel = $('#user-criteria'); 
+                                                                               
+        var $panel = $('#condition-list-pane'); 
 
         var criteria_cache = {};
         
-        var $criteria_div = $panel.find("#criteria-list"),
+        var $criteria_div = $panel.find("#condition-list"),
             $run_query_div = $panel.find(".content"),
             $remove_criteria = $panel.find("#remove-criteria");
         
-        var criteria_api_uri = $criteria_div.attr("data-uri");
-        var report_url = $criteria_div.attr("data-report");
-        var session_api_uri = $panel.attr("data-uri");
+        var criteria_api_uri = App.urls.session.scope;
+        var report_url = App.urls.report;
+        var session_api_uri = App.urls.session.scope;
         
-        
-        // Grab the contents of panel while it is empty and save off the 
-        // "No Criteria" indicator text
-        var $no_criteria_defined = $criteria_div.children();
+        $criteria_div.append('<div class="message warning">You have not defined any conditions</div>');
+        var $no_criteria_defined;
         
         // Create the run query button
         var $run_query = $(template);
@@ -31,101 +28,102 @@ define(['cilantro/define/criteria'],
               }
               if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
                   $.each(data.store.children.reverse(), function(index, criteria_constraint){
-                      $panel.triggerHandler("UpdateQueryEvent", [criteria_constraint, true]);
+                      App.hub.publish("UpdateQueryEvent", criteria_constraint, data.conditions[index]);
                   });
               }else{
-                  $panel.triggerHandler("UpdateQueryEvent", [data.store, true]);
-                  console.log(data.store)
+                  App.hub.publish("UpdateQueryEvent", data.store, data.conditions[0]);
               }
         });
 
-        // Setup click even handlers
+        // Setup click event handlers
         // run the query
         $run_query.click(function(){
-            var all_constraints = [];
-            var server_query;
-            for (var key in criteria_cache){
-                 if (criteria_cache.hasOwnProperty(key)){
-                   all_constraints.push(criteria_cache[key].data("constraint"));
-                 }
-            }
-            
-            if (all_constraints.length < 2){
-                server_query = all_constraints[0];
-            }else{
-                server_query = {type: "and", children : all_constraints};
-            }
-            $.putJSON(session_api_uri, JSON.stringify(server_query), function(){
-                window.location=report_url;
-            });
+                window.location="/report";
         });
         
         // Hook into the remove all criteria link
         $remove_criteria.click(function(){
            for (var key in criteria_cache){
                if (criteria_cache.hasOwnProperty(key)){
-                   criteria_cache[key].trigger("CriteriaRemovedEvent");
+                   App.hub.publish("CriteriaRemovedEvent", criteria_cache[key]);
                }
            } 
         });
         
         // Listen for new criteria as it is added
-        $panel.bind("UpdateQueryEvent", function(evt, criteria_constraint, page_is_loading){
-            
+        App.hub.subscribe("UpdateQueryEvent", function(criteria_constraint, english){
             var pk = criteria_constraint.concept_id;
             var new_criteria;
             // If this is the first criteria to be added remove 
             // content indicating no criteria is defined, and add 
             // "run query button"
             if ($.isEmptyObject(criteria_cache)){
-                $no_criteria_defined.detach();
+                $no_criteria_defined = $criteria_div.children().detach();
                 $run_query_div.append($run_query);
             }
 
             // Until this is validated by the server and we receive the english version of it
             // disable the query.
             $run_query.attr("disabled","true");
-            $.postJSON(criteria_api_uri, JSON.stringify(criteria_constraint), function(english){
-                $run_query.removeAttr("disabled");
-                var was_empty = $.isEmptyObject(criteria_cache);
-                // Is this an update?
-                if (criteria_cache.hasOwnProperty(pk)){
-                    new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
-                    criteria_cache[pk].replaceWith(new_criteria);
-                    new_criteria.fadeTo(300, 0.5, function() {
-                          new_criteria.fadeTo("fast", 1);
-                    });
-                }else{
-                    new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
-                    if (page_is_loading){
-                        $criteria_div.prepend(new_criteria);
-                    }else{
-                         $criteria_div.append(new_criteria);
-                    }
-                    var addEvent = $.Event("ConceptAddedEvent");
-                    addEvent.concept_id = pk;
-                    $panel.trigger(addEvent);
-                }
-                criteria_cache[pk] =  new_criteria;
-                if (!page_is_loading){
-                    new_criteria.addClass("selected");
-                    new_criteria.siblings().removeClass("selected");
-                }
-                
-                // If the cache used to be empty, show this one in the console.
-                if (was_empty){
-                   $($criteria_div.children()[0]).find(".field-anchor").click();
-                }
-            }, "text");
+
+            // PATCH
+            if (!english){
+                $.ajax({
+                     url:criteria_api_uri,
+                     type:"PATCH",
+                     data:JSON.stringify({add:criteria_constraint}),
+                     contentType:"application/json",
+                     success: function(english){
+                        $run_query.removeAttr("disabled");
+                        var was_empty = $.isEmptyObject(criteria_cache);
+                        // Is this an update?
+                        if (criteria_cache.hasOwnProperty(pk)){
+                            new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
+                            criteria_cache[pk].replaceWith(new_criteria);
+                            new_criteria.fadeTo(300, 0.5, function() {
+                                  new_criteria.fadeTo("fast", 1);
+                            });
+                        }else{
+                            new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
+                            $criteria_div.append(new_criteria);
+                            var addEvent = $.Event("ConceptAddedEvent");
+                            addEvent.concept_id = pk;
+                            $panel.trigger(addEvent);
+                        }
+                        criteria_cache[pk] =  new_criteria;
+                        //new_criteria.addClass("selected");
+                        //new_criteria.siblings().removeClass("selected");
+                        // If the cache used to be empty, show this one in the console.
+                        if (was_empty){
+                           $($criteria_div.children()[0]).find(".field-anchor").click();
+                        }
+                   }
+                });
+            }else{
+               // This is temporary just to get the interface working until further refactoring can be done
+               new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
+               $criteria_div.append(new_criteria);
+               var addEvent = $.Event("ConceptAddedEvent");
+               addEvent.concept_id = pk;
+               $panel.trigger(addEvent);
+               criteria_cache[pk] =  new_criteria;
+               $run_query.removeAttr("disabled");
+            }
         });
 
-
         // Listen for removed criteria
-        $panel.bind("CriteriaRemovedEvent", function(evt){
-            var $target = $(evt.target);
+        App.hub.subscribe("CriteriaRemovedEvent", function($target){
             var constraint = $target.data("constraint");
             criteria_cache[constraint.concept_id].remove();
             delete criteria_cache[constraint.concept_id];
+            
+            // Delete from the session
+            $.ajax({
+                url:criteria_api_uri,
+                type:"PATCH",
+                data: JSON.stringify({remove:constraint}), 
+                contentType: "application/json"
+            });
             
             var removedEvent = $.Event("ConceptDeletedEvent");
             removedEvent.concept_id = constraint.concept_id;
@@ -143,16 +141,10 @@ define(['cilantro/define/criteria'],
         // Highlight the selected criteria to make it clear which one is
         // displayed
         $panel.bind("ShowConceptEvent", function (evt){
-              var $target = $(evt.target);
-              $criteria_div.children(".criterion").removeClass("selected");
-              if  ($target.is(".criterion")){
-                  $target.addClass("selected");
-              }else{
-                  // If the user clicked on the left-hand side, but we have this criteria
-                  // defined, highlight it.
-                  var id = evt.originalEvent.concept_id;
-                  criteria_cache[id] && criteria_cache[id].addClass("selected");
-              }
+             // If the user clicked on the left-hand side, but we have this criteria
+             // defined, highlight it.
+             var id = evt.originalEvent.concept_id;
+             criteria_cache[id] && criteria_cache[id].addClass("selected");
         });
 
         return {

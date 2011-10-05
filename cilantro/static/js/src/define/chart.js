@@ -27,6 +27,8 @@ define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/lib/hig
                      },
                      pie:{
                          dataLabels: {
+                             color: "#000000",
+                             connectorColor:"#000000",
                              enabled: true,
                              formatter: function() {
                                  return this.point.name;
@@ -268,16 +270,17 @@ define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/lib/hig
         },
         render: function(){
             // Add this instance's details
-            this.dom = $('<div class="chart"></div>');
+            this.dom = $('<div style="height:450px;" class="chart"></div>');
             this.options.chart.renderTo = this.dom.get(0);
             var objRef = this;
             this.options.tooltip.formatter = function(){
                 // We use unmap here because name refers potentially cleaned string, ("No", instead of false, etc)
                 return "" + objRef.data_store[objRef.unmap[this.point.name]];
             };
-            this.options.chart.defaultSeriesType = 'pie';
+            this.options.series[0].type = 'pie';
             this.options.series[0].name = this.viewset.data.title;
-            this.options.series[0].data = this.viewset.data.coords;
+            this.options.series[0].data = this.viewset.data.coords; 
+
             this.options.title.text = this.viewset.data.title;
             this.options.plotOptions.series.events.click = $.proxy(this.seriesClick, this);
             this.chart = new Highcharts.Chart(this.options);
@@ -294,7 +297,7 @@ define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/lib/hig
      var BarChart = ChoiceChart.extend({
          render: function(){
              var objRef = this;
-             this.dom = $('<div class="chart"></div>');
+             this.dom = $('<div style="height:450px;" class="chart"></div>');
              this.options.chart.marginBottom = this.viewset.data.coords.length > 6 ? 100 : 50;
              this.options.chart.renderTo =  this.dom.get(0);
              this.options.chart.defaultSeriesType = 'column';
@@ -407,9 +410,11 @@ define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/lib/hig
          },
          render: function(){
              this.range_form.find("input").css("margin","10px");
+             var chart_dom = $('<div style="height:450px;width:500px;"></div>');
              var dom = this.dom = $('<div class="chart"></div>');
+             dom.append(chart_dom);
 
-             this.options.chart.renderTo = dom.get(0);
+             this.options.chart.renderTo = chart_dom.get(0);
              this.options.chart.defaultSeriesType = 'line';
              this.options.chart.zoomType = 'x';
              this.options.title.text = this.viewset.data.title;
