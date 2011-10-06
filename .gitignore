@@ -1,5 +1,17 @@
 .sass-cache
 .DS_Store
 *.pyc
-cilantro/static/js/min/build.txt
+
 cilantro/static/js/src/lib/highcharts.js
+
+# compiled from CoffeeScript
+cilantro/static/js/src/pages
+cilantro/static/js/src/types
+cilantro/static/js/src/common
+
+# RequireJS optimizer may leave this behind
+cilantro/static/js/min/build.txt
+
+# Compiled from SCSS
+cilantro/static/css/*.css
+cilantro/static/css/coriander
