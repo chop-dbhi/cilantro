@@ -23,12 +23,17 @@ define(['cilantro/define/criteria'],
         
         // Load any criteria on the session
         $.getJSON(session_api_uri, function(data){
+              var conditions = {};
+              $.each(data.conditions, function(){
+                   conditions[this.concept_id]=this;
+              });
+              
               if ((data.store === null) || $.isEmptyObject(data.store)){
                   return;
               }
               if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
                   $.each(data.store.children.reverse(), function(index, criteria_constraint){
-                      App.hub.publish("UpdateQueryEvent", criteria_constraint, data.conditions[index]);
+                      App.hub.publish("UpdateQueryEvent", criteria_constraint, conditions[criteria_constraint.concept_id]);
                   });
               }else{
                   App.hub.publish("UpdateQueryEvent", data.store, data.conditions[0]);
@@ -71,12 +76,13 @@ define(['cilantro/define/criteria'],
                 $.ajax({
                      url:criteria_api_uri,
                      type:"PATCH",
-                     data:JSON.stringify({add:criteria_constraint}),
+                     data:criteria_cache.hasOwnProperty(pk)?JSON.stringify({replace:criteria_constraint}):JSON.stringify({add:criteria_constraint}),
                      contentType:"application/json",
                      success: function(english){
                         $run_query.removeAttr("disabled");
                         var was_empty = $.isEmptyObject(criteria_cache);
                         // Is this an update?
+                        debugger;
                         if (criteria_cache.hasOwnProperty(pk)){
                             new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
                             criteria_cache[pk].replaceWith(new_criteria);
