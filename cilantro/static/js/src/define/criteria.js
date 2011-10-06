@@ -3,8 +3,10 @@ define(
         var tmpl = _.template('<div class="condition clearfix"><a href="#" class="remove"></a><%= condition %></div>'); 
         var criteriaList = $('#condition-list');
 
-        criteriaList.bind('activate-criterion', function(evt, id) {
-            //criteriaList.children().removeClass('selected').filter('[data-id='+id+']').addClass('selected');
+        criteriaList.bind('activate-criterion', function(evt, id,element) {
+            criteriaList.children().removeClass('selected');
+            element.addClass("selected");
+
         });
 
         var Criteria = function(criteria_constraint, uri, server_resp){
@@ -17,7 +19,8 @@ define(
             // Display the concept in the main area when the user clicks on the description
             element.click(function (evt) { 
                 element.trigger('activate-criterion',
-                    [criteria_constraint.concept_id]);
+                    [criteria_constraint.concept_id,element]);
+                 
                 return false;
             }); 
 

@@ -94,8 +94,8 @@ define(['cilantro/define/criteria'],
                             App.hub.publish("ConceptAddedEvent", pk); 
                         }
                         criteria_cache[pk] =  new_criteria;
-                        //new_criteria.addClass("selected");
-                        //new_criteria.siblings().removeClass("selected");
+                        new_criteria.addClass("selected");
+                        new_criteria.siblings().removeClass("selected");
                         // If the cache used to be empty, show this one in the console.
                         if (was_empty){
                            $($criteria_div.children()[0]).find(".field-anchor").click();
