@@ -1,4 +1,4 @@
-define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/lib/highcharts'], function(Form, ViewElement) {
+define(['cilantro/define/form', 'cilantro/define/viewelement', 'cilantro/vendor/highcharts'], function(Form, ViewElement) {
     // Base Class for all charts
     var Chart = ViewElement.extend({
         constructor: function(viewset, concept_pk){

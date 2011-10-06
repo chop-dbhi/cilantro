@@ -1,10 +1,13 @@
 
-[submodule "cilantro/static/coffee/common"]
-	path = cilantro/static/coffee/common
+[submodule "modules/backbone-common"]
+	path = modules/backbone-common
 	url = git://github.com/bruth/backbone-common.git
-[submodule "cilantro/static/highcharts"]
-	path = cilantro/static/highcharts
-	url = git://github.com/highslide-software/highcharts.com.git
-[submodule "cilantro/static/scss/coriander"]
-	path = cilantro/static/scss/coriander
+[submodule "modules/coriander"]
+	path = modules/coriander
 	url = git://github.com/cbmi/coriander.git
+[submodule "modules/highcharts"]
+	path = modules/highcharts
+	url = git://github.com/highslide-software/highcharts.com.git
+[submodule "modules/jquery-idle-timeout"]
+	path = modules/jquery-idle-timeout
+	url = git://github.com/ehynds/jquery-idle-timeout.git

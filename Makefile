@@ -17,9 +17,18 @@ COMPILE_SASS = `which sass` \
 COMPILE_COFFEE = `which coffee` -w -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
 REQUIRE_OPTIMIZE = `which node` bin/r.js -o cilantro/static/js/app.build.js
 
-HIGHCHARTS_TAG = 4a32faec62d449a67ff3343f985d62a8d2dfcb74
+LATEST_TAG = `git describe --tags \`git rev-list --tags --max-count=1\``
 
-all: sass coffee highcharts optimize
+all: build-submodules watch
+
+sass:
+	@echo 'Compiling Sass...'
+	@mkdir -p ${CSS_DIR}
+	@${COMPILE_SASS}
+
+coffee:
+	@echo 'Compiling CoffeeScript...'
+	@${COMPILE_COFFEE}
 
 watch: unwatch
 	@echo 'Watching in the background...'
@@ -33,27 +42,42 @@ unwatch:
 		rm ${PID_FILE}; \
 	fi;
 
-sass:
-	@echo 'Compiling Sass...'
-	@mkdir -p ${CSS_DIR}
-	@${COMPILE_SASS}
+init-submodules:
+	@echo 'Initializing submodules...'
+	@if [ -d .git ]; then \
+		if git submodule status | grep -q -E '^-'; then \
+			git submodule update --init --recursive; \
+		else \
+			git submodule update --init --recursive --merge; \
+		fi; \
+	fi;
 
-coffee:
-	@echo 'Compiling CoffeeScript...'
-	@${COMPILE_COFFEE}
+build-submodules: init-submodules coriander backbone-common jquery-idle-timeout highcharts
+
+coriander:
+	@echo 'Setting up submodule coriander...'
+	@rm -rf ${STATIC_DIR}/scss/coriander
+	@cp -r ./modules/coriander ${STATIC_DIR}/scss/coriander
+
+backbone-common:
+	@echo 'Setting up submodule backbone-common...'
+	@rm -rf ${STATIC_DIR}/coffee/common
+	@cp -r ./modules/backbone-common ${STATIC_DIR}/coffee/common
+
+jquery-idle-timeout:
+	@echo 'Setting up submodule jquery-idle-timeout...'
+	@cat ./modules/jquery-idle-timeout/src/*.js > ${JS_SRC_DIR}/vendor/jquery.idle.js
 
 highcharts:
-	@echo 'Updating HighCharts...'
-	@cd ${HIGHCHARTS_SM} && git checkout ${HIGHCHARTS_TAG}
-	@cp ${HIGHCHARTS_SM}/js/highcharts.src.js ${JS_SRC_DIR}/lib/highcharts.js
+	@echo 'Setting up submodule highcharts...'
+	@cp ./modules/highcharts/js/highcharts.src.js ${JS_SRC_DIR}/vendor/highcharts.js
 
 optimize:
-	@echo 'Optimizing...'
+	@echo 'Optimizing the javascript...'
 	@mkdir -p ${JS_MIN_DIR}
 	@${REQUIRE_OPTIMIZE} > /dev/null
 
 clean:
-	@rm -rf ${OPTIMIZED_DIR}
-	@rm -rf ${CSS_DIR}
+	@rm -rf ${JS_MIN_DIR}
 
-.PHONY: all watch unwatch sass coffee optimize clean
+.PHONY: all sass coffee watch unwatch optimize clean

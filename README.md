@@ -9,6 +9,8 @@ Build Dependencies
 
 Fancy Makefile
 --------------
+- Initialize and Watch - ``make [all]`` - initializes and updates all submodules
+and sets each one up according to their Makefile target
 - Compile Sass/SCSS - ``make sass``
 - Compile CoffeeScript - ``make coffee`` (I made a funny)
 - Optimize JavaScript - ``make optimize``
