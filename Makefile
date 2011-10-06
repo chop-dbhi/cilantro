@@ -40,7 +40,7 @@ sass:
 
 coffee:
 	@echo 'Compiling CoffeeScript...'
-	@${COMPILE_COFFEE} > /dev/null
+	@${COMPILE_COFFEE}
 
 highcharts:
 	@echo 'Updating HighCharts...'

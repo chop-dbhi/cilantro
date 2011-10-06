@@ -16,6 +16,8 @@ define [
 
         $ ->
 
+            ReportEditor = new Report.Views.Editor
+
             ReportList = new Report.Views.List
                 collection: reports
 

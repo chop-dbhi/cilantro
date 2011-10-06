@@ -5,6 +5,11 @@ define [
     (polling) ->
 
         class Report extends Backbone.Model
+            url: ->
+                if not /\/$/.test (url = super)
+                    url += '/'
+                return url
+
 
 
         class ReportCollection extends polling.Collection

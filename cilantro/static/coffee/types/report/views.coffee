@@ -10,7 +10,6 @@ define [
                 <input type="text" name="name" placeholder="Name...">
                 <textarea name="description" placeholder="Description..."></textarea>
                 <div class="controls">
-                    <button class="delete">Delete</button>
                     <button class="cancel">Cancel</button>
                     <button class="save">Save</button>
                 </div>
@@ -20,15 +19,15 @@ define [
                 '[name=name]': 'name'
                 '[name=description]': 'description'
                 '.save': 'saveButton'
-                '.delete': 'deleteButton'
                 '.cancel': 'cancelButton'
 
             events:
                 'click .save': 'save'
-                'click .delete': 'delete'
                 'click .cancel': 'cancel'
 
             initialize: ->
+                App.hub.subscribe 'report/edit', @editHandler
+
                 @el.appendTo('body').dialog
                     dialogClass: 'ui-dialog-simple'
                     autoOpen: false
@@ -37,6 +36,12 @@ define [
                     draggable: true
                     position: ['center', 150]
                     width: 500
+
+            editHandler: (model) =>
+                @name.val model.get 'name'
+                @description.val model.get 'description'
+                @activeModel = model
+                @el.dialog 'open'
 
             save: ->
                 @activeModel.set
@@ -50,27 +55,34 @@ define [
                 delete @activeModel
                 @el.dialog('close')
 
-            delete: ->
-                @activeModel.destroy()
-                delete @activeModel
-                @el.dialog('close')
+
+        ReportEditorMixin =
+            edit: (evt, model=@model) ->
+                App.hub.publish 'report/edit', model
+                return false
+
+
 
         class ReportItem extends Backbone.View
-            el: '<div>
-                    <strong role="name"></strong>
+            el: '<section class="report">
+                    <a role="name"></a>
                     <span class="info">- <span role="unique-count"></span> unique patients</span>
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
                     <div role="description"></div>
-                    <div class="controls"><button class="edit">Edit</button> <button class="copy">Copy</button></div>
-                </div>'
+                    <div class="controls">
+                        <button class="delete">Delete</button>
+                        <button class="edit">Edit</button>
+                        <button class="copy">Copy</button>
+                    </div>
+                </section>'
 
             events:
                 'click .time': 'toggleTime'
                 'click .edit': 'edit'
                 'click .copy': 'copy'
+                'click .delete': 'delete'
                 'mouseenter': 'showControls'
                 'mouseleave': 'hideControls'
-                'click': 'toggleDescription'
 
             elements:
                 '[role=name]': 'name'
@@ -82,9 +94,12 @@ define [
 
             render: ->
                 @name.text @model.get 'name'
+                @name.attr 'href', @model.get 'url'
                 @modified.text @model.get 'modified'
                 @timesince.text @model.get 'timesince'
-                @description.text @model.get 'description'
+                if not (description = @model.get 'description')
+                    description = 'No description provided'
+                @description.text description
                 @uniqueCount.text @model.get 'unique_count'
                 @
 
@@ -92,10 +107,6 @@ define [
                 @modified.toggle()
                 @timesince.toggle()
                 evt.stopPropagation()
-
-            toggleDescription: (evt) ->
-                if not evt.isPropagationStopped()
-                    @description.toggle()
 
             showControls: (evt) ->
                 @_controlsTimer = setTimeout =>
@@ -108,24 +119,18 @@ define [
                 @controls.slideUp(300)
                 return false
 
-            showEditor: (model=@model) ->
-                if not model.id then @editor.deleteButton.hide() else @editor.deleteButton.show()
-                @editor.name.val model.get 'name'
-                @editor.description.val model.get 'description'
-                @editor.activeModel = model
-                @editor.el.dialog 'open'
-
-            edit: (evt) ->
-                @showEditor()
-                return false
-
             copy: (evt) ->
                 copy = @model.clone()
                 copy.set('id', null)
                 copy.set 'name', copy.get('name') + ' (copy)'
-                @showEditor copy
-                @editor.name.select()
+                # set a 'hidden' id of the reference
+                copy.set '_id', @model.id
+                # XXX a bit of a hack to get the ``url`` method
+                copy.collection = @model.collection
+                @edit evt, copy
                 return false
+
+            delete: -> @model.destroy()
 
 
         class ReportList extends CollectionViews.View
@@ -136,97 +141,43 @@ define [
             defaultContent: '<div class="info">You have no saved reports.
                 <a id="open-report-help" href="#">Learn more</a>.</div>'
 
-            initialize: ->
-                @editor = new ReportEditor
-                super
-
-            add: (model) ->
-                view = super
-                view.editor = @editor
-                return view
-
-        # include the expandable list functionality..
-        utils.include ReportList, CollectionViews.ExpandableListMixin
-
 
         # view representing primary element for the session's report name
         class ReportName extends Backbone.View
             el: '#report-name'
 
             events:
-                'click span': 'edit'
-                'blur [name=name]': 'show'
-                'keypress [name=name]': 'enter'
+                'click': 'edit'
+                'mouseover': 'hover'
+                'mouseout': 'hover'
 
-            elements:
-                'span': 'name'
-                '[name=name]': 'nameInput'
-
-            initialize: ->
-                @model.bind 'change', @render
+            initialize: (options) ->
+                @model.bind 'change:name', @render
+                @hoverText = $('<span class="info">click to edit</span>')
 
             render: =>
+                @el.text ''
                 if (name = @model.get 'name')
-                    @name.removeClass 'placeholder'
+                    @el.removeClass 'placeholder'
+                    @el.append(@hoverText.hide())
                 else
-                    @name.addClass 'placeholder'
+                    @el.addClass 'placeholder'
                     name = @model.defaults.name
+                    @hoverText.detach()
 
-                @name.text name
+                # add a space between the hover text and the name
+                @el.prepend name + ' '
 
-            edit: =>
-                # temporarily stop polling, so the user's input does not get overriden
-                @model.stopPolling()
+            hover: -> @hoverText.toggle()
 
-                @name.hide()
-                @nameInput.show().select()
-
-            show: (event) =>
-                # ensure it's a non-empty, non-all whitespace value
-                if (name = @nameInput.val()) and not /^\s*$/.test name
-                    @model.set name: name
-                    @render()
-
-                @name.show()
-                @nameInput.hide()
-
-                # resume polling
-                @model.startPolling()
-
-            enter: (event) =>
-                @show() if event.which is 13
-
-        # view representing primary element for the session's report name
-#        class ReportInfo extends Backbone.View
-#            el: '#report-info'
-#
-#            events:
-#                'click p': 'editDescription'
-#                'blur [name=description]': 'showDescription'
-#
-#            elements:
-#                'p': 'description'
-#                '[name=description]': 'descriptionInput'
-#
-#            initialize: ->
-#                if @model.id and @model.get('has_changed') then @el.addClass 'unsaved'
-#
-#            editDescription: =>
-#                @description.hide()
-#                @descriptionInput.show().select()
-#
-#            showDescription: =>
-#                if not @model.get 'description'
-#                    @model.set description: @model.defaults.description
-#                    @description.addClass 'placeholder'
-#                else
-#                    @description.removeClass 'placeholder'
-#
-#                @description.show()
-#                @descriptionInput.hide()
+        # include various mixins into defined classes...
+        utils.include ReportItem, ReportEditorMixin
+        utils.include ReportList, CollectionViews.ExpandableListMixin
+        utils.include ReportName, ReportEditorMixin
 
         return {
             Name: ReportName
             Item: ReportItem
             List: ReportList
+            Editor: ReportEditor
         }
