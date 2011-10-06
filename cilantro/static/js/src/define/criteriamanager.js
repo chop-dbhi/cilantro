@@ -86,9 +86,7 @@ define(['cilantro/define/criteria'],
                         }else{
                             new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
                             $criteria_div.append(new_criteria);
-                            var addEvent = $.Event("ConceptAddedEvent");
-                            addEvent.concept_id = pk;
-                            $panel.trigger(addEvent);
+                            App.hub.publish("ConceptAddedEvent", pk); 
                         }
                         criteria_cache[pk] =  new_criteria;
                         //new_criteria.addClass("selected");
@@ -103,9 +101,7 @@ define(['cilantro/define/criteria'],
                // This is temporary just to get the interface working until further refactoring can be done
                new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
                $criteria_div.append(new_criteria);
-               var addEvent = $.Event("ConceptAddedEvent");
-               addEvent.concept_id = pk;
-               $panel.trigger(addEvent);
+               App.hub.publish("ConceptAddedEvent", pk); 
                criteria_cache[pk] =  new_criteria;
                $run_query.removeAttr("disabled");
             }

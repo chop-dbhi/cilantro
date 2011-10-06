@@ -112,18 +112,16 @@ define(['cilantro/define/view'],
            
            @private
         */
-        function conceptAddedHandler(evt) {
+        function conceptAddedHandler(pk) {
             
-            if ($.inArray(evt.concept_id, concepts_in_query) < 0 ) {
-                concepts_in_query.push(parseInt(evt.concept_id, 10));
+            if ($.inArray(pk, concepts_in_query) < 0 ) {
+                concepts_in_query.push(parseInt(pk, 10));
             
-                if (activeConcept === parseInt(evt.concept_id, 10)) {
+                if (activeConcept === parseInt(pk, 10)) {
                     $addQueryButton.html('<span>Update Condition</span>');
                     $(".success", $staticBox).show();
                 }
             }
-            
-            evt.stopPropagation();
         }
         
         /**
@@ -754,6 +752,8 @@ define(['cilantro/define/view'],
                 $staticBox.find("#add_to_query").removeAttr("disabled");
             }
         }
+
+        App.hub.subscribe("ConceptAddedEvent", conceptAddedHandler);
         // Bind all framework events to their handler
         $container.bind({
             'ViewReadyEvent': viewReadyHandler,
@@ -764,8 +764,7 @@ define(['cilantro/define/view'],
             'InvalidInputEvent' : badInputHandler,
             'InputCorrectedEvent': fixedInputHandler,
             'ConstructQueryEvent': constructQueryHandler,
-            'ConceptDeletedEvent': conceptDeletedHandler,
-            'ConceptAddedEvent': conceptAddedHandler
+            'ConceptDeletedEvent': conceptDeletedHandler
         });
         
         /**
