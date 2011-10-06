@@ -751,7 +751,7 @@ define(['cilantro/define/view'],
             
             // Re-enable the button if there are no more errors.
             if ($.isEmptyObject(cache[activeConcept].invalid_fields)){
-                $staticBox.find("#add_to_query").attr("disabled","");
+                $staticBox.find("#add_to_query").removeAttr("disabled");
             }
         }
         // Bind all framework events to their handler
