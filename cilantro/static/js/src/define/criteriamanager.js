@@ -82,7 +82,6 @@ define(['cilantro/define/criteria'],
                         $run_query.removeAttr("disabled");
                         var was_empty = $.isEmptyObject(criteria_cache);
                         // Is this an update?
-                        debugger;
                         if (criteria_cache.hasOwnProperty(pk)){
                             new_criteria = criteria.Criteria(criteria_constraint, criteria_api_uri, english);
                             criteria_cache[pk].replaceWith(new_criteria);
