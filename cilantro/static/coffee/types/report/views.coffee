@@ -138,8 +138,8 @@ define [
 
             viewClass: ReportItem
 
-            defaultContent: '<div class="info">You have no saved reports.
-                <a id="open-report-help" href="#">Learn more</a>.</div>'
+            defaultContent: '<section class="info">You have no saved reports.
+                <a id="open-report-help" href="#">Learn more</a>.</section>'
 
 
         # view representing primary element for the session's report name
