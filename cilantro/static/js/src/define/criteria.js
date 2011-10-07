@@ -6,7 +6,7 @@ define(
         criteriaList.bind('activate-criterion', function(evt, id,element) {
             criteriaList.children().removeClass('selected');
             element.addClass("selected");
-
+            App.hub.publish("concept/active", id);
         });
 
         var Criteria = function(criteria_constraint, uri, server_resp){

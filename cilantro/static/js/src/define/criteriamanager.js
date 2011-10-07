@@ -141,11 +141,10 @@ define(['cilantro/define/criteria'],
         // Listen to see if the user clicks on any of the criteria.
         // Highlight the selected criteria to make it clear which one is
         // displayed
-        $panel.bind("ShowConceptEvent", function (evt){
+        App.hub.subscribe("concept/active", function (model){
              // If the user clicked on the left-hand side, but we have this criteria
              // defined, highlight it.
-             var id = evt.originalEvent.concept_id;
-             criteria_cache[id] && criteria_cache[id].addClass("selected");
+             criteria_cache[model.id] && criteria_cache[model.id].addClass("selected");
         });
 
         return {
