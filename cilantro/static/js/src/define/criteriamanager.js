@@ -126,9 +126,7 @@ define(['cilantro/define/criteria'],
                 contentType: "application/json"
             });
             
-            var removedEvent = $.Event("ConceptDeletedEvent");
-            removedEvent.concept_id = constraint.concept_id;
-            $panel.trigger(removedEvent);
+            App.hub.publish("ConceptDeletedEvent", constraint.concept_id);
             
             // If this is the last criteria, remove "run query" button
             // and add back "No Criteria" indicator

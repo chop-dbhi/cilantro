@@ -129,12 +129,12 @@ define(['cilantro/define/view'],
            
            @private
         */
-        function conceptDeletedHandler(evt){
-            var index = $.inArray(parseInt(evt.concept_id, 10), concepts_in_query);
+        function conceptDeletedHandler(concept_id){
+            var index = $.inArray(parseInt(concept_id, 10), concepts_in_query);
 
             if (index >= 0 ){
                 concepts_in_query.splice(index,1);
-                if (activeConcept === parseInt(evt.concept_id, 10)){
+                if (activeConcept === parseInt(concept_id, 10)){
                     $addQueryButton.html('<span class="icon plus"/> <span>Add Condition</span>');
                       $(".success", $staticBox).hide();
                 }
@@ -754,6 +754,7 @@ define(['cilantro/define/view'],
         }
 
         App.hub.subscribe("ConceptAddedEvent", conceptAddedHandler);
+        App.hub.subscribe("ConceptDeletedEvent", conceptDeletedHandler); 
         // Bind all framework events to their handler
         $container.bind({
             'ViewReadyEvent': viewReadyHandler,
@@ -764,9 +765,9 @@ define(['cilantro/define/view'],
             'InvalidInputEvent' : badInputHandler,
             'InputCorrectedEvent': fixedInputHandler,
             'ConstructQueryEvent': constructQueryHandler,
-            'ConceptDeletedEvent': conceptDeletedHandler
         });
         
+         
         /**
           This function loads dependencies for the concept and for the any views.
           A callback does not have to be specified if the view is custom because
