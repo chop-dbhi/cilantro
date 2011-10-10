@@ -32,7 +32,7 @@ define(['cilantro/define/criteria'],
                   return;
               }
               if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
-                  $.each(data.store.children.reverse(), function(index, criteria_constraint){
+                  $.each(data.store.children, function(index, criteria_constraint){
                       App.hub.publish("UpdateQueryEvent", criteria_constraint, conditions[criteria_constraint.concept_id]);
                   });
               }else{

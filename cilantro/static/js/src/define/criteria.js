@@ -1,12 +1,14 @@
-define(
-    function() {
+define(['cilantro/define/conceptmanager'], 
+    function(ConceptManager) {
         var tmpl = _.template('<div class="condition clearfix"><a href="#" class="remove"></a><%= condition %></div>'); 
         var criteriaList = $('#condition-list');
 
         criteriaList.bind('activate-criterion', function(evt, id,element) {
             criteriaList.children().removeClass('selected');
             element.addClass("selected");
-            App.hub.publish("concept/active", id);
+            $.get(App.urls.criteria+id, function(data){
+                ConceptManager.show(data.viewset,element.data("constraint"));
+            });
         });
 
         var Criteria = function(criteria_constraint, uri, server_resp){
