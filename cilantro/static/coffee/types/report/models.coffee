@@ -11,7 +11,6 @@ define [
                 return url
 
 
-
         class ReportCollection extends polling.Collection
             url: App.urls.reports
             model: Report
@@ -23,15 +22,6 @@ define [
             defaults:
                 name: 'click to add a name...'
                 description: 'click to add a description...'
-
-            initialize: ->
-                # prevent the initial change event (when fetched), triggers a save
-                # to occur. thus we bind it after the initial fetch
-                @bind 'change', ->
-                    @unbind 'change'
-                    @bind 'change', @save
-
-                super
 
 
         return {

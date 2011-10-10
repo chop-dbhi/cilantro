@@ -13,13 +13,19 @@ define [
 
             initialize: ->
                 @model.bind 'change:conditions', @render
+                @defaultContent = @$(@defaultContent)
+                @el.append(@defaultContent)
 
             render: =>
                 conditions = @model.get 'conditions'
                 if conditions
+                    @defaultContent.detach()
                     text = ''
                     _.map(conditions, (node) -> text += "<li>#{node.condition}</li>")
                     @el.html text
+                else
+                    @el.append(@defaultContent)
+
                 @collapse()
 
 
@@ -30,14 +36,20 @@ define [
 
             initialize: ->
                 @model.bind 'change:header', @render
+                @defaultContent = @$(@defaultContent)
+                @el.append(@defaultContent)
 
             template: _.template '<li><%= name %><% if (direction) { %>
                 <span class="info">(<%= direction %>)</span><% } %></li>'
 
             render: =>
+                @defaultContent.detach()
                 @el.empty()
-                for col in @model.get 'header'
-                    @el.append @template col
+                if (header = @model.get 'header')
+                    for col in header
+                        @el.append @template col
+                else
+                    @el.append(@defaultContent)
                 @collapse()
 
 
