@@ -144,6 +144,7 @@ define(['cilantro/define/criteria'],
         App.hub.subscribe("concept/active", function (model){
              // If the user clicked on the left-hand side, but we have this criteria
              // defined, highlight it.
+             criteria_cache[model.id] && criteria_cache[model.id].siblings().removeClass("selected");
              criteria_cache[model.id] && criteria_cache[model.id].addClass("selected");
         });
 
