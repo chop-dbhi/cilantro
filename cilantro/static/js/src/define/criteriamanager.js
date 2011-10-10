@@ -9,7 +9,7 @@ define(['cilantro/define/criteria'],
         
         var $criteria_div = $panel.find("#condition-list"),
             $run_query_div = $panel.find(".content"),
-            $remove_criteria = $panel.find("#remove-criteria");
+            $remove_criteria = $panel.find("#clear-conditions");
         
         var criteria_api_uri = App.urls.session.scope;
         var report_url = App.urls.report;

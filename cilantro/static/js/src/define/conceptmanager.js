@@ -139,8 +139,6 @@ define(['cilantro/define/view'],
                       $(".success", $staticBox).hide();
                 }
             }
-
-            evt.stopPropagation();
         }
 
         /**
