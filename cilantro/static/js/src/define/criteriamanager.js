@@ -21,24 +21,7 @@ define(['cilantro/define/criteria'],
         // Create the run query button
         var $run_query = $(template);
         
-        // Load any criteria on the session
-        $.getJSON(session_api_uri, function(data){
-              var conditions = {};
-              $.each(data.conditions, function(){
-                   conditions[this.concept_id]=this;
-              });
-              
-              if ((data.store === null) || $.isEmptyObject(data.store)){
-                  return;
-              }
-              if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
-                  $.each(data.store.children, function(index, criteria_constraint){
-                      App.hub.publish("UpdateQueryEvent", criteria_constraint, conditions[criteria_constraint.concept_id]);
-                  });
-              }else{
-                  App.hub.publish("UpdateQueryEvent", data.store, data.conditions[0]);
-              }
-        });
+
 
         // Setup click event handlers
         // run the query
@@ -144,6 +127,27 @@ define(['cilantro/define/criteria'],
              // defined, highlight it.
              criteria_cache[model.id] && criteria_cache[model.id].siblings().removeClass("selected");
              criteria_cache[model.id] && criteria_cache[model.id].addClass("selected");
+        });
+
+        // Load any criteria on the session
+        $.getJSON(session_api_uri, function(data){
+              var conditions = {};
+              $.each(data.conditions, function(){
+                   conditions[this.concept_id]=this;
+              });
+              
+              if ((data.store === null) || $.isEmptyObject(data.store)){
+                  return;
+              }
+              if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
+                  $.each(data.store.children, function(index, criteria_constraint){
+                      App.hub.publish("UpdateQueryEvent", criteria_constraint, conditions[criteria_constraint.concept_id]);
+                  });
+              }else{
+                  App.hub.publish("UpdateQueryEvent", data.store, data.conditions[0]);
+              }       
+              // Show the last condition
+              $criteria_div.children().last().click();
         });
 
         return {
