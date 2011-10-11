@@ -94,7 +94,7 @@ define [
 
             render: ->
                 @name.text @model.get 'name'
-                @name.attr 'href', @model.get 'url'
+                @name.attr 'href', @model.get 'report_url'
                 @modified.text @model.get 'modified'
                 @timesince.text @model.get 'timesince'
                 if not (description = @model.get 'description')

@@ -18,14 +18,14 @@ define [
 
             render: =>
                 conditions = @model.get 'conditions'
+                @defaultContent.detach()
+                @el.empty()
                 if conditions
-                    @defaultContent.detach()
                     text = ''
                     _.map(conditions, (node) -> text += "<li>#{node.condition}</li>")
                     @el.html text
                 else
                     @el.append(@defaultContent)
-
                 @collapse()
 
 
@@ -61,6 +61,7 @@ define [
             el: '#session-report'
 
             elements:
+                '[role=name]': 'name'
                 '[role=modified]': 'modified'
                 '[role=timesince]': 'timesince'
 
@@ -78,6 +79,12 @@ define [
                 @model.bind 'change:has_changed', @hasChanged
 
             render: =>
+                if (name = @model.get 'name')
+                    @name.text(name).attr('href', @model.get('report_url')).show()
+                    if @model.get 'has_changed'
+                        @name.after(' <span class="info">modified</span>')
+                else
+                    @name.hide()
                 @modified.text @model.get('modified')
                 @timesince.text @model.get('timesince')
 
