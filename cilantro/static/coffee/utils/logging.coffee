@@ -47,12 +47,17 @@ define ['cilantro/vendor/backbone'], ->
             App.hub.subscribe 'log', @log
             App.hub.subscribe 'dismiss', @dismiss
 
+            @modelViews = {}
+
         log: (view) =>
             # TODO add logic for handling higher priority messages..
 
-            if not view instanceof Backbone.View
+            if not (view instanceof Backbone.View)
+                model = view
                 view = new MessageView
-                    model: view
+                    model: model
+
+                @modelViews[model] = view
 
             @el.append view.el.hide()
             view.show()
@@ -65,8 +70,13 @@ define ['cilantro/vendor/backbone'], ->
                 , view.timeout
 
         dismiss: (view) =>
-            clearTimeout @_messageTimer
-            view.hide()
+            if not (view instanceof Backbone.View)
+                model = view
+                view = @modelViews[model]
+                delete @modelViews[model]
+            if view
+                clearTimeout @_messageTimer
+                view.hide()
 
 
     return {
