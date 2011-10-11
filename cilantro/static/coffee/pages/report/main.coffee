@@ -9,6 +9,12 @@ require [
 
         sessionReport = new Report.Models.Session
 
+        App.hub.subscribe 'session/idle', ->
+            sessionReport.stopPolling()
+
+        App.hub.subscribe 'session/resume', ->
+            sessionReport.startPolling()
+
         $ ->
             ReportEditor = new Report.Views.Editor
 

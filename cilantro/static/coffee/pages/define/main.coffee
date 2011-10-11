@@ -15,9 +15,10 @@ require [
         domains = new Domain.Models.Collection
         concepts = new Concept.Models.Collection
         sessionReport = new Report.Models.Session
+
         conditions =  
-            bind:->
-            fetch:->
+            bind: ->
+            fetch: ->
 
         #conditions = new Condition.Collection
 
@@ -26,6 +27,12 @@ require [
         App.pending = 2
         App.session = {}
         App.ready -> domains.at(0).activate()
+
+        App.hub.subscribe 'session/idle', ->
+            sessionReport.stopPolling()
+
+        App.hub.subscribe 'session/resume', ->
+            sessionReport.startPolling()
 
         $ ->
 

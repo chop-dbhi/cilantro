@@ -5,6 +5,7 @@ define [
         'cilantro/lib/jquery.block'
         'cilantro/lib/jquery.jqote2'
         'cilantro/lib/jquery.scrollto'
+        'cilantro/vendor/jquery.idle'
         'cilantro/vendor/underscore'
         'cilantro/vendor/backbone'
         'cilantro/vendor/pubsub'
@@ -40,3 +41,13 @@ define [
         # post-init App setup
         App.Log = new Logging.Log
         App.LogView = new Logging.LogView
+
+        # basic client-side session timer
+        $.idleTimer 10 * 1000
+
+        $(document).bind
+            'idle.idleTimer': ->
+                App.hub.publish 'session/idle'
+
+            'active.idleTimer': ->
+                App.hub.publish 'session/resume'
