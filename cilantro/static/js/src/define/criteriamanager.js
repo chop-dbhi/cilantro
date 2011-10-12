@@ -26,7 +26,7 @@ define(['cilantro/define/criteria'],
         // Setup click event handlers
         // run the query
         $run_query.click(function(){
-                window.location="/report";
+                window.location = App.urls.report;
         });
         
         // Hook into the remove all criteria link
