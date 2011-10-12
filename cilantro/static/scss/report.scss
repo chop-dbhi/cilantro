@@ -46,17 +46,36 @@
 }
 
 #stats {
-    width: 150px;
+    @include inline-block;
+    text-align: left;
+    max-width: 400px;
     padding: 0;
     margin-left: 0;
     list-style: none;
     margin-right: 10px;
+
+    .stat {
+        @include inline-block;
+        @include box-shadow(0 2px 3px #ccc, inset 0 2px 3px #fff);
+        @include border-radius(3px);
+        min-width: 50px;
+        border: 1px solid #aaa;
+        margin-right: 5px;
+        padding: 5px;
+        text-align: center;
+        span {
+            font-size: 22px;
+            font-weight: 500;
+        }
+    }
 }
 
 #details {
-    width: 440px;
+    @include inline-block;
+    vertical-align: top;
+    max-width: 400px;
     padding: 0;
-    margin-left: 0;
+    margin: 0;
     list-style: none;
     margin-right: 10px;
 }
