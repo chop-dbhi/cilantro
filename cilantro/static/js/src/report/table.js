@@ -104,11 +104,17 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                             report.unblock();
                         },
                         success: function(json) {
-                            if (json.unique !== undefined)
+                            if (json.unique !== null) {
+                                if (json.unique.toString() !== unique.text())
+                                    unique.parent().effect('highlight', 1000);
                                 unique.text(json.unique);
+                            }
 
-                            if (json.count !== undefined)
+                            if (json.count !== null) {
+                                if (json.count.toString() !== count.text())
+                                    count.parent().effect('highlight', 1000);
                                 count.text(json.count);
+                            }
                             
                             if (json.count === 0) {
                                 $('.content').html(EMPTY_RESULTS).css('text-align', 'center');
@@ -169,14 +175,11 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                     return;
 
                 half = (nInnerWidth - rInnerWidth) / 2.0;
-
-                /*
                 nLeft = parseInt(content.css('margin-left').match(/-?\d+/)[0]) - half;
 
                 content.animate({
-                    marginLeft: nLeft
+                    left: nLeft
                 });
-                */
 
                 report.animate({
                     width: nInnerWidth
