@@ -23,8 +23,8 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                 tbody = table.find('tbody'),            // data loading
                 per_page = $('.per-page'),              // data loading
                 pages = $('.page-links'),               // data loading
-                unique = $('#unique-count'),            // data loading
-                count = $('#count');                    // data loading
+                unique = $('#report-unique'),            // data loading
+                count = $('#report-count');                    // data loading
 
             /*
              * The renderers necessary for rendering the response data into HTML
@@ -69,14 +69,14 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                     ajax: {
                         url: App.urls.session.scope,
                         success: function(json) {
-                            if (json.text) { 
+                            if (json.conditions) { 
                                 var t = '';
-                                if (typeof json.text === 'string') {
+                                if (typeof json.conditions === 'string') {
                                     t = '<li>' + json.text + '</li>';
                                 } else {
-                                    var conditions = json.text.conditions;
+                                    var conditions = json.conditions;
                                     for (var i=0; i < conditions.length; i++)
-                                        t += '<li>' + conditions[i] + '</li>';
+                                        t += '<li>' + conditions[i].condition + '</li>';
                                 }
                                 details.html(t);
                             }
@@ -88,7 +88,6 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                     ajax: {
                         url: App.urls.session.perspective,
                         success: function(json) {
-    //                        rnd.table_header.target.html('<th><input type="checkbox"></th>');
                             rnd.table_header.render(json.header);
                         }
                     }
@@ -106,10 +105,10 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                         },
                         success: function(json) {
                             if (json.unique !== undefined)
-                                unique.html(json.unique);
+                                unique.text(json.unique);
 
                             if (json.count !== undefined)
-                                count.html(json.count);
+                                count.text(json.count);
                             
                             if (json.count === 0) {
                                 $('.content').html(EMPTY_RESULTS).css('text-align', 'center');
@@ -171,11 +170,13 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
                 half = (nInnerWidth - rInnerWidth) / 2.0;
 
+                /*
                 nLeft = parseInt(content.css('margin-left').match(/-?\d+/)[0]) - half;
 
                 content.animate({
                     marginLeft: nLeft
                 });
+                */
 
                 report.animate({
                     width: nInnerWidth
@@ -193,16 +194,19 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
              /*
              * Define primary event that handles fetching data.
              */
-            body.bind('update.report', function(evt, data) {
-                var params = {data: data};
-                src.table_rows.get(params, true);
+            body.bind('update.report', function(evt, params) {
+                if (params)
+                    params.data = 1
+                var data = {data: params};
+                src.table_rows.get(data, true);
                 return false;
             });
 
             body.bind('update.perspective', function(evt, params) {
-                $.putJSON(App.urls.session.perspective, JSON.stringify(params), function() {
+                params = {'replace': params}
+                $.patchJSON(App.urls.session.perspective, JSON.stringify(params), function() {
                     body.trigger('update.report');
-                    if ('columns' in params)
+                    if ('columns' in params.replace)
                         src.table_header.get(null, true); 
                 });
                 return false;
@@ -214,7 +218,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
              */
             report.delegate('.per-page', 'change', function(evt) {
                 if (this.value)
-                    body.trigger('update.report', {'n': this.value});
+                    body.trigger('update.report', {'size': this.value});
                 return false;
             });
 
@@ -249,7 +253,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
              * Hook up the elements that change the page.
              */
             pages.delegate('a', 'click', function(evt) {
-                body.trigger('update.report', {'p': this.hash.substr(1)});
+                body.trigger('update.report', {'page': this.hash.substr(1)});
                 return false;
             });
         };

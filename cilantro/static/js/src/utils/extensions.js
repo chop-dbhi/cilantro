@@ -53,6 +53,17 @@ if (!Array.prototype.map) {
                 dataType: type
             });
         },
+
+        patchJSON: function(url, data, callback, type) {
+            return $.ajax({
+                type: 'PATCH',
+                url: url,
+                contentType: 'application/json',
+                data: data,
+                success: callback,
+                dataType: type
+            });
+        },
         
         log: function(msg) {
             /*
