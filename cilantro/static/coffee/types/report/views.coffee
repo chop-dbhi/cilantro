@@ -48,6 +48,8 @@ define [
                     name: @name.val()
                     description: @description.val()
                 @activeModel.save()
+                if @activeModel.isNew()
+                    @activeModel.collection.add @activeModel
                 delete @activeModel
                 @el.dialog('close')
 
