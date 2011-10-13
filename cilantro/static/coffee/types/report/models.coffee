@@ -14,6 +14,8 @@ define [
         class ReportCollection extends polling.Collection
             url: App.urls.reports
             model: Report
+            comparator: (model) ->
+                return -Number(new Date model.get 'modified')
 
 
         class SessionReport extends polling.Model
