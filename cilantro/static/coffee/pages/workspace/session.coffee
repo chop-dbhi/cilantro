@@ -79,12 +79,11 @@ define [
                 @model.bind 'change:has_changed', @hasChanged
 
             render: =>
-                if (name = @model.get 'name')
-                    @name.text(name).attr('href', @model.get('report_url')).show()
-                    if @model.get 'has_changed'
-                        @name.after(' <span class="info">modified</span>')
-                else
-                    @name.hide()
+                if @model.hasChanged 'name'
+                    @name.text(@model.get 'name').attr('href', @model.get('report_url')).parent().show()
+                else if not @model.get 'name'
+                    @name.parent().hide()
+
                 @modified.text @model.get('modified')
                 @timesince.text @model.get('timesince')
 
