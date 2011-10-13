@@ -31,8 +31,8 @@
   var _ = root._;
   if (!_ && (typeof require !== 'undefined')) _ = require('underscore')._;
 
-  // For Backbone's purposes, jQuery or Zepto owns the `$` variable.
-  var $ = root.jQuery || root.Zepto;
+  // For Backbone's purposes, jQuery, Zepto, or Ender owns the `$` variable.
+  var $ = root.jQuery || root.Zepto || root.ender;
 
   // Runs Backbone.js in *noConflict* mode, returning the `Backbone` variable
   // to its previous owner. Returns a reference to this Backbone object.
@@ -191,9 +191,9 @@
     // Set a hash of model attributes on the object, firing `"change"` unless you
     // choose to silence it.
     set : function(attrs, value, options) {
-      this._resolveArgs(arguments);
-      attrs = arguments[0];
-      options = arguments[2];
+      var args = this._resolveArgs(arguments);
+      attrs = args[0];
+      options = args[1];
 
       if (!attrs) return this;
       if (attrs.attributes) attrs = attrs.attributes;
@@ -293,9 +293,9 @@
     // If the server returns an attributes hash that differs, the model's
     // state will be `set` again.
     save : function(attrs, value, options) {
-      this._resolveArgs(arguments);
-      attrs = arguments[0];
-      options = arguments[2];
+      var args = this._resolveArgs(arguments);
+      attrs = args[0];
+      options = args[1];
 
       if (!attrs && !this.set(attrs, options)) return false;
       var model = this;
@@ -415,15 +415,15 @@
     // such as ``set`` and ``save``
     _resolveArgs : function(args) {
       // Determine what `attr` is. Support for two most practical types
-      if (_.isString(args[0]) || _.isNumber(args[0])) {
-        var attr = args[0]
+      var attr = args[0];
+      if (_.isString(attr) || _.isNumber(attr)) {
         // Create object with single key/value pair
         args[0] = {};
         args[0][attr] = args[1];
-      } else {
-        args[2] = args[1];
+        args[1] = args[2];
       }
-      args[2]|| (args[2] = {});
+      args[1] || (args[1] = {});
+      return args;
     }
 
   });
@@ -530,6 +530,47 @@
       return this;
     },
 
+    // When you have an existing set of models in a collection,
+    // you can do in-place updates of these models, reusing existing instances.
+    // - Items are matched against existing items in the collection by id
+    // - New items are added
+    // - matching models are updated using set(), triggers 'change'.
+    // - existing models not present in the update are removed if 'removeMissing' is passed.
+    // - a collection change event will be dispatched for each add() and remove()
+    update : function(models, options) {
+      models  || (models = []);
+      options || (options = {});
+
+      //keep track of the models we've updated, cause we're gunna delete the rest if 'removeMissing' is set.
+      var updateMap = this.reduce(function(map, model){ map[model.id] = false; return map },{});
+
+      _.each( models, function(model) {
+
+        var idAttribute = this.model.prototype.idAttribute;
+        var modelId = model[idAttribute];
+
+        if ( modelId == undefined ) throw new Error("Can't update a model with no id attribute. Please use 'reset'.");
+
+        if ( this._byId[modelId] ) {
+          var attrs = (model instanceof Backbone.Model) ? _.clone(model.attributes) : _.clone(model);
+          delete attrs[idAttribute];
+          this._byId[modelId].set( attrs );
+          updateMap[modelId] = true;
+        }
+        else {
+          this.add( model );
+        }
+      }, this);
+
+      if ( options.removeMissing ) {
+        _.select(updateMap, function(updated, modelId){
+          if (!updated) this.remove( modelId );
+        }, this);
+      }
+
+      return this;
+    },
+
     // Fetch the default set of models for this collection, resetting the
     // collection when they arrive. If `add: true` is passed, appends the
     // models to the collection instead of resetting.
@@ -538,7 +579,7 @@
       var collection = this;
       var success = options.success;
       options.success = function(resp, status, xhr) {
-        collection[options.add ? 'add' : 'reset'](collection.parse(resp, xhr), options);
+        collection[options.update ? 'update' : options.add ? 'add' : 'reset'](collection.parse(resp, xhr), options);
         if (success) success(collection, resp);
       };
       options.error = wrapError(options.error, collection, options);
@@ -781,12 +822,13 @@
           fragment = window.location.pathname;
           var search = window.location.search;
           if (search) fragment += search;
-          if (fragment.indexOf(this.options.root) == 0) fragment = fragment.substr(this.options.root.length);
         } else {
           fragment = window.location.hash;
         }
       }
-      return decodeURIComponent(fragment.replace(hashStrip, ''));
+      fragment = decodeURIComponent(fragment.replace(hashStrip, ''));
+      if (!fragment.indexOf(this.options.root)) fragment = fragment.substr(this.options.root.length);
+      return fragment;
     },
 
     // Start the hash change handling, returning `true` if the current URL matches
@@ -957,7 +999,7 @@
       return el;
     },
 
-    // Set callbacks, where `this.callbacks` is a hash of
+    // Set callbacks, where `this.events` is a hash of
     //
     // *{"event selector": "callback"}*
     //
@@ -974,7 +1016,7 @@
     delegateEvents : function(events) {
       if (!(events || (events = this.events))) return;
       if (_.isFunction(events)) events = events.call(this);
-      var el = $(this.el).unbind('.delegateEvents' + this.cid);
+      this.undelegateEvents();
       for (var key in events) {
         var method = this[events[key]];
         if (!method) throw new Error('Event "' + events[key] + '" does not exist');
@@ -983,11 +1025,16 @@
         method = _.bind(method, this);
         eventName += '.delegateEvents' + this.cid;
         if (selector === '') {
-          el.bind(eventName, method);
+          $(this.el).bind(eventName, method);
         } else {
-          el.delegate(selector, eventName, method);
+          $(this.el).delegate(selector, eventName, method);
         }
       }
+    },
+
+    // Clears all callbacks previously bound to the view with `delegateEvents`.
+    undelegateEvents: function() {
+      $(this.el).unbind('.delegateEvents' + this.cid);
     },
 
     // Iterates over each key (a selector) which creates an element within the
@@ -1021,7 +1068,7 @@
     // Ensure that the View has a DOM element to render into.
     // If `this.el` is a string, pass it through `$()`, take the first
     // matching element, and re-assign it to `el`. Otherwise, create
-    // an element from the `id`, `className` and `tagName` proeprties.
+    // an element from the `id`, `className` and `tagName` properties.
     _ensureElement : function() {
       if (!this.el) {
         var attrs = this.attributes || {};
@@ -1060,7 +1107,7 @@
 
   // Override this function to change the manner in which Backbone persists
   // models to the server. You will be passed the type of request, and the
-  // model in question. By default, uses makes a RESTful Ajax request
+  // model in question. By default, makes a RESTful Ajax request
   // to the model's `url()`. Some possible customizations could be:
   //
   // * Use `setTimeout` to batch rapid-fire updates into a single request.
