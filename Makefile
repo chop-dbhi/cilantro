@@ -2,7 +2,7 @@ STATIC_DIR = cilantro/static
 COFFEE_DIR = ${STATIC_DIR}/coffee
 JS_SRC_DIR = ${STATIC_DIR}/js/src
 JS_MIN_DIR = ${STATIC_DIR}/js/min
-PID_FILE = /tmp/cilantro-watch
+PID_FILE = .watch-pid
 
 HIGHCHARTS_SM = ${STATIC_DIR}/highcharts
 
@@ -12,19 +12,22 @@ CSS_DIR = ${STATIC_DIR}/css
 COMPILE_SASS = `which sass` \
 			   --scss \
 			   --style=compressed \
-			   --watch ${SASS_DIR}:${CSS_DIR} \
-			   -r ${STATIC_DIR}/scss/coriander/bourbon/lib/bourbon.rb
-COMPILE_COFFEE = `which coffee` -w -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
+			   -r ${STATIC_DIR}/scss/coriander/bourbon/lib/bourbon.rb \
+			   ${SASS_DIR}:${CSS_DIR}
+COMPILE_COFFEE = `which coffee` -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
+WATCH_COFFEE = `which coffee` -w -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
 REQUIRE_OPTIMIZE = `which node` bin/r.js -o cilantro/static/js/app.build.js
 
 LATEST_TAG = `git describe --tags \`git rev-list --tags --max-count=1\``
 
 all: build-submodules watch
 
+build: build-submodules sass coffee optimize
+
 sass:
 	@echo 'Compiling Sass...'
 	@mkdir -p ${CSS_DIR}
-	@${COMPILE_SASS}
+	@${COMPILE_SASS} --update
 
 coffee:
 	@echo 'Compiling CoffeeScript...'
@@ -32,8 +35,8 @@ coffee:
 
 watch: unwatch
 	@echo 'Watching in the background...'
-	@${COMPILE_COFFEE} &> /dev/null & echo $$! > ${PID_FILE}
-	@${COMPILE_SASS} &> /dev/null & echo $$! >> ${PID_FILE}
+	@${WATCH_COFFEE} &> /dev/null & echo $$! > ${PID_FILE}
+	@${COMPILE_SASS} --watch &> /dev/null & echo $$! >> ${PID_FILE}
 
 unwatch:
 	@if [ -f ${PID_FILE} ]; then \
