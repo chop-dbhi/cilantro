@@ -57,7 +57,7 @@ for dirpath, dirnames, filenames in os.walk(BASE_PACKAGE):
     for i, dirname in enumerate(dirnames):
         if dirname.startswith('.'):
             del dirnames[i]
-        elif dirname in ('tests', 'fixtures', 'scss', 'cs'):
+        elif dirname in ('tests', 'scss', 'coffee'):
             del dirnames[i]
     if '__init__.py' in filenames:
         packages.append('.'.join(fullsplit(dirpath)))

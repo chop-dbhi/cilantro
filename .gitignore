@@ -2,6 +2,8 @@
 .sass-cache
 .DS_Store
 *.pyc
+dist
+MANIFEST
 
 cilantro/static/js/src/lib/highcharts.js
 

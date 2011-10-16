@@ -1,14 +1,18 @@
-VERSION = (2, 1, 5, 'final')
+__version_info__ = {
+    'major': 0,
+    'minor': 9,
+    'micro': 0,
+    'releaselevel': 'beta',
+    'serial': 1
+}
 
-def get_version():
-    version = '%s.%s' % VERSION[:2]
-    if version[2]:
-        version = '%s.%s' % (version, VERSION[2])
+def get_version(short=False):
+    assert __version_info__['releaselevel'] in ('alpha', 'beta', 'final')
+    vers = ["%(major)i.%(minor)i" % __version_info__, ]
+    if __version_info__['micro']:
+        vers.append(".%(micro)i" % __version_info__)
+    if __version_info__['releaselevel'] != 'final' and not short:
+        vers.append('%s%i' % (__version_info__['releaselevel'][0], __version_info__['serial']))
+    return ''.join(vers)
 
-    if len(VERSION) > 3:
-        if VERSION[3:] == ('alpha', 0):
-            version = '%spre-alpha' % version
-        else:
-            if VERSION[3] != 'final':
-                version = '%s%s%s' % (version, VERSION[3], VERSION[4])
-    return version
+__version__ = get_version()
