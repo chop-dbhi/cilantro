@@ -20,7 +20,8 @@
     // to the correct file system location.
     paths: {
         'cilantro': '.',
-        'common': './common'
+        'common': './common',
+        'vendor': './vendor'
     },
     
     // an array of modules to compile
