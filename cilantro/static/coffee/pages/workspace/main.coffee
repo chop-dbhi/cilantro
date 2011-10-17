@@ -41,6 +41,9 @@ define [
             SessionReport = new Views.Report
                 model: sessionReport
 
+            UnsavedReport = new Report.Messages.UnsavedReport
+                model: sessionReport
+
             reports.fetch()
             sessionReport.fetch()
             sessionScope.fetch()

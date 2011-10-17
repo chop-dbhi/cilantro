@@ -1,10 +1,8 @@
 define [
         'common/views/collection'
-        'cilantro/utils/logging'
-        'cilantro/types/report/main'
     ],
 
-    (CollectionViews, Logging, Report) ->
+    (CollectionViews) ->
 
         class ScopeView extends CollectionViews.ExpandableList
             el: '#session-scope'
@@ -53,10 +51,6 @@ define [
                 @collapse()
 
 
-        class UnsavedReport extends Logging.MessageView
-            template: _.template Report.Messages.UnsavedReportTemplate
-
-
         class ReportView extends Backbone.View
             el: '#session-report'
 
@@ -69,14 +63,7 @@ define [
                 'click .timestamp': 'toggleTime'
 
             initialize: ->
-                @message = new UnsavedReport(model: @model).render()
-
                 @model.bind 'change', @render
-
-                @model.bind 'change:name', (model, value) =>
-                    @message.el.find('[role=name]').text(value)
-
-                @model.bind 'change:has_changed', @hasChanged
 
             render: =>
                 if @model.hasChanged 'name'
@@ -87,16 +74,9 @@ define [
                 @modified.text @model.get('modified')
                 @timesince.text @model.get('timesince')
 
-            hasChanged: (model, value, options) =>
-                if value is true
-                    App.hub.publish 'log', @message
-                else
-                    App.hub.publish 'dismiss', @message
-
             toggleTime: ->
                 @modified.toggle()
                 @timesince.toggle()
-
 
 
         return {

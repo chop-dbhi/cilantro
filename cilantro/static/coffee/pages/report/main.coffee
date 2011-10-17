@@ -21,6 +21,9 @@ require [
             ReportName = new Report.Views.Name
                 model: sessionReport
 
+            UnsavedReport = new Report.Messages.UnsavedReport
+                model: sessionReport
+
             sessionReport.fetch()
 
             m_columns.init()
