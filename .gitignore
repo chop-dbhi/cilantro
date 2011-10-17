@@ -15,7 +15,7 @@ cilantro/static/js/src/common
 cilantro/static/js/src/utils/logging.js
 
 # RequireJS optimizer may leave this behind
-cilantro/static/js/min/build.txt
+cilantro/static/js/min
 
 # Compiled from SCSS
 cilantro/static/css/*.css
