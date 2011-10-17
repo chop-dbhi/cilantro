@@ -57,8 +57,6 @@ for dirpath, dirnames, filenames in os.walk(BASE_PACKAGE):
     for i, dirname in enumerate(dirnames):
         if dirname.startswith('.'):
             del dirnames[i]
-        elif dirname in ('tests', 'scss', 'coffee'):
-            del dirnames[i]
     if '__init__.py' in filenames:
         packages.append('.'.join(fullsplit(dirpath)))
     elif filenames:
@@ -80,6 +78,7 @@ setup(
     description = 'A client implementation for Serrano',
     license = 'BSD',
     keywords = 'snippets tools utilities',
+    url = 'https://github.com/cbmi/django-cilantro-pre',
 
     packages = packages,
     cmdclass = cmdclasses,

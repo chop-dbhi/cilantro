@@ -24,6 +24,10 @@ all: build-submodules watch
 
 build: build-submodules sass coffee optimize
 
+dist: build
+	@echo 'Creating a source distributions...'
+	@python setup.py sdist > /dev/null
+
 sass:
 	@echo 'Compiling Sass...'
 	@mkdir -p ${CSS_DIR}

@@ -1,5 +1,7 @@
-include *.md
 exclude cilantro/static/js/app.build.js
 exclude cilantro/static/config.rb
-global-exclude cilantro/static/coffee
-global-exclude cilantro/static/scss
+
+global-exclude .DS_Store
+
+prune cilantro/static/coffee
+prune cilantro/static/scss
