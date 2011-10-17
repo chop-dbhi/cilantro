@@ -67,7 +67,7 @@ define [
 
             render: =>
                 if @model.hasChanged 'name'
-                    @name.text(@model.get 'name').attr('href', @model.get('report_url')).parent().show()
+                    @name.text(@model.get 'name').attr('href', @model.get('permalink')).parent().show()
                 else if not @model.get 'name'
                     @name.parent().hide()
 
