@@ -1,9 +1,9 @@
 /** vim: et:ts=4:sw=4:sts=4
- * @license RequireJS 0.26.0 Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
+ * @license RequireJS 0.27.1 Copyright (c) 2010-2011, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/requirejs for details
  */
-/*jslint strict: false, plusplus: false */
+/*jslint strict: false, plusplus: false, sub: true */
 /*global window: false, navigator: false, document: false, importScripts: false,
   jQuery: false, clearInterval: false, setInterval: false, self: false,
   setTimeout: false, opera: false */
@@ -11,7 +11,7 @@
 var requirejs, require, define;
 (function () {
     //Change this version number for each release.
-    var version = "0.26.0",
+    var version = "0.27.1",
         commentRegExp = /(\/\*([\s\S]*?)\*\/|\/\/(.*)$)/mg,
         cjsRequireRegExp = /require\(\s*["']([^'"\s]+)["']\s*\)/g,
         currDirRegExp = /^\.\//,
@@ -31,17 +31,14 @@ var requirejs, require, define;
         defContextName = "_",
         //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
         isOpera = typeof opera !== "undefined" && opera.toString() === "[object Opera]",
-        reqWaitIdPrefix = "_r@@",
         empty = {},
         contexts = {},
         globalDefQueue = [],
         interactiveScript = null,
-        isDone = false,
         checkLoadedDepth = 0,
         useInteractive = false,
         req, cfg = {}, currentlyAddingScript, s, head, baseElement, scripts, script,
-        src, subPath, mainScript, dataMain, i, scrollIntervalId, setReadyState, ctx,
-        jQueryCheck, checkLoadedTimeoutId;
+        src, subPath, mainScript, dataMain, i, ctx, jQueryCheck, checkLoadedTimeoutId;
 
     function isFunction(it) {
         return ostring.call(it) === "[object Function]";
@@ -172,7 +169,7 @@ var requirejs, require, define;
         var context, resume,
             config = {
                 waitSeconds: 7,
-                baseUrl: s.baseUrl || "./",
+                baseUrl: "./",
                 paths: {},
                 pkgs: {},
                 catchError: {}
@@ -188,12 +185,15 @@ var requirejs, require, define;
             loaded = {},
             waiting = {},
             waitAry = [],
-            waitIdCounter = 0,
+            urlFetched = {},
+            managerCounter = 0,
             managerCallbacks = {},
             plugins = {},
-            pluginsQueue = {},
-            resumeDepth = 0,
-            normalizedWaiting = {};
+            //Used to indicate which modules in a build scenario
+            //need to be full executed.
+            needFullExec = {},
+            fullExec = {},
+            resumeDepth = 0;
 
         /**
          * Trims the . and .. from an array of path segments.
@@ -304,41 +304,26 @@ var requirejs, require, define;
             if (name) {
                 if (prefix) {
                     pluginModule = defined[prefix];
-                    if (pluginModule) {
-                        //Plugin is loaded, use its normalize method, otherwise,
-                        //normalize name as usual.
-                        if (pluginModule.normalize) {
-                            normalizedName = pluginModule.normalize(name, function (name) {
-                                return normalize(name, parentName);
-                            });
-                        } else {
-                            normalizedName = normalize(name, parentName);
-                        }
+                    if (pluginModule && pluginModule.normalize) {
+                        //Plugin is loaded, use its normalize method.
+                        normalizedName = pluginModule.normalize(name, function (name) {
+                            return normalize(name, parentName);
+                        });
                     } else {
-                        //Plugin is not loaded yet, so do not normalize
-                        //the name, wait for plugin to load to see if
-                        //it has a normalize method. To avoid possible
-                        //ambiguity with relative names loaded from another
-                        //plugin, use the parent's name as part of this name.
-                        normalizedName = '__$p' + parentName + '@' + (name || '');
+                        normalizedName = normalize(name, parentName);
                     }
                 } else {
+                    //A regular module.
                     normalizedName = normalize(name, parentName);
-                }
 
-                url = urlMap[normalizedName];
-                if (!url) {
-                    //Calculate url for the module, if it has a name.
-                    if (req.toModuleUrl) {
-                        //Special logic required for a particular engine,
-                        //like Node.
-                        url = req.toModuleUrl(context, normalizedName, parentModuleMap);
-                    } else {
+                    url = urlMap[normalizedName];
+                    if (!url) {
+                        //Calculate url for the module, if it has a name.
                         url = context.nameToUrl(normalizedName, null, parentModuleMap);
-                    }
 
-                    //Store the URL mapping for later.
-                    urlMap[normalizedName] = url;
+                        //Store the URL mapping for later.
+                        urlMap[normalizedName] = url;
+                    }
                 }
             }
 
@@ -373,23 +358,12 @@ var requirejs, require, define;
             return priorityDone;
         }
 
-        /**
-         * Helper function that creates a setExports function for a "module"
-         * CommonJS dependency. Do this here to avoid creating a closure that
-         * is part of a loop.
-         */
-        function makeSetExports(moduleObj) {
-            return function (exports) {
-                moduleObj.exports = exports;
-            };
-        }
-
         function makeContextModuleFunc(func, relModuleMap, enableBuildCallback) {
             return function () {
                 //A version of a require function that passes a moduleName
                 //value for items that may need to
                 //look up paths relative to the moduleName
-                var args = [].concat(aps.call(arguments, 0)), lastArg;
+                var args = aps.call(arguments, 0), lastArg;
                 if (enableBuildCallback &&
                     isFunction((lastArg = args[args.length - 1]))) {
                     lastArg.__requireJsBuild = true;
@@ -413,136 +387,30 @@ var requirejs, require, define;
                 toUrl: makeContextModuleFunc(context.toUrl, relModuleMap),
                 defined: makeContextModuleFunc(context.requireDefined, relModuleMap),
                 specified: makeContextModuleFunc(context.requireSpecified, relModuleMap),
-                ready: req.ready,
                 isBrowser: req.isBrowser
             });
-            //Something used by node.
-            if (req.paths) {
-                modRequire.paths = req.paths;
-            }
             return modRequire;
-        }
-
-        /**
-         * Used to update the normalized name for plugin-based dependencies
-         * after a plugin loads, since it can have its own normalization structure.
-         * @param {String} pluginName the normalized plugin module name.
-         */
-        function updateNormalizedNames(pluginName) {
-
-            var oldFullName, oldModuleMap, moduleMap, fullName, callbacks,
-                i, j, k, depArray, existingCallbacks,
-                maps = normalizedWaiting[pluginName];
-
-            if (maps) {
-                for (i = 0; (oldModuleMap = maps[i]); i++) {
-                    oldFullName = oldModuleMap.fullName;
-                    moduleMap = makeModuleMap(oldModuleMap.originalName, oldModuleMap.parentMap);
-                    fullName = moduleMap.fullName;
-                    //Callbacks could be undefined if the same plugin!name was
-                    //required twice in a row, so use empty array in that case.
-                    callbacks = managerCallbacks[oldFullName] || [];
-                    existingCallbacks = managerCallbacks[fullName];
-
-                    if (fullName !== oldFullName) {
-                        //Update the specified object, but only if it is already
-                        //in there. In sync environments, it may not be yet.
-                        if (oldFullName in specified) {
-                            delete specified[oldFullName];
-                            specified[fullName] = true;
-                        }
-
-                        //Update managerCallbacks to use the correct normalized name.
-                        //If there are already callbacks for the normalized name,
-                        //just add to them.
-                        if (existingCallbacks) {
-                            managerCallbacks[fullName] = existingCallbacks.concat(callbacks);
-                        } else {
-                            managerCallbacks[fullName] = callbacks;
-                        }
-                        delete managerCallbacks[oldFullName];
-
-                        //In each manager callback, update the normalized name in the depArray.
-                        for (j = 0; j < callbacks.length; j++) {
-                            depArray = callbacks[j].depArray;
-                            for (k = 0; k < depArray.length; k++) {
-                                if (depArray[k] === oldFullName) {
-                                    depArray[k] = fullName;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            delete normalizedWaiting[pluginName];
         }
 
         /*
          * Queues a dependency for checking after the loader is out of a
          * "paused" state, for example while a script file is being loaded
          * in the browser, where it may have many modules defined in it.
-         *
-         * depName will be fully qualified, no relative . or .. path.
          */
-        function queueDependency(dep) {
-            //Make sure to load any plugin and associate the dependency
-            //with that plugin.
-            var prefix = dep.prefix,
-                fullName = dep.fullName;
-
-            //Do not bother if the depName is already in transit
-            if (specified[fullName] || fullName in defined) {
-                return;
-            }
-
-            if (prefix && !plugins[prefix]) {
-                //Queue up loading of the dependency, track it
-                //via context.plugins. Mark it as a plugin so
-                //that the build system will know to treat it
-                //special.
-                plugins[prefix] = undefined;
-
-                //Remember this dep that needs to have normaliztion done
-                //after the plugin loads.
-                (normalizedWaiting[prefix] || (normalizedWaiting[prefix] = []))
-                    .push(dep);
-
-                //Register an action to do once the plugin loads, to update
-                //all managerCallbacks to use a properly normalized module
-                //name.
-                (managerCallbacks[prefix] ||
-                (managerCallbacks[prefix] = [])).push({
-                    onDep: function (name, value) {
-                        if (name === prefix) {
-                            updateNormalizedNames(prefix);
-                        }
-                    }
-                });
-
-                queueDependency(makeModuleMap(prefix));
-            }
-
-            context.paused.push(dep);
+        function queueDependency(manager) {
+            context.paused.push(manager);
         }
 
         function execManager(manager) {
-            var i, ret, waitingCallbacks, err, errFile,
+            var i, ret, err, errFile, errModuleTree,
                 cb = manager.callback,
-                fullName = manager.fullName,
-                args = [],
-                ary = manager.depArray;
+                map = manager.map,
+                fullName = map.fullName,
+                args = manager.deps,
+                listeners = manager.listeners;
 
             //Call the callback to define the module, if necessary.
             if (cb && isFunction(cb)) {
-                //Pull out the defined dependencies and pass the ordered
-                //values to the callback.
-                if (ary) {
-                    for (i = 0; i < ary.length; i++) {
-                        args.push(manager.deps[ary[i]]);
-                    }
-                }
-
                 if (config.catchError.define) {
                     try {
                         ret = req.execCb(fullName, manager.callback, args, defined[fullName]);
@@ -565,21 +433,32 @@ var requirejs, require, define;
                     } else {
                         //Use the return value from the function.
                         defined[fullName] = ret;
+                        //If this module needed full execution in a build
+                        //environment, mark that now.
+                        if (needFullExec[fullName]) {
+                            fullExec[fullName] = true;
+                        }
                     }
                 }
             } else if (fullName) {
                 //May just be an object definition for the module. Only
                 //worry about defining if have a module name.
                 ret = defined[fullName] = cb;
+
+                //If this module needed full execution in a build
+                //environment, mark that now.
+                if (needFullExec[fullName]) {
+                    fullExec[fullName] = true;
+                }
             }
 
             //Clean up waiting. Do this before error calls, and before
-            //calling back waitingCallbacks, so that bookkeeping is correct
+            //calling back listeners, so that bookkeeping is correct
             //in the event of an error and error is reported in correct order,
-            //since the waitingCallbacks will likely have errors if the
+            //since the listeners will likely have errors if the
             //onError function does not throw.
-            if (waiting[manager.waitId]) {
-                delete waiting[manager.waitId];
+            if (waiting[manager.id]) {
+                delete waiting[manager.id];
                 manager.isDone = true;
                 context.waitCount -= 1;
                 if (context.waitCount === 0) {
@@ -588,68 +467,241 @@ var requirejs, require, define;
                 }
             }
 
+            //Do not need to track manager callback now that it is defined.
+            delete managerCallbacks[fullName];
+
+            //Allow instrumentation like the optimizer to know the order
+            //of modules executed and their dependencies.
+            if (req.onResourceLoad && !manager.placeholder) {
+                req.onResourceLoad(context, map, manager.depArray);
+            }
+
             if (err) {
                 errFile = (fullName ? makeModuleMap(fullName).url : '') ||
                            err.fileName || err.sourceURL;
+                errModuleTree = err.moduleTree;
                 err = makeError('defineerror', 'Error evaluating ' +
                                 'module "' + fullName + '" at location "' +
                                 errFile + '":\n' +
                                 err + '\nfileName:' + errFile +
                                 '\nlineNumber: ' + (err.lineNumber || err.line), err);
                 err.moduleName = fullName;
+                err.moduleTree = errModuleTree;
                 return req.onError(err);
             }
 
-            if (fullName) {
-                //If anything was waiting for this module to be defined,
-                //notify them now.
-                waitingCallbacks = managerCallbacks[fullName];
-                if (waitingCallbacks) {
-                    for (i = 0; i < waitingCallbacks.length; i++) {
-                        waitingCallbacks[i].onDep(fullName, ret);
-                    }
-                    delete managerCallbacks[fullName];
-                }
+            //Let listeners know of this manager's value.
+            for (i = 0; (cb = listeners[i]); i++) {
+                cb(ret);
             }
 
             return undefined;
+        }
+
+        /**
+         * Helper that creates a callack function that is called when a dependency
+         * is ready, and sets the i-th dependency for the manager as the
+         * value passed to the callback generated by this function.
+         */
+        function makeArgCallback(manager, i) {
+            return function (value) {
+                //Only do the work if it has not been done
+                //already for a dependency. Cycle breaking
+                //logic in forceExec could mean this function
+                //is called more than once for a given dependency.
+                if (!manager.depDone[i]) {
+                    manager.depDone[i] = true;
+                    manager.deps[i] = value;
+                    manager.depCount -= 1;
+                    if (!manager.depCount) {
+                        //All done, execute!
+                        execManager(manager);
+                    }
+                }
+            };
+        }
+
+        function callPlugin(pluginName, depManager) {
+            var map = depManager.map,
+                fullName = map.fullName,
+                name = map.name,
+                plugin = plugins[pluginName] ||
+                        (plugins[pluginName] = defined[pluginName]),
+                load;
+
+            //No need to continue if the manager is already
+            //in the process of loading.
+            if (depManager.loading) {
+                return;
+            }
+            depManager.loading = true;
+
+            load = function (ret) {
+                depManager.callback = function () {
+                    return ret;
+                };
+                execManager(depManager);
+
+                loaded[depManager.id] = true;
+
+                //The loading of this plugin
+                //might have placed other things
+                //in the paused queue. In particular,
+                //a loader plugin that depends on
+                //a different plugin loaded resource.
+                resume();
+            };
+
+            //Allow plugins to load other code without having to know the
+            //context or how to "complete" the load.
+            load.fromText = function (moduleName, text) {
+                /*jslint evil: true */
+                var hasInteractive = useInteractive;
+
+                //Indicate a the module is in process of loading.
+                loaded[moduleName] = false;
+                context.scriptCount += 1;
+
+                //Indicate this is not a "real" module, so do not track it
+                //for builds, it does not map to a real file.
+                context.fake[moduleName] = true;
+
+                //Turn off interactive script matching for IE for any define
+                //calls in the text, then turn it back on at the end.
+                if (hasInteractive) {
+                    useInteractive = false;
+                }
+
+                req.exec(text);
+
+                if (hasInteractive) {
+                    useInteractive = true;
+                }
+
+                //Support anonymous modules.
+                context.completeLoad(moduleName);
+            };
+
+            //No need to continue if the plugin value has already been
+            //defined by a build.
+            if (fullName in defined) {
+                load(defined[fullName]);
+            } else {
+                //Use parentName here since the plugin's name is not reliable,
+                //could be some weird string with no path that actually wants to
+                //reference the parentName's path.
+                plugin.load(name, makeRequire(map.parentMap, true), load, config);
+            }
+        }
+
+        /**
+         * Adds the manager to the waiting queue. Only fully
+         * resolved items should be in the waiting queue.
+         */
+        function addWait(manager) {
+            if (!waiting[manager.id]) {
+                waiting[manager.id] = manager;
+                waitAry.push(manager);
+                context.waitCount += 1;
+            }
+        }
+
+        /**
+         * Function added to every manager object. Created out here
+         * to avoid new function creation for each manager instance.
+         */
+        function managerAdd(cb) {
+            this.listeners.push(cb);
+        }
+
+        function getManager(map, shouldQueue) {
+            var fullName = map.fullName,
+                prefix = map.prefix,
+                plugin = prefix ? plugins[prefix] ||
+                                (plugins[prefix] = defined[prefix]) : null,
+                manager, created, pluginManager;
+
+            if (fullName) {
+                manager = managerCallbacks[fullName];
+            }
+
+            if (!manager) {
+                created = true;
+                manager = {
+                    //ID is just the full name, but if it is a plugin resource
+                    //for a plugin that has not been loaded,
+                    //then add an ID counter to it.
+                    id: (prefix && !plugin ?
+                        (managerCounter++) + '__p@:' : '') +
+                        (fullName || '__r@' + (managerCounter++)),
+                    map: map,
+                    depCount: 0,
+                    depDone: [],
+                    depCallbacks: [],
+                    deps: [],
+                    listeners: [],
+                    add: managerAdd
+                };
+
+                specified[manager.id] = true;
+
+                //Only track the manager/reuse it if this is a non-plugin
+                //resource. Also only track plugin resources once
+                //the plugin has been loaded, and so the fullName is the
+                //true normalized value.
+                if (fullName && (!prefix || plugins[prefix])) {
+                    managerCallbacks[fullName] = manager;
+                }
+            }
+
+            //If there is a plugin needed, but it is not loaded,
+            //first load the plugin, then continue on.
+            if (prefix && !plugin) {
+                pluginManager = getManager(makeModuleMap(prefix), true);
+                pluginManager.add(function (plugin) {
+                    //Create a new manager for the normalized
+                    //resource ID and have it call this manager when
+                    //done.
+                    var newMap = makeModuleMap(map.originalName, map.parentMap),
+                        normalizedManager = getManager(newMap, true);
+
+                    //Indicate this manager is a placeholder for the real,
+                    //normalized thing. Important for when trying to map
+                    //modules and dependencies, for instance, in a build.
+                    manager.placeholder = true;
+
+                    normalizedManager.add(function (resource) {
+                        manager.callback = function () {
+                            return resource;
+                        };
+                        execManager(manager);
+                    });
+                });
+            } else if (created && shouldQueue) {
+                //Indicate the resource is not loaded yet if it is to be
+                //queued.
+                loaded[manager.id] = false;
+                queueDependency(manager);
+                addWait(manager);
+            }
+
+            return manager;
         }
 
         function main(inName, depArray, callback, relModuleMap) {
             var moduleMap = makeModuleMap(inName, relModuleMap),
                 name = moduleMap.name,
                 fullName = moduleMap.fullName,
-                uniques = {},
-                manager = {
-                    //Use a wait ID because some entries are anon
-                    //async require calls.
-                    waitId: name || reqWaitIdPrefix + (waitIdCounter++),
-                    depCount: 0,
-                    depMax: 0,
-                    prefix: moduleMap.prefix,
-                    name: name,
-                    fullName: fullName,
-                    deps: {},
-                    depArray: depArray,
-                    callback: callback,
-                    onDep: function (depName, value) {
-                        if (!(depName in manager.deps)) {
-                            manager.deps[depName] = value;
-                            manager.depCount += 1;
-                            if (manager.depCount === manager.depMax) {
-                                //All done, execute!
-                                execManager(manager);
-                            }
-                        }
-                    }
-                },
-                i, depArg, depName, cjsMod;
+                manager = getManager(moduleMap),
+                id = manager.id,
+                deps = manager.deps,
+                i, depArg, depName, depPrefix, cjsMod;
 
             if (fullName) {
                 //If module already defined for context, or already loaded,
                 //then leave. Also leave if jQuery is registering but it does
                 //not match the desired version number in the config.
-                if (fullName in defined || loaded[fullName] === true ||
+                if (fullName in defined || loaded[id] === true ||
                     (fullName === "jquery" && config.jQuery &&
                      config.jQuery !== callback().fn.jquery)) {
                     return;
@@ -659,14 +711,21 @@ var requirejs, require, define;
                 //as part of a layer, where onScriptLoad is not fired
                 //for those cases. Do this after the inline define and
                 //dependency tracing is done.
-                specified[fullName] = true;
-                loaded[fullName] = true;
+                specified[id] = true;
+                loaded[id] = true;
 
                 //If module is jQuery set up delaying its dom ready listeners.
                 if (fullName === "jquery" && callback) {
                     jQueryCheck(callback());
                 }
             }
+
+            //Attach real depArray and callback to the manager. Do this
+            //only if the module has not been defined already, so do this after
+            //the fullName checks above. IE can call main() more than once
+            //for a module.
+            manager.depArray = depArray;
+            manager.callback = callback;
 
             //Add the dependencies to the deps field, and register for callbacks
             //on the dependencies.
@@ -679,6 +738,7 @@ var requirejs, require, define;
                     //Split the dependency name into plugin and name parts
                     depArg = makeModuleMap(depArg, (name ? moduleMap : relModuleMap));
                     depName = depArg.fullName;
+                    depPrefix = depArg.prefix;
 
                     //Fix the name in depArray to be just the name, since
                     //that is how it will be called back later.
@@ -686,46 +746,54 @@ var requirejs, require, define;
 
                     //Fast path CommonJS standard dependencies.
                     if (depName === "require") {
-                        manager.deps[depName] = makeRequire(moduleMap);
+                        deps[i] = makeRequire(moduleMap);
                     } else if (depName === "exports") {
                         //CommonJS module spec 1.1
-                        manager.deps[depName] = defined[fullName] = {};
+                        deps[i] = defined[fullName] = {};
                         manager.usingExports = true;
                     } else if (depName === "module") {
                         //CommonJS module spec 1.1
-                        manager.cjsModule = cjsMod = manager.deps[depName] = {
+                        manager.cjsModule = cjsMod = deps[i] = {
                             id: name,
                             uri: name ? context.nameToUrl(name, null, relModuleMap) : undefined,
                             exports: defined[fullName]
                         };
-                        cjsMod.setExports = makeSetExports(cjsMod);
-                    } else if (depName in defined && !(depName in waiting)) {
-                        //Module already defined, no need to wait for it.
-                        manager.deps[depName] = defined[depName];
-                    } else if (!uniques[depName]) {
+                    } else if (depName in defined && !(depName in waiting) &&
+                               (!(fullName in needFullExec) ||
+                                (fullName in needFullExec && fullExec[depName]))) {
+                        //Module already defined, and not in a build situation
+                        //where the module is a something that needs full
+                        //execution and this dependency has not been fully
+                        //executed. See r.js's requirePatch.js for more info
+                        //on fullExec.
+                        deps[i] = defined[depName];
+                    } else {
+                        //Mark this dependency as needing full exec if
+                        //the current module needs full exec.
+                        if (fullName in needFullExec) {
+                            needFullExec[depName] = true;
+                            //Reset state so fully executed code will get
+                            //picked up correctly.
+                            delete defined[depName];
+                            urlFetched[depArg.url] = false;
+                        }
 
-                        //A dynamic dependency.
-                        manager.depMax += 1;
-
-                        queueDependency(depArg);
-
-                        //Register to get notification when dependency loads.
-                        (managerCallbacks[depName] ||
-                        (managerCallbacks[depName] = [])).push(manager);
-
-                        uniques[depName] = true;
+                        //Either a resource that is not loaded yet, or a plugin
+                        //resource for either a plugin that has not
+                        //loaded yet.
+                        manager.depCount += 1;
+                        manager.depCallbacks[i] = makeArgCallback(manager, i);
+                        getManager(depArg, true).add(manager.depCallbacks[i]);
                     }
                 }
             }
 
             //Do not bother tracking the manager if it is all done.
-            if (manager.depCount === manager.depMax) {
+            if (!manager.depCount) {
                 //All done, execute!
                 execManager(manager);
             } else {
-                waiting[manager.waitId] = manager;
-                waitAry.push(manager);
-                context.waitCount += 1;
+                addWait(manager);
             }
         }
 
@@ -735,10 +803,6 @@ var requirejs, require, define;
          */
         function callDefMain(args) {
             main.apply(null, args);
-            //Mark the module loaded. Must do it here in addition
-            //to doing it in define in case a script does
-            //not call define
-            loaded[args[0]] = true;
         }
 
         /**
@@ -787,9 +851,10 @@ var requirejs, require, define;
                 return undefined;
             }
 
-            var fullName = manager.fullName,
+            var fullName = manager.map.fullName,
                 depArray = manager.depArray,
-                depName, i;
+                i, depName, depManager, prefix, prefixManager, value;
+
             if (fullName) {
                 if (traced[fullName]) {
                     return defined[fullName];
@@ -798,14 +863,24 @@ var requirejs, require, define;
                 traced[fullName] = true;
             }
 
-            //forceExec all of its dependencies.
-            for (i = 0; i < depArray.length; i++) {
-                //Some array members may be null, like if a trailing comma
-                //IE, so do the explicit [i] access and check if it has a value.
-                depName = depArray[i];
-                if (depName) {
-                    if (!manager.deps[depName] && waiting[depName]) {
-                        manager.onDep(depName, forceExec(waiting[depName], traced));
+            //Trace through the dependencies.
+            if (depArray) {
+                for (i = 0; i < depArray.length; i++) {
+                    //Some array members may be null, like if a trailing comma
+                    //IE, so do the explicit [i] access and check if it has a value.
+                    depName = depArray[i];
+                    if (depName) {
+                        //First, make sure if it is a plugin resource that the
+                        //plugin is not blocked.
+                        prefix = makeModuleMap(depName).prefix;
+                        if (prefix && (prefixManager = waiting[prefix])) {
+                            forceExec(prefixManager, traced);
+                        }
+                        depManager = waiting[depName];
+                        if (depManager && !depManager.isDone && loaded[depName]) {
+                            value = forceExec(depManager, traced);
+                            manager.depCallbacks[i](value);
+                        }
                     }
                 }
             }
@@ -899,6 +974,11 @@ var requirejs, require, define;
                     forceExec(manager, {});
                 }
 
+                //If anything got placed in the paused queue, run it down.
+                if (context.paused.length) {
+                    resume();
+                }
+
                 //Only allow this recursion to a certain depth. Only
                 //triggered by errors in calling a module in which its
                 //modules waiting on it cannot finish loading, or some circular
@@ -920,136 +1000,11 @@ var requirejs, require, define;
             return undefined;
         }
 
-        function callPlugin(pluginName, dep) {
-            var name = dep.name,
-                fullName = dep.fullName,
-                load;
-
-            //Do not bother if plugin is already defined or being loaded.
-            if (fullName in defined || fullName in loaded) {
-                return;
-            }
-
-            if (!plugins[pluginName]) {
-                plugins[pluginName] = defined[pluginName];
-            }
-
-            //Only set loaded to false for tracking if it has not already been set.
-            if (!loaded[fullName]) {
-                loaded[fullName] = false;
-            }
-
-            load = function (ret) {
-                //Allow the build process to register plugin-loaded dependencies.
-                if (req.onPluginLoad) {
-                    req.onPluginLoad(context, pluginName, name, ret);
-                }
-
-                execManager({
-                    prefix: dep.prefix,
-                    name: dep.name,
-                    fullName: dep.fullName,
-                    callback: function () {
-                        return ret;
-                    }
-                });
-                loaded[fullName] = true;
-            };
-
-            //Allow plugins to load other code without having to know the
-            //context or how to "complete" the load.
-            load.fromText = function (moduleName, text) {
-                /*jslint evil: true */
-                var hasInteractive = useInteractive;
-
-                //Indicate a the module is in process of loading.
-                context.loaded[moduleName] = false;
-                context.scriptCount += 1;
-
-                //Turn off interactive script matching for IE for any define
-                //calls in the text, then turn it back on at the end.
-                if (hasInteractive) {
-                    useInteractive = false;
-                }
-
-                req.exec(text);
-
-                if (hasInteractive) {
-                    useInteractive = true;
-                }
-
-                //Support anonymous modules.
-                context.completeLoad(moduleName);
-            };
-
-            //Use parentName here since the plugin's name is not reliable,
-            //could be some weird string with no path that actually wants to
-            //reference the parentName's path.
-            plugins[pluginName].load(name, makeRequire(dep.parentMap, true), load, config);
-        }
-
-        function loadPaused(dep) {
-            //Renormalize dependency if its name was waiting on a plugin
-            //to load, which as since loaded.
-            if (dep.prefix && dep.name && dep.name.indexOf('__$p') === 0 && defined[dep.prefix]) {
-                dep = makeModuleMap(dep.originalName, dep.parentMap);
-            }
-
-            var pluginName = dep.prefix,
-                fullName = dep.fullName,
-                urlFetched = context.urlFetched;
-
-            //Do not bother if the dependency has already been specified.
-            if (specified[fullName] || loaded[fullName]) {
-                return;
-            } else {
-                specified[fullName] = true;
-            }
-
-            if (pluginName) {
-                //If plugin not loaded, wait for it.
-                //set up callback list. if no list, then register
-                //managerCallback for that plugin.
-                if (defined[pluginName]) {
-                    callPlugin(pluginName, dep);
-                } else {
-                    if (!pluginsQueue[pluginName]) {
-                        pluginsQueue[pluginName] = [];
-                        (managerCallbacks[pluginName] ||
-                        (managerCallbacks[pluginName] = [])).push({
-                            onDep: function (name, value) {
-                                if (name === pluginName) {
-                                    var i, oldModuleMap, ary = pluginsQueue[pluginName];
-
-                                    //Now update all queued plugin actions.
-                                    for (i = 0; i < ary.length; i++) {
-                                        oldModuleMap = ary[i];
-                                        //Update the moduleMap since the
-                                        //module name may be normalized
-                                        //differently now.
-                                        callPlugin(pluginName,
-                                                   makeModuleMap(oldModuleMap.originalName, oldModuleMap.parentMap));
-                                    }
-                                    delete pluginsQueue[pluginName];
-                                }
-                            }
-                        });
-                    }
-                    pluginsQueue[pluginName].push(dep);
-                }
-            } else {
-                if (!urlFetched[dep.url]) {
-                    req.load(context, fullName, dep.url);
-                    urlFetched[dep.url] = true;
-                }
-            }
-        }
-
         /**
          * Resumes tracing of dependencies and then checks if everything is loaded.
          */
         resume = function () {
-            var args, i, p;
+            var manager, map, url, i, p, args, fullName;
 
             resumeDepth += 1;
 
@@ -1080,9 +1035,24 @@ var requirejs, require, define;
                     //Reset paused list
                     context.paused = [];
 
-                    for (i = 0; (args = p[i]); i++) {
-                        loadPaused(args);
+                    for (i = 0; (manager = p[i]); i++) {
+                        map = manager.map;
+                        url = map.url;
+                        fullName = map.fullName;
+
+                        //If the manager is for a plugin managed resource,
+                        //ask the plugin to load it now.
+                        if (map.prefix) {
+                            callPlugin(map.prefix, manager);
+                        } else {
+                            //Regular dependency.
+                            if (!urlFetched[url] && !loaded[fullName]) {
+                                req.load(context, fullName, url);
+                                urlFetched[url] = true;
+                            }
+                        }
                     }
+
                     //Move the start time for timeout forward.
                     context.startTime = (new Date()).getTime();
                     context.pausedCount -= p.length;
@@ -1114,12 +1084,15 @@ var requirejs, require, define;
             specified: specified,
             loaded: loaded,
             urlMap: urlMap,
+            urlFetched: urlFetched,
             scriptCount: 0,
-            urlFetched: {},
             defined: defined,
             paused: [],
             pausedCount: 0,
             plugins: plugins,
+            needFullExec: needFullExec,
+            fake: {},
+            fullExec: fullExec,
             managerCallbacks: managerCallbacks,
             makeModuleMap: makeModuleMap,
             normalize: normalize,
@@ -1185,7 +1158,6 @@ var requirejs, require, define;
                     //Allow tracing some require calls to allow the fetching
                     //of the priority config.
                     context.requireWait = false;
-
                     //But first, call resume to register any defined modules that may
                     //be in a data-main built file before the priority config
                     //call. Also grab any waiting define calls for this context.
@@ -1212,12 +1184,6 @@ var requirejs, require, define;
                 if (cfg.deps || cfg.callback) {
                     context.require(cfg.deps || [], cfg.callback);
                 }
-
-                //Set up ready callback, if asked. Useful when require is defined as a
-                //config object before require.js is loaded.
-                if (cfg.ready) {
-                    req.ready(cfg.ready);
-                }
             },
 
             requireDefined: function (moduleName, relModuleMap) {
@@ -1231,6 +1197,11 @@ var requirejs, require, define;
             require: function (deps, callback, relModuleMap) {
                 var moduleName, fullName, moduleMap;
                 if (typeof deps === "string") {
+                    if (isFunction(callback)) {
+                        //Invalid call
+                        return req.onError(makeError("requireargs", "Invalid require call"));
+                    }
+
                     //Synchronous access to one module. If require.get is
                     //available (as in the Node adapter), prefer that.
                     //In this case deps is the moduleName and callback is
@@ -1257,7 +1228,11 @@ var requirejs, require, define;
                     return defined[fullName];
                 }
 
-                main(null, deps, callback, relModuleMap);
+                //Call main but only if there are dependencies or
+                //a callback to call.
+                if (deps && deps.length || callback) {
+                    main(null, deps, callback, relModuleMap);
+                }
 
                 //If the require call does not trigger anything new to load,
                 //then resume the dependency processing.
@@ -1327,11 +1302,6 @@ var requirejs, require, define;
                                     return jQuery;
                                 } : null]);
                 }
-
-                //Mark the script as loaded. Note that this can be different from a
-                //moduleName that maps to a define call. This line is important
-                //for traditional browser scripts.
-                loaded[moduleName] = true;
 
                 //If a global jQuery is defined, check for it. Need to do it here
                 //instead of main() since stock jQuery does not register as
@@ -1493,7 +1463,7 @@ var requirejs, require, define;
     /**
      * Export require as a global, but only if it does not already exist.
      */
-    if (typeof require === "undefined") {
+    if (!require) {
         require = req;
     }
 
@@ -1506,17 +1476,13 @@ var requirejs, require, define;
     };
 
     req.version = version;
-    req.isArray = isArray;
-    req.isFunction = isFunction;
-    req.mixin = mixin;
+
     //Used to filter out dependencies that are already paths.
     req.jsExtRegExp = /^\/|:|\?|\.js$/;
     s = req.s = {
         contexts: contexts,
         //Stores a list of URLs that should not get async script tag treatment.
-        skipAsync: {},
-        isPageLoaded: !isBrowser,
-        readyCalls: []
+        skipAsync: {}
     };
 
     req.isAsync = req.isBrowser = isBrowser;
@@ -1550,14 +1516,7 @@ var requirejs, require, define;
      * @param {Object} url the URL to the module.
      */
     req.load = function (context, moduleName, url) {
-        var loaded = context.loaded;
-
-        isDone = false;
-
-        //Only set loaded to false for tracking if it has not already been set.
-        if (!loaded[moduleName]) {
-            loaded[moduleName] = false;
-        }
+        req.resourcesReady(false);
 
         context.scriptCount += 1;
         req.attach(url, context, moduleName);
@@ -1594,7 +1553,7 @@ var requirejs, require, define;
      * return a value to define the module corresponding to the first argument's
      * name.
      */
-    define = req.def = function (name, deps, callback) {
+    define = function (name, deps, callback) {
         var node, context;
 
         //Allow for anonymous functions
@@ -1606,14 +1565,14 @@ var requirejs, require, define;
         }
 
         //This module may not have dependencies
-        if (!req.isArray(deps)) {
+        if (!isArray(deps)) {
             callback = deps;
             deps = [];
         }
 
         //If no name, and callback is a function, then figure out if it a
         //CommonJS thing with dependencies.
-        if (!name && !deps.length && req.isFunction(callback)) {
+        if (!deps.length && isFunction(callback)) {
             //Remove comments from the callback string,
             //look for require calls, and pull them into the dependencies,
             //but only if there are function args.
@@ -1683,6 +1642,25 @@ var requirejs, require, define;
         return callback.apply(exports, args);
     };
 
+
+    /**
+     * Adds a node to the DOM. Public function since used by the order plugin.
+     * This method should not normally be called by outside code.
+     */
+    req.addScriptToDom = function (node) {
+        //For some cache cases in IE 6-8, the script executes before the end
+        //of the appendChild execution, so to tie an anonymous define
+        //call to the module name (which is stored on the node), hold on
+        //to a reference to this node, but clear after the DOM insertion.
+        currentlyAddingScript = node;
+        if (baseElement) {
+            head.insertBefore(node, baseElement);
+        } else {
+            head.appendChild(node);
+        }
+        currentlyAddingScript = null;
+    };
+
     /**
      * callback for script loads, used to check status of loading.
      *
@@ -1698,7 +1676,7 @@ var requirejs, require, define;
         var node = evt.currentTarget || evt.srcElement, contextName, moduleName,
             context;
 
-        if (evt.type === "load" || readyRegExp.test(node.readyState)) {
+        if (evt.type === "load" || (node && readyRegExp.test(node.readyState))) {
             //Reset interactive script so a script node is not held onto for
             //to long.
             interactiveScript = null;
@@ -1732,9 +1710,14 @@ var requirejs, require, define;
      * @param {moduleName} the name of the module that is associated with the script.
      * @param {Function} [callback] optional callback, defaults to require.onScriptLoad
      * @param {String} [type] optional type, defaults to text/javascript
+     * @param {Function} [fetchOnlyFunction] optional function to indicate the script node
+     * should be set up to fetch the script but do not attach it to the DOM
+     * so that it can later be attached to execute it. This is a way for the
+     * order plugin to support ordered loading in IE. Once the script is fetched,
+     * but not executed, the fetchOnlyFunction will be called.
      */
-    req.attach = function (url, context, moduleName, callback, type) {
-        var node, loaded;
+    req.attach = function (url, context, moduleName, callback, type, fetchOnlyFunction) {
+        var node;
         if (isBrowser) {
             //In the browser so use a script tag
             callback = callback || req.onScriptLoad;
@@ -1775,23 +1758,36 @@ var requirejs, require, define;
                 //However, IE reports the script as being in "interactive"
                 //readyState at the time of the define call.
                 useInteractive = true;
-                node.attachEvent("onreadystatechange", callback);
+
+
+                if (fetchOnlyFunction) {
+                    //Need to use old school onreadystate here since
+                    //when the event fires and the node is not attached
+                    //to the DOM, the evt.srcElement is null, so use
+                    //a closure to remember the node.
+                    node.onreadystatechange = function (evt) {
+                        //Script loaded but not executed.
+                        //Clear loaded handler, set the real one that
+                        //waits for script execution.
+                        if (node.readyState === 'loaded') {
+                            node.onreadystatechange = null;
+                            node.attachEvent("onreadystatechange", callback);
+                            fetchOnlyFunction(node);
+                        }
+                    };
+                } else {
+                    node.attachEvent("onreadystatechange", callback);
+                }
             } else {
                 node.addEventListener("load", callback, false);
             }
             node.src = url;
 
-            //For some cache cases in IE 6-8, the script executes before the end
-            //of the appendChild execution, so to tie an anonymous define
-            //call to the module name (which is stored on the node), hold on
-            //to a reference to this node, but clear after the DOM insertion.
-            currentlyAddingScript = node;
-            if (baseElement) {
-                head.insertBefore(node, baseElement);
-            } else {
-                head.appendChild(node);
+            //Fetch only means waiting to attach to DOM after loaded.
+            if (!fetchOnlyFunction) {
+                req.addScriptToDom(node);
             }
-            currentlyAddingScript = null;
+
             return node;
         } else if (isWebWorker) {
             //In a web worker, use importScripts. This is not a very
@@ -1800,9 +1796,6 @@ var requirejs, require, define;
             //are in play, the expectation that a build has been done so that
             //only one script needs to be loaded anyway. This may need to be
             //reevaluated if other use cases become common.
-            loaded = context.loaded;
-            loaded[moduleName] = false;
-
             importScripts(url);
 
             //Account for anonymous modules
@@ -1849,36 +1842,8 @@ var requirejs, require, define;
         }
     }
 
-    //Set baseUrl based on config.
-    s.baseUrl = cfg.baseUrl;
-
-    //****** START page load functionality ****************
-    /**
-     * Sets the page as loaded and triggers check for all modules loaded.
-     */
-    req.pageLoaded = function () {
-        if (!s.isPageLoaded) {
-            s.isPageLoaded = true;
-            if (scrollIntervalId) {
-                clearInterval(scrollIntervalId);
-            }
-
-            //Part of a fix for FF < 3.6 where readyState was not set to
-            //complete so libraries like jQuery that check for readyState
-            //after page load where not getting initialized correctly.
-            //Original approach suggested by Andrea Giammarchi:
-            //http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
-            //see other setReadyState reference for the rest of the fix.
-            if (setReadyState) {
-                document.readyState = "complete";
-            }
-
-            req.callReady();
-        }
-    };
-
     //See if there is nothing waiting across contexts, and if not, trigger
-    //callReady.
+    //resourcesReady.
     req.checkReadyState = function () {
         var contexts = s.contexts, prop;
         for (prop in contexts) {
@@ -1888,26 +1853,22 @@ var requirejs, require, define;
                 }
             }
         }
-        s.isDone = true;
-        req.callReady();
+        req.resourcesReady(true);
     };
 
     /**
-     * Internal function that calls back any ready functions. If you are
-     * integrating RequireJS with another library without require.ready support,
-     * you can define this method to call your page ready code instead.
+     * Internal function that is triggered whenever all scripts/resources
+     * have been loaded by the loader. Can be overridden by other, for
+     * instance the domReady plugin, which wants to know when all resources
+     * are loaded.
      */
-    req.callReady = function () {
-        var callbacks = s.readyCalls, i, callback, contexts, context, prop;
+    req.resourcesReady = function (isReady) {
+        var contexts, context, prop;
 
-        if (s.isPageLoaded && s.isDone) {
-            if (callbacks.length) {
-                s.readyCalls = [];
-                for (i = 0; (callback = callbacks[i]); i++) {
-                    callback();
-                }
-            }
+        //First, set the public variable indicating that resources are loading.
+        req.resourcesDone = isReady;
 
+        if (req.resourcesDone) {
             //If jQuery with DOM ready delayed, release it now.
             contexts = s.contexts;
             for (prop in contexts) {
@@ -1922,62 +1883,23 @@ var requirejs, require, define;
         }
     };
 
-    /**
-     * Registers functions to call when the page is loaded
-     */
-    req.ready = function (callback) {
-        if (s.isPageLoaded && s.isDone) {
-            callback();
-        } else {
-            s.readyCalls.push(callback);
+    //FF < 3.6 readyState fix. Needed so that domReady plugin
+    //works well in that environment, since require.js is normally
+    //loaded via an HTML script tag so it will be there before window load,
+    //where the domReady plugin is more likely to be loaded after window load.
+    req.pageLoaded = function () {
+        if (document.readyState !== "complete") {
+            document.readyState = "complete";
         }
-        return req;
     };
-
     if (isBrowser) {
         if (document.addEventListener) {
-            //Standards. Hooray! Assumption here that if standards based,
-            //it knows about DOMContentLoaded.
-            document.addEventListener("DOMContentLoaded", req.pageLoaded, false);
-            window.addEventListener("load", req.pageLoaded, false);
-            //Part of FF < 3.6 readystate fix (see setReadyState refs for more info)
             if (!document.readyState) {
-                setReadyState = true;
                 document.readyState = "loading";
+                window.addEventListener("load", req.pageLoaded, false);
             }
-        } else if (window.attachEvent) {
-            window.attachEvent("onload", req.pageLoaded);
-
-            //DOMContentLoaded approximation, as found by Diego Perini:
-            //http://javascript.nwbox.com/IEContentLoaded/
-            if (self === self.top) {
-                scrollIntervalId = setInterval(function () {
-                    try {
-                        //From this ticket:
-                        //http://bugs.dojotoolkit.org/ticket/11106,
-                        //In IE HTML Application (HTA), such as in a selenium test,
-                        //javascript in the iframe can't see anything outside
-                        //of it, so self===self.top is true, but the iframe is
-                        //not the top window and doScroll will be available
-                        //before document.body is set. Test document.body
-                        //before trying the doScroll trick.
-                        if (document.body) {
-                            document.documentElement.doScroll("left");
-                            req.pageLoaded();
-                        }
-                    } catch (e) {}
-                }, 30);
-            }
-        }
-
-        //Check if document already complete, and if so, just trigger page load
-        //listeners. NOTE: does not work with Firefox before 3.6. To support
-        //those browsers, manually call require.pageLoaded().
-        if (document.readyState === "complete") {
-            req.pageLoaded();
         }
     }
-    //****** END page load functionality ****************
 
     //Set up default context. If require was a configuration object, use that as base config.
     req(cfg);
@@ -2011,7 +1933,7 @@ var requirejs, require, define;
     }
 }());
 /*!
- * jQuery JavaScript Library v1.6.2
+ * jQuery JavaScript Library v1.6.4
  * http://jquery.com/
  *
  * Copyright 2011, John Resig
@@ -2023,7 +1945,7 @@ var requirejs, require, define;
  * Copyright 2011, The Dojo Foundation
  * Released under the MIT, BSD, and GPL Licenses.
  *
- * Date: Thu Jun 30 14:16:56 2011 -0400
+ * Date: Mon Sep 12 18:54:48 2011 -0400
  */
 (function( window, undefined ) {
 
@@ -2049,8 +1971,8 @@ var jQuery = function( selector, context ) {
 	rootjQuery,
 
 	// A simple way to check for HTML strings or ID strings
-	// (both of which we optimize for)
-	quickExpr = /^(?:[^<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,
+	// Prioritize #id over <tag> to avoid XSS via location.hash (#9521)
+	quickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,
 
 	// Check if a string has a non-whitespace character in it
 	rnotwhite = /\S/,
@@ -2078,11 +2000,12 @@ var jQuery = function( selector, context ) {
 	rmozilla = /(mozilla)(?:.*? rv:([\w.]+))?/,
 
 	// Matches dashed string for camelizing
-	rdashAlpha = /-([a-z])/ig,
+	rdashAlpha = /-([a-z]|[0-9])/ig,
+	rmsPrefix = /^-ms-/,
 
 	// Used by jQuery.camelCase as callback to replace()
 	fcamelCase = function( all, letter ) {
-		return letter.toUpperCase();
+		return ( letter + "" ).toUpperCase();
 	},
 
 	// Keep a UserAgent string for use with jQuery.browser
@@ -2224,7 +2147,7 @@ jQuery.fn = jQuery.prototype = {
 	selector: "",
 
 	// The current version of jQuery being used
-	jquery: "1.6.2",
+	jquery: "1.6.4",
 
 	// The default length of a jQuery object is 0
 	length: 0,
@@ -2533,10 +2456,15 @@ jQuery.extend({
 			return false;
 		}
 
-		// Not own constructor property must be Object
-		if ( obj.constructor &&
-			!hasOwn.call(obj, "constructor") &&
-			!hasOwn.call(obj.constructor.prototype, "isPrototypeOf") ) {
+		try {
+			// Not own constructor property must be Object
+			if ( obj.constructor &&
+				!hasOwn.call(obj, "constructor") &&
+				!hasOwn.call(obj.constructor.prototype, "isPrototypeOf") ) {
+				return false;
+			}
+		} catch ( e ) {
+			// IE8,9 Will throw exceptions on certain host objects #9897
 			return false;
 		}
 
@@ -2586,24 +2514,23 @@ jQuery.extend({
 	},
 
 	// Cross-browser xml parsing
-	// (xml & tmp used internally)
-	parseXML: function( data , xml , tmp ) {
-
-		if ( window.DOMParser ) { // Standard
-			tmp = new DOMParser();
-			xml = tmp.parseFromString( data , "text/xml" );
-		} else { // IE
-			xml = new ActiveXObject( "Microsoft.XMLDOM" );
-			xml.async = "false";
-			xml.loadXML( data );
+	parseXML: function( data ) {
+		var xml, tmp;
+		try {
+			if ( window.DOMParser ) { // Standard
+				tmp = new DOMParser();
+				xml = tmp.parseFromString( data , "text/xml" );
+			} else { // IE
+				xml = new ActiveXObject( "Microsoft.XMLDOM" );
+				xml.async = "false";
+				xml.loadXML( data );
+			}
+		} catch( e ) {
+			xml = undefined;
 		}
-
-		tmp = xml.documentElement;
-
-		if ( ! tmp || ! tmp.nodeName || tmp.nodeName === "parsererror" ) {
+		if ( !xml || !xml.documentElement || xml.getElementsByTagName( "parsererror" ).length ) {
 			jQuery.error( "Invalid XML: " + data );
 		}
-
 		return xml;
 	},
 
@@ -2623,10 +2550,10 @@ jQuery.extend({
 		}
 	},
 
-	// Converts a dashed string to camelCased string;
-	// Used by both the css and data modules
+	// Convert dashed to camelCase; used by the css and data modules
+	// Microsoft forgot to hump their vendor prefix (#9572)
 	camelCase: function( string ) {
-		return string.replace( rdashAlpha, fcamelCase );
+		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
 	},
 
 	nodeName: function( elem, name ) {
@@ -2711,6 +2638,9 @@ jQuery.extend({
 	},
 
 	inArray: function( elem, array ) {
+		if ( !array ) {
+			return -1;
+		}
 
 		if ( indexOf ) {
 			return indexOf.call( array, elem );
@@ -3083,7 +3013,7 @@ jQuery.extend({
 								if ( returned && jQuery.isFunction( returned.promise ) ) {
 									returned.promise().then( newDefer.resolve, newDefer.reject );
 								} else {
-									newDefer[ action ]( returned );
+									newDefer[ action + "With" ]( this === deferred ? newDefer : this, [ returned ] );
 								}
 							});
 						} else {
@@ -3184,6 +3114,7 @@ jQuery.support = (function() {
 	// Preliminary tests
 	div.setAttribute("className", "t");
 	div.innerHTML = "   <link/><table></table><a href='/a' style='top:1px;float:left;opacity:.55;'>a</a><input type='checkbox'/>";
+
 
 	all = div.getElementsByTagName( "*" );
 	a = div.getElementsByTagName( "a" )[ 0 ];
@@ -3305,13 +3236,14 @@ jQuery.support = (function() {
 		width: 0,
 		height: 0,
 		border: 0,
-		margin: 0
+		margin: 0,
+		background: "none"
 	};
 	if ( body ) {
 		jQuery.extend( testElementStyle, {
 			position: "absolute",
-			left: -1000,
-			top: -1000
+			left: "-1000px",
+			top: "-1000px"
 		});
 	}
 	for ( i in testElementStyle ) {
@@ -3416,7 +3348,7 @@ jQuery.boxModel = jQuery.support.boxModel;
 
 
 var rbrace = /^(?:\{.*\}|\[.*\])$/,
-	rmultiDash = /([a-z])([A-Z])/g;
+	rmultiDash = /([A-Z])/g;
 
 jQuery.extend({
 	cache: {},
@@ -3448,7 +3380,9 @@ jQuery.extend({
 			return;
 		}
 
-		var internalKey = jQuery.expando, getByName = typeof name === "string", thisCache,
+		var thisCache, ret,
+			internalKey = jQuery.expando,
+			getByName = typeof name === "string",
 
 			// We have to handle DOM nodes and JS objects differently because IE6-7
 			// can't GC object references properly across the DOM-JS boundary
@@ -3464,7 +3398,7 @@ jQuery.extend({
 
 		// Avoid doing any more work than we need to when trying to get data on an
 		// object that has no data at all
-		if ( (!id || (pvt && id && !cache[ id ][ internalKey ])) && getByName && data === undefined ) {
+		if ( (!id || (pvt && id && (cache[ id ] && !cache[ id ][ internalKey ]))) && getByName && data === undefined ) {
 			return;
 		}
 
@@ -3523,10 +3457,24 @@ jQuery.extend({
 			return thisCache[ internalKey ] && thisCache[ internalKey ].events;
 		}
 
-		return getByName ? 
-			// Check for both converted-to-camel and non-converted data property names
-			thisCache[ jQuery.camelCase( name ) ] || thisCache[ name ] :
-			thisCache;
+		// Check for both converted-to-camel and non-converted data property names
+		// If a data property was specified
+		if ( getByName ) {
+
+			// First Try to find as-is property data
+			ret = thisCache[ name ];
+
+			// Test for null|undefined property data
+			if ( ret == null ) {
+
+				// Try to find the camelCased property
+				ret = thisCache[ jQuery.camelCase( name ) ];
+			}
+		} else {
+			ret = thisCache;
+		}
+
+		return ret;
 	},
 
 	removeData: function( elem, name, pvt /* Internal Use Only */ ) {
@@ -3534,7 +3482,12 @@ jQuery.extend({
 			return;
 		}
 
-		var internalKey = jQuery.expando, isNode = elem.nodeType,
+		var thisCache,
+
+			// Reference to internal data cache key
+			internalKey = jQuery.expando,
+
+			isNode = elem.nodeType,
 
 			// See jQuery.data for more information
 			cache = isNode ? jQuery.cache : elem,
@@ -3549,9 +3502,16 @@ jQuery.extend({
 		}
 
 		if ( name ) {
-			var thisCache = pvt ? cache[ id ][ internalKey ] : cache[ id ];
+
+			thisCache = pvt ? cache[ id ][ internalKey ] : cache[ id ];
 
 			if ( thisCache ) {
+
+				// Support interoperable removal of hyphenated or camelcased keys
+				if ( !thisCache[ name ] ) {
+					name = jQuery.camelCase( name );
+				}
+
 				delete thisCache[ name ];
 
 				// If there is no data left in the cache, we want to continue
@@ -3578,7 +3538,8 @@ jQuery.extend({
 		// Browsers that fail expando deletion also refuse to delete expandos on
 		// the window, but it will allow it on all other JS objects; other browsers
 		// don't care
-		if ( jQuery.support.deleteExpando || cache != window ) {
+		// Ensure that `cache` is not a window object #10080
+		if ( jQuery.support.deleteExpando || !cache.setInterval ) {
 			delete cache[ id ];
 		} else {
 			cache[ id ] = null;
@@ -3702,7 +3663,8 @@ function dataAttr( elem, key, data ) {
 	// If nothing was found internally, try to fetch any
 	// data from the HTML5 data-* attribute
 	if ( data === undefined && elem.nodeType === 1 ) {
-		var name = "data-" + key.replace( rmultiDash, "$1-$2" ).toLowerCase();
+
+		var name = "data-" + key.replace( rmultiDash, "-$1" ).toLowerCase();
 
 		data = elem.getAttribute( name );
 
@@ -3922,8 +3884,7 @@ var rclass = /[\n\t\r]/g,
 	rfocusable = /^(?:button|input|object|select|textarea)$/i,
 	rclickable = /^a(?:rea)?$/i,
 	rboolean = /^(?:autofocus|autoplay|async|checked|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped|selected)$/i,
-	rinvalidChar = /\:|^on/,
-	formHook, boolHook;
+	nodeHook, boolHook;
 
 jQuery.fn.extend({
 	attr: function( name, value ) {
@@ -4061,7 +4022,7 @@ jQuery.fn.extend({
 	hasClass: function( selector ) {
 		var className = " " + selector + " ";
 		for ( var i = 0, l = this.length; i < l; i++ ) {
-			if ( (" " + this[i].className + " ").replace(rclass, " ").indexOf( className ) > -1 ) {
+			if ( this[i].nodeType === 1 && (" " + this[i].className + " ").replace(rclass, " ").indexOf( className ) > -1 ) {
 				return true;
 			}
 		}
@@ -4241,14 +4202,11 @@ jQuery.extend({
 			if ( !hooks ) {
 				// Use boolHook for boolean attributes
 				if ( rboolean.test( name ) ) {
-
 					hooks = boolHook;
 
-				// Use formHook for forms and if the name contains certain characters
-				} else if ( formHook && name !== "className" &&
-					(jQuery.nodeName( elem, "form" ) || rinvalidChar.test( name )) ) {
-
-					hooks = formHook;
+				// Use nodeHook if available( IE6/7 )
+				} else if ( nodeHook ) {
+					hooks = nodeHook;
 				}
 			}
 		}
@@ -4285,14 +4243,9 @@ jQuery.extend({
 		var propName;
 		if ( elem.nodeType === 1 ) {
 			name = jQuery.attrFix[ name ] || name;
-		
-			if ( jQuery.support.getSetAttribute ) {
-				// Use removeAttribute in browsers that support it
-				elem.removeAttribute( name );
-			} else {
-				jQuery.attr( elem, name, "" );
-				elem.removeAttributeNode( elem.getAttributeNode( name ) );
-			}
+
+			jQuery.attr( elem, name, "" );
+			elem.removeAttribute( name );
 
 			// Set corresponding property to false for boolean attributes
 			if ( rboolean.test( name ) && (propName = jQuery.propFix[ name ] || name) in elem ) {
@@ -4320,33 +4273,20 @@ jQuery.extend({
 				}
 			}
 		},
-		tabIndex: {
-			get: function( elem ) {
-				// elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
-				// http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
-				var attributeNode = elem.getAttributeNode("tabIndex");
-
-				return attributeNode && attributeNode.specified ?
-					parseInt( attributeNode.value, 10 ) :
-					rfocusable.test( elem.nodeName ) || rclickable.test( elem.nodeName ) && elem.href ?
-						0 :
-						undefined;
-			}
-		},
 		// Use the value property for back compat
-		// Use the formHook for button elements in IE6/7 (#1954)
+		// Use the nodeHook for button elements in IE6/7 (#1954)
 		value: {
 			get: function( elem, name ) {
-				if ( formHook && jQuery.nodeName( elem, "button" ) ) {
-					return formHook.get( elem, name );
+				if ( nodeHook && jQuery.nodeName( elem, "button" ) ) {
+					return nodeHook.get( elem, name );
 				}
 				return name in elem ?
 					elem.value :
 					null;
 			},
 			set: function( elem, value, name ) {
-				if ( formHook && jQuery.nodeName( elem, "button" ) ) {
-					return formHook.set( elem, value, name );
+				if ( nodeHook && jQuery.nodeName( elem, "button" ) ) {
+					return nodeHook.set( elem, value, name );
 				}
 				// Does not return so that setAttribute is also used
 				elem.value = value;
@@ -4395,7 +4335,7 @@ jQuery.extend({
 			}
 
 		} else {
-			if ( hooks && "get" in hooks && (ret = hooks.get( elem, name )) !== undefined ) {
+			if ( hooks && "get" in hooks && (ret = hooks.get( elem, name )) !== null ) {
 				return ret;
 
 			} else {
@@ -4404,14 +4344,33 @@ jQuery.extend({
 		}
 	},
 	
-	propHooks: {}
+	propHooks: {
+		tabIndex: {
+			get: function( elem ) {
+				// elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
+				// http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
+				var attributeNode = elem.getAttributeNode("tabindex");
+
+				return attributeNode && attributeNode.specified ?
+					parseInt( attributeNode.value, 10 ) :
+					rfocusable.test( elem.nodeName ) || rclickable.test( elem.nodeName ) && elem.href ?
+						0 :
+						undefined;
+			}
+		}
+	}
 });
+
+// Add the tabindex propHook to attrHooks for back-compat
+jQuery.attrHooks.tabIndex = jQuery.propHooks.tabIndex;
 
 // Hook for boolean attributes
 boolHook = {
 	get: function( elem, name ) {
 		// Align boolean attributes with corresponding properties
-		return jQuery.prop( elem, name ) ?
+		// Fall back to attribute presence where some booleans are not supported
+		var attrNode;
+		return jQuery.prop( elem, name ) === true || ( attrNode = elem.getAttributeNode( name ) ) && attrNode.nodeValue !== false ?
 			name.toLowerCase() :
 			undefined;
 	},
@@ -4437,12 +4396,10 @@ boolHook = {
 
 // IE6/7 do not support getting/setting some attributes with get/setAttribute
 if ( !jQuery.support.getSetAttribute ) {
-
-	// propFix is more comprehensive and contains all fixes
-	jQuery.attrFix = jQuery.propFix;
 	
-	// Use this for any attribute on a form in IE6/7
-	formHook = jQuery.attrHooks.name = jQuery.attrHooks.title = jQuery.valHooks.button = {
+	// Use this for any attribute in IE6/7
+	// This fixes almost every IE6/7 issue
+	nodeHook = jQuery.valHooks.button = {
 		get: function( elem, name ) {
 			var ret;
 			ret = elem.getAttributeNode( name );
@@ -4452,13 +4409,13 @@ if ( !jQuery.support.getSetAttribute ) {
 				undefined;
 		},
 		set: function( elem, value, name ) {
-			// Check form objects in IE (multiple bugs related)
-			// Only use nodeValue if the attribute node exists on the form
+			// Set the existing or create a new attribute node
 			var ret = elem.getAttributeNode( name );
-			if ( ret ) {
-				ret.nodeValue = value;
-				return value;
+			if ( !ret ) {
+				ret = document.createAttribute( name );
+				elem.setAttributeNode( ret );
 			}
+			return (ret.nodeValue = value + "");
 		}
 	};
 
@@ -4517,6 +4474,7 @@ if ( !jQuery.support.optSelected ) {
 					parent.parentNode.selectedIndex;
 				}
 			}
+			return null;
 		}
 	});
 }
@@ -5247,8 +5205,9 @@ if ( !jQuery.support.submitBubbles ) {
 		setup: function( data, namespaces ) {
 			if ( !jQuery.nodeName( this, "form" ) ) {
 				jQuery.event.add(this, "click.specialSubmit", function( e ) {
+					// Avoid triggering error on non-existent type attribute in IE VML (#7071)
 					var elem = e.target,
-						type = elem.type;
+						type = jQuery.nodeName( elem, "input" ) || jQuery.nodeName( elem, "button" ) ? elem.type : "";
 
 					if ( (type === "submit" || type === "image") && jQuery( elem ).closest("form").length ) {
 						trigger( "submit", this, arguments );
@@ -5257,7 +5216,7 @@ if ( !jQuery.support.submitBubbles ) {
 
 				jQuery.event.add(this, "keypress.specialSubmit", function( e ) {
 					var elem = e.target,
-						type = elem.type;
+						type = jQuery.nodeName( elem, "input" ) || jQuery.nodeName( elem, "button" ) ? elem.type : "";
 
 					if ( (type === "text" || type === "password") && jQuery( elem ).closest("form").length && e.keyCode === 13 ) {
 						trigger( "submit", this, arguments );
@@ -5282,7 +5241,8 @@ if ( !jQuery.support.changeBubbles ) {
 	var changeFilters,
 
 	getVal = function( elem ) {
-		var type = elem.type, val = elem.value;
+		var type = jQuery.nodeName( elem, "input" ) ? elem.type : "",
+			val = elem.value;
 
 		if ( type === "radio" || type === "checkbox" ) {
 			val = elem.checked;
@@ -7307,12 +7267,17 @@ jQuery.fn.extend({
 	// Determine the position of an element within
 	// the matched set of elements
 	index: function( elem ) {
-		if ( !elem || typeof elem === "string" ) {
-			return jQuery.inArray( this[0],
-				// If it receives a string, the selector is used
-				// If it receives nothing, the siblings are used
-				elem ? jQuery( elem ) : this.parent().children() );
+
+		// No argument, return index in parent
+		if ( !elem ) {
+			return ( this[0] && this[0].parentNode ) ? this.prevAll().length : -1;
 		}
+
+		// index in selector
+		if ( typeof elem === "string" ) {
+			return jQuery.inArray( this[0], jQuery( elem ) );
+		}
+
 		// Locate the position of the desired element
 		return jQuery.inArray(
 			// If it receives a jQuery object, the first element is used
@@ -8060,7 +8025,10 @@ jQuery.extend({
 			// with an element if you are cloning the body and one of the
 			// elements on the page has a name or id of "length"
 			for ( i = 0; srcElements[i]; ++i ) {
-				cloneFixAttributes( srcElements[i], destElements[i] );
+				// Ensure that the destination node is not null; Fixes #9587
+				if ( destElements[i] ) {
+					cloneFixAttributes( srcElements[i], destElements[i] );
+				}
 			}
 		}
 
@@ -8260,14 +8228,14 @@ function evalScript( i, elem ) {
 
 
 
+
 var ralpha = /alpha\([^)]*\)/i,
 	ropacity = /opacity=([^)]*)/,
 	// fixed for IE9, see #8346
 	rupper = /([A-Z]|^ms)/g,
 	rnumpx = /^-?\d+(?:px)?$/i,
 	rnum = /^-?\d/,
-	rrelNum = /^[+\-]=/,
-	rrelNumFilter = /[^+\-\.\de]+/g,
+	rrelNum = /^([\-+])=([\-+.\de]+)/,
 
 	cssShow = { position: "absolute", visibility: "hidden", display: "block" },
 	cssWidth = [ "Left", "Right" ],
@@ -8344,16 +8312,16 @@ jQuery.extend({
 		if ( value !== undefined ) {
 			type = typeof value;
 
-			// Make sure that NaN and null values aren't set. See: #7116
-			if ( type === "number" && isNaN( value ) || value == null ) {
-				return;
-			}
-
 			// convert relative number strings (+= or -=) to relative numbers. #7345
-			if ( type === "string" && rrelNum.test( value ) ) {
-				value = +value.replace( rrelNumFilter, "" ) + parseFloat( jQuery.css( elem, name ) );
+			if ( type === "string" && (ret = rrelNum.exec( value )) ) {
+				value = ( +( ret[1] + 1) * +ret[2] ) + parseFloat( jQuery.css( elem, name ) );
 				// Fixes bug #9237
 				type = "number";
+			}
+
+			// Make sure that NaN and null values aren't set. See: #7116
+			if ( value == null || type === "number" && isNaN( value ) ) {
+				return;
 			}
 
 			// If a number was passed in, add 'px' to the (except for certain CSS properties)
@@ -8471,18 +8439,29 @@ if ( !jQuery.support.opacity ) {
 
 		set: function( elem, value ) {
 			var style = elem.style,
-				currentStyle = elem.currentStyle;
+				currentStyle = elem.currentStyle,
+				opacity = jQuery.isNaN( value ) ? "" : "alpha(opacity=" + value * 100 + ")",
+				filter = currentStyle && currentStyle.filter || style.filter || "";
 
 			// IE has trouble with opacity if it does not have layout
 			// Force it by setting the zoom level
 			style.zoom = 1;
 
-			// Set the alpha filter to set the opacity
-			var opacity = jQuery.isNaN( value ) ?
-				"" :
-				"alpha(opacity=" + value * 100 + ")",
-				filter = currentStyle && currentStyle.filter || style.filter || "";
+			// if setting opacity to 1, and no other filters exist - attempt to remove filter attribute #6652
+			if ( value >= 1 && jQuery.trim( filter.replace( ralpha, "" ) ) === "" ) {
 
+				// Setting style.filter to null, "" & " " still leave "filter:" in the cssText
+				// if "filter:" is present at all, clearType is disabled, we want to avoid this
+				// style.removeAttribute is IE Only, but so apparently is this code path...
+				style.removeAttribute( "filter" );
+
+				// if there there is no filter style applied in a css rule, we are done
+				if ( currentStyle && !currentStyle.filter ) {
+					return;
+				}
+			}
+
+			// otherwise, set new filter values
 			style.filter = ralpha.test( filter ) ?
 				filter.replace( ralpha, opacity ) :
 				filter + " " + opacity;
@@ -8637,9 +8616,9 @@ var r20 = /%20/g,
 	rCRLF = /\r?\n/g,
 	rhash = /#.*$/,
 	rheaders = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg, // IE leaves an \r character at EOL
-	rinput = /^(?:color|date|datetime|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
+	rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,
 	// #7653, #8125, #8152: local protocol detection
-	rlocalProtocol = /^(?:about|app|app\-storage|.+\-extension|file|widget):$/,
+	rlocalProtocol = /^(?:about|app|app\-storage|.+\-extension|file|res|widget):$/,
 	rnoContent = /^(?:GET|HEAD)$/,
 	rprotocol = /^\/\//,
 	rquery = /\?/,
@@ -8674,7 +8653,10 @@ var r20 = /%20/g,
 	ajaxLocation,
 
 	// Document location segments
-	ajaxLocParts;
+	ajaxLocParts,
+	
+	// Avoid comment-prolog char sequence (#10098); must appease lint and evade compression
+	allTypes = ["*/"] + ["*"];
 
 // #8138, IE may throw an exception when accessing
 // a field from window.location if document.domain has been set
@@ -8765,6 +8747,22 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 	// unnecessary when only executing (prefilters)
 	// but it'll be ignored by the caller in that case
 	return selection;
+}
+
+// A special extend for ajax options
+// that takes "flat" options (not to be deep extended)
+// Fixes #9887
+function ajaxExtend( target, src ) {
+	var key, deep,
+		flatOptions = jQuery.ajaxSettings.flatOptions || {};
+	for( key in src ) {
+		if ( src[ key ] !== undefined ) {
+			( flatOptions[ key ] ? target : ( deep || ( deep = {} ) ) )[ key ] = src[ key ];
+		}
+	}
+	if ( deep ) {
+		jQuery.extend( true, target, deep );
+	}
 }
 
 jQuery.fn.extend({
@@ -8910,23 +8908,16 @@ jQuery.extend({
 	// Creates a full fledged settings object into target
 	// with both ajaxSettings and settings fields.
 	// If target is omitted, writes into ajaxSettings.
-	ajaxSetup: function ( target, settings ) {
-		if ( !settings ) {
-			// Only one parameter, we extend ajaxSettings
-			settings = target;
-			target = jQuery.extend( true, jQuery.ajaxSettings, settings );
+	ajaxSetup: function( target, settings ) {
+		if ( settings ) {
+			// Building a settings object
+			ajaxExtend( target, jQuery.ajaxSettings );
 		} else {
-			// target was provided, we extend into it
-			jQuery.extend( true, target, jQuery.ajaxSettings, settings );
+			// Extending ajaxSettings
+			settings = target;
+			target = jQuery.ajaxSettings;
 		}
-		// Flatten fields we don't want deep extended
-		for( var field in { context: 1, url: 1 } ) {
-			if ( field in settings ) {
-				target[ field ] = settings[ field ];
-			} else if( field in jQuery.ajaxSettings ) {
-				target[ field ] = jQuery.ajaxSettings[ field ];
-			}
-		}
+		ajaxExtend( target, settings );
 		return target;
 	},
 
@@ -8954,7 +8945,7 @@ jQuery.extend({
 			html: "text/html",
 			text: "text/plain",
 			json: "application/json, text/javascript",
-			"*": "*/*"
+			"*": allTypes
 		},
 
 		contents: {
@@ -8984,6 +8975,15 @@ jQuery.extend({
 
 			// Parse text as xml
 			"text xml": jQuery.parseXML
+		},
+
+		// For options that shouldn't be deep extended:
+		// you can add your own custom options here if
+		// and when you create one that shouldn't be
+		// deep extended (see ajaxExtend)
+		flatOptions: {
+			context: true,
+			url: true
 		}
 	},
 
@@ -9094,7 +9094,7 @@ jQuery.extend({
 		// Callback for when everything is done
 		// It is defined here because jslint complains if it is declared
 		// at the end of the function (which would be more logical and readable)
-		function done( status, statusText, responses, headers ) {
+		function done( status, nativeStatusText, responses, headers ) {
 
 			// Called once
 			if ( state === 2 ) {
@@ -9117,11 +9117,12 @@ jQuery.extend({
 			responseHeadersString = headers || "";
 
 			// Set readyState
-			jqXHR.readyState = status ? 4 : 0;
+			jqXHR.readyState = status > 0 ? 4 : 0;
 
 			var isSuccess,
 				success,
 				error,
+				statusText = nativeStatusText,
 				response = responses ? ajaxHandleResponses( s, jqXHR, responses ) : undefined,
 				lastModified,
 				etag;
@@ -9173,7 +9174,7 @@ jQuery.extend({
 
 			// Set data for the fake xhr object
 			jqXHR.status = status;
-			jqXHR.statusText = statusText;
+			jqXHR.statusText = "" + ( nativeStatusText || statusText );
 
 			// Success/Error
 			if ( isSuccess ) {
@@ -9195,7 +9196,7 @@ jQuery.extend({
 			completeDeferred.resolveWith( callbackContext, [ jqXHR, statusText ] );
 
 			if ( fireGlobals ) {
-				globalEventContext.trigger( "ajaxComplete", [ jqXHR, s] );
+				globalEventContext.trigger( "ajaxComplete", [ jqXHR, s ] );
 				// Handle the global AJAX counter
 				if ( !( --jQuery.active ) ) {
 					jQuery.event.trigger( "ajaxStop" );
@@ -9276,6 +9277,8 @@ jQuery.extend({
 			// If data is available, append data to url
 			if ( s.data ) {
 				s.url += ( rquery.test( s.url ) ? "&" : "?" ) + s.data;
+				// #9682: remove data so that it's not used in an eventual retry
+				delete s.data;
 			}
 
 			// Get ifModifiedKey before adding the anti-cache parameter
@@ -9313,7 +9316,7 @@ jQuery.extend({
 		jqXHR.setRequestHeader(
 			"Accept",
 			s.dataTypes[ 0 ] && s.accepts[ s.dataTypes[0] ] ?
-				s.accepts[ s.dataTypes[0] ] + ( s.dataTypes[ 0 ] !== "*" ? ", */*; q=0.01" : "" ) :
+				s.accepts[ s.dataTypes[0] ] + ( s.dataTypes[ 0 ] !== "*" ? ", " + allTypes + "; q=0.01" : "" ) :
 				s.accepts[ "*" ]
 		);
 
@@ -9359,7 +9362,7 @@ jQuery.extend({
 				transport.send( requestHeaders, done );
 			} catch (e) {
 				// Propagate exception as error if not done
-				if ( status < 2 ) {
+				if ( state < 2 ) {
 					done( -1, e );
 				// Simply rethrow otherwise
 				} else {
@@ -10007,10 +10010,7 @@ var elemdisplay = {},
 		// opacity animations
 		[ "opacity" ]
 	],
-	fxNow,
-	requestAnimationFrame = window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame ||
-		window.oRequestAnimationFrame;
+	fxNow;
 
 jQuery.fn.extend({
 	show: function( speed, easing, callback ) {
@@ -10386,8 +10386,7 @@ jQuery.fx.prototype = {
 	// Start an animation from one number to another
 	custom: function( from, to, unit ) {
 		var self = this,
-			fx = jQuery.fx,
-			raf;
+			fx = jQuery.fx;
 
 		this.startTime = fxNow || createFxNow();
 		this.start = from;
@@ -10403,20 +10402,7 @@ jQuery.fx.prototype = {
 		t.elem = this.elem;
 
 		if ( t() && jQuery.timers.push(t) && !timerId ) {
-			// Use requestAnimationFrame instead of setInterval if available
-			if ( requestAnimationFrame ) {
-				timerId = true;
-				raf = function() {
-					// When timerId gets set to null at any point, this stops
-					if ( timerId ) {
-						requestAnimationFrame( raf );
-						fx.tick();
-					}
-				};
-				requestAnimationFrame( raf );
-			} else {
-				timerId = setInterval( fx.tick, fx.interval );
-			}
+			timerId = setInterval( fx.tick, fx.interval );
 		}
 	},
 
@@ -10959,9 +10945,10 @@ jQuery.each([ "Height", "Width" ], function( i, name ) {
 		if ( jQuery.isWindow( elem ) ) {
 			// Everyone else use document.documentElement or document.body depending on Quirks vs Standards mode
 			// 3rd condition allows Nokia support, as it supports the docElem prop but not CSS1Compat
-			var docElemProp = elem.document.documentElement[ "client" + name ];
+			var docElemProp = elem.document.documentElement[ "client" + name ],
+				body = elem.document.body;
 			return elem.document.compatMode === "CSS1Compat" && docElemProp ||
-				elem.document.body[ "client" + name ] || docElemProp;
+				body && body[ "client" + name ] || docElemProp;
 
 		// Get document width or height
 		} else if ( elem.nodeType === 9 ) {
@@ -10991,10 +10978,7 @@ jQuery.each([ "Height", "Width" ], function( i, name ) {
 // Expose jQuery to the global object
 window.jQuery = window.$ = jQuery;
 })(window);
-
 //Register jQuery as a module.
 if (typeof define !== "undefined" && define.amd) {
     define('jquery',[], function() {return jQuery });
 }
-
-define("require-jquery", function(){});
