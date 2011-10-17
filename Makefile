@@ -75,7 +75,7 @@ highcharts:
 	@echo 'Setting up submodule highcharts...'
 	@cp ./modules/highcharts/js/highcharts.src.js ${JS_SRC_DIR}/vendor/highcharts.js
 
-optimize:
+optimize: clean
 	@echo 'Optimizing the javascript...'
 	@mkdir -p ${JS_MIN_DIR}
 	@${REQUIRE_OPTIMIZE} > /dev/null
