@@ -40,7 +40,7 @@ define [
             events:
                 'mouseenter div': 'mouseenter'
                 'mouseleave div': 'mouseleave'
-                'click div': 'click'
+                'click': 'click'
 
             initialize: ->
                 super
