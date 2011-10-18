@@ -1,3 +1,4 @@
+include LICENSE
 exclude cilantro/static/js/app.build.js
 exclude cilantro/static/config.rb
 

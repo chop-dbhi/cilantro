@@ -72,13 +72,13 @@ version = __import__(BASE_PACKAGE).get_version()
 
 setup(
     version = version,
-    name = 'django-cilantro',
+    name = 'cilantro',
     author = 'Byron Ruth',
     author_email = 'ruthb@email.chop.edu',
     description = 'A client implementation for Serrano',
     license = 'BSD',
     keywords = 'snippets tools utilities',
-    url = 'https://github.com/cbmi/django-cilantro-pre',
+    url = 'https://github.com/cbmi/django-cilantro',
 
     packages = packages,
     cmdclass = cmdclasses,
