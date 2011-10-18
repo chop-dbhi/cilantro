@@ -132,13 +132,14 @@ define(['cilantro/define/criteria'],
         // Load any criteria on the session
         $.getJSON(session_api_uri, function(data){
               var conditions = {};
-              $.each(data.conditions, function(){
-                   conditions[this.concept_id]=this;
-              });
-              
               if ((data.store === null) || $.isEmptyObject(data.store)){
                   return;
               }
+
+              $.each(data.conditions, function(){
+                   conditions[this.concept_id]=this;
+              });
+
               if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
                   $.each(data.store.children, function(index, criteria_constraint){
                       App.hub.publish("UpdateQueryEvent", criteria_constraint, conditions[criteria_constraint.concept_id]);
