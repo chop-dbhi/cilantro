@@ -27,19 +27,19 @@
     // an array of modules to compile
     modules: [{
         
-        name: 'main'
+        name: 'cilantro/main'
 
     }, {
 
-        name: 'pages/workspace/main'
+        name: 'cilantro/pages/workspace/main'
 
     }, {
 
-        name: 'pages/define/main'
+        name: 'cilantro/pages/define/main'
 
     }, {
         
-        name: 'report/main'
+        name: 'cilantro/report/main'
 
     }]
 })
