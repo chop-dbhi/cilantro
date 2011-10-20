@@ -27,6 +27,9 @@ define [
 
         $ ->
 
+            $('#new-report').click ->
+                App.hub.publish 'report/clear'
+
             ReportEditor = new Report.Views.Editor
 
             ReportList = new Report.Views.List
