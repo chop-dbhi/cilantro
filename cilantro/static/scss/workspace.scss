@@ -24,6 +24,17 @@
     text-align: right;
 }
 
+#new-report {
+    @include clean-button(#c3d871);
+
+    strong {
+        font-size: 20px;
+    }
+    span {
+        color: darken(#c3d871, 50);
+    }
+}
+
 #session-report {
     > .column {
         @include inline-block;

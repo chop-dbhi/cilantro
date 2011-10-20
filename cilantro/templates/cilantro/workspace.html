@@ -12,6 +12,8 @@
     <script>
         var App = {
             urls: {
+                report: '{% url report %}',
+                define: '{% url define %}',
                 session: {
                     scope: '{% url api:scope:session %}',
                     perspective: '{% url api:perspectives:session %}',
@@ -47,6 +49,13 @@
                         <ul id="session-perspective"></ul>
                     </div>
                 </section>
+
+                <hr>
+
+                <button id="new-report">
+                    <strong>New Report</strong><br>
+                    <span>(make sure to save any unsaved changes first)</span>
+                </button>
 
             </div>
 
