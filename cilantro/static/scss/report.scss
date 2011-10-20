@@ -226,6 +226,10 @@
     }
 }
 
+#active-columns li {
+    cursor: move;
+}
+
 #active-columns li.placeholder {
     @include border-radius(0);
     display: block;
