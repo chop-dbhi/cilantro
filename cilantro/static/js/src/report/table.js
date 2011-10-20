@@ -135,7 +135,9 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                             if (json.per_page)
                                 per_page.val(json.per_page);
 
-                            report.trigger('resize-report');
+                            setTimeout(function() {
+                                report.trigger('resize-report');
+                            }, 300);
 
                             /*
                              * Unhide necessary elements on first request.
@@ -163,10 +165,11 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             report.bind('resize-report', function(evt) {
                 var minWidth = 900,
                     rInnerWidth = report.innerWidth(),
-                    tOuterWidth = table.outerWidth(true)+20; // padding is not usable
+                    tOuterWidth = table.outerWidth(true) + 4; // padding is not usable
 
                 // do not grow past window width. take into account the padding
-                nInnerWidth = Math.min(tOuterWidth, $(window).width()-30);
+                var nInnerWidth = Math.min(tOuterWidth, $(window).width() - 30);
+                // do not shrink below the minimum width
                 nInnerWidth = Math.max(minWidth, nInnerWidth);
  
                 // determine the difference. half of it needs to be added
@@ -174,11 +177,8 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                 if (nInnerWidth == rInnerWidth)
                     return;
 
-                half = (nInnerWidth - rInnerWidth) / 2.0;
-                nLeft = parseInt(content.css('margin-left').match(/-?\d+/)[0]) - half;
-
                 content.animate({
-                    left: nLeft
+                    width: nInnerWidth
                 });
 
                 report.animate({
@@ -210,7 +210,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                 $.patchJSON(App.urls.session.perspective, JSON.stringify(params), function() {
                     body.trigger('update.report');
                     if ('columns' in params.replace)
-                        src.table_header.get(null, true); 
+                        src.table_header.get(null, true);
                 });
                 return false;
             });
