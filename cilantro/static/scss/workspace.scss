@@ -26,12 +26,11 @@
 
 #new-report {
     @include clean-button(#c3d871);
+    font-size: 1.3em;
 
-    strong {
-        font-size: 20px;
-    }
-    span {
-        color: darken(#c3d871, 50);
+    small {
+        font-size: 0.7em;
+        color: darken(#c3d871, 40);
     }
 }
 

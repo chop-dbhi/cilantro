@@ -136,7 +136,10 @@
         }
 
         > .instructions {
-            height: 100px;
+
+            h4 {
+                margin-top: 0;
+            }
 
             button {
                 margin: 5px 0;
