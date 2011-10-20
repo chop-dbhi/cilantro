@@ -25,8 +25,8 @@ define [
             url: App.urls.session.report
 
             defaults:
-                name: 'click to add a name...'
-                description: 'click to add a description...'
+                name: 'click to give your report a name...'
+                description: 'click to give your report a description...'
 
             initialize: ->
                 super
