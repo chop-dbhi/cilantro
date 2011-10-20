@@ -58,11 +58,6 @@ define [
                     <span class="info">- <span role="unique-count"></span> unique patients</span>
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
                     <div role="description"></div>
-                    <div class="controls">
-                        <button class="delete">Delete</button>
-                        <button class="edit">Edit</button>
-                        <button class="copy">Copy</button>
-                    </div>
                 </div>'
 
             parent: '#session-report'
