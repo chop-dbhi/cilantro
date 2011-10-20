@@ -34,10 +34,10 @@ define ['cilantro/vendor/backbone'], ->
             @
 
         show: ->
-            @el.fadeIn 1000, 'easeOutBounce'
+            @el.fadeIn 500
 
         hide: ->
-            @el.fadeOut 400, 'easeInExpo'
+            @el.fadeOut 300
 
 
     class LogView extends Backbone.View
@@ -51,7 +51,6 @@ define ['cilantro/vendor/backbone'], ->
 
         log: (view) =>
             # TODO add logic for handling higher priority messages..
-
             if not (view instanceof Backbone.View)
                 model = view
                 view = new MessageView

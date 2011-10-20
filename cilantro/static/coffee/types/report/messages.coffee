@@ -8,9 +8,10 @@ define [
             UnsavedReportTemplate:
                 '<div class="message-block warning">
                     <div class="content">
-                        <strong role="name"><%= name %></strong> has unsaved changes<br>
-                        <span class="info">To save it as a new Report, <a href="#">give it a new name</a>.</span>
-                    </div><div class="action">Save Report</div>
+                        <strong role="name"><%= name %></strong> has unsaved changes
+                    </div>
+                    <button class="revert">Revert</button>
+                    <button class="save">Save</button>
                 </div>'
 
 
@@ -21,7 +22,8 @@ define [
                 '[role=name]': 'name'
 
             events:
-                'click .action': 'save'
+                'click .save': 'save'
+                'click .cancel': 'cancel'
 
             initialize: ->
                 @render()
@@ -43,6 +45,8 @@ define [
 
             save: ->
                 @model.save(null, url: @model.get('permalink'))
+
+            cancel: ->
 
 
         return {
