@@ -27,6 +27,10 @@
 #new-report {
     @include clean-button(#c3d871);
     font-size: 1.3em;
+    width: 300px;
+    margin-left: -150px;
+    position: relative;
+    left: 50%;
 
     small {
         font-size: 0.7em;
