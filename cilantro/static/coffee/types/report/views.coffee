@@ -67,7 +67,7 @@ define [
 
         class ReportItem extends Backbone.View
             el: '<section class="report">
-                    <a role="name"></a>
+                    <strong><a role="name"></a></strong>
                     <span class="info">- <span role="unique-count"></span> unique patients</span>
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
                     <div role="description"></div>

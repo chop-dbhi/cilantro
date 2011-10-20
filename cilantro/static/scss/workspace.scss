@@ -1,12 +1,12 @@
 @import "coriander/mixins/all";
 
-.col {
+.column {
     @include inline-block;
     vertical-align: top;
-    width: 460px;
+    width: 463px;
 
     &:first-child {
-        margin-right: 15px;
+        margin-right: 10px;
     }
 
     h2 {
@@ -14,7 +14,7 @@
     }
 }
 
-[role='modified'] {
+[role=modified] {
     display: none;
 }
 
@@ -25,14 +25,21 @@
 }
 
 #session-report {
-    > div {
+    > .column {
         @include inline-block;
         vertical-align: top;
-        width: 217px;
+        width: 223px;
+        margin-top: 5px;
+
+        &:first-child {
+            margin-right: 15px;
+        }
     }
 }
 
 #session-scope, #session-perspective {
-    font-size: 0.9em;
+    font-size: 11px;
     list-style: disc;
+    padding-left: 30px;
+    margin: 0;
 }

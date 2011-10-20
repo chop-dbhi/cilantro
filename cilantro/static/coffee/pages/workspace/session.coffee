@@ -1,8 +1,9 @@
 define [
         'common/views/collection'
+        'cilantro/types/report/main'
     ],
 
-    (CollectionViews) ->
+    (CollectionViews, Report) ->
 
         class ScopeView extends CollectionViews.ExpandableList
             el: '#session-scope'
@@ -51,32 +52,32 @@ define [
                 @collapse()
 
 
-        class ReportView extends Backbone.View
-            el: '#session-report'
+        class ReportView extends Report.Views.Item
+            el: '<div>
+                    <strong><a role="name"></a></strong>
+                    <span class="info">- <span role="unique-count"></span> unique patients</span>
+                    <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
+                    <div role="description"></div>
+                    <div class="controls">
+                        <button class="delete">Delete</button>
+                        <button class="edit">Edit</button>
+                        <button class="copy">Copy</button>
+                    </div>
+                </div>'
 
-            elements:
-                '[role=name]': 'name'
-                '[role=modified]': 'modified'
-                '[role=timesince]': 'timesince'
-
-            events:
-                'click .timestamp': 'toggleTime'
+            parent: '#session-report'
 
             initialize: ->
+                @el.prependTo(@parent)
                 @model.bind 'change', @render
 
             render: =>
-                if @model.hasChanged 'name'
-                    @name.text(@model.get 'name').attr('href', @model.get('permalink')).parent().show()
-                else if not @model.get 'name'
-                    @name.parent().hide()
-
-                @modified.text @model.get('modified')
-                @timesince.text @model.get('timesince')
-
-            toggleTime: ->
-                @modified.toggle()
-                @timesince.toggle()
+                super
+                name = @model.get 'name'
+                if @model.hasChanged('name') and name
+                    @name.text(name).attr('href', @model.get('permalink')).parent().show()
+                else if not name
+                    @name.text('(session report)')
 
 
         return {

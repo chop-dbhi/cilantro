@@ -34,10 +34,10 @@ define ['cilantro/vendor/backbone'], ->
             @
 
         show: ->
-            @el.slideDown 1000, 'easeOutBounce'
+            @el.fadeIn 1000, 'easeOutBounce'
 
         hide: ->
-            @el.slideUp 400, 'easeInExpo'
+            @el.fadeOut 400, 'easeInExpo'
 
 
     class LogView extends Backbone.View
