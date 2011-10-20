@@ -56,8 +56,8 @@ define(['cilantro/define/view'],
           @type string
         */
         var add_query_tmpl = [
-            '<div class="message success">Condition has been added.</div>',
-            '<button id="add_to_query"></button>'
+            '<button id="add_to_query"></button>',
+            '<div class="message success">This condition has been added</div>'
         ].join('');
 
         /**
@@ -668,7 +668,7 @@ define(['cilantro/define/view'],
                    view.contents && view.contents.dom().find("[name="+target_name+"]").addClass("invalid"+evt.reason);
                    view.contents && view.contents.dom().find("[name="+target_name+"]").children().addClass("invalid"+evt.reason);
             });
-            var message = evt.message ? evt.message : "This query contains invalid input, please correct any invalid fields.";
+            var message = evt.message ? evt.message : "This condition contains invalid input. Please correct the above invalid fields.";
             var already_displayed = false;
             $.each($staticBox.find(".error"), function(index, warning) {
                 warning = $(warning);

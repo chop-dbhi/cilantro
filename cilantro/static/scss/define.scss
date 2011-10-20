@@ -256,6 +256,12 @@
     }
 }
 
+#plugin-dynamic-content {
+    .invalid {
+        border-color: red;
+    }
+}
+
 #plugin-static-content {
     margin-top: 10px;
 }
@@ -265,7 +271,6 @@
 }
 
 #add_to_query {
-    margin-top: 10px;
     float: right;
 }
 
