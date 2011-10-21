@@ -23,7 +23,7 @@ define [
 
             events:
                 'click .save': 'save'
-                'click .cancel': 'cancel'
+                'click .revert': 'revert'
 
             initialize: ->
                 @render()
@@ -46,7 +46,10 @@ define [
             save: ->
                 @model.save(null, url: @model.get('permalink'))
 
-            cancel: ->
+            revert: ->
+                @model.save null,
+                    data: JSON.stringify(revert: true)
+                    contentType: 'application/json'
 
 
         return {
