@@ -15,14 +15,14 @@ define [
 
 
         class ReportCollection extends polling.Collection
-            url: App.urls.reports
+            url: App.endpoints.reports
             model: Report
             comparator: (model) ->
                 return -Number(new Date model.get 'modified')
 
 
         class SessionReport extends polling.Model
-            url: App.urls.session.report
+            url: App.endpoints.session.report
 
             defaults:
                 name: 'click to give your report a name...'
@@ -36,7 +36,7 @@ define [
                 App.hub.subscribe 'report/clear', =>
                     @clear silent: true
                     @save null,
-                        success: -> window.location = App.urls.define
+                        success: -> window.location = App.endpoints.define
 
                 # subscribe to report changes so if the reference changes,
                 # it is immediately updated here on the session model

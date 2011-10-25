@@ -12,9 +12,9 @@ define ['cilantro/define/criteria'], (criteria) ->
             $run_query_div = $panel.find(".content"),
             $remove_criteria = $panel.find("#remove-criteria")
         
-        criteria_api_uri = App.urls.criteria
-        report_url = App.urls.report
-        session_api_uri = App.urls.session.scope
+        criteria_api_uri = App.endpoints.criteria
+        report_url = App.endpoints.report
+        session_api_uri = App.endpoints.session.scope
         
         
         # Grab the contents of panel while it is empty and save off the 

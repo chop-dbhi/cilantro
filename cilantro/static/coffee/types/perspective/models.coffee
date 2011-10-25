@@ -5,7 +5,7 @@ define [
     (polling) ->
 
         class SessionPerspective extends polling.Model
-            url: App.urls.session.perspective
+            url: App.endpoints.session.perspective
 
             initialize: ->
                 super

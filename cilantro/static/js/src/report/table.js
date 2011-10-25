@@ -6,7 +6,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
         // TODO remove hardcoded URL
         var EMPTY_RESULTS = '<div style="text-align: center; display: inline;" class="message warning">No results match your conditions. ' +
-            '<a href="' + App.urls.define + '">Refine your conditions</a>.</div>';
+            '<a href="' + App.endpoints.define + '">Refine your conditions</a>.</div>';
 
         function init() {
             var firstRequest = true;
@@ -67,7 +67,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             var src = {
                 scope_info: new m_datasource.ajax({
                     ajax: {
-                        url: App.urls.session.scope,
+                        url: App.endpoints.session.scope,
                         success: function(json) {
                             if (json.conditions) { 
                                 var t = '';
@@ -86,7 +86,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
                 table_header: new m_datasource.ajax({
                     ajax: {
-                        url: App.urls.session.perspective,
+                        url: App.endpoints.session.perspective,
                         success: function(json) {
                             rnd.table_header.render(json.header);
                         }
@@ -95,7 +95,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
                 table_rows: new m_datasource.ajax({
                     ajax: {
-                        url: App.urls.session.report,
+                        url: App.endpoints.session.report,
                         data: {data: 1},
                         beforeSend: function() {
                             report.block();
@@ -208,13 +208,13 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             body.bind('update.perspective', function(evt, params) {
                 if (params) {
                     params = {'replace': params}
-                    $.patchJSON(App.urls.session.perspective, JSON.stringify(params), function() {
+                    $.patchJSON(App.endpoints.session.perspective, JSON.stringify(params), function() {
                         body.trigger('update.report');
                         if ('columns' in params.replace)
                             src.table_header.get(null, true);
                     });
                 } else {
-                    $.getJSON(App.urls.session.perspective, function() {
+                    $.getJSON(App.endpoints.session.perspective, function() {
                         body.trigger('update.report');
                         src.table_header.get(null, true);
                     });

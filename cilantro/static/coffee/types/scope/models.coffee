@@ -5,7 +5,7 @@ define [
     (polling) ->
 
         class SessionScope extends polling.Model
-            url: App.urls.session.scope
+            url: App.endpoints.session.scope
 
             initialize: ->
                 super

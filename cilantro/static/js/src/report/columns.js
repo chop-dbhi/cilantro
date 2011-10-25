@@ -118,7 +118,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             var src = {
                 perspective: new m_datasource.ajax({
                     ajax: {
-                        url: App.urls.session.perspective,
+                        url: App.endpoints.session.perspective,
                         success: function(json) {
                             if (json.store) {
                                 columnsdialog.trigger('removeall.column');

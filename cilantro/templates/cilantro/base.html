@@ -74,6 +74,24 @@
                 priority: ['cilantro/main']
             };
 
+            // namespace for the application. defined here are all the
+            // necessary endpoints. this liste will hopefully decrease over
+            // time...
+            var App = {
+                endpoints: {
+                    session: {
+                        scope: '{% url api:scope:session %}',
+                        perspective: '{% url api:perspectives:session %}',
+                        report: '{% url api:reports:session %}'
+                    },
+                    reports: '{% url api:reports:read %}',
+                    domains: '{% url api:categories:read %}',
+                    criteria: '{% url api:criteria:read %}',
+                    define: '{% url define %}',
+                    report: '{% url report %}'
+                }
+            };
+
             {% block require_config %}
             {% endblock %}
         </script>

@@ -19,7 +19,7 @@ define [
 
         class ConceptCollection extends Backbone.Collection
             model: Concept
-            url: App.urls.criteria
+            url: App.endpoints.criteria
 
             initialize: ->
                 # when a domain is activated, only the concepts under that

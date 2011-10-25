@@ -12,7 +12,7 @@ define [
         class ConditionCollection extends Backbone.Collection
             model: Condition
 
-            url: App.urls.session.scope
+            url: App.endpoints.session.scope
 
             parse: (json) -> json.conditions
 

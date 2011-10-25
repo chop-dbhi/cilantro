@@ -9,20 +9,6 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script>
-        var App = {
-            urls: {
-                report: '{% url report %}',
-                define: '{% url define %}',
-                session: {
-                    scope: '{% url api:scope:session %}',
-                    perspective: '{% url api:perspectives:session %}',
-                    report: '{% url api:reports:session %}'
-                },
-                reports: '{% url api:reports:read %}'
-            }
-        };
-    </script>
     <script>require(['cilantro/pages/workspace/main']);</script>
 {% endblock %}
 

@@ -6,7 +6,7 @@ define [
     (stateview, Search) ->
 
         class ResultCollection extends Search.ResultCollection
-            url: App.urls.criteria
+            url: App.endpoints.criteria
 
 
         class ResultItemView extends stateview.View

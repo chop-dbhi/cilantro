@@ -21,7 +21,7 @@ define [
 
         class DomainCollection extends Backbone.Collection
             model: Domain
-            url: App.urls.domains
+            url: App.endpoints.domains
 
             initialize: ->
                 @bind 'active', @activate

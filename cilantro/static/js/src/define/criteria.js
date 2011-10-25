@@ -6,7 +6,7 @@ define(['cilantro/define/conceptmanager'],
         criteriaList.bind('activate-criterion', function(evt, id,element) {
             criteriaList.children().removeClass('selected');
             element.addClass("selected");
-            $.get(App.urls.criteria+id, function(data){
+            $.get(App.endpoints.criteria+id, function(data){
                 ConceptManager.show(data.viewset,element.data("constraint"));
             });
         });

@@ -33,7 +33,7 @@ require [
 
             e.bind 'click', ->
                 e.attr('disabled', true)
-                window.location = App.urls.session.report + '?data=1&format=csv'
+                window.location = App.endpoints.session.report + '?data=1&format=csv'
                 setTimeout ->
                     e.attr('disabled', false)
                 , 5000

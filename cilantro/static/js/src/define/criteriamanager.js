@@ -11,9 +11,9 @@ define(['cilantro/define/criteria'],
             $run_query_div = $panel.find(".content"),
             $remove_criteria = $panel.find("#clear-conditions");
         
-        var criteria_api_uri = App.urls.session.scope;
-        var report_url = App.urls.report;
-        var session_api_uri = App.urls.session.scope;
+        var criteria_api_uri = App.endpoints.session.scope;
+        var report_url = App.endpoints.report;
+        var session_api_uri = App.endpoints.session.scope;
         
         $criteria_div.append('<div class="message warning">You have not defined any conditions</div>');
         var $no_criteria_defined;
@@ -26,7 +26,7 @@ define(['cilantro/define/criteria'],
         // Setup click event handlers
         // run the query
         $run_query.click(function(){
-                window.location = App.urls.report;
+                window.location = App.endpoints.report;
         });
         
         // Hook into the remove all criteria link
