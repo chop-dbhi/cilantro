@@ -87,4 +87,4 @@ optimize: clean
 clean:
 	@rm -rf ${JS_MIN_DIR}
 
-.PHONY: all sass coffee watch unwatch optimize clean
+.PHONY: all sass coffee watch unwatch build optimize clean

@@ -44,12 +44,10 @@ define [
                 return @
 
             save: ->
-                @model.save(null, url: @model.get('permalink'))
+                @model.push()
 
             revert: ->
-                @model.save null,
-                    data: JSON.stringify(revert: true)
-                    contentType: 'application/json'
+                @model.revert()
 
 
         return {
