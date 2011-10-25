@@ -206,12 +206,19 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             });
 
             body.bind('update.perspective', function(evt, params) {
-                params = {'replace': params}
-                $.patchJSON(App.urls.session.perspective, JSON.stringify(params), function() {
-                    body.trigger('update.report');
-                    if ('columns' in params.replace)
+                if (params) {
+                    params = {'replace': params}
+                    $.patchJSON(App.urls.session.perspective, JSON.stringify(params), function() {
+                        body.trigger('update.report');
+                        if ('columns' in params.replace)
+                            src.table_header.get(null, true);
+                    });
+                } else {
+                    $.getJSON(App.urls.session.perspective, function() {
+                        body.trigger('update.report');
                         src.table_header.get(null, true);
-                });
+                    });
+                }
                 return false;
             });
 

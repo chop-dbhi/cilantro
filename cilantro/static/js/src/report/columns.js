@@ -121,9 +121,11 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                         url: App.urls.session.perspective,
                         success: function(json) {
                             if (json.store) {
+                                columnsdialog.trigger('removeall.column');
                                 var rcols = json.store.columns;
-                                for (var i=0; i < rcols.length; i++)
+                                for (var i=0; i < rcols.length; i++) {
                                     columnsdialog.trigger('add.column', [rcols[i]]);
+                                }
                             }
                         }
                     }
@@ -131,6 +133,11 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
             };
 
             src.perspective.get();
+
+            App.hub.subscribe('report/revert', function() {
+                src.perspective.get(null, true);
+                body.trigger('update.perspective');
+            });
 
             var descriptionBox = $('<div id="description"></div>')
                 .appendTo('body');
