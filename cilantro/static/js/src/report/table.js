@@ -216,6 +216,7 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                 } else {
                     $.getJSON(App.endpoints.session.perspective, function() {
                         body.trigger('update.report');
+                        src.scope_info.get(null, true);
                         src.table_header.get(null, true);
                     });
                 }

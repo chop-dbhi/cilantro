@@ -80,6 +80,7 @@
 
     .time {
         cursor: default;
+        margin: 2px 0 5px 0;
     }
 
     [role=description] {
@@ -89,6 +90,7 @@
         margin-top: 5px;
         background-color: #eee;
         font-size: 0.9em;
+        clear: both;
     }
 
     .controls {
