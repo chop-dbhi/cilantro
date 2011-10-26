@@ -19,6 +19,7 @@ require [
         conditions =  
             bind: ->
             fetch: ->
+            remove: ->
 
         #conditions = new Condition.Collection
 
