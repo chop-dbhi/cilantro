@@ -37,6 +37,8 @@ define(['cilantro/define/criteria'],
                }
            } 
         });
+
+
         
         // Listen for new criteria as it is added
         App.hub.subscribe("UpdateQueryEvent", function(criteria_constraint, english){
@@ -96,13 +98,13 @@ define(['cilantro/define/criteria'],
         });
 
         // Listen for removed criteria
-        App.hub.subscribe("CriteriaRemovedEvent", function($target){
+        App.hub.subscribe("CriteriaRemovedEvent", function($target, revert){
             var constraint = $target.data("constraint");
             criteria_cache[constraint.concept_id].remove();
             delete criteria_cache[constraint.concept_id];
             
             // Delete from the session
-            $.ajax({
+            !revert && $.ajax({
                 url:criteria_api_uri,
                 type:"PATCH",
                 data: JSON.stringify({remove:constraint}), 
@@ -128,9 +130,9 @@ define(['cilantro/define/criteria'],
              criteria_cache[model.id] && criteria_cache[model.id].siblings().removeClass("selected");
              criteria_cache[model.id] && criteria_cache[model.id].addClass("selected");
         });
+        
 
-        // Load any criteria on the session
-        $.getJSON(session_api_uri, function(data){
+        function getSession(data){
               var conditions = {};
               if ((data.store === null) || $.isEmptyObject(data.store)){
                   return;
@@ -149,6 +151,19 @@ define(['cilantro/define/criteria'],
               }       
               // Show the last condition
               $criteria_div.children().last().click();
+        }
+
+        // Load any criteria on the session
+        $.getJSON(session_api_uri, getSession);
+
+        App.hub.subscribe("report/revert", function(){
+             for (var key in criteria_cache){
+                 if (criteria_cache.hasOwnProperty(key)){
+                     App.hub.publish("CriteriaRemovedEvent", criteria_cache[key], true);
+                 }
+             } 
+             // reload any criteria on the session
+             $.getJSON(session_api_uri, getSession);
         });
 
         return {
