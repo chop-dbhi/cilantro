@@ -37,6 +37,7 @@ define [
                         domain.activate()
                         subdomain.activate()
 
+            comparator: (model) -> model.get 'order'
 
             # override parse to differentiate domains from subdomains. all domains
             # without a parent will be returned to be added to this collection. all
@@ -56,7 +57,11 @@ define [
                 subdomains = _.flatten _.values groups
                 for key of groups
                     id = parseInt(key)
-                    subdomains.push id: id, name: 'All', parent: id: id
+                    subdomains.push
+                        id: id
+                        name: 'All'
+                        parent:
+                            id: id
 
                 @subdomains.reset subdomains
 
@@ -93,7 +98,7 @@ define [
                 @bind 'inactive', @inactivate
 
 
-            comparator: (model) -> model.id
+            comparator: (model) -> model.get 'order'
 
             # which subdomains can be active and deactivated depend on the domain
             # they are associated with. only subdomains within the domain need

@@ -81,10 +81,11 @@
             color: #333;
             cursor: pointer;        
         }
-        // inner text
+
         > span {
+            vertical-align: middle;
             position: relative;
-            top: -8px;
+            top: 2px;
         }
     }
     
