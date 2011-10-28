@@ -71,7 +71,7 @@ define [
                 view = @childViews[id]
                 @description.show view, 'right'
 
-            mouseleave: ->
+            mouseleave: (event) ->
                 @description.hide()
 
             # on click, immediately hide the description, so description does not
