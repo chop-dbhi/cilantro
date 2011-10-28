@@ -47,6 +47,11 @@ define [
                 @collection.bind 'active', @activate
                 @description = new ConceptDescriptionPopover
 
+            reset: (collection, options) ->
+                super
+                # fade-in the criteria-wrap
+                if options.initial then @el.parent().fadeIn()
+
             # convenience method for auto-scrolling to a particular concept within
             # this collection view.
             scrollToConcept: (model) =>

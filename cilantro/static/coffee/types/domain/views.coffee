@@ -38,6 +38,12 @@ define [
             el: '#domains'
             viewClass: DomainView
 
+            reset: (collection, options) ->
+                super
+                # fade-in the tabs
+                if options.initial then $('#tabs').fadeIn()
+
+
 
         class SubdomainView extends DomainView
             el: '<span role="name"></span>'
@@ -46,7 +52,7 @@ define [
                 @
 
 
-        class SubdomainCollectionView extends DomainCollectionView
+        class SubdomainCollectionView extends collectionview.View
             el: '#subdomains'
             viewClass: SubdomainView
 
@@ -58,9 +64,9 @@ define [
 
             toggleEnableByDomain: (id) =>
                 if not @collection._byDomain[id]
-                    if not @el.is(':hidden') then @el.fadeTo(100, 0).slideUp('fast')
+                    if not @el.is(':hidden') then @el.slideUp('fast')
                 else if @el.is(':hidden')
-                    @el.slideDown('fast').fadeTo(100, 1)
+                    @el.slideDown('fast')
 
         return {
             DomainView: DomainView

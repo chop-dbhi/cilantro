@@ -57,8 +57,7 @@ define [
                 if not @input
                     @input = new @inputViewClass
                     @input.results = @
-                    @defaultContent = $(@defaultContent).hide()
-                    @content.append @defaultContent
+                    @defaultContent = $(@defaultContent)
                 @render()
                 super
 
@@ -67,7 +66,6 @@ define [
 
             render: ->
                 @el.appendTo 'body'
-                @reposition()
                 $(window).bind 'resize', @reposition
                 @
 
@@ -85,9 +83,9 @@ define [
                 @collection.query(value)
                     .success (ids) =>
                         if ids.length
-                            @defaultContent.hide()
+                            @defaultContent.detach()
                         else
-                            @defaultContent.show()
+                            @defaultContent.show().prependTo(@content)
 
             mouseenter: ->
                 @entered = true
@@ -97,6 +95,7 @@ define [
                 @hide() if not @input.focused
 
             show: ->
+                @reposition()
                 @el.fadeIn('fast')
 
             hide: ->

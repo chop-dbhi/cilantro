@@ -13,6 +13,7 @@ cilantro/static/js/src/pages
 cilantro/static/js/src/types
 cilantro/static/js/src/common
 cilantro/static/js/src/utils/logging.js
+cilantro/static/js/src/utils/search.js
 
 # RequireJS optimizer may leave this behind
 cilantro/static/js/min

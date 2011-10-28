@@ -23,10 +23,8 @@
 
             {% spaceless %}
             <div id="tabs">
-                <form method="get" action="{% url api:criteria:read %}">
-                    <input id="concept-search" type="text" name="q" autocomplete="off" placeholder="Search...">
-                </form>
-                <div id="domains" data-uri="{% url api:categories:read %}"></div>
+                <input id="concept-search" type="text" name="q" autocomplete="off" placeholder="Search...">
+                <div id="domains"></div>
             </div>
  
             <div id="subdomains" class="tabs"></div>
@@ -56,7 +54,7 @@
                 </section>
                 
                 <section id="criteria-wrap">
-                    <div id="criteria" data-uri="{% url api:criteria:read %}">
+                    <div id="criteria">
                         <em id="no-results"></em>
                     </div>
                 </section>
@@ -70,11 +68,15 @@
 
             <div class="title">
                 <button id="clear-conditions">Clear</button>
-                Conditions
+                <span>Conditions</span>
             </div>
 
             <div class="content">
+                <div id="no-conditions" class="message warning">You have not defined any conditions</div>
                 <div id="condition-list"></div>
+                <div class="controls">
+                    <button id="get-report">Get Report</button>
+                </div>
             </div>
         </div>
 
