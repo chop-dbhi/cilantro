@@ -25,40 +25,6 @@
     cursor: pointer;
 }
 
-#report-info {
-    textarea { display: none; width: 99%; }
-    p { margin: 0; }
-
-    $bgcolor: #f9f9f9;
-    background-color: $bgcolor;
-
-    border: {
-        top: 1px solid darken($bgcolor, 30);
-        left: 1px solid darken($bgcolor, 30);
-        right: 1px solid darken($bgcolor, 30);
-    }
-
-    &.unsaved {
-        $bgcolor: #f3f2d6;
-        background-color: $bgcolor;
-        border: {
-            top: 1px solid darken($bgcolor, 30);
-            left: 1px solid darken($bgcolor, 30);
-            right: 1px solid darken($bgcolor, 30);
-        }
-    }
-
-    &.saved {
-        $bgcolor: #e0f3d6;
-        background-color: $bgcolor;
-        border: {
-            top: 1px solid darken($bgcolor, 30);
-            left: 1px solid darken($bgcolor, 30);
-            right: 1px solid darken($bgcolor, 30);
-        }
-    }
-}
-
 .report {
     @include box-shadow(none);
     @include transition((box-shadow, border), 0.5s, ease-in-out);

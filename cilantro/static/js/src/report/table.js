@@ -4,10 +4,6 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
 
     function(m_datasource, m_renderer, m_templates) {
 
-        // TODO remove hardcoded URL
-        var EMPTY_RESULTS = '<div style="text-align: center; display: inline;" class="message warning">No results match your conditions. ' +
-            '<a href="' + App.endpoints.define + '">Refine your conditions</a>.</div>';
-
         function init() {
             var firstRequest = true;
 
@@ -24,7 +20,8 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                 per_page = $('.per-page'),              // data loading
                 pages = $('.page-links'),               // data loading
                 unique = $('#report-unique'),            // data loading
-                count = $('#report-count');                    // data loading
+                count = $('#report-count'),                    // data loading
+                noResults = $('#no-results');
 
             /*
              * The renderers necessary for rendering the response data into HTML
@@ -117,39 +114,32 @@ define(['cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/t
                             }
                             
                             if (json.count === 0) {
-                                $('.content').html(EMPTY_RESULTS).css('text-align', 'center');
+                                table.hide();
+                                toolbars.hide();
+                                noResults.show();
                                 actions.hide();
                                 return;
+                            } else {
+                                noResults.hide();
+                                table.show();
+                                actions.show();
+                                toolbars.show();
                             }
 
                             rnd.table_rows.render(json.rows); 
 
                             if (json.pages) {
                                 rnd.pages.render(json.pages);
+                                rnd.pages.target.show();
                             } else {
-                                if (firstRequest)
-                                    per_page.hide();
                                 rnd.pages.target.hide();
                             }
 
-                            if (json.per_page)
+                            if (json.per_page) {
                                 per_page.val(json.per_page);
-
-                            setTimeout(function() {
-                                report.trigger('resize-report');
-                            }, 300);
-
-                            /*
-                             * Unhide necessary elements on first request.
-                             */
-                            if (firstRequest) {
-                                firstRequest = false;
-                                setTimeout(function() {
-                                    info.show();
-                                    toolbars.show();
-                                    table.show();
-                                }, 500);
                             }
+
+                            report.trigger('resize-report');
                         }
                     }
                 })

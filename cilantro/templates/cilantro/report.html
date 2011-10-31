@@ -17,8 +17,6 @@
         <div id="report-name" class="title"></div>
 
         <div id="report-info" class="info">
-            <p role="description"></p>
-
             {# this is here because it is floated to the right #}
             <div id="actions">
                 {% spaceless %}
@@ -55,6 +53,10 @@
 
         <div class="content">
             <div id="table-wrap">
+                <div id="no-results">
+                    <span class="message warning">No results match your conditions.
+                        <a href="{% url define %}">Refine your conditions</a>.</span>
+                </div>
                 <table id="table" class="sortable">
                     <thead><tr></tr></thead>
                     <tbody></tbody>
