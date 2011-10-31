@@ -68,7 +68,7 @@ define [
         class ReportItem extends Backbone.View
             el: '<section class="report">
                     <strong><a role="name"></a></strong>
-                    <span class="info">- <span role="unique-count"></span> unique patients</span>
+                    <span class="info">- <span role="unique-count"></span> unique <span role="verbose-name"></span></span>
                     <span class="info time" style="float: right">modified <span role="modified"></span><span role="timesince"></span></span>
                     <div role="description"></div>
                     <div class="controls">
@@ -89,6 +89,7 @@ define [
             elements:
                 '[role=name]': 'name'
                 '[role=unique-count]': 'uniqueCount'
+                '[role=verbose-name]': 'verboseName'
                 '[role=modified]': 'modified'
                 '[role=timesince]': 'timesince'
                 '[role=description]': 'description'
@@ -99,10 +100,12 @@ define [
                 @name.attr 'href', @model.get 'permalink'
                 @modified.text @model.get 'modified'
                 @timesince.text @model.get 'timesince'
-                if not (description = @model.get 'description')
-                    description = 'No description provided'
-                @description.text description
+                if (description = @model.get 'description')
+                    @description.show().text description
+                else
+                    @description.hide().text 'No description provided'
                 @uniqueCount.text @model.get 'unique_count'
+                @verboseName.text @model.get 'model_name_plural'
                 @
 
             toggleTime: (evt) ->

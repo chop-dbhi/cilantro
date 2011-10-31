@@ -18,7 +18,6 @@
 
         <div id="report-info" class="info">
             <p role="description"></p>
-            <textarea name="description"></textarea>
 
             {# this is here because it is floated to the right #}
             <div id="actions">
@@ -32,7 +31,7 @@
 
             <div id="stats">
                 <div class="stat"><span id="report-count"></span><br>rows</div>
-                <div class="stat"><span id="report-unique"></span><br>patients</div>
+                <div class="stat"><span id="report-unique"></span><br>{{ model_name_plural }}</div>
             </div>
 
             <ul id="details">
@@ -87,7 +86,7 @@
                     <p class="info">Below are the columns of data that are available for
                     viewing. Note that depending on which columns are added to your report,
                     the the <em>number of rows</em> may change, but the <em>number of
-                    patients</em> will stay constant.</p>
+                    {{ model_name_plural }}</em> will stay constant.</p>
 
                     <form method="get" action="{% url api:columns:read %}">
                         <input id="search" class="search" type="text" name="q" autocomplete="off" placeholder="Search...">
