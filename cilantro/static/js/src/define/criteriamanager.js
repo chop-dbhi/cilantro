@@ -79,6 +79,8 @@ define(['cilantro/define/criteria'], function(criteria) {
            conditionCache[pk] =  new_criteria;
            getReportButton.removeAttr("disabled");
         }
+
+        App.hub.publish('concept/request', pk);
     });
 
     // Listen for removed criteria

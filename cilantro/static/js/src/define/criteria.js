@@ -20,6 +20,7 @@ define(['cilantro/define/conceptmanager'],
             });
             // Display the concept in the main area when the user clicks on the description
             element.click(function (evt) { 
+                App.hub.publish('concept/request', criteria_constraint.concept_id);
                 element.trigger('activate-criterion',
                     [criteria_constraint.concept_id,element]);
                  
