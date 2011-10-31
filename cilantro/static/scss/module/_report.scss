@@ -1,5 +1,5 @@
 #report-editor {
-    @extend .clearfix;
+    @include clearfix;
 
     input[name="name"] {
         font-size: 22px;
@@ -63,6 +63,7 @@
     @include box-shadow(none);
     @include transition((box-shadow, border), 0.5s, ease-in-out);
     @include border-radius(3px);
+    @include clearfix;
 
     padding: 5px;
     margin-bottom: 10px;
@@ -81,6 +82,9 @@
     .time {
         cursor: default;
         margin: 2px 0 5px 0;
+        float: right;
+
+        ~ * { clear: right; }
     }
 
     [role=description] {
@@ -90,7 +94,6 @@
         margin-top: 5px;
         background-color: #eee;
         font-size: 0.9em;
-        clear: both;
     }
 
     .controls {

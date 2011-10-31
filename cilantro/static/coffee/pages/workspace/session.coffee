@@ -72,7 +72,7 @@ define [
                 if @model.hasChanged('name') and name
                     @name.text(name).attr('href', @model.get('permalink')).parent().show()
                 else if not name
-                    @name.text('(session report)')
+                    @name.text('(session)')
 
 
         return {

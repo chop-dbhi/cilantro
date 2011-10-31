@@ -39,6 +39,7 @@
 }
 
 #session-report {
+    > div { @include clearfix; }
     > .column {
         @include inline-block;
         vertical-align: top;

@@ -6,7 +6,8 @@ define [
 
         class Report extends Backbone.Model
             url: ->
-                if not /\/$/.test (url = super)
+                url = super
+                if not /\/$/.test url
                     url += '/'
                 return url
 
