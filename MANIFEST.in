@@ -1,5 +1,5 @@
 include LICENSE
-exclude cilantro/static/js/app.build.js
+exclude cilantro/static/javascript/app.build.js
 exclude cilantro/static/config.rb
 
 global-exclude .DS_Store

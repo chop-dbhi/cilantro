@@ -6,7 +6,7 @@
 <!-- Consider adding a manifest.appcache: h5bp.com/d/Offline -->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
     <head>
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}{{ CILANTRO.site_name }}{% endblock %}</title>
 
         <meta charset="utf-8"> 
         <!-- Use the .htaccess and remove these lines to avoid edge case issues.
@@ -20,7 +20,20 @@
         {% block styles %}{% endblock %}
     
         {% block head_scripts %}
-            <script src="{{ CILANTRO_JS_URL }}vendor/modernizr.js"></script>
+            <script src="{{ CILANTRO_JAVASCRIPT_URL }}vendor/modernizr.js"></script>
+            {% if CILANTRO.google_analytics and not debug %}
+                <script>
+                    var _gaq = _gaq || [];
+                    _gaq.push(['_setAccount', '{{ CILANTRO.google_analytics }}']);
+                    _gaq.push(['_trackPageview']);
+
+                    (function() {
+                        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                    })();
+                </script>
+            {% endif %}
         {% endblock %}
     </head>
     
@@ -59,14 +72,14 @@
                 // everything should be relative to the project's javascript
                 // url for convenience. Cilantro is namespaced within the
                 // project anyway
-                baseUrl: '{{ JS_URL }}',
+                baseUrl: '{{ JAVASCRIPT_URL }}',
 
                 // define the absolute path for cilantro since everything is
                 // namespaced under 'cilantro'
                 paths: {
-                    'cilantro': '{{ CILANTRO_JS_URL }}',
-                    'common': '{{ CILANTRO_JS_URL }}/common',
-                    'vendor': '{{ CILANTRO_JS_URL }}/vendor'
+                    'cilantro': '{{ CILANTRO_JAVASCRIPT_URL }}',
+                    'common': '{{ CILANTRO_JAVASCRIPT_URL }}/common',
+                    'vendor': '{{ CILANTRO_JAVASCRIPT_URL }}/vendor'
                 },
                 
                 // bootstrap script containing the shared libraries for each
@@ -97,7 +110,7 @@
             {% endblock %}
         </script>
 
-        <script src="{{ CILANTRO_JS_URL }}vendor/require-jquery.js"></script>
+        <script src="{{ CILANTRO_JAVASCRIPT_URL }}vendor/require-jquery.js"></script>
 
         {% block scripts %}{% endblock %}
     </body>

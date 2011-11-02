@@ -1,7 +1,7 @@
 STATIC_DIR = cilantro/static
 COFFEE_DIR = ${STATIC_DIR}/coffee
-JS_SRC_DIR = ${STATIC_DIR}/js/src
-JS_MIN_DIR = ${STATIC_DIR}/js/min
+JS_SRC_DIR = ${STATIC_DIR}/javascript/src
+JS_MIN_DIR = ${STATIC_DIR}/javascript/min
 PID_FILE = .watch-pid
 
 HIGHCHARTS_SM = ${STATIC_DIR}/highcharts
@@ -16,7 +16,7 @@ COMPILE_SASS = `which sass` \
 			   ${SASS_DIR}:${CSS_DIR}
 COMPILE_COFFEE = `which coffee` -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
 WATCH_COFFEE = `which coffee` -w -b -o ${JS_SRC_DIR} -c ${COFFEE_DIR}
-REQUIRE_OPTIMIZE = `which node` bin/r.js -o cilantro/static/js/app.build.js
+REQUIRE_OPTIMIZE = `which node` bin/r.js -o cilantro/static/javascript/app.build.js
 
 LATEST_TAG = `git describe --tags \`git rev-list --tags --max-count=1\``
 

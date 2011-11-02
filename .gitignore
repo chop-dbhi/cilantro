@@ -5,18 +5,18 @@
 dist
 MANIFEST
 
-cilantro/static/js/src/lib/highcharts.js
+cilantro/static/javascript/src/lib/highcharts.js
 
 # compiled from CoffeeScript
-cilantro/static/js/src/main.js
-cilantro/static/js/src/pages
-cilantro/static/js/src/types
-cilantro/static/js/src/common
-cilantro/static/js/src/utils/logging.js
-cilantro/static/js/src/utils/search.js
+cilantro/static/javascript/src/main.js
+cilantro/static/javascript/src/pages
+cilantro/static/javascript/src/types
+cilantro/static/javascript/src/common
+cilantro/static/javascript/src/utils/logging.js
+cilantro/static/javascript/src/utils/search.js
 
 # RequireJS optimizer may leave this behind
-cilantro/static/js/min
+cilantro/static/javascript/min
 
 # Compiled from SCSS
 cilantro/static/css/*.css
@@ -25,5 +25,5 @@ cilantro/static/css/coriander
 # Submodule code
 cilantro/static/scss/coriander
 cilantro/static/coffee/common
-cilantro/static/js/src/vendor/jquery.idle.js
-cilantro/static/js/src/vendor/highcharts.js
+cilantro/static/javascript/src/vendor/jquery.idle.js
+cilantro/static/javascript/src/vendor/highcharts.js

@@ -1,4 +1,8 @@
+{% load markup %}
+
+{% spaceless %}
 <footer id="footer">
-    {% block footer %}{% endblock %}<br><br>
+    {% block footer %}{{ CILANTRO.footer_content|markdown }}{% endblock %}
     <div id="harvest-logo"></div>
 </footer>
+{% endspaceless %}

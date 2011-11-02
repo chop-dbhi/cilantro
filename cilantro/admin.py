@@ -1,4 +1,5 @@
 from django.contrib import admin
+from cilantro.models import Settings
 from avocado.fields.admin import FieldAdmin
 from avocado.models import Field
 
@@ -13,3 +14,4 @@ class ChartEnabledFieldAdmin(FieldAdmin):
 
 admin.site.unregister(Field)
 admin.site.register(Field, ChartEnabledFieldAdmin)
+admin.site.register(Settings)
