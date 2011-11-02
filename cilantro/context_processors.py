@@ -2,17 +2,20 @@ from django.contrib.sites.models import Site
 
 def media(request):
     from django.conf import settings
-    CILANTRO_STATIC_URL = getattr(settings, 'CILANTRO_STATIC_URL', None)
+    static_url = getattr(settings, 'CILANTRO_STATIC_URL', None)
 
-    if CILANTRO_STATIC_URL is None:
-        CILANTRO_STATIC_URL = settings.STATIC_URL + 'cilantro/'
+    if static_url is None:
+        static_url = settings.STATIC_URL + 'cilantro/'
 
-    _dir = 'src' if settings.DEBUG else 'min'
-    CILANTRO_JAVASCRIPT_URL = '%sjavascript/%s/' % (CILANTRO_STATIC_URL, _dir)
+    javascript_url = '{0}scripts/javascript/{1}/'.format(static_url,
+        'src' if settings.DEBUG else 'min')
+
+    css_url = '{0}stylesheets/css/'.format(static_url)
 
     return {
-        'CILANTRO_STATIC_URL': CILANTRO_STATIC_URL,
-        'CILANTRO_JAVASCRIPT_URL': CILANTRO_JAVASCRIPT_URL
+        'CILANTRO_STATIC_URL': static_url,
+        'CILANTRO_JAVASCRIPT_URL': javascript_url,
+        'CILANTRO_CSS_URL': css_url,
     }
 
 def settings(request):

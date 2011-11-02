@@ -1,0 +1,40 @@
+// default icons for navigation
+#main-nav {
+    > a, > span {
+        .workspace {
+            background: transparent url(../../images/icons/workspace.png) no-repeat 0 0;
+            height: 12px;
+        }
+
+        .databrowse {
+            background: transparent url(../../images/icons/databrowse.png) no-repeat 0 0;
+            height: 11px;
+        }
+
+        .query {
+            background: transparent url(../../images/icons/query.png) no-repeat 0 0;
+            top: 2px;
+            height: 13px;
+        }
+
+        .selected, &:hover, &:active {
+            .workspace {
+                background-position: 0 -13px;
+            }
+            .databrowse {
+                background-position: 0 -12px;
+            }
+            .query {
+                background-position: 0 -13px;
+            }
+        }
+    }
+}
+
+// the Harvest tractor
+#harvest-logo {
+    margin: 0 auto;
+    background: transparent url(../../images/harvest_tractor.png) no-repeat;
+    height: 33px;
+    width: 114px;
+}

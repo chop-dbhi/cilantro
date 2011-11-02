@@ -5,25 +5,25 @@
 dist
 MANIFEST
 
-cilantro/static/javascript/src/lib/highcharts.js
+cilantro/static/cilantro/scripts/javascript/src/lib/highcharts.js
 
 # compiled from CoffeeScript
-cilantro/static/javascript/src/main.js
-cilantro/static/javascript/src/pages
-cilantro/static/javascript/src/types
-cilantro/static/javascript/src/common
-cilantro/static/javascript/src/utils/logging.js
-cilantro/static/javascript/src/utils/search.js
+cilantro/static/cilantro/scripts/javascript/src/main.js
+cilantro/static/cilantro/scripts/javascript/src/pages
+cilantro/static/cilantro/scripts/javascript/src/types
+cilantro/static/cilantro/scripts/javascript/src/common
+cilantro/static/cilantro/scripts/javascript/src/utils/logging.js
+cilantro/static/cilantro/scripts/javascript/src/utils/search.js
 
 # RequireJS optimizer may leave this behind
-cilantro/static/javascript/min
+cilantro/static/cilantro/scripts/javascript/min
 
 # Compiled from SCSS
-cilantro/static/css/*.css
-cilantro/static/css/coriander
+cilantro/static/cilantro/stylesheets/css/*.css
+cilantro/static/cilantro/stylesheets/css/coriander
 
 # Submodule code
-cilantro/static/scss/coriander
-cilantro/static/coffee/common
-cilantro/static/javascript/src/vendor/jquery.idle.js
-cilantro/static/javascript/src/vendor/highcharts.js
+cilantro/static/cilantro/stylesheets/scss/coriander
+cilantro/static/cilantro/scripts/coffeescript/common
+cilantro/static/cilantro/scripts/javascript/src/vendor/jquery.idle.js
+cilantro/static/cilantro/scripts/javascript/src/vendor/highcharts.js

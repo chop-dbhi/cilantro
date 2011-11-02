@@ -1,0 +1,273 @@
+@import "coriander/mixins/all";
+
+#search {
+    @include search-box;
+    width: 405px;
+    margin: 5px 0;
+}
+
+#report {
+    > .info {
+        border-bottom: none;
+
+    }
+
+    .toolbar {
+        display: none;
+        text-align: right;
+
+        > * {
+            vertical-align: middle;
+        }
+    }
+
+    // contains the main data table, it provides a scrollable interface to
+    // ensure the user does not have to scroll horizontally
+    .content {
+        padding: 2px;
+        background-color: #f9f9f9;
+    }
+}
+
+#no-results {
+    display: none;
+    text-align: center;
+    padding: 10px 0;
+}
+
+#table-wrap {
+    @include horizontal-thin-scrollbar;
+    overflow: auto;
+}
+
+#table {
+    display: none;
+    margin: 0;
+
+    td {
+        -moz-user-select: auto;
+        -webkit-user-select: auto;
+        user-select: auto;
+    }
+}
+
+#stats {
+    @include inline-block;
+    text-align: left;
+    max-width: 400px;
+    padding: 0;
+    margin-left: 0;
+    list-style: none;
+    margin-right: 10px;
+
+    .stat {
+        @include inline-block;
+        @include box-shadow(0 2px 3px #ccc, inset 0 2px 3px #fff);
+        @include border-radius(3px);
+        min-width: 50px;
+        border: 1px solid #aaa;
+        margin-right: 5px;
+        padding: 5px;
+        text-align: center;
+        span {
+            font-size: 22px;
+            font-weight: 500;
+        }
+    }
+}
+
+#details {
+    @include inline-block;
+    vertical-align: top;
+    max-width: 400px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    margin-right: 10px;
+}
+
+#actions {
+    float: right;
+    width: 250px;
+    text-align: right;
+
+    button {
+        margin-left: 5px;
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}
+
+.page-links {
+
+    > * {
+        margin-right: 10px;
+    }
+
+    .pages {
+        @include inline-block;
+    }
+
+    .inactive {
+        color: #999;
+    }
+
+}
+
+.per-page {
+    font-size: 0.8em;
+}
+
+#columns-dialog {
+    display: none; /* for jquery ui dialog */
+
+     // contents gets extracted and put into #description
+    .description {
+        display: none;
+    }
+
+    .content > div {
+        @include inline-block;
+
+        text-shadow: 0 1px 2px #fff;
+
+        margin: 0;
+        vertical-align: top;
+        width: 433px;
+
+        &:first-child {
+            margin-right: 10px;
+        }
+
+        > .instructions {
+
+            h4 {
+                margin-top: 0;
+            }
+
+            button {
+                margin: 5px 0;
+            }
+        }
+
+    }
+
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    li {
+        @include box-shadow(0 1px 1px #fdfdfd);
+
+        display: none;
+        padding: 7px;
+        border-bottom: 1px solid #ddd;
+        font-weight: 500;
+
+        &:hover {
+            color: #000;
+            background-color: #fff;
+        }
+
+        &.active {
+            display: block;
+
+            &.filtered {
+                display: none;
+            }
+        }
+    }
+
+    section {
+        margin: 0;
+        padding: 2px;
+    }
+}
+
+#columns, #active-columns {
+    @include vertical-thin-scrollbar;
+    height: 405px;
+    overflow: auto;
+    margin: 0;
+    padding: 0 5px !important;
+
+    > div {
+        margin: 10px 0;
+
+        h4 {
+            background-color: #e9e9e9;
+            padding: 2px 5px;
+        }
+    }
+
+    .add-column, .remove-column {
+        float: right;
+        margin-top: 3px;
+        font-size: 11px;
+        color: #999;
+        text-align: right;
+        text-decoration: none;
+
+        > .icon {
+            position: relative;
+            bottom: 2px;
+        }
+    }
+
+    .add-column {
+        &:hover, &:active {
+            color: #000;
+        }
+    }
+
+    .remove-column {
+        &:hover, &:active {
+            color: maroon;
+        }
+    }
+}
+
+#active-columns li {
+    cursor: move;
+}
+
+#active-columns li.placeholder {
+    @include border-radius(0);
+    display: block;
+    background-color: #fff;
+    border: 1px dashed #ccc;
+}
+
+#description {
+    @include border-radius(5px);
+    @include vertical-thin-scrollbar;
+
+    padding: 5px 10px;
+    z-index: 2000;
+    position: absolute;
+    display: none;
+    background-color: #fff;
+    border: 1px solid #666;
+    width: 300px;
+    max-height: 400px;
+    overflow: auto;
+    white-space: pre-line;
+}
+
+/*
+ * Begin IE fixes...
+ */
+
+.ie7 {
+    .container > .content {
+        border-bottom: none;
+    }
+
+    #active-columns, #columns {
+    }
+}
