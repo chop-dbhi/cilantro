@@ -78,6 +78,7 @@
             // necessary endpoints. this liste will hopefully decrease over
             // time...
             var App = {
+                csrftoken: '{{ csrf_token }}',
                 endpoints: {
                     session: {
                         scope: '{% url api:scope:session %}',

@@ -47,6 +47,6 @@ $(document).ajaxSend(function(event, xhr, settings) {
     }
 
     if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
-        xhr.setRequestHeader("X-CSRFToken", getCookie('audgendb_csrftoken'));
+        xhr.setRequestHeader('X-CSRFToken', App.csrftoken || '');
     }
 });
