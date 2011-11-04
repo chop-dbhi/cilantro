@@ -21,13 +21,15 @@
     paths: {
         'cilantro': '.',
         'common': './common',
-        'vendor': './vendor'
+        'vendor': './vendor',
+        'jquery': './vendor/jquery'
     },
 
     // an array of modules to compile
     modules: [{
 
-        name: 'cilantro/main'
+        name: 'cilantro/main',
+        exclude: ['jquery']
 
     }, {
 

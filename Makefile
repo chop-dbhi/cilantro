@@ -57,7 +57,8 @@ init-submodules:
 		fi; \
 	fi;
 
-build-submodules: init-submodules coriander backbone-common jquery-idle-timeout highcharts
+build-submodules: init-submodules coriander backbone-common jquery-idle-timeout highcharts \
+	requirejs rjs
 
 coriander:
 	@echo 'Setting up submodule coriander...'
@@ -76,6 +77,20 @@ jquery-idle-timeout:
 highcharts:
 	@echo 'Setting up submodule highcharts...'
 	@cp ./modules/highcharts/js/highcharts.src.js ${JS_SRC_DIR}/vendor/highcharts.js
+
+requirejs:
+	@echo 'Setting up requirejs...'
+	@cp ./modules/requirejs/require.js ${JS_SRC_DIR}/vendor/require.js
+
+rjs:
+	@echo 'Setting up r.js...'
+	@cd ./modules/rjs && node dist.js
+	@cp ./modules/rjs/r.js ./bin/r.js
+
+jquery:
+	@echo 'Setting up jquery...'
+	@cd ./modules/jquery && make
+	@cp ./modules/jquery/dist/jquery.js ${JS_SRC_DIR}/vendor/jquery.js
 
 optimize: clean
 	@echo 'Optimizing the javascript...'

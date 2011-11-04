@@ -65,28 +65,10 @@
         {# additional functionality, templates, hidden elements, etc. #}
         {% block extra_markup %}{% endblock %}
 
+        <script src="{{ CILANTRO_JAVASCRIPT_URL }}vendor/require.js"></script>
         {# the configuration for RequireJS which ensures the paths are #}
         {# correctly setup and able to be extended. #}
         <script>
-            var require = {
-                // everything should be relative to the project's javascript
-                // url for convenience. Cilantro is namespaced within the
-                // project anyway
-                baseUrl: '{{ JAVASCRIPT_URL }}',
-
-                // define the absolute path for cilantro since everything is
-                // namespaced under 'cilantro'
-                paths: {
-                    'cilantro': '{{ CILANTRO_JAVASCRIPT_URL }}',
-                    'common': '{{ CILANTRO_JAVASCRIPT_URL }}/common',
-                    'vendor': '{{ CILANTRO_JAVASCRIPT_URL }}/vendor'
-                },
-                
-                // bootstrap script containing the shared libraries for each
-                // page
-                priority: ['cilantro/main']
-            };
-
             // namespace for the application. defined here are all the
             // necessary endpoints. this liste will hopefully decrease over
             // time...
@@ -106,11 +88,26 @@
                 }
             };
 
-            {% block require_config %}
-            {% endblock %}
-        </script>
+            require({
+                // everything should be relative to the project's javascript
+                // url for convenience. Cilantro is namespaced within the
+                // project anyway
+                baseUrl: '{{ JAVASCRIPT_URL }}',
 
-        <script src="{{ CILANTRO_JAVASCRIPT_URL }}vendor/require-jquery.js"></script>
+                // define the absolute path for cilantro since everything is
+                // namespaced under 'cilantro'
+                paths: {
+                    'cilantro': '{{ CILANTRO_JAVASCRIPT_URL }}',
+                    'common': '{{ CILANTRO_JAVASCRIPT_URL }}common',
+                    'vendor': '{{ CILANTRO_JAVASCRIPT_URL }}vendor',
+                    'jquery': '{{ CILANTRO_JAVASCRIPT_URL }}vendor/jquery'
+                },
+                
+                // jQuery is a hard dependency for most downstream libraries
+                priority: ['jquery']
+            }, ['cilantro/main']);
+
+        </script>
 
         {% block scripts %}{% endblock %}
     </body>

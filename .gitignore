@@ -27,3 +27,6 @@ cilantro/static/cilantro/stylesheets/scss/coriander
 cilantro/static/cilantro/scripts/coffeescript/common
 cilantro/static/cilantro/scripts/javascript/src/vendor/jquery.idle.js
 cilantro/static/cilantro/scripts/javascript/src/vendor/highcharts.js
+cilantro/static/cilantro/scripts/javascript/src/vendor/jquery.js
+cilantro/static/cilantro/scripts/javascript/src/vendor/require.js
+bin/r.js

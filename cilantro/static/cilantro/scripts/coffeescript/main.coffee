@@ -6,7 +6,6 @@ define [
         'cilantro/lib/jquery.jqote2'
         'cilantro/lib/jquery.scrollto'
         'cilantro/vendor/jquery.idle'
-        'cilantro/vendor/underscore'
         'cilantro/vendor/backbone'
         'cilantro/vendor/pubsub'
         'cilantro/utils/ajaxsetup'

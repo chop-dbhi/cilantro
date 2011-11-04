@@ -11,3 +11,12 @@
 [submodule "modules/jquery-idle-timeout"]
 	path = modules/jquery-idle-timeout
 	url = git://github.com/ehynds/jquery-idle-timeout.git
+[submodule "modules/requirejs"]
+	path = modules/requirejs
+	url = git://github.com/jrburke/requirejs.git
+[submodule "modules/rjs"]
+	path = modules/rjs
+	url = git://github.com/jrburke/r.js.git
+[submodule "modules/jquery"]
+	path = modules/jquery
+	url = git://github.com/jquery/jquery.git
