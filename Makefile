@@ -85,7 +85,8 @@ requirejs:
 rjs:
 	@echo 'Setting up r.js...'
 	@cd ./modules/rjs && node dist.js
-	@cp ./modules/rjs/r.js ./bin/r.js
+	@mkdir -p ./bin
+	@cp ./modules/rjs/r.js ./bin
 
 jquery:
 	@echo 'Setting up jquery...'
