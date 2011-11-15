@@ -58,28 +58,28 @@ init-submodules:
 	fi;
 
 build-submodules: init-submodules coriander backbone-common jquery-idle-timeout highcharts \
-	requirejs rjs
+	requirejs rjs backbone underscore pubsub
 
 coriander:
-	@echo 'Setting up submodule coriander...'
+	@echo 'Setting up Coriander...'
 	@rm -rf ${SASS_DIR}/coriander
 	@cp -r ./modules/coriander ${SASS_DIR}/coriander
 
 backbone-common:
-	@echo 'Setting up submodule backbone-common...'
+	@echo 'Setting up Backbone-common...'
 	@rm -rf ${COFFEE_DIR}/common
 	@cp -r ./modules/backbone-common ${COFFEE_DIR}/common
 
 jquery-idle-timeout:
-	@echo 'Setting up submodule jquery-idle-timeout...'
+	@echo 'Setting up jQuery-idle-timeout...'
 	@cat ./modules/jquery-idle-timeout/src/*.js > ${JS_SRC_DIR}/vendor/jquery.idle.js
 
 highcharts:
-	@echo 'Setting up submodule highcharts...'
+	@echo 'Setting up Highcharts...'
 	@cp ./modules/highcharts/js/highcharts.src.js ${JS_SRC_DIR}/vendor/highcharts.js
 
 requirejs:
-	@echo 'Setting up requirejs...'
+	@echo 'Setting up RequireJS...'
 	@cp ./modules/requirejs/require.js ${JS_SRC_DIR}/vendor/require.js
 
 rjs:
@@ -89,9 +89,22 @@ rjs:
 	@cp ./modules/rjs/r.js ./bin
 
 jquery:
-	@echo 'Setting up jquery...'
+	@echo 'Setting up jQuery...'
 	@cd ./modules/jquery && make
 	@cp ./modules/jquery/dist/jquery.js ${JS_SRC_DIR}/vendor/jquery.js
+
+backbone:
+	@echo 'Setting up Backbone...'
+	@cp ./modules/backbone/backbone.js ${JS_SRC_DIR}/vendor/backbone.js
+
+underscore:
+	@echo 'Setting up Underscore...'
+	@cp ./modules/underscore/underscore.js ${JS_SRC_DIR}/vendor/underscore.js
+
+pubsub:
+	@echo 'Setting up PubSub...'
+	@cd ./modules/pubsub && make
+	@cp ./modules/pubsub/dist/pubsub.js ${JS_SRC_DIR}/vendor/pubsub.js
 
 optimize: clean
 	@echo 'Optimizing the javascript...'

@@ -1,4 +1,4 @@
-define ['cilantro/vendor/backbone'], ->
+define ->
 
     LOG_LEVELS =
         'debug': 0

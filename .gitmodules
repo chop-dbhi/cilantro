@@ -20,3 +20,12 @@
 [submodule "modules/jquery"]
 	path = modules/jquery
 	url = git://github.com/jquery/jquery.git
+[submodule "modules/backbone"]
+	path = modules/backbone
+	url = git://github.com/bruth/backbone.git
+[submodule "modules/underscore"]
+	path = modules/underscore
+	url = git://github.com/documentcloud/underscore.git
+[submodule "modules/pubsub"]
+	path = modules/pubsub
+	url = git://github.com/bruth/pubsub.git

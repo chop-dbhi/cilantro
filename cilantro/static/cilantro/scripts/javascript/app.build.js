@@ -10,10 +10,10 @@
     dir: 'min',
 
     // explicitly specify the optimization method
-    optimize: 'uglify',
+    optimize: 'none',
 
     // no CSS optimization is necessary since we use the sass optimization tool
-    optimizeCss: 'none',
+    optimizeCss: 'uglify',
 
     // everything is namespaced within the code, therefore this must be
     // here to route 'cilantro' to the baseUrl to ensure the "url" routes
@@ -21,27 +21,29 @@
     paths: {
         'cilantro': '.',
         'common': './common',
-        'vendor': './vendor',
-        'jquery': './vendor/jquery'
+        'jquery': './vendor/jquery',
+        'backbone': './vendor/backbone',
+        'underscore': './vendor/underscore',
+        'pubsub': './vendor/pubsub'
     },
 
     // an array of modules to compile
     modules: [{
-
+        name: 'cilantro/core'
+    }, {
+        name: 'common/utils',
+        exclude: ['backbone', 'underscore']
+    }, {
         name: 'cilantro/main',
-        exclude: ['jquery']
-
+        exclude: ['jquery', 'backbone', 'underscore', 'vendor/jquery.ui']
     }, {
-
-        name: 'cilantro/pages/workspace/main'
-
+        name: 'cilantro/pages/workspace/main',
+        exclude: ['jquery', 'backbone', 'underscore']
     }, {
-
-        name: 'cilantro/pages/define/main'
-
+        name: 'cilantro/pages/define/main',
+        exclude: ['jquery', 'backbone', 'underscore']
     }, {
-
-        name: 'cilantro/report/main'
-
+        name: 'cilantro/report/main',
+        exclude: ['jquery', 'backbone', 'underscore']
     }]
 })
