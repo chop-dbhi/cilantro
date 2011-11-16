@@ -2,11 +2,11 @@
 <header id="header">
 {% block header %}
     {% block logo %}
-        <a href="{% url login %}">
+        <a id="logo-link" href="{% url login %}">
         {% if CILANTRO.site_logo %}
             <img src="{{ CILANTRO.site_logo.url }}">
         {% else %}
-            <h1>{{ CILANTRO.site_name }}</h1>
+            <h1>{% firstof CILANTRO.site_name "Harvest App" %}</h1>
         {% endif %}
         </a>
     {% endblock %}
