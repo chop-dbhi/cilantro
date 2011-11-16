@@ -10,10 +10,10 @@
     dir: 'min',
 
     // explicitly specify the optimization method
-    optimize: 'none',
+    optimize: 'uglify',
 
     // no CSS optimization is necessary since we use the sass optimization tool
-    optimizeCss: 'uglify',
+    optimizeCss: 'none',
 
     // everything is namespaced within the code, therefore this must be
     // here to route 'cilantro' to the baseUrl to ensure the "url" routes
@@ -31,19 +31,16 @@
     modules: [{
         name: 'cilantro/core'
     }, {
-        name: 'common/utils',
-        exclude: ['backbone', 'underscore']
-    }, {
         name: 'cilantro/main',
-        exclude: ['jquery', 'backbone', 'underscore', 'vendor/jquery.ui']
+        exclude: ['cilantro/core']
     }, {
         name: 'cilantro/pages/workspace/main',
-        exclude: ['jquery', 'backbone', 'underscore']
+        exclude: ['cilantro/core', 'cilantro/main']
     }, {
         name: 'cilantro/pages/define/main',
-        exclude: ['jquery', 'backbone', 'underscore']
+        exclude: ['cilantro/core', 'cilantro/main']
     }, {
         name: 'cilantro/report/main',
-        exclude: ['jquery', 'backbone', 'underscore']
+        exclude: ['cilantro/core', 'cilantro/main']
     }]
 })
