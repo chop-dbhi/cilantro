@@ -1,0 +1,9 @@
+{% spaceless %}
+    {% if field.errors %}
+        <div class="form-error {% if type %}{{ type }}{% endif %}">
+            {{ field }}<span>{{ field.errors.0 }}</span>
+        </div>
+    {% else %}
+        {{ field }}
+    {% endif %}
+{% endspaceless %}
