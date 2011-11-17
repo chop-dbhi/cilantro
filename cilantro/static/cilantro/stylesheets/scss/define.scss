@@ -1,5 +1,9 @@
 @import "coriander/mixins/all";
 
+#content {
+    text-align: left;
+}
+
 // layout
 #left-pane {
     width: 745px;
