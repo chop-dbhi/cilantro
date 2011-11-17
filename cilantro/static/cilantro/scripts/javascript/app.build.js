@@ -20,11 +20,11 @@
     // to the correct file system location.
     paths: {
         'cilantro': '.',
-        'common': './common',
-        'jquery': './vendor/jquery',
-        'backbone': './vendor/backbone',
-        'underscore': './vendor/underscore',
-        'pubsub': './vendor/pubsub'
+        'common': 'common',
+        'jquery': 'vendor/jquery',
+        'backbone': 'vendor/backbone',
+        'underscore': 'vendor/underscore',
+        'pubsub': 'vendor/pubsub'
     },
 
     // an array of modules to compile
