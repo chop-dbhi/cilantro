@@ -1,4 +1,7 @@
-define ->
+define [
+    'backbone'
+    'underscore'
+], (Backbone, _) ->
 
     LOG_LEVELS =
         'debug': 0
@@ -30,7 +33,7 @@ define ->
         template: _.template '<div class="message <%= level %>"><%= message %></div>'
 
         render: ->
-            @el = $(@template @model.get('message'))
+            @el = @$(@template @model.get('message'))
             @
 
         show: ->

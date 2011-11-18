@@ -1,53 +1,52 @@
 define [
-        'cilantro/types/report/main'
-        'cilantro/types/scope/main'
-        'cilantro/types/perspective/main'
-        'cilantro/pages/workspace/session'
-    ],
+    'jquery'
+    'cilantro/types/report/main'
+    'cilantro/types/scope/main'
+    'cilantro/types/perspective/main'
+    'cilantro/pages/workspace/session'
+], ($, Report, Scope, Perspective, Views) ->
 
-    (Report, Scope, Perspective, Views) ->
+    reports = new Report.Models.Collection
 
-        reports = new Report.Models.Collection
+    sessionReport = new Report.Models.Session
+    sessionScope = new Scope.Models.Session
+    sessionPerspective = new Perspective.Models.Session
 
-        sessionReport = new Report.Models.Session
-        sessionScope = new Scope.Models.Session
-        sessionPerspective = new Perspective.Models.Session
+    App.hub.subscribe 'session/idle', ->
+        reports.stopPolling()
+        sessionReport.stopPolling()
+        sessionScope.stopPolling()
+        sessionPerspective.stopPolling()
 
-        App.hub.subscribe 'session/idle', ->
-            reports.stopPolling()
-            sessionReport.stopPolling()
-            sessionScope.stopPolling()
-            sessionPerspective.stopPolling()
+    App.hub.subscribe 'session/resume', ->
+        reports.startPolling()
+        sessionReport.startPolling()
+        sessionScope.startPolling()
+        sessionPerspective.startPolling()
 
-        App.hub.subscribe 'session/resume', ->
-            reports.startPolling()
-            sessionReport.startPolling()
-            sessionScope.startPolling()
-            sessionPerspective.startPolling()
+    $ ->
 
-        $ ->
+        $('#new-report').click ->
+            App.hub.publish 'report/clear'
 
-            $('#new-report').click ->
-                App.hub.publish 'report/clear'
+        ReportEditor = new Report.Views.Editor
 
-            ReportEditor = new Report.Views.Editor
+        ReportList = new Report.Views.List
+            collection: reports
 
-            ReportList = new Report.Views.List
-                collection: reports
+        SessionScope = new Views.Scope
+            model: sessionScope
 
-            SessionScope = new Views.Scope
-                model: sessionScope
+        SessionPerspective = new Views.Perspective
+            model: sessionPerspective
 
-            SessionPerspective = new Views.Perspective
-                model: sessionPerspective
+        SessionReport = new Views.Report
+            model: sessionReport
 
-            SessionReport = new Views.Report
-                model: sessionReport
+        UnsavedReport = new Report.Messages.UnsavedReport
+            model: sessionReport
 
-            UnsavedReport = new Report.Messages.UnsavedReport
-                model: sessionReport
-
-            reports.fetch()
-            sessionReport.fetch()
-            sessionScope.fetch()
-            sessionPerspective.fetch()
+        reports.fetch()
+        sessionReport.fetch()
+        sessionScope.fetch()
+        sessionPerspective.fetch()

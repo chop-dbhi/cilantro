@@ -1,6 +1,6 @@
 // report/templates
 
-define(function() {
+define(['jquery'], function($) {
     return {
         columns: $.jqotec([
             '<div data-model="category" data-id="<%= this.id %>">',

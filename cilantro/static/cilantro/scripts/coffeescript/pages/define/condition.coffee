@@ -1,119 +1,119 @@
 define [
-        'common/models/state'
-        'common/views/state'
-        'common/views/collection'
-    ],
+    'underscore'
+    'backbone'
+    'common/models/state'
+    'common/views/state'
+    'common/views/collection'
+], (_, Backbone, statemodel, stateview, collectionview) ->
 
-    (statemodel, stateview, collectionview) ->
-
-        class Condition extends statemodel.Model
-
-
-        class ConditionCollection extends Backbone.Collection
-            model: Condition
-
-            url: App.endpoints.session.scope
-
-            parse: (json) -> json.conditions
+    class Condition extends statemodel.Model
 
 
-        class ConditionView extends Backbone.View
-            events:
-                'click': 'click'
-                'click .remove': 'remove'
+    class ConditionCollection extends Backbone.Collection
+        model: Condition
 
-            template: _.template '<div class="criterion clearfix">
-                    <a href="#" class="remove-criterion"></a>
-                    <a href="#" class="field-anchor">
-                    <%= condition %>
-                    </a>
-                </div>'
+        url: App.endpoints.session.scope
 
-            render: ->
-                @el.remove()
-                @el = $(@template @model.toJSON())
-                @delegateEvents()
-                @
-
-            click: ->
-                @model.activate()
-                return false
-
-            remove: ->
-                @model.remove()
-                return false
+        parse: (json) -> json.conditions
 
 
-        class ConditionListPane extends Backbone.View
-            el: '#condition-list-pane'
+    class ConditionView extends Backbone.View
+        events:
+            'click': 'click'
+            'click .remove': 'remove'
 
-            events:
-                'click #clear-conditions': 'click'
+        template: _.template '<div class="criterion clearfix">
+                <a href="#" class="remove-criterion"></a>
+                <a href="#" class="field-anchor">
+                <%= condition %>
+                </a>
+            </div>'
 
-            initialize: (options) ->
-                @list = options.list
+        render: ->
+            @el.remove()
+            @el = @$(@template @model.toJSON())
+            @delegateEvents()
+            @
 
-            click: ->
-                @list.collection.remove(@list.collection.models)
+        click: ->
+            @model.activate()
+            return false
 
-        class ConditionListView extends collectionview.View
-            el: '#condition-list'
-
-            viewClass: ConditionView
-
-            #defaultContent: '<div class="message warning">You have not defined any conditions</div>'
+        remove: ->
+            @model.remove()
+            return false
 
 
-        return {
-            Collection: ConditionCollection
-            ListView: ConditionListView
-            ListPane: ConditionListPane
-        }
+    class ConditionListPane extends Backbone.View
+        el: '#condition-list-pane'
+
+        events:
+            'click #clear-conditions': 'click'
+
+        initialize: (options) ->
+            @list = options.list
+
+        click: ->
+            @list.collection.remove(@list.collection.models)
+
+    class ConditionListView extends collectionview.View
+        el: '#condition-list'
+
+        viewClass: ConditionView
+
+        #defaultContent: '<div class="message warning">You have not defined any conditions</div>'
+
+
+    return {
+        Collection: ConditionCollection
+        ListView: ConditionListView
+        ListPane: ConditionListPane
+    }
 
 
 ###
-    define(
-        function() {
+define(
+    function() {
 
-            var tmpl = $.jqotec([
-                '<div data-uri="<%=this.uri%>" data-id="<%= this.pk %>" class="criterion clearfix">',
-                    '<a href="#" class="remove-criterion"></a>',
-                    '<a href="#" class="field-anchor">',
-                        '<%= this.description %>',
-                    '</a>',
-                '</div>'
-            ].join(''));
+        var tmpl = $.jqotec([
+            '<div data-uri="<%=this.uri%>" data-id="<%= this.pk %>" class="criterion clearfix">',
+                '<a href="#" class="remove-criterion"></a>',
+                '<a href="#" class="field-anchor">',
+                    '<%= this.description %>',
+                '</a>',
+            '</div>'
+        ].join(''));
 
-            var criteriaList = $('#criteria-list');
+        var criteriaList = $('#criteria-list');
 
-            criteriaList.bind('activate-criterion', function(evt, id) {
-                criteriaList.children().removeClass('selected').filter('[data-id='+id+']').addClass('selected');
+        criteriaList.bind('activate-criterion', function(evt, id) {
+            criteriaList.children().removeClass('selected').filter('[data-id='+id+']').addClass('selected');
+        });
+
+        var Criteria = function(criteria_constraint, uri, english){
+
+            var element = $($.jqote(tmpl, {pk:criteria_constraint.concept_id,
+                                           description:english,
+                                           uri:uri+criteria_constraint.concept_id}));
+            element.data("constraint", criteria_constraint);
+
+            element.find(".remove-criterion").click(function(){
+                element.trigger("CriteriaRemovedEvent");
+                return false;
             });
 
-            var Criteria = function(criteria_constraint, uri, english){
 
-                var element = $($.jqote(tmpl, {pk:criteria_constraint.concept_id,
-                                               description:english,
-                                               uri:uri+criteria_constraint.concept_id}));
-                element.data("constraint", criteria_constraint);
+            // Display the concept in the main area when the user clicks on the description
+            element.click(function (evt) {
+                element.trigger('activate-criterion',
+                    [criteria_constraint.concept_id]);
+                return false;
+            });
 
-                element.find(".remove-criterion").click(function(){
-                    element.trigger("CriteriaRemovedEvent");
-                    return false;
-                });
+            return element;
+        };
 
-
-                // Display the concept in the main area when the user clicks on the description
-                element.click(function (evt) {
-                    element.trigger('activate-criterion',
-                        [criteria_constraint.concept_id]);
-                    return false;
-                });
-
-                return element;
-            };
-
-            return {Criteria:Criteria};
-        }
-    );
+        return {Criteria:Criteria};
+    }
+);
 ###

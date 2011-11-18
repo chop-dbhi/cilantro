@@ -94,6 +94,7 @@
                 baseUrl: '{{ JAVASCRIPT_URL }}',
                 paths: {
                     'cilantro': '{{ CILANTRO_JAVASCRIPT_URL }}',
+                    'order': '{{ CILANTRO_JAVASCRIPT_URL }}order',
                     'common': '{{ CILANTRO_JAVASCRIPT_URL }}common',
                     'vendor': '{{ CILANTRO_JAVASCRIPT_URL }}vendor',
                     'jquery': '{{ CILANTRO_JAVASCRIPT_URL }}vendor/jquery',
@@ -101,12 +102,11 @@
                     'underscore': '{{ CILANTRO_JAVASCRIPT_URL }}vendor/underscore',
                     'pubsub': '{{ CILANTRO_JAVASCRIPT_URL }}vendor/pubsub'
                 },
-                priority: ['cilantro/core'],
-                deps: ['cilantro/main']
+                priority: ['cilantro/core']
             };
         </script>
-        <script src="{{ CILANTRO_JAVASCRIPT_URL }}vendor/require.js"></script>
 
+        <script data-main="cilantro/main" src="{{ CILANTRO_JAVASCRIPT_URL }}vendor/require.js"></script>
 
         {% block scripts %}{% endblock %}
     </body>

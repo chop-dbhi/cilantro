@@ -1,17 +1,14 @@
 define [
     'jquery'
-    'backbone'
     'underscore'
+    'backbone'
     'pubsub'
     'common/utils'
-    'vendor/jquery.ui'
-], ($, Backbone, _, PubSub, Utils) ->
+], ($, _, Backbone, PubSub, Utils) ->
 
     # Attach to the window since they are used all over the
     # application
-    @$ = $
-    @Backbone = Backbone
-    @_ = _
+    @$ = @jQuery = $
 
     # an object may already be defined, so we create a reference
     # to the existing attributes

@@ -1,8 +1,8 @@
 // report/main
 
-define(['cilantro/report/table', 'cilantro/report/columns'],
+define(['jquery', 'cilantro/report/table', 'cilantro/report/columns'],
 
-    function(m_table, m_columns) {
+    function($, m_table, m_columns) {
 
         $(function() {
 

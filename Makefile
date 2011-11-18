@@ -18,9 +18,9 @@ REQUIRE_OPTIMIZE = `which node` bin/r.js -o ${STATIC_DIR}/scripts/javascript/app
 
 LATEST_TAG = `git describe --tags \`git rev-list --tags --max-count=1\``
 
-all: build-submodules watch
+all: build watch
 
-build: build-submodules sass coffee optimize
+build: clean build-submodules sass coffee optimize
 
 dist: build
 	@echo 'Creating a source distributions...'
@@ -81,6 +81,7 @@ highcharts:
 requirejs:
 	@echo 'Setting up RequireJS...'
 	@cp ./modules/requirejs/require.js ${JS_SRC_DIR}/vendor/require.js
+	@cp ./modules/requirejs/order.js ${JS_SRC_DIR}/order.js
 
 rjs:
 	@echo 'Setting up r.js...'
@@ -106,8 +107,9 @@ pubsub:
 	@cd ./modules/pubsub && make
 	@cp ./modules/pubsub/dist/pubsub.js ${JS_SRC_DIR}/vendor/pubsub.js
 
-optimize: clean
+optimize:
 	@echo 'Optimizing the javascript...'
+	@rm -rf ${JS_MIN_DIR}
 	@mkdir -p ${JS_MIN_DIR}
 	@${REQUIRE_OPTIMIZE} > /dev/null
 

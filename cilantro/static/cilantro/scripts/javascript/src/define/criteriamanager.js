@@ -1,4 +1,4 @@
-define(['cilantro/define/criteria'], function(criteria) {
+define(['jquery', 'cilantro/define/criteria'], function($, criteria) {
 
     var conditionCache = {};
 

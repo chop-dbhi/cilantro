@@ -1,29 +1,28 @@
 define [
-        'cilantro/define/criteriamanager'
-        'cilantro/define/conceptmanager'
-    ],
+    'backbone'
+    'cilantro/define/criteriamanager'
+    'cilantro/define/conceptmanager'
+], (Backbone, CriteriaManager, ConceptManager) ->
 
-    (CriteriaManager, ConceptManager) ->
+    class ConceptInterfaceView extends Backbone.View
+        el: '#plugin-panel'
 
-        class ConceptInterfaceView extends Backbone.View
-            el: '#plugin-panel'
+        initialize: ->
+            App.hub.subscribe 'concept/active', @activate
 
-            initialize: ->
-                App.hub.subscribe 'concept/active', @activate
+        activate: (model) =>
 
-            activate: (model) =>
+            condition = CriteriaManager.retrieveCriteriaDS(model.id)
 
-                condition = CriteriaManager.retrieveCriteriaDS(model.id)
+            if ConceptManager.isConceptLoaded(model.id)
+                ConceptManager.show id: model.id, condition
+            else
+                model.fetch
+                    beforeSend: => @el.block()
+                    complete: => @el.unblock()
+                    success: ->
+                        ConceptManager.show(model.get('viewset'), condition)
 
-                if ConceptManager.isConceptLoaded(model.id)
-                    ConceptManager.show id: model.id, condition
-                else
-                    model.fetch
-                        beforeSend: => @el.block()
-                        complete: => @el.unblock()
-                        success: ->
-                            ConceptManager.show(model.get('viewset'), condition)
-
-        return {
-            ConceptInterfaceView: ConceptInterfaceView
-        }
+    return {
+        ConceptInterfaceView: ConceptInterfaceView
+    }

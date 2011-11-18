@@ -1,4 +1,6 @@
-define ->
+define [
+    'backbone'
+], (Backbone) ->
 
     class ReportHelpModal extends Backbone.View
         title: 'Learn about Reports'
@@ -23,7 +25,7 @@ define ->
                 title: @title
 
             if options.trigger
-                $(options.trigger).click =>
+                @$(options.trigger).click =>
                     @el.dialog('open')
                     return false
 

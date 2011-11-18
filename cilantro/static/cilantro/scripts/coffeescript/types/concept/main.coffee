@@ -1,11 +1,6 @@
 define [
-        'cilantro/types/concept/models'
-        'cilantro/types/concept/views'
-    ],
+    'cilantro/types/concept/models'
+    'cilantro/types/concept/views'
+], (Models, Views) ->
 
-    (Models, Views) ->
-
-        return {
-            Models: Models
-            Views: Views
-        }
+    return Models: Models, Views: Views

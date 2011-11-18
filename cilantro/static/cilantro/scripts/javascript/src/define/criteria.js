@@ -1,5 +1,5 @@
-define(['cilantro/define/conceptmanager'],
-    function(ConceptManager) {
+define(['jquery', 'underscore', 'cilantro/define/conceptmanager'],
+    function($, _, ConceptManager) {
         var tmpl = _.template('<div class="condition clearfix"><a href="#" class="remove"></a><%= condition %></div>');
         var criteriaList = $('#condition-list');
 

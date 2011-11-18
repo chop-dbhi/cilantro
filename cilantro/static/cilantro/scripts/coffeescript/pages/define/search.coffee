@@ -1,41 +1,40 @@
 define [
-        'common/views/state'
-        'cilantro/utils/search'
-    ],
+    'underscore'
+    'common/views/state'
+    'cilantro/utils/search'
+], (_, stateview, Search) ->
 
-    (stateview, Search) ->
-
-        class ResultCollection extends Search.ResultCollection
-            url: App.endpoints.criteria
-
-
-        class ResultItemView extends stateview.View
-            template: _.template '<span class="name"><%= name %></span>
-                <br><span class="info"><%= domain.name %></span>'
-
-            events:
-                'click': 'click'
-
-            render: ->
-                @el.html @template @model.toJSON()
-                @
-
-            click: ->
-                App.hub.publish 'concept/request', @model.id
-                return false
+    class ResultCollection extends Search.ResultCollection
+        url: App.endpoints.criteria
 
 
-        class InputView extends Search.InputView
-            el: '#concept-search'
+    class ResultItemView extends stateview.View
+        template: _.template '<span class="name"><%= name %></span>
+            <br><span class="info"><%= domain.name %></span>'
+
+        events:
+            'click': 'click'
+
+        render: ->
+            @el.html @template @model.toJSON()
+            @
+
+        click: ->
+            App.hub.publish 'concept/request', @model.id
+            return false
 
 
-        class ResultListView extends Search.ResultListView
-            el: '#concept-search-results'
-            viewClass: ResultItemView
-            inputViewClass: InputView
+    class InputView extends Search.InputView
+        el: '#concept-search'
 
 
-        return {
-            ResultCollection: ResultCollection
-            ResultListView: ResultListView
-        }
+    class ResultListView extends Search.ResultListView
+        el: '#concept-search-results'
+        viewClass: ResultItemView
+        inputViewClass: InputView
+
+
+    return {
+        ResultCollection: ResultCollection
+        ResultListView: ResultListView
+    }

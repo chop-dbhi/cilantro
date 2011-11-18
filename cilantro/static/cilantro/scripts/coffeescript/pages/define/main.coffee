@@ -1,76 +1,73 @@
-require [
-        'cilantro/types/report/main'
-        'cilantro/types/scope/main'
-        'cilantro/types/domain/main'
-        'cilantro/types/concept/main'
+define [
+    'cilantro/types/report/main'
+    'cilantro/types/scope/main'
+    'cilantro/types/domain/main'
+    'cilantro/types/concept/main'
+    'cilantro/pages/define/search'
+    'cilantro/pages/define/condition'
+    'cilantro/pages/define/interface'
+], (Report, Scope, Domain, Concept, Search, Condition, Interface) ->
 
-        'cilantro/pages/define/search'
-        'cilantro/pages/define/condition'
-        'cilantro/pages/define/interface'
-    ],
+    # create collections..
+    domains = new Domain.Models.Collection
+    concepts = new Concept.Models.Collection
+    sessionReport = new Report.Models.Session
 
-    (Report, Scope, Domain, Concept, Search, Condition, Interface) ->
+    conditions =
+        bind: ->
+        fetch: ->
+        remove: ->
 
-        # create collections..
-        domains = new Domain.Models.Collection
-        concepts = new Concept.Models.Collection
-        sessionReport = new Report.Models.Session
+    #conditions = new Condition.Collection
 
-        conditions =
-            bind: ->
-            fetch: ->
-            remove: ->
+    conceptResults = new Search.ResultCollection
 
-        #conditions = new Condition.Collection
+    App.pending = 2
+    App.session = {}
+    App.ready -> domains.at(0).activate()
 
-        conceptResults = new Search.ResultCollection
+    App.hub.subscribe 'session/idle', ->
+        sessionReport.stopPolling()
 
-        App.pending = 2
-        App.session = {}
-        App.ready -> domains.at(0).activate()
+    App.hub.subscribe 'session/resume', ->
+        sessionReport.startPolling()
 
-        App.hub.subscribe 'session/idle', ->
-            sessionReport.stopPolling()
+    $ ->
 
-        App.hub.subscribe 'session/resume', ->
-            sessionReport.startPolling()
+        ConceptInterface = new Interface.ConceptInterfaceView
 
-        $ ->
+        DomainTabs = new Domain.Views.DomainCollectionView
+            collection: domains
 
-            ConceptInterface = new Interface.ConceptInterfaceView
+        ConceptList = new Concept.Views.CollectionView
+            collection: concepts
 
-            DomainTabs = new Domain.Views.DomainCollectionView
-                collection: domains
+        ConceptResultList = new Search.ResultListView
+            collection: conceptResults
 
-            ConceptList = new Concept.Views.CollectionView
-                collection: concepts
+        ConditionList = new Condition.ListView
+            collection: conditions
 
-            ConceptResultList = new Search.ResultListView
-                collection: conceptResults
+        ConditionListPane = new Condition.ListPane
+            list: ConditionList
 
-            ConditionList = new Condition.ListView
-                collection: conditions
+        ReportEditor = new Report.Views.Editor
 
-            ConditionListPane = new Condition.ListPane
-                list: ConditionList
+        ReportName = new Report.Views.Name
+            model: sessionReport
 
-            ReportEditor = new Report.Views.Editor
+        UnsavedReport = new Report.Messages.UnsavedReport
+            model: sessionReport
 
-            ReportName = new Report.Views.Name
-                model: sessionReport
+        domains.fetch
+            initial: true
+            success: -> App.pending--
 
-            UnsavedReport = new Report.Messages.UnsavedReport
-                model: sessionReport
+        concepts.fetch
+            initial: true
+            success: -> App.pending--
 
-            domains.fetch
-                initial: true
-                success: -> App.pending--
+        conceptResults.fetch()
 
-            concepts.fetch
-                initial: true
-                success: -> App.pending--
-
-            conceptResults.fetch()
-
-            conditions.fetch()
-            sessionReport.fetch()
+        conditions.fetch()
+        sessionReport.fetch()

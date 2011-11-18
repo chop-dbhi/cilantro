@@ -1,22 +1,18 @@
 define [
-        'common/models/polling'
-    ],
+    'common/models/polling'
+], (polling) ->
 
-    (polling) ->
+    class SessionPerspective extends polling.Model
+        url: App.endpoints.session.perspective
 
-        class SessionPerspective extends polling.Model
-            url: App.endpoints.session.perspective
+        initialize: ->
+            super
 
-            initialize: ->
-                super
+            App.hub.subscribe 'report/revert', @revert
 
-                App.hub.subscribe 'report/revert', @revert
-
-            # Currently, the session perspective is managed via the session
-            # report thus this needs to only fetch itself to update
-            revert: => @fetch()
+        # Currently, the session perspective is managed via the session
+        # report thus this needs to only fetch itself to update
+        revert: => @fetch()
 
 
-        return {
-            Session: SessionPerspective
-        }
+    return Session: SessionPerspective

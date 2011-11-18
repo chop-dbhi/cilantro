@@ -1,9 +1,5 @@
 define [
-        'cilantro/types/scope/models'
-    ],
+    'cilantro/types/scope/models'
+], (Models) ->
 
-    (Models) ->
-
-        return {
-            Models: Models
-        }
+    return Models: Models

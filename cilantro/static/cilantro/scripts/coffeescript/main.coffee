@@ -1,15 +1,15 @@
 define [
     'cilantro/core'
     'cilantro/utils/logging'
-    'cilantro/utils/ajaxsetup'
-    'cilantro/utils/extensions'
-    'cilantro/utils/sanitizer'
-    'vendor/jquery.idle'
-    'vendor/jquery.jqote2'
-    'vendor/jquery.block'
-    'vendor/jquery.scrollto'
+    'order!vendor/jquery.ui'
+    'order!vendor/jquery.idle'
+    'order!vendor/jquery.jqote2'
+    'order!vendor/jquery.block'
+    'order!vendor/jquery.scrollto'
+    'order!cilantro/utils/ajaxsetup'
+    'order!cilantro/utils/extensions'
+    'order!cilantro/utils/sanitizer'
 ], (Core, Logging) ->
-
     # IE 7...
     if not window.JSON then require ['vendor/json2']
 
