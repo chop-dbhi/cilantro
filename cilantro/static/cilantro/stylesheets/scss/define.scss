@@ -207,6 +207,7 @@
 #concept-search {
     @include search-box;
     float: right;
+    min-width: 120px;
     width: 120px;
     margin-top: 5px;
 }
@@ -279,6 +280,7 @@
     background-color: #fff;
 
     input {
+        min-width: 0px;
         width: 40px;
     }
 
