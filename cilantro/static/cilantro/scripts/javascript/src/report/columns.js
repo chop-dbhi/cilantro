@@ -1,8 +1,8 @@
 // report/columns
 
-define(['jquery', 'cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantro/report/templates'],
+define(['jquery', 'cilantro/rest/datasource'],
 
-    function($, m_datasource, m_renderer, m_templates) {
+    function($, m_datasource) {
 
         function init() {
 

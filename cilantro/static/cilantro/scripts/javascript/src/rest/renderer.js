@@ -1,6 +1,6 @@
 // rest/renderer
 
-define(['cilantro/rest/basext'], function(BaseExt) {
+define(['cilantro/rest/basext', 'jquery', 'underscore'], function(BaseExt, $, _) {
     /*
      * The base renderer class. A renderer takes data and uses it to act
      * on other objects, whether be DOM elements or other JS objects.
@@ -29,16 +29,27 @@ define(['cilantro/rest/basext'], function(BaseExt) {
             if (replace === true)
                 this.target.html('');
 
+            var l = [];
             if (this.bindData === true) {
-                l = [];
                 for (var d, e, i = 0; i < data.length; i++) {
                     d = data[i];
-                    e = $.jqoteobj(this.template, d);
+                    e = $(this.template(d));
                     e.data(d);
                     l.push(e);
                 }
             } else {
-                l = [$.jqoteobj(this.template, data)];
+                if (_.isArray(data)) {
+                    var self = this;
+                    l = _.map(data, function(o) {
+                        if (_.isArray(o)) {
+                            return $(self.template({data: o}));
+                        } else {
+                            return $(self.template(o));
+                        }
+                    });
+                } else {
+                    l = [$(this.template(data))];
+                }
             }
 
             var tgt = this.target;
