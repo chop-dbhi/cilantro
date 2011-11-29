@@ -1,4 +1,4 @@
-from django.contrib.sites.models import Site
+from cilantro.models import Settings
 
 def media(request):
     from django.conf import settings
@@ -19,7 +19,7 @@ def media(request):
     }
 
 def settings(request):
-    site = Site.objects.get_current()
+    settings = Settings.objects.get_current(request)
     return {
-        'CILANTRO': site.cilantro_settings,
+        'CILANTRO': settings
     }
