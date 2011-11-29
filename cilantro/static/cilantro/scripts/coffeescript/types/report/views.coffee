@@ -115,7 +115,7 @@ define [
         showControls: (evt) ->
             @_controlsTimer = setTimeout =>
                 @controls.slideDown(200)
-            , 300
+            , 700
             return false
 
         hideControls: (evt) ->
