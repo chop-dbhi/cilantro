@@ -6,10 +6,13 @@
     margin: 5px 0;
 }
 
+#content {
+    width: auto;
+}
+
 #report {
     > .info {
         border-bottom: none;
-
     }
 
     .toolbar {
@@ -49,6 +52,10 @@
         -webkit-user-select: auto;
         user-select: auto;
     }
+}
+
+#report-info {
+    text-align: left;
 }
 
 #stats {
