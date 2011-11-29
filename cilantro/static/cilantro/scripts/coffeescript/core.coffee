@@ -6,10 +6,6 @@ define [
     'common/utils'
 ], ($, _, Backbone, PubSub, Utils) ->
 
-    # Attach to the window since they are used all over the
-    # application
-    @$ = @jQuery = $
-
     # an object may already be defined, so we create a reference
     # to the existing attributes
     attrs = @App or {}
