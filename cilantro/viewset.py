@@ -93,4 +93,4 @@ class DefaultViewSet(AbstractViewSet):
 
         return viewset
 
-
+library.default = DefaultViewSet()
