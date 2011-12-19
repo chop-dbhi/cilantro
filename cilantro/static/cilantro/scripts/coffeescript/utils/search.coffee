@@ -1,9 +1,10 @@
 define [
+    'jquery'
     'backbone'
     'common/views/collection'
     'common/models/state'
     'common/views/state'
-], (Backbone, collectionview, statemodel, stateview) ->
+], ($, Backbone, collectionview, statemodel, stateview) ->
 
     class Result extends statemodel.Model
 
@@ -11,7 +12,7 @@ define [
         model: Result
 
         query: (query) ->
-            @$.get @url, q: query, (ids) =>
+            $.get @url, q: query, (ids) =>
                 @each (model) ->
                     if model.id in ids then model.enable() else model.disable()
 
