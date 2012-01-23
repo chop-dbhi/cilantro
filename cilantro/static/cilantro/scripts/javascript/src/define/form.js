@@ -184,20 +184,20 @@ define(['jquery', "cilantro/define/viewelement", 'order!vendor/jquery.jqote2'], 
                                                               $("label[for="+opt.id+"_input1]", dom).hide();
                                                               $("input[name="+opt.id+"_input0]", dom).show().change();
                                                           }
-                                                      } else if ($associated_inputs && $associated_inputs.attr("type") in {"text":1, "textarea":1}){
+                                                      } else if ($associated_inputs && $associated_inputs.prop("type") in {"text":1, "textarea":1}){
                                                           // The operator has associated inputs, and they are of type text or textarea:
                                                           // This section takes care of modifying textinputs when the user changes the operator
                                                           // to be an IN operator.
                                                           // One of the convenience things we allows is the pasting of newline sepearate text so that
                                                           // for example, someone can paste in an excel column of patient aliases.
                                                           // If the user selects an IN operator, we switch the text input -> textarea and vice versa
-                                                          if (opt.value.search(/exact/) >= 0 && $associated_inputs.attr("type") === "textarea"){
+                                                          if (opt.value.search(/exact/) >= 0 && $associated_inputs.prop("type") === "textarea"){
                                                               // The operator is of type exact, but the associated input is a text area, switch to text input
                                                               $associated_inputs.data("switch").data("switch", $associated_inputs);
                                                               $associated_inputs.before($associated_inputs.data("switch")).detach();
                                                               $associated_inputs.data("switch").keyup();
                                                               // Swap out textarea with text
-                                                          } else if (opt.value.search(/^-?in$/)>=0 && $associated_inputs.attr("type") === "text"){
+                                                          } else if (opt.value.search(/^-?in$/)>=0 && $associated_inputs.prop("type") === "text"){
                                                               // The operator is of type in, but the associated input is a text input, switch to textarea
                                                               if (!$associated_inputs.data("switch")){
                                                                  // We have not yet done a switch, otherwise we would have saved it, so we have to actually create the
@@ -327,7 +327,7 @@ define(['jquery', "cilantro/define/viewelement", 'order!vendor/jquery.jqote2'], 
             // Note: Just because we are here doesn't mean we contain the element
             // to be updated, it may reside on another view within this concept
             if ($element.length === 0) return;
-            var type = $element.attr("type");
+            var type = $element.prop("type");
             switch (type){
                 case "checkbox": $element.attr("checked", element.value);
                                  break;
