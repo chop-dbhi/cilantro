@@ -1,13 +1,14 @@
 @import "coriander/mixins/all";
 
+#content {
+    max-width: none;
+    width: auto;
+}
+
 #search {
     @include search-box;
     width: 405px;
     margin: 5px 0;
-}
-
-#content {
-    width: auto;
 }
 
 #report {

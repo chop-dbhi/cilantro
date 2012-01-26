@@ -4,10 +4,6 @@
     @include box-shadow(0 1px 3px darken(#dadfe8, 20), inset 0 1px 3px #aaa);
     color: #666;
     font-size: 0.85em;
-    position: top;
-    top: 0;
-    left: 0;
-    right: 0;
     z-index: 5;
     min-height: 25px;
     padding: 5px 10px;
@@ -25,9 +21,11 @@
         margin-top: 7px;
     }
 }
+
 #logo-link {
     text-decoration: none;
 }
+
 // the main navigation across all pages
 #main-nav {
     @include anchors(#aaa, #fff);
@@ -96,30 +94,28 @@
         }
     }
 }
+
 // hidden placeholder for application messages to be made visible
 #messages {
-    position: relative;
-    margin: 0 auto;
     text-align: center;
     height: 30px;
 }
+
 // area for page-specific content
 #content {
     position: relative;
-    top: 20px;
-    width: 960px;
-    margin: 0 auto;
+    max-width: 960px;
+    margin: 20px auto;
+    text-align: center;
 }
+
 // document footer for project copyright and other info
 #footer {
-    position: relative;
-    top: 70px;
-    left: 0;
-    right: 0;
     color: darken(#dadfe8, 50);
     text-shadow: 0 1px 2px lighten(#dadfe8, 100);
     font-size: 0.9em;
     text-align: center;
+    margin-bottom: 20px;
 }
 // the Harvest tractor
 #harvest-logo {
