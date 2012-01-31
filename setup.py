@@ -83,6 +83,8 @@ setup(
     packages = packages,
     cmdclass = cmdclasses,
 
+    install_requires = ['serrano>=0.9b14', 'pil'],
+
     data_files = data_files,
     classifiers = [
         'Development Status :: 4 - Beta',
