@@ -22,6 +22,7 @@ define(['jquery', "cilantro/vendor/base"], function($){
             this.dom.bind('RegisterElementsEvent', $.proxy(this.registerElements, this));
             this.dom.bind('HideDependentsEvent', $.proxy(this.hideDependents, this));
             this.dom.bind('ShowDependentsEvent', $.proxy(this.showDependents, this));
+            this.dom.bind('ConstructElementQueryEvent', $.proxy(this.constructQuery, this));
       },
       render: function(){
           // This function needs to set the "form" attribute of this object.
@@ -69,7 +70,8 @@ define(['jquery', "cilantro/vendor/base"], function($){
          if ((this.dom[0] !==  (evt.originalEvent ? evt.originalEvent.target : evt.target)) && (this.dom.has(evt.target).length === 0)){
              $("input,select,label", this.dom).filter(":disabled").removeAttr("disabled").change();
          }
-      }
+      },
+      constructQuery: function(evt) {}
     });
     return ViewElement;
 });

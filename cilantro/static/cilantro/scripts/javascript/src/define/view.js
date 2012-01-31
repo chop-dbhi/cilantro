@@ -124,7 +124,18 @@ define(['jquery', 'cilantro/define/chart','cilantro/define/form','cilantro/utils
                 evt.stopPropagation();
             },
             constructQuery: function(evt){
-                this.view.trigger("ConstructQueryEvent");
+                var custom = false;
+                var fd = this.fd;
+                $.each(this.viewset.elements, function(i, e) {
+                    if (e.type == 'custom') {
+                        custom = true;
+                        fd.leaveMessage(i, "triggerHandler", 'ConstructElementQueryEvent');
+                    }
+                });
+
+                if (!custom) {
+                    this.view.trigger("ConstructQueryEvent");
+                }
                 evt.stopPropagation();
             },
             notifyChildren: function(evt,arg){
@@ -132,11 +143,9 @@ define(['jquery', 'cilantro/define/chart','cilantro/define/form','cilantro/utils
               $.each(this.viewset.elements, function(index){
                     fd.leaveMessage(index, "triggerHandler", evt, arg);
               });
-              evt.stopPropagation();
             },
             eventPassThru: function(evt, arg){
                 this.view.triggerHandler(evt, arg);
-                evt.stopPropagation();
             },
             dom: function(){
                 return this.view;

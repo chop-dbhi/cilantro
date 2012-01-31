@@ -619,16 +619,21 @@ define(['jquery', 'cilantro/define/view'],
           @private
         */
         function constructQueryHandler(event, ds){
+            var server_query;
             ds = ds || cache[activeConcept].ds;
             // Does this datasource contain valid values?
-            if (!postViewErrorCheck(ds)){
-                var evt = $.Event("InvalidInputEvent");
-                evt.ephemeral = true;
-                evt.message = "No value has been specified.";
-                $(event.target).trigger(evt);
-                return false;
+            if (!ds.custom) {
+                if (!postViewErrorCheck(ds)){
+                    var evt = $.Event("InvalidInputEvent");
+                    evt.ephemeral = true;
+                    evt.message = "No value has been specified.";
+                    $(event.target).trigger(evt);
+                    return false;
+                }
+                server_query =  buildQuery(ds);
+            } else {
+                server_query = ds;
             }
-            var server_query =  buildQuery(ds);
             App.hub.publish("UpdateQueryEvent", server_query);
             return true;
         }
@@ -876,8 +881,13 @@ define(['jquery', 'cilantro/define/view'],
                 // If this concept already has a query associated with it,
                 // populate the datasource
                 if (concept.query) {
-                    concept.ds = createDSFromQuery(concept.query);
-                }else{
+                    // For custom data sources, leave the query as-is
+                    if (concept.query.custom) {
+                        concept.ds = concept.query;
+                    } else {
+                        concept.ds = createDSFromQuery(concept.query);
+                    }
+                } else {
                     // create empty datasource
                     concept.ds = {};
                 }
