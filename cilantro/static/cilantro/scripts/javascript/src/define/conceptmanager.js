@@ -57,7 +57,7 @@ define(['jquery', 'cilantro/define/view'],
         */
         var add_query_tmpl = [
             '<button id="add_to_query"></button>',
-            '<div class="message success">This condition has been added</div>'
+            '<div class="message success">Added condition</div>'
         ].join('');
 
         /**
@@ -717,9 +717,15 @@ define(['jquery', 'cilantro/define/view'],
             // screen, but not kept there until a specific thing is fixed)
             // then fade out and then remove
             if (evt.ephemeral){
-                warning.fadeOut(3000, function(){
-                    warning.remove();
-                });
+                var delay;
+                if ((delay = parseInt(evt.ephemeral, 10)) === NaN) {
+                    delay = 1000;
+                }
+                setTimeout(function() {
+                    warning.fadeOut(3000, function(){
+                        warning.remove();
+                    });
+                }, delay);
             }else{
                 // if not ephemeral, disable the button
                 $staticBox.find("#add_to_query").attr("disabled","true");

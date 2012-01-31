@@ -46,28 +46,44 @@ define(['jquery', 'cilantro/define/criteria'], function($, criteria) {
 
             data[operation] = criteria_constraint;
 
-            $.patchJSON(scopeEndpoint, JSON.stringify(data), function(english) {
-                getReportButton.removeAttr("disabled");
-                var was_empty = $.isEmptyObject(conditionCache);
-                // Is this an update?
-                if (operation === 'replace'){
-                    new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, english);
-                    conditionCache[pk].replaceWith(new_criteria);
-                    new_criteria.fadeTo(300, 0.5, function() {
-                          new_criteria.fadeTo("fast", 1);
-                    });
-                } else {
-                    new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, english);
-                    conditionList.append(new_criteria);
-                    App.hub.publish("ConceptAddedEvent", pk);
-                }
-                conditionCache[pk] =  new_criteria;
-                new_criteria.addClass("selected");
-                new_criteria.siblings().removeClass("selected");
+            $.ajax({
+                type: 'PATCH',
+                url: scopeEndpoint,
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: function(english) {
+                    var was_empty = $.isEmptyObject(conditionCache);
+                    // Is this an update?
+                    if (operation === 'replace'){
+                        new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, english);
+                        conditionCache[pk].replaceWith(new_criteria);
+                        new_criteria.fadeTo(300, 0.5, function() {
+                              new_criteria.fadeTo("fast", 1);
+                        });
+                    } else {
+                        new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, english);
+                        conditionList.append(new_criteria);
+                        App.hub.publish("ConceptAddedEvent", pk);
+                    }
+                    conditionCache[pk] =  new_criteria;
+                    new_criteria.addClass("selected");
+                    new_criteria.siblings().removeClass("selected");
 
-                // If the cache used to be empty, show this one in the console.
-                if (was_empty){
-                   $(conditionList.children()[0]).find(".field-anchor").click();
+                    // If the cache used to be empty, show this one in the console.
+                    if (was_empty){
+                       $(conditionList.children()[0]).find(".field-anchor").click();
+                    }
+                },
+                complete: function(xhr, status) {
+                    getReportButton.attr("disabled", false);
+                },
+                statusCode: {
+                    422: function(xhr, status, error) {
+                        var evt = $.Event("InvalidInputEvent");
+                        evt.ephemeral = 3000;
+                        evt.message = JSON.parse(xhr.responseText).validation_error;
+                        $('#plugin-panel').trigger(evt);
+                    }
                 }
            });
 
