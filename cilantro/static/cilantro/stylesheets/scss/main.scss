@@ -6,3 +6,21 @@
 body {
     background: url(../../images/noise.png);
 }
+
+#browser-support-message {
+    background-color: #fff;
+    border: 1px solid #999;
+    border-top: none;
+    padding: 10px;
+    position: absolute;
+    left: 50%;
+    margin-left: -310px;
+    width: 600px;
+    color: #b90000;
+    z-index: 1000;
+
+    h3 {
+        color: #333;
+    }
+}
+
