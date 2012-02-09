@@ -99,13 +99,18 @@ define [
             @name.attr 'href', @model.get 'permalink'
             @modified.text @model.get 'modified'
             @timesince.text @model.get 'timesince'
+
             if (description = @model.get 'description')
                 @description.show().text description
             else
                 @description.hide().text 'No description provided'
-            @uniqueCount.text @model.get 'unique_count'
-            @verboseName.text @model.get 'model_name_plural'
-            @
+
+            @uniqueCount.text (uniqueCount = @model.get 'unique_count')
+            if uniqueCount is 1
+                @verboseName.text @model.get 'model_name'
+            else
+                @verboseName.text @model.get 'model_name_plural'
+            return @
 
         toggleTime: (evt) ->
             @modified.toggle()

@@ -1,4 +1,4 @@
-STATIC_DIR = cilantro/static/cilantro
+STATIC_DIR = ./cilantro/static/cilantro
 COFFEE_DIR = ${STATIC_DIR}/scripts/coffeescript
 JS_SRC_DIR = ${STATIC_DIR}/scripts/javascript/src
 JS_MIN_DIR = ${STATIC_DIR}/scripts/javascript/min

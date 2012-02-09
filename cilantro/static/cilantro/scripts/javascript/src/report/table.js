@@ -19,8 +19,10 @@ define(['jquery', 'cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantr
                 tbody = table.find('tbody'),            // data loading
                 per_page = $('.per-page'),              // data loading
                 pages = $('.page-links'),               // data loading
-                unique = $('#report-unique'),            // data loading
-                count = $('#report-count'),                    // data loading
+                unique = $('.report-unique'),            // data loading
+                uniqueLabel = $('.report-unique-label'),
+                count = $('.report-count'),                    // data loading
+                countLabel = $('.report-count-label'),
                 noResults = $('#no-results');
 
             /*
@@ -101,16 +103,20 @@ define(['jquery', 'cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantr
                             report.unblock();
                         },
                         success: function(json) {
-                            if (json.unique !== null) {
-                                if (json.unique.toString() !== unique.text())
+                            if (json.unique_count !== null) {
+                                if (json.unique_count.toString() !== unique.text()) {
                                     unique.parent().effect('highlight', 1000);
-                                unique.text(json.unique);
+                                    unique.text(json.unique_count);
+                                    uniqueLabel.text((json.unique_count == 1 ? json.model_name : json.model_name_plural));
+                                }
                             }
 
                             if (json.count !== null) {
-                                if (json.count.toString() !== count.text())
+                                if (json.count.toString() !== count.text()) {
                                     count.parent().effect('highlight', 1000);
-                                count.text(json.count);
+                                    count.text(json.count);
+                                    countLabel.text((json.count == 1 ? 'row' : 'rows'));
+                                }
                             }
 
                             if (json.count === 0) {
