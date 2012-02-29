@@ -69,15 +69,13 @@ define(['jquery', 'cilantro/rest/datasource', 'cilantro/rest/renderer', 'cilantr
                         url: App.endpoints.session.scope,
                         success: function(json) {
                             if (json.conditions) {
-                                var t = '';
-                                if (typeof json.conditions === 'string') {
-                                    t = '<li>' + json.text + '</li>';
-                                } else {
-                                    var conditions = json.conditions;
-                                    for (var i=0; i < conditions.length; i++)
-                                        t += '<li>' + conditions[i].condition + '</li>';
-                                }
-                                details.html(t);
+                                var html = '';
+                                $.each(json.conditions, function(cid, list) {
+                                    $.each(list, function(idx, val) {
+                                        html += '<li>' + val + '</li>'
+                                    });
+                                });
+                                details.html(html);
                             }
                         }
                     }

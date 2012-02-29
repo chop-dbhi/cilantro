@@ -19,9 +19,10 @@ define [
             @defaultContent.detach()
             @el.empty()
             if conditions
-                text = ''
-                _.map(conditions, (node) -> text += "<li>#{node.condition}</li>")
-                @el.html text
+                html = ''
+                for key, value of conditions
+                    _.map(value, (text) -> html += "<li>#{ text }</li>")
+                @el.html html
             else
                 @el.append(@defaultContent)
             @collapse()

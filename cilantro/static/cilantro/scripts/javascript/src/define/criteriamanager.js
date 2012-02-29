@@ -51,17 +51,17 @@ define(['jquery', 'cilantro/define/criteria'], function($, criteria) {
                 url: scopeEndpoint,
                 data: JSON.stringify(data),
                 contentType: 'application/json',
-                success: function(english) {
+                success: function(resp) {
                     var was_empty = $.isEmptyObject(conditionCache);
                     // Is this an update?
                     if (operation === 'replace'){
-                        new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, english);
+                        new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, resp.patch_condition_text);
                         conditionCache[pk].replaceWith(new_criteria);
                         new_criteria.fadeTo(300, 0.5, function() {
                               new_criteria.fadeTo("fast", 1);
                         });
                     } else {
-                        new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, english);
+                        new_criteria = criteria.Criteria(criteria_constraint, scopeEndpoint, resp.patch_condition_text);
                         conditionList.append(new_criteria);
                         App.hub.publish("ConceptAddedEvent", pk);
                     }
@@ -135,21 +135,16 @@ define(['jquery', 'cilantro/define/criteria'], function($, criteria) {
 
 
     function getSession(data){
-          var conditions = {};
           if ((data.store === null) || $.isEmptyObject(data.store)){
               return;
           }
 
-          $.each(data.conditions, function(){
-               conditions[this.concept_id]=this;
-          });
-
           if (!data.store.hasOwnProperty("concept_id")){ // Root node representing a list of concepts won't have this attribute
               $.each(data.store.children, function(index, criteria_constraint){
-                  App.hub.publish("UpdateQueryEvent", criteria_constraint, conditions[criteria_constraint.concept_id]);
+                  App.hub.publish("UpdateQueryEvent", criteria_constraint, data.conditions[criteria_constraint.concept_id][0]);
               });
           }else{
-              App.hub.publish("UpdateQueryEvent", data.store, data.conditions[0]);
+              App.hub.publish("UpdateQueryEvent", data.store, data.conditions[data.store.concept_id][0]);
           }
           // Show the last condition
           conditionList.children().last().click();

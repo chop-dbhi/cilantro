@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'cilantro/define/conceptmanager'],
     function($, _, ConceptManager) {
-        var tmpl = _.template('<div class="condition clearfix"><a href="#" class="remove"></a><%= condition %></div>');
+        var tmpl = _.template('<div class="condition clearfix"><a href="#" class="remove"></a><%= text %></div>');
         var criteriaList = $('#condition-list');
 
         criteriaList.bind('activate-criterion', function(evt, id,element) {
@@ -11,8 +11,8 @@ define(['jquery', 'underscore', 'cilantro/define/conceptmanager'],
             });
         });
 
-        var Criteria = function(criteria_constraint, uri, server_resp){
-            var element =  $(tmpl(server_resp));
+        var Criteria = function(criteria_constraint, uri, text){
+            var element =  $(tmpl({text: text}));
             element.data("constraint", criteria_constraint);
             element.find(".remove").click(function(){
                 App.hub.publish("CriteriaRemovedEvent", element);
