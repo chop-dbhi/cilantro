@@ -1,5 +1,6 @@
 // document header containing the project logo and account nagivation
 #header {
+    @include user-select(none);
     @include anchors(#666, #333);
     @include box-shadow(0 1px 3px darken(#dadfe8, 20), inset 0 1px 3px #aaa);
     color: #666;
@@ -28,6 +29,7 @@
 
 // the main navigation across all pages
 #main-nav {
+    @include user-select(none);
     @include anchors(#aaa, #fff);
     @include box-shadow(inset 0 1px 2px #666, inset 0 -1px 2px #111, 0 1px 2px #999);
     background-color: #333;
@@ -97,6 +99,7 @@
 
 // hidden placeholder for application messages to be made visible
 #messages {
+    @include user-select(none);
     text-align: center;
     height: 30px;
 }
@@ -111,6 +114,7 @@
 
 // document footer for project copyright and other info
 #footer {
+    @include user-select(none);
     color: darken(#dadfe8, 50);
     text-shadow: 0 1px 2px lighten(#dadfe8, 100);
     font-size: 0.9em;
