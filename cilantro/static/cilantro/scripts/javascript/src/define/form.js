@@ -191,7 +191,7 @@ define(['jquery', "cilantro/define/viewelement", 'order!vendor/jquery.jqote2'], 
                                                           // One of the convenience things we allows is the pasting of newline sepearate text so that
                                                           // for example, someone can paste in an excel column of patient aliases.
                                                           // If the user selects an IN operator, we switch the text input -> textarea and vice versa
-                                                          if (opt.value.search(/exact/) >= 0 && $associated_inputs.prop("type") === "textarea"){
+                                                          if (opt.value.search(/^-?in$/) < 0 && $associated_inputs.prop("type") === "textarea"){
                                                               // The operator is of type exact, but the associated input is a text area, switch to text input
                                                               $associated_inputs.data("switch").data("switch", $associated_inputs);
                                                               $associated_inputs.before($associated_inputs.data("switch")).detach();
