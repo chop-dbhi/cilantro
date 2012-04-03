@@ -282,13 +282,12 @@
     font-size: 0.85em;
     background-color: #fff;
 
-    input {
-        min-width: 0px;
-        width: 40px;
+    input, textarea {
+        width: 200px;
     }
 
-    [data-validate=date] {
-        width: 60px;
+    [data-validate=date], [data-validate=number] {
+        width: 50px;
     }
 
     h2 {

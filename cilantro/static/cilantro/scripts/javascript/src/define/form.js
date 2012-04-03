@@ -202,7 +202,7 @@ define(['jquery', "cilantro/define/viewelement", 'order!vendor/jquery.jqote2'], 
                                                               if (!$associated_inputs.data("switch")){
                                                                  // We have not yet done a switch, otherwise we would have saved it, so we have to actually create the
                                                                  // textarea. This happens only once per input
-                                                                 var $mline = $('<textarea rows="8" id="'+$associated_inputs.attr("id")+'" name="'+$associated_inputs.attr("name")+'" cols="25"></textarea>').data("switch",$associated_inputs);
+                                                                 var $mline = $('<textarea rows="8" id="'+$associated_inputs.attr("id")+'" name="'+$associated_inputs.attr("name")+'"></textarea>').data("switch",$associated_inputs);
 
                                                                  $associated_inputs.before($mline).detach();
                                                                  ds = dom.data("datasource")||{};
@@ -380,16 +380,16 @@ define(['jquery', "cilantro/define/viewelement", 'order!vendor/jquery.jqote2'], 
                                    decOperatorsTmpl.join(''),
                                 '</select>',
                                 '<span class="input_association" name="<%=this.field_id%>_input_assoc">',
-                                '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input0" type="text" name="<%=this.field_id%>_input0" size="5">',
+                                '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input0" type="text" name="<%=this.field_id%>_input0">',
                                 ' <label for="<%=this.field_id%>_input1">and</label> ',
-                                '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input1" type="text" name="<%=this.field_id%>_input1" size="5">',
+                                '<input data-validate="<%=this.datatype%>" id="<%=this.field_id%>_input1" type="text" name="<%=this.field_id%>_input1">',
                                 '</span>'].join("")),
         string_tmpl: $.jqotec([ '<% if (this.choices) {%>',
                                      '<label for="<%=this.field_id%>"><%=this.label%></label>', // No defaults for this type, doesn't make sense
                                          '<select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',
                                             choiceOperatorsTmpl.join(''),
                                          '</select>',
-                                     '<select multiple="multiple" id="<%=this.field_id%>-value" name="<%=this.field_id%>" size="3" data-optional="<%=this.optional%>" >',
+                                     '<select multiple="multiple" id="<%=this.field_id%>-value" name="<%=this.field_id%>" data-optional="<%=this.optional%>" >',
                                      '<% for (var index = 0; index < this.choices.length; index++) { %>',
                                             '<option value="<%=this.choices[index][0]%>"><%=this.choices[index][1]%></option>',
                                      '<%}%>',
@@ -399,13 +399,13 @@ define(['jquery', "cilantro/define/viewelement", 'order!vendor/jquery.jqote2'], 
                                       '<select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',
                                            freeTextOperatorsTmpl.join(''),
                                       '</select>',
-                                      '<input data-optional="<%=this.optional%>" type="text" id="<%=this.field_id%>_text" name="<%=this.field_id%>" size = "10">',
+                                      '<input data-optional="<%=this.optional%>" type="text" id="<%=this.field_id%>_text" name="<%=this.field_id%>">',
                                  '<%}%>'].join('')),
         stringlist_tmpl: $.jqotec([ '<label for="<%=this.field_id%>"><%=this.label%></label>', // No defaults for this type, doesn't make sense
                                     '<select id="<%=this.field_id%>-operator" name="<%=this.field_id%>_operator">',
                                            choiceOperatorsTmpl.join(''),
                                      '</select>',
-                                     '<textarea data-optional="<%=this.optional%>" id="<%=this.field_id%>_text" name="<%=this.field_id%>" rows="8" cols="25"></textarea>'
+                                     '<textarea data-optional="<%=this.optional%>" id="<%=this.field_id%>_text" name="<%=this.field_id%>"></textarea>'
                                   ].join('')),
         pk_tmpl: $.jqotec(['<p><label for="<%=this.pkchoice_id%>"><%=this.pkchoice_label%></label>',
                             '<select id="<%=this.pkchoice_id%>" name="<%=this.pkchoice_id%>">',
