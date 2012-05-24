@@ -1,0 +1,10 @@
+@mixin loader($size: tiny) {
+    background: transparent url(../../images/loader-#{$size}.gif);
+    background-repeat: no-repeat;
+    background-position: center;
+    > * { opacity: 0.2 }
+}
+
+.loading {
+    @include loader;
+}

@@ -1,0 +1,44 @@
+@import "lib/bourbon/bourbon";
+@import "lib/bootstrap";
+//@import "lib/bootstrap-responsive";
+
+@import "base/app";
+@import "base/modal";
+
+@import "layouts/subnav";
+@import "layouts/scrollable-column";
+@import "layouts/panels";
+@import "layouts/main-area";
+@import "layouts/analysis-area";
+
+@import "state/loading";
+
+@import "modules/chosen";
+@import "modules/icons";
+@import "modules/container";
+@import "modules/charts";
+@import "modules/accordian";
+@import "modules/form-fields";
+@import "modules/conditions";
+@import "modules/grouped-tables";
+@import "modules/data-concepts";
+@import "modules/data-filters";
+
+* {
+    @include user-select(none);
+}
+
+input, p {
+    @include user-select(auto);
+}
+
+body {
+    background: #f9f9f9 url(../../images/fabric_plaid.png);
+    // Padding for navigation bars
+    padding-top: 77px;
+    font-size: 16px;
+}
+
+h1 {
+    margin: 10px 0 20px 0;
+}

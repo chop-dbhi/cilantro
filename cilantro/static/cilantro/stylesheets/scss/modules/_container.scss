@@ -1,0 +1,30 @@
+.area-container {
+    @include raised;
+    vertical-align: top;
+    background-color: #fff;
+    position: relative;
+
+    .heading {
+        @include border-radius(3px 3px 0 0);
+        border-bottom: 1px solid #eee;
+        background-color: #f9f9f9;
+        text-shadow: 0 1px 1px #fff;
+        padding: 10px;
+        height: 18px;
+        font-weight: 500;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    > .btn-toolbar {
+        position: absolute;
+        right: 10px;
+        top: -3px;
+        z-index: 10;
+    }
+
+    .content {
+        @include box-sizing(border-box);
+        padding: 10px;
+    }
+}

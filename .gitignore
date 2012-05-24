@@ -1,0 +1,4 @@
+*.sw[po]
+*.py[co]
+.sass-cache
+*.swn

@@ -1,0 +1,22 @@
+.group {
+    margin-top: 10px;
+
+    .group-label {
+        display: block;
+        font-weight: 500;
+        font-size: 22px;
+        margin-bottom: 5px;
+    }
+
+    .group-table {
+        // Extend Bootstrap table
+        @extend .table;
+        @extend .table-striped;
+
+        @include border-radius(3px);
+        @include box-shadow(1px 1px 3px #ccc);
+        border: 1px solid #bbb;
+
+        background-color: #fff;
+    }
+}
