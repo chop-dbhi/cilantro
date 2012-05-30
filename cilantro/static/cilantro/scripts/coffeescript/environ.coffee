@@ -120,26 +120,45 @@ define [
     Backbone.ajax.requests = []
 
     Backbone.ajax.requestNext = ->
-        if (next = @requests.shift())
-            @request(next)
+        if (args = @requests.shift())
+            [options, promise] = args
+            @request options, promise
         else
             @pending = false
 
-    Backbone.ajax.request = (options, trigger=true) ->
-        complete = (xhr, status) =>
-            if status is 'timeout'
-                if ATTEMPTS < MAX_ATTEMPTS
-                    ATTEMPTS++
-                    return _ajax(options)
-            else if 200 <= xhr.status < 300
-                # In cases there was a `complete` handler defined
-                if options.complete then options.complete(arguments)
-                if trigger then @requestNext()
+    Backbone.ajax.request = (_options, promise, trigger=true) ->
+        options = _.extend {}, _options
 
+        success = options.success
+        error = options.error
+        complete = options.complete
+
+        params =
+            complete: (xhr, status) =>
+                if status is 'timeout'
+                    # If this does not pass, this is considered a failed request
+                    if ATTEMPTS < MAX_ATTEMPTS
+                        return _ajax params
+                else if 200 <= xhr.status < 300
+                    # In cases there was a `complete` handler defined
+                    if complete then complete.apply @, arguments
+                    if trigger then @requestNext()
+
+            success: ->
+                if success then success.apply @, arguments
+                promise.resolveWith @, arguments
+
+            error: (xhr, status, err) ->
+                if status is 'timeout' and ATTEMPTS < MAX_ATTEMPTS
+                    ATTEMPTS++
+                else
+                    if error then error.apply @, arguments
+                    promise.rejectWith @, arguments
+
+        params = _.extend options, params
         # Add custom complete for handling retries for this particular
         # request. This ensures the queue won't be handled out of order
-        options.complete = complete
-        _ajax(options)
+        _ajax params
         # Each new request from the queue will reset the number of attempts
         # that have been made.
         ATTEMPTS = 1
@@ -147,16 +166,22 @@ define [
 
     Backbone.ajax.queue = (options) ->
         type = (options.type or 'get').toLowerCase()
+        # Since requests are being queued, the `xhr` is not being created
+        # immediately and thus no way of adding deferred callbacks. This
+        # `promise` acts as a proxy for the request's `xhr` object.
+        promise = $.Deferred()
+
         # For GET requests, the order is not terribly important.
         # The `pending` flag is not since it does not deal with
         # saving changes to the server.
         if type is 'get'
-            @request options, false
+            @request options, promise, false
         else if @pending
-            @requests.push options
+            @requests.push [options, promise]
         else
             @pending = true
-            @request options
+            @request options, promise
+        return promise
 
 
     { CSRF_TOKEN, SCRIPT_NAME, absolutePath }

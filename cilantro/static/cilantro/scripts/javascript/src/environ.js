@@ -87,50 +87,74 @@ define(['jquery', 'use!underscore', 'use!backbone', 'use!bootstrap', 'use!jquery
   Backbone.ajax.pending = false;
   Backbone.ajax.requests = [];
   Backbone.ajax.requestNext = function() {
-    var next;
-    if ((next = this.requests.shift())) {
-      return this.request(next);
+    var args, options, promise;
+    if ((args = this.requests.shift())) {
+      options = args[0], promise = args[1];
+      return this.request(options, promise);
     } else {
       return this.pending = false;
     }
   };
-  Backbone.ajax.request = function(options, trigger) {
-    var complete,
+  Backbone.ajax.request = function(_options, promise, trigger) {
+    var complete, error, options, params, success,
       _this = this;
     if (trigger == null) {
       trigger = true;
     }
-    complete = function(xhr, status) {
-      var _ref;
-      if (status === 'timeout') {
-        if (ATTEMPTS < MAX_ATTEMPTS) {
-          ATTEMPTS++;
-          return _ajax(options);
+    options = _.extend({}, _options);
+    success = options.success;
+    error = options.error;
+    complete = options.complete;
+    params = {
+      complete: function(xhr, status) {
+        var _ref;
+        if (status === 'timeout') {
+          if (ATTEMPTS < MAX_ATTEMPTS) {
+            return _ajax(params);
+          }
+        } else if ((200 <= (_ref = xhr.status) && _ref < 300)) {
+          if (complete) {
+            complete.apply(_this, arguments);
+          }
+          if (trigger) {
+            return _this.requestNext();
+          }
         }
-      } else if ((200 <= (_ref = xhr.status) && _ref < 300)) {
-        if (options.complete) {
-          options.complete(arguments);
+      },
+      success: function() {
+        if (success) {
+          success.apply(this, arguments);
         }
-        if (trigger) {
-          return _this.requestNext();
+        return promise.resolveWith(this, arguments);
+      },
+      error: function(xhr, status, err) {
+        if (status === 'timeout' && ATTEMPTS < MAX_ATTEMPTS) {
+          return ATTEMPTS++;
+        } else {
+          if (error) {
+            error.apply(this, arguments);
+          }
+          return promise.rejectWith(this, arguments);
         }
       }
     };
-    options.complete = complete;
-    _ajax(options);
+    params = _.extend(options, params);
+    _ajax(params);
     return ATTEMPTS = 1;
   };
   Backbone.ajax.queue = function(options) {
-    var type;
+    var promise, type;
     type = (options.type || 'get').toLowerCase();
+    promise = $.Deferred();
     if (type === 'get') {
-      return this.request(options, false);
+      this.request(options, promise, false);
     } else if (this.pending) {
-      return this.requests.push(options);
+      this.requests.push([options, promise]);
     } else {
       this.pending = true;
-      return this.request(options);
+      this.request(options, promise);
     }
+    return promise;
   };
   return {
     CSRF_TOKEN: CSRF_TOKEN,
