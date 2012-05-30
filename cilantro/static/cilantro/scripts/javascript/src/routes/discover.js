@@ -2,7 +2,7 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define(['environ', 'jquery', 'use!underscore', 'use!backbone'], function(environ, $, _, Backbone) {
+define(['environ', 'jquery', 'use!backbone'], function(environ, $, Backbone) {
   var DiscoverArea;
   DiscoverArea = (function(_super) {
 
@@ -19,11 +19,13 @@ define(['environ', 'jquery', 'use!underscore', 'use!backbone'], function(environ
     };
 
     DiscoverArea.prototype.load = function() {
-      return this.$el.fadeIn();
+      this.$el.fadeIn();
+      return App.QueryViewsPanel.$el.panel('open');
     };
 
     DiscoverArea.prototype.unload = function() {
-      return this.$el.hide();
+      this.$el.hide();
+      return App.QueryViewsPanel.$el.panel('close');
     };
 
     DiscoverArea.prototype.destroy = function() {};

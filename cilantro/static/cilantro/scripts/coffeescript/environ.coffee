@@ -2,9 +2,12 @@ define [
     'jquery'
     'use!underscore'
     'use!backbone'
+
+    # Load various plugin-based modules for jQuery
     'use!bootstrap'
     'use!jquery.chosen'
-    'panels'
+    'use!jquery.ui'
+    'jquery.panels'
 ], ($, _, Backbone) ->
 
     # Ajax states

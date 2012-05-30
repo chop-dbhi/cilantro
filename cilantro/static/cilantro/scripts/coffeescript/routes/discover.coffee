@@ -1,10 +1,12 @@
 define [
     'environ'
     'jquery'
-    'use!underscore'
     'use!backbone'
-], (environ, $, _, Backbone) ->
+], (environ, $, Backbone) ->
 
+    # Provides the UI components for viewing expanded QueryView
+    # representations. It also provides an interface for building
+    # composite DataContexts
     class DiscoverArea extends Backbone.View
         id: '#discover-area'
 
@@ -16,9 +18,11 @@ define [
 
         load: ->
             @$el.fadeIn()
+            App.QueryViewsPanel.$el.panel 'open'
 
         unload: ->
             @$el.hide()
+            App.QueryViewsPanel.$el.panel 'close'
 
         destroy: ->
 
