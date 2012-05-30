@@ -3,7 +3,7 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(environ, $, _, Backbone, session) {
-  var Router;
+  var ROUTING, Router;
   Router = (function(_super) {
 
     __extends(Router, _super);
@@ -30,6 +30,7 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
   App.router = new Router;
   App.views = {};
   App.loaded = [];
+  ROUTING = false;
   return App.register = function(route, name, view) {
     var _this = this;
     if (App.views[name] != null) {
@@ -38,8 +39,8 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
     App.views[name] = view;
     this.router.route(route, name, function() {
       var _i, _len, _name, _ref, _ref1, _ref2;
-      if (!App._routing) {
-        App._routing = true;
+      if (!ROUTING) {
+        ROUTING = true;
         _ref = _this.loaded;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           _name = _ref[_i];
@@ -51,7 +52,7 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
         }
         _this.loaded = [];
         _.defer(function() {
-          return App._routing = false;
+          return ROUTING = false;
         });
       }
       if ((_ref2 = App.views[name]) != null) {

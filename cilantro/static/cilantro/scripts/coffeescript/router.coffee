@@ -27,20 +27,22 @@ define [
     App.views = {}
     App.loaded = []
 
+    ROUTING = false
+
     App.register = (route, name, view) ->
         if App.views[name]? then throw new Error "#{ name } view already registered"
         App.views[name] = view
 
         @router.route route, name, =>
             # First route handler, perform initial steps
-            if not App._routing
-                App._routing = true
+            if not ROUTING
+                ROUTING = true
                 # Unload existing views, check for existence in case the
                 # view had been destroyed in the meantime
                 (App.views[_name]?.unload?() for _name in @loaded)
                 @loaded = []
                 # Defer to end of call stack
-                _.defer -> App._routing = false
+                _.defer -> ROUTING = false
 
             App.views[name]?.load?()
             @loaded.push name
