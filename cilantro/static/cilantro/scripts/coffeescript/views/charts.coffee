@@ -49,11 +49,10 @@ define [
         initialize: (options) ->
             @enumerableOnly = options.enumerableOnly
 
-            @collection.on 'reset', @render
-            # Render if already populated
-            if @collection.models[0] then @render()
+            @collection.deferred.done =>
+                @render()
 
-        render: =>
+        render: ->
             @$el.append '<option value=>---</option>'
 
             for model in @collection.models
@@ -64,7 +63,7 @@ define [
                 if @enumerableOnly and not data.enumerable
                     continue
                 @$el.append "<option value=#{ model.id }>#{ model.get 'name' } [#{ model.get 'model_name' }]</option>"
-            return
+            return @
 
         getSelected: ->
             return @collection.get parseInt @$el.val()
@@ -117,12 +116,6 @@ define [
                         @$form.hide()
                     if (expanded = @model.get 'expanded') then @expand() else @contract()
 
-            # Promise for the async components. Any methods that rely on these
-            # components should use this promise.
-            @ready = new $.Deferred
-            @collection.on 'reset', =>
-                @ready.resolve()
-
         render: (options) ->
             if @chart then @chart.destroy?()
             @$label.hide().detach()
@@ -150,6 +143,7 @@ define [
             $.extend true, options, @chartOptions
             options.chart.renderTo = @$renderArea[0]
             @chart = new Highcharts.Chart options
+            return @
 
         # Disable redundant fields since using the same field for multiple
         # axes doesn't make sense
@@ -203,7 +197,6 @@ define [
         showToolbar: ->
             @$toolbar.fadeIn 200
 
-
         # Toggles between showing the outliers and hiding the outliers
         # on the chart if any are present. The button will be greayed out
         # if none are available.
@@ -226,13 +219,12 @@ define [
                 timeout: 10 * 1000 # 10 seconds
                 success: (resp) =>
                     @$renderArea.removeClass 'loading'
-                    options = utils.processResponse resp, fields, seriesIdx
-                    @render options
+                    @render utils.processResponse resp, fields, seriesIdx
 
         updateChart: (event) ->
             if event then event.preventDefault()
             
-            @ready.then _.debounce =>
+            @collection.deferred.done =>
                 # TODO fix this nonsense
                 if not event?
                     if (xAxis = @model.get 'xAxis')

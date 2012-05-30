@@ -10,22 +10,28 @@ define [
     'models/charts'
 ], (environ, $, _, Backbone, views, Serrano) ->
 
+    class DataFields extends Serrano.DataFields
+        url: environ.absolutePath '/api/fields/'
+
+        initialize: ->
+            @deferred = @fetch()
+
+    class DataConcepts extends Serrano.DataConcepts
+        url: environ.absolutePath '/api/concepts/'
+
+        initialize: ->
+            @deferred = @fetch()
+
+    # Note, these instances are not plural since the `models` property is
+    # actually the list of models..
+    App.DataField = new DataFields
+    App.DataConcept = new DataConcepts
+
     $ ->
 
-        class DataFields extends Serrano.DataFields
-            url: environ.absolutePath '/api/fields/'
-
-        class DataConcepts extends Serrano.DataConcepts
-            url: environ.absolutePath '/api/concepts/'
-
-        # Note, these instances are not plural since the `models` property is
-        # actually the list of models..
-        App.DataField = new DataFields
-        App.DataConcept = new DataConcepts
-
         # Lazily create the QueryViews
-        App.DataConcept.on 'reset', (collection) ->
-            collection.each (model, i) ->
+        App.DataConcept.deferred.done ->
+            App.DataConcept.each (model, i) ->
                 if model.get 'queryview'
                     new views.QueryView
                         model: model
@@ -34,8 +40,6 @@ define [
             el: '#data-filters-accordian'
             collection: App.DataConcept
 
-        App.DataField.fetch()
-        App.DataConcept.fetch()
 
         # Load the preferences now that the routes are loaded
         App.preferences.load()

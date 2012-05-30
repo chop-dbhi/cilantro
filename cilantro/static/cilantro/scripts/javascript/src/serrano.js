@@ -3,31 +3,7 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(['use!underscore', 'use!backbone'], function(_, Backbone) {
-  var DataConcepts, DataContext, DataContexts, DataField, DataFields, Distribution, Distributions;
-  Distribution = (function(_super) {
-
-    __extends(Distribution, _super);
-
-    function Distribution() {
-      return Distribution.__super__.constructor.apply(this, arguments);
-    }
-
-    return Distribution;
-
-  })(Backbone.Model);
-  Distributions = (function(_super) {
-
-    __extends(Distributions, _super);
-
-    function Distributions() {
-      return Distributions.__super__.constructor.apply(this, arguments);
-    }
-
-    Distributions.prototype.model = Distribution;
-
-    return Distributions;
-
-  })(Backbone.Collection);
+  var DataConcept, DataConcepts, DataContext, DataContexts, DataField, DataFields;
   DataField = (function(_super) {
 
     __extends(DataField, _super);
@@ -47,9 +23,22 @@ define(['use!underscore', 'use!backbone'], function(_, Backbone) {
       return DataFields.__super__.constructor.apply(this, arguments);
     }
 
+    DataFields.prototype.model = DataField;
+
     return DataFields;
 
   })(Backbone.Collection);
+  DataConcept = (function(_super) {
+
+    __extends(DataConcept, _super);
+
+    function DataConcept() {
+      return DataConcept.__super__.constructor.apply(this, arguments);
+    }
+
+    return DataConcept;
+
+  })(Backbone.Model);
   DataConcepts = (function(_super) {
 
     __extends(DataConcepts, _super);
@@ -57,6 +46,8 @@ define(['use!underscore', 'use!backbone'], function(_, Backbone) {
     function DataConcepts() {
       return DataConcepts.__super__.constructor.apply(this, arguments);
     }
+
+    DataConcepts.prototype.model = DataConcept;
 
     return DataConcepts;
 
@@ -80,12 +71,14 @@ define(['use!underscore', 'use!backbone'], function(_, Backbone) {
       return DataContexts.__super__.constructor.apply(this, arguments);
     }
 
+    DataContexts.prototype.model = DataContext;
+
     return DataContexts;
 
   })(Backbone.Collection);
   return {
     DataFields: DataFields,
     DataConcepts: DataConcepts,
-    Distributions: Distributions
+    DataContexts: DataContexts
   };
 });

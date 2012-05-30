@@ -3,38 +3,46 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(['environ', 'jquery', 'use!underscore', 'use!backbone', 'views', 'serrano', 'use!jquery.ui', 'router', 'models/charts'], function(environ, $, _, Backbone, views, Serrano) {
+  var DataConcepts, DataFields;
+  DataFields = (function(_super) {
+
+    __extends(DataFields, _super);
+
+    function DataFields() {
+      return DataFields.__super__.constructor.apply(this, arguments);
+    }
+
+    DataFields.prototype.url = environ.absolutePath('/api/fields/');
+
+    DataFields.prototype.initialize = function() {
+      return this.deferred = this.fetch();
+    };
+
+    return DataFields;
+
+  })(Serrano.DataFields);
+  DataConcepts = (function(_super) {
+
+    __extends(DataConcepts, _super);
+
+    function DataConcepts() {
+      return DataConcepts.__super__.constructor.apply(this, arguments);
+    }
+
+    DataConcepts.prototype.url = environ.absolutePath('/api/concepts/');
+
+    DataConcepts.prototype.initialize = function() {
+      return this.deferred = this.fetch();
+    };
+
+    return DataConcepts;
+
+  })(Serrano.DataConcepts);
+  App.DataField = new DataFields;
+  App.DataConcept = new DataConcepts;
   return $(function() {
-    var DataConcepts, DataFields;
-    DataFields = (function(_super) {
-
-      __extends(DataFields, _super);
-
-      function DataFields() {
-        return DataFields.__super__.constructor.apply(this, arguments);
-      }
-
-      DataFields.prototype.url = environ.absolutePath('/api/fields/');
-
-      return DataFields;
-
-    })(Serrano.DataFields);
-    DataConcepts = (function(_super) {
-
-      __extends(DataConcepts, _super);
-
-      function DataConcepts() {
-        return DataConcepts.__super__.constructor.apply(this, arguments);
-      }
-
-      DataConcepts.prototype.url = environ.absolutePath('/api/concepts/');
-
-      return DataConcepts;
-
-    })(Serrano.DataConcepts);
-    App.DataField = new DataFields;
-    App.DataConcept = new DataConcepts;
-    App.DataConcept.on('reset', function(collection) {
-      return collection.each(function(model, i) {
+    App.DataConcept.deferred.done(function() {
+      return App.DataConcept.each(function(model, i) {
         if (model.get('queryview')) {
           return new views.QueryView({
             model: model
@@ -46,8 +54,6 @@ define(['environ', 'jquery', 'use!underscore', 'use!backbone', 'views', 'serrano
       el: '#data-filters-accordian',
       collection: App.DataConcept
     });
-    App.DataField.fetch();
-    App.DataConcept.fetch();
     App.preferences.load();
     return require(['routes/workspace', 'routes/discover', 'routes/composite', 'routes/analyze', 'routes/review'], function() {
       return Backbone.history.start({

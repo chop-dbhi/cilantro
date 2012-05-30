@@ -1,23 +1,24 @@
-define ['use!underscore', 'use!backbone'], (_, Backbone) ->
-
-    class Distribution extends Backbone.Model
-
-
-    class Distributions extends Backbone.Collection
-        model: Distribution
- 
+define [
+    'use!underscore'
+    'use!backbone'
+], (_, Backbone) ->
 
     class DataField extends Backbone.Model
 
     class DataFields extends Backbone.Collection
+        model: DataField
 
+
+    class DataConcept extends Backbone.Model
 
     class DataConcepts extends Backbone.Collection
+        model: DataConcept
 
 
     class DataContext extends Backbone.Model
 
     class DataContexts extends Backbone.Collection
+        model: DataContext
 
 
-    { DataFields, DataConcepts, Distributions }
+    { DataFields, DataConcepts, DataContexts }
