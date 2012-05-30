@@ -97,9 +97,21 @@
         </div>
 
         <script>
-            var SCRIPT_NAME = '{{ request.META.SCRIPT_NAME }}',
-                CSRF_TOKEN = '{{ csrf_token }}';
+            var
 
+                // Used by `environ.js` to correctly prefix URL paths
+                SCRIPT_NAME = '{{ request.META.SCRIPT_NAME }}',
+
+                // Used for non-safe requests, also defined in `environ.js`
+                CSRF_TOKEN = '{{ csrf_token }}',
+
+                // Namespace for shared App components
+                App = {preferences: JSON.parse('{{ user_preferences|safe }}')};
+
+            // Pre-configuration, everything is relative to Cilantro's path. For
+            // integration of external scripts, create a contexted `require`
+            // function. See http://requirejs.org/docs/api.html#multiversion.
+            // Note that all existing scripts defined here can be used
             var require = {
                 baseUrl: '{{ CILANTRO_JAVASCRIPT_URL }}',
                 use: {
@@ -132,6 +144,6 @@
             };
         </script>
 
-        <script data-main=main src={{ CILANTRO_JAVASCRIPT_URL }}/require.js></script>
+        <script data-main=main src={{ CILANTRO_JAVASCRIPT_URL }}require.js></script>
     </body>
 </html>

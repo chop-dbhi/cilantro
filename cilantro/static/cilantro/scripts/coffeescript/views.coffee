@@ -1,37 +1,25 @@
-define ['environ', 'mediator', 'jquery', 'use!underscore', 'use!backbone', 'charts'], (environ, mediator, $, _, Backbone, Charts) ->
+define [
+    'environ'
+    'mediator'
+    'jquery'
+    'use!underscore'
+    'use!backbone'
+    'templates'
+    'views/forms'
+    'views/charts'
+], (environ, mediator, $, _, Backbone, Templates, Forms, Charts) ->
 
     class Container extends Backbone.View
-        className: 'area-container'
-
-        template: _.template '
-            <div class=heading></div>
-            <div class=content></div>
-        '
+        template: Templates.container
 
         initialize: ->
-            @$el.html @template()
+            @setElement @template()
             @heading = @$el.find '.heading'
             @content = @$el.find '.content'
 
 
     class QueryView extends Backbone.View
-        template: _.template '
-            <div class="area-container queryview">
-                <div class=heading>
-                    {{ name }} <small>{{ category }}</small>
-                </div>
-                <div class=btn-toolbar>
-                    <button data-toggle=detail class="btn btn-small"><i class=icon-info-sign></i></button>
-                </div>
-                <div class=details>
-                    <div class=description>{{ description }}</div>
-                </div>
-                <div class="content row-fluid">
-                    <div class="span6 controls"></div>
-                    <div class="span6 charts"></div>
-                </div>
-            </div>
-        '
+        template: Templates.queryview
 
         events:
             'click [data-toggle=detail]': 'toggleDetail'
@@ -74,7 +62,7 @@ define ['environ', 'mediator', 'jquery', 'use!underscore', 'use!backbone', 'char
                 @fieldCollection = new Backbone.Collection @model.get 'fields'
 
                 # Initialize form
-                form = new FilterForm
+                form = new Forms.FilterForm
                     collection: @fieldCollection
                 @$controls.append form.$el
 
@@ -103,20 +91,8 @@ define ['environ', 'mediator', 'jquery', 'use!underscore', 'use!backbone', 'char
                     chart.renderChart url, null, [model]
             else
                 @pendingUpdate = true
+            return
 
-
-
-    accordianGroupTmpl = _.template '
-        <div class=accordian-group>
-            <div class=accordian-heading>
-                <a class=accordian-toggle data-toggle=collapse data-parent={{ parent }} href=#{{ slug }}>{{ name }}</a>
-                <i class=icon-filter></i>
-            </div>
-            <div id={{ slug }} class="accordian-body collapse">
-                <ul class=nav></ul>
-            </div>
-        </div> 
-    '
 
     # Accordian representation of the data filters
     class DataFiltersAccordian extends Backbone.View
@@ -136,7 +112,7 @@ define ['environ', 'mediator', 'jquery', 'use!underscore', 'use!backbone', 'char
                 if not groupName or categoryName isnt groupName
                     groupName = categoryName
                     id = @$el.prop('id')
-                    group = $ accordianGroupTmpl
+                    group = $ Templates.accordianGroup
                         name: groupName
                         parent: id
                         slug: "#{ id }-#{ groupName.toLowerCase() }"
@@ -147,158 +123,8 @@ define ['environ', 'mediator', 'jquery', 'use!underscore', 'use!backbone', 'char
         showQueryview: (event) ->
             event.preventDefault()
             targetId = $(event.target).data('target')
-            mediator.publish "queryview", targetId, 'show'
+            mediator.publish 'queryview', targetId, 'show'
 
 
 
-    class FilterForm extends Backbone.View
-        tagName: 'form'
-
-        events:
-            'submit': 'preventDefault'
-            'click [name=filter]': 'applyFilter'
-            'click [name=exclude]': 'applyExclude'
-
-        template: _.template '
-            <div class=fieldsets></div>
-            <button class="btn success" name=filter>Filter</button>
-            <button class="btn danger" name=exclude>Exclude</button>
-        '
-
-        initialize: ->
-            @$el.html @template()
-            @filterButton = @$el.find '[name=filter]'
-            @excludeButton = @$el.find '[name=exclude]'
-
-            fieldsets = @$el.find '.fieldsets'
-
-            @fieldsets = {}
-            for model in @collection.models
-                if model.get('data').enumerable
-                    view = new MultiEnumFieldSet
-                        model: model
-                else if model.get('data').type is 'number'
-                    view = new NumberFieldSet
-                        model: model
-                else
-                    view = new FilterFieldSet
-                        model: model
-
-                fieldsets.append view.$el
-                @fieldsets[model.id] = view
-
-        preventDefault: (event) ->
-            event.preventDefault()
-
-        applyFilter: ->
-
-        applyExclude: ->
-
-
-    class FilterFieldSet extends Backbone.View
-        tagName: 'fieldset'
-
-        template: _.template '
-            <select name=operator></select>
-            <input name=value>
-        '
-
-        initialize: (options) ->
-            @$el.html @template()
-            @operator = @$el.find '[name=operator]'
-            @value = @$el.find '[name=value]'
-
-            # Populate the operators
-            $.each @model.get('operators'), (i, choice) =>
-                option = $ "<option value=\"#{ choice[0] }\">#{ choice[1] }</option>"
-                @operator.append option
-
-        render: (filter) ->
-            if filter
-                @filter = filter
-                @setOperator()
-                @setValue()
-
-        getOperator: ->
-            @operator.val()
-
-        getValue: ->
-            @value.val()
-
-        setOperator: ->
-            @operator.val @filter.get 'operator'
-
-        setValue: ->
-            @value.val filter.get 'value'
-
-        applyFilter: ->
-            @filter.set
-                value: @getValue()
-                operator: @getOperator()
-                negate: false
-
-        applyExclude: ->
-            @filter.set
-                value: @getValue()
-                operator: @getOperator()
-                negate: true
-
-
-    class NumberFieldSet extends FilterFieldSet
-        events:
-            'change [name=operator]': 'toggleOperator'
-
-        template: _.template '
-            <select name=operator></select>
-            <input name=value>
-            <input name=value2>
-        '
-
-        initialize: ->
-            super
-            # Hide by default
-            @value2 = @$el.find('[name=value2]').hide()
-
-        getValue: ->
-            if /between/.test @getOperator()
-                [@value.val(), @value2.val()]
-            else
-                @value.val()
-
-        setValue: ->
-            value = @filter.get 'value'
-            if /between/.test @filter.get 'operator'
-                @value.val value[0]
-                @value2.val value[1]
-            else
-                @value.val value
-
-        toggleOperator: ->
-            if /between/.test @getOperator()
-                @value2.show()
-            else
-                @value2.hide()
-
-
-    class SingleEnumFieldSet extends FilterFieldSet
-        template: _.template '
-            <select name=value></select>
-        '
-
-        initialize: (options) ->
-            super
-            # Populate the values
-            $.each @model.get('data').choices, (i, choice) =>
-                option = $ "<option value=\"#{ choice[0] }\">#{ choice[1] }</option>"
-                @value.append option
-
-
-        getOperator: -> 'in'
-
-
-    class MultiEnumFieldSet extends SingleEnumFieldSet
-        template: _.template '
-            <select name=value multiple></select>
-        '
-
-    { Container, DataFiltersAccordian, FilterForm, FilterFieldSet, NumberFieldSet, SingleEnumFieldSet, MultiEnumFieldSet, QueryView }
+    { Container, DataFiltersAccordian, QueryView }

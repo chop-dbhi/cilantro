@@ -1,4 +1,10 @@
-define ['jquery', 'use!underscore', 'use!backbone', 'use!bootstrap', 'use!jquery.chosen', 'backbone.charts'], ($, _, Backbone) ->
+define [
+    'jquery'
+    'use!underscore'
+    'use!backbone'
+    'use!bootstrap'
+    'use!jquery.chosen'
+], ($, _, Backbone) ->
 
     # Ajax states
     LOADING = 'Loading'
@@ -22,9 +28,9 @@ define ['jquery', 'use!underscore', 'use!backbone', 'use!bootstrap', 'use!jquery
     # No global jQuery..
     # $.noConflict()
 
-    # Reasonable timeout..
-    # $.ajaxSetup
-    # timeout: 5000
+    # Reasonable default timeout..
+    $.ajaxSetup
+        timeout: 5000
 
 
     # Checks for environment settings
@@ -56,6 +62,9 @@ define ['jquery', 'use!underscore', 'use!backbone', 'use!bootstrap', 'use!jquery
     # handlers.
     # TODO keep track of ATTEMPTS
     $ ->
+        $('[data-toggle=chosen]').chosen
+            allow_single_deselect: true
+
         syncStatus = $('#sync-status')
 
         $(document)
@@ -148,5 +157,6 @@ define ['jquery', 'use!underscore', 'use!backbone', 'use!bootstrap', 'use!jquery
         else
             @pending = true
             @request options
+
 
     { CSRF_TOKEN, SCRIPT_NAME, absolutePath }
