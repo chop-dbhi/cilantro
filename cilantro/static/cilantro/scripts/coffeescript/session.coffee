@@ -1,8 +1,8 @@
 define [
     'environ'
     'mediator'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
 ], (environ, mediator, _, Backbone) ->
 
     class Preferences extends Backbone.Model

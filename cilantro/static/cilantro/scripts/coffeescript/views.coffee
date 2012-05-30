@@ -3,8 +3,8 @@
 define [
     'environ'
     'jquery'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
 ], (environ, $, _, Backbone) ->
 
     class Container extends Backbone.View

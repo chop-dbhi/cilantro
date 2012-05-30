@@ -1,8 +1,8 @@
 define [
     'environ'
     'jquery'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
 ], (environ, $, _, Backbone) ->
 
     # `App` should be marked as to whether a composite datacontext is in use

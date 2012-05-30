@@ -1,7 +1,7 @@
 define [
     'environ'
     'jquery'
-    'use!backbone'
+    'backbone'
 ], (environ, $, Backbone) ->
 
     # Provides the UI components for viewing expanded QueryView

@@ -1,7 +1,7 @@
 define [
     'environ'
     'jquery'
-    'use!backbone'
+    'backbone'
     'charts/utils'
     'backbone.charts'
 ], (environ, $, Backbone, utils) ->

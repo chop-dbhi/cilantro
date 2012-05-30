@@ -1,4 +1,4 @@
-define ['use!highcharts'], (Highcharts) ->
+define ['highcharts'], (Highcharts) ->
 
     # MAX_RADIUS = 10
     # MIN_RADIUS = 3

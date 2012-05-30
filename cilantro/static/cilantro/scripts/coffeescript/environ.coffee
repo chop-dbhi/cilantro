@@ -1,12 +1,12 @@
 define [
     'jquery'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
 
     # Load various plugin-based modules for jQuery
-    'use!bootstrap'
-    'use!jquery.chosen'
-    'use!jquery.ui'
+    'bootstrap'
+    'jquery.chosen'
+    'jquery.ui'
     'jquery.panels'
 ], ($, _, Backbone) ->
 

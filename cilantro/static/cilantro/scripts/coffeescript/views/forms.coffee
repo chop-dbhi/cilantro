@@ -1,8 +1,8 @@
 define [
     'environ'
     'jquery'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
     'templates'
 ], (environ, $, _, Backbone, Templates) ->
 

@@ -1,4 +1,4 @@
-define ['use!underscore'], (_) ->
+define ['underscore'], (_) ->
 
     channels = {}
 

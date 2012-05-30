@@ -1,8 +1,8 @@
 define [
     'environ'
     'jquery'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
     'session'
 ], (environ, $, _, Backbone, session) ->
 

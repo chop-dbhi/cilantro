@@ -1,8 +1,8 @@
 define [
     'environ'
     'jquery'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
 ], (environ, $, _, Backbone) ->
 
     class ReviewArea extends Backbone.View

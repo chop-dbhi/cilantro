@@ -1,6 +1,6 @@
 define [
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
 ], (_, Backbone) ->
 
     class DataField extends Backbone.Model

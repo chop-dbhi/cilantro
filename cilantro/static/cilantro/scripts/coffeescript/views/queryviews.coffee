@@ -2,8 +2,8 @@ define [
     'environ'
     'mediator'
     'jquery'
-    'use!underscore'
-    'use!backbone'
+    'underscore'
+    'backbone'
     'views/charts'
 ], (environ, mediator, $, _, Backbone, Charts) ->
 

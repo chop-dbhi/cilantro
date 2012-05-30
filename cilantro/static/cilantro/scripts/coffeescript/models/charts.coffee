@@ -1,7 +1,7 @@
 define [
     'environ'
     'mediator'
-    'use!backbone'
+    'backbone'
 ], (environ, mediator, Backbone) ->
 
     class Distribution extends Backbone.Model

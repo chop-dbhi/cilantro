@@ -93,32 +93,20 @@
             // Note that all existing scripts defined here can be used
             var require = {
                 baseUrl: '{{ CILANTRO_JAVASCRIPT_URL }}',
-                use: {
+                shim: {
                     'underscore': {
-                        attach: function() {
-                            return window._;
-                        }
+                        exports: '_'
                     },
                     'backbone': {
                         deps: ['underscore', 'jquery'],
-                        attach: function() {
-                            return window.Backbone;
-                        }
-                    },
-                    'bootstrap': {
-                        deps: ['jquery']
-                    },
-                    'jquery.chosen': {
-                        deps: ['jquery']
-                    },
-                    'jquery.ui': {
-                        deps: ['jquery']
+                        exports: 'Backbone'
                     },
                     'highcharts': {
-                        attach: function() {
-                            return window.Highcharts;
-                        }
-                    }
+                        exports: 'Highcharts'
+                    },
+                    'bootstrap': ['jquery'],
+                    'jquery.chosen': ['jquery'],
+                    'jquery.ui': ['jquery']
                 }
             };
         </script>
