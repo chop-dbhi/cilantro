@@ -4,6 +4,7 @@ define [
     'use!backbone'
     'use!bootstrap'
     'use!jquery.chosen'
+    'panels'
 ], ($, _, Backbone) ->
 
     # Ajax states
@@ -12,6 +13,7 @@ define [
     SAVED = 'Saved'
     OFFLINE = 'Offline'
     ERROR = 'Error'
+    DONE = 'Done'
 
     # Gloabl attempts counter
     # TODO make this a property of the `Backbone.ajax` function
@@ -69,6 +71,8 @@ define [
 
         $(document)
             .ajaxSend (event, xhr, settings) ->
+                syncStatus.removeClass 'alert-danger'
+
                 # For all same origin, non-safe requests add the X-CSRFToken header
                 if not safeMethod(settings.type) and sameOrigin(settings.url)
                     xhr.setRequestHeader 'X-CSRFToken', CSRF_TOKEN
@@ -83,14 +87,15 @@ define [
                 visible = syncStatus.is(':visible')
                 if ATTEMPTS is MAX_ATTEMPTS and not visible
                     syncStatus.fadeIn(200)
-                else if visible
-                    syncStatus.fadeOut(200)
+                else
+                    syncStatus.text(DONE)
+                    if visible then syncStatus.fadeOut(200)
 
             .ajaxError (event, xhr, settings, error) ->
                 if error is 'timeout'
                     syncStatus.text OFFLINE
                 else if xhr.status >= 500
-                    syncStatus.text ERROR
+                    syncStatus.text(ERROR).addClass 'alert-danger'
 
 
         # Handle a few common cases if the server if there are still pending
@@ -129,6 +134,7 @@ define [
     Backbone.ajax.request = (_options, promise, trigger=true) ->
         options = _.extend {}, _options
 
+        # Reference existing handlers
         success = options.success
         error = options.error
         complete = options.complete
