@@ -1,3 +1,4 @@
+import jsonfield
 from django.db import models
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
@@ -33,7 +34,8 @@ class SiteConfiguration(models.Model):
 
 
 class UserPreferences(models.Model):
-    user = models.ForeignKey(User)
+    user = models.OneToOneField(User)
+    json = jsonfield.JSONField(default=dict)
 
     def __unicode__(self):
-        return u'{0} Preferences'.format(self.user)
+        return u'{}\'s Preferences'.format(self.user)
