@@ -34,8 +34,11 @@ class SiteConfiguration(models.Model):
 
 
 class UserPreferences(models.Model):
-    user = models.OneToOneField(User)
     json = jsonfield.JSONField(default=dict)
+    user = models.ForeignKey(User, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
 
     def __unicode__(self):
-        return u'{}\'s Preferences'.format(self.user)
+        if self.user_id:
+            return u'{}\'s Preferences'.format(self.user)
+        return u'Preferences for Session [{}]'.format(self.session_key)
