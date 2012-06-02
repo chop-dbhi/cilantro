@@ -61,57 +61,56 @@ define [
     # paths.
     absolutePath = (path) -> SCRIPT_NAME + path
 
-    syncStatus = null
-
     # Setup the sync status text and the various global ajax
     # handlers.
     # TODO keep track of ATTEMPTS
+    syncStatus = $('<div id=sync-status></div>').addClass('alert')
+
+    $(document)
+        .ajaxSend (event, xhr, settings) ->
+            syncStatus.removeClass 'alert-danger'
+
+            # For all same origin, non-safe requests add the X-CSRFToken header
+            if not safeMethod(settings.type) and sameOrigin(settings.url)
+                xhr.setRequestHeader 'X-CSRFToken', CSRF_TOKEN
+
+            type = (settings.type or 'get').toLowerCase()
+            if type is 'get'
+                syncStatus.text LOADING
+            else
+                syncStatus.text SYNCING
+
+        .ajaxStop ->
+            visible = syncStatus.is(':visible')
+            if ATTEMPTS is MAX_ATTEMPTS and not visible
+                syncStatus.fadeIn(200)
+            else
+                syncStatus.text(DONE)
+                if visible then syncStatus.fadeOut(200)
+
+        .ajaxError (event, xhr, settings, error) ->
+            if error is 'timeout'
+                syncStatus.text OFFLINE
+            else if xhr.status >= 500
+                syncStatus.text(ERROR).addClass 'alert-danger'
+
+
+    # Handle a few common cases if the server if there are still pending
+    # requests or if the max attempts have been made.
+    $(window).on 'beforeunload', ->
+        if Backbone.ajax.pending
+            if ATTEMPTS is MAX_ATTEMPTS
+                return "Unfortunately, your data hasn't been saved. The server
+                    or your Internet connection is acting up. Sorry!"
+            else
+                syncStatus.fadeIn(200)
+                return "Wow, you're quick! Your stuff is being saved.
+                    It will only take a moment."
+
     $ ->
+        syncStatus.appendTo('body')
         $('[data-toggle=chosen]').chosen
             allow_single_deselect: true
-
-        syncStatus = $('#sync-status')
-
-        $(document)
-            .ajaxSend (event, xhr, settings) ->
-                syncStatus.removeClass 'alert-danger'
-
-                # For all same origin, non-safe requests add the X-CSRFToken header
-                if not safeMethod(settings.type) and sameOrigin(settings.url)
-                    xhr.setRequestHeader 'X-CSRFToken', CSRF_TOKEN
-
-                type = (settings.type or 'get').toLowerCase()
-                if type is 'get'
-                    syncStatus.text LOADING
-                else
-                    syncStatus.text SYNCING
-
-            .ajaxStop ->
-                visible = syncStatus.is(':visible')
-                if ATTEMPTS is MAX_ATTEMPTS and not visible
-                    syncStatus.fadeIn(200)
-                else
-                    syncStatus.text(DONE)
-                    if visible then syncStatus.fadeOut(200)
-
-            .ajaxError (event, xhr, settings, error) ->
-                if error is 'timeout'
-                    syncStatus.text OFFLINE
-                else if xhr.status >= 500
-                    syncStatus.text(ERROR).addClass 'alert-danger'
-
-
-        # Handle a few common cases if the server if there are still pending
-        # requests or if the max attempts have been made.
-        $(window).on 'beforeunload', ->
-            if Backbone.ajax.pending
-                if ATTEMPTS is MAX_ATTEMPTS
-                    return "Unfortunately, your data hasn't been saved. The server
-                        or your Internet connection is acting up. Sorry!"
-                else
-                    syncStatus.fadeIn(200)
-                    return "Wow, you're quick! Your stuff is being saved.
-                        It will only take a moment."
 
     # Override `Backbone.ajax` to queue all requests.
     # Cache Backbone ajax function, by default, just $.ajax
@@ -152,6 +151,9 @@ define [
                     # In cases there was a `complete` handler defined
                     if complete then complete.apply @, arguments
                     if trigger then @requestNext()
+                else
+                    # Last resort, ensure this is turned off
+                    @pending = false
 
             success: ->
                 if success then success.apply @, arguments

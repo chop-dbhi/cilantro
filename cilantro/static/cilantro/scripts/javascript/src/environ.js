@@ -38,51 +38,51 @@ define(['jquery', 'underscore', 'backbone', 'bootstrap', 'jquery.chosen', 'jquer
   absolutePath = function(path) {
     return SCRIPT_NAME + path;
   };
-  syncStatus = null;
+  syncStatus = $('<div id=sync-status></div>').addClass('alert');
+  $(document).ajaxSend(function(event, xhr, settings) {
+    var type;
+    syncStatus.removeClass('alert-danger');
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+      xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
+    }
+    type = (settings.type || 'get').toLowerCase();
+    if (type === 'get') {
+      return syncStatus.text(LOADING);
+    } else {
+      return syncStatus.text(SYNCING);
+    }
+  }).ajaxStop(function() {
+    var visible;
+    visible = syncStatus.is(':visible');
+    if (ATTEMPTS === MAX_ATTEMPTS && !visible) {
+      return syncStatus.fadeIn(200);
+    } else {
+      syncStatus.text(DONE);
+      if (visible) {
+        return syncStatus.fadeOut(200);
+      }
+    }
+  }).ajaxError(function(event, xhr, settings, error) {
+    if (error === 'timeout') {
+      return syncStatus.text(OFFLINE);
+    } else if (xhr.status >= 500) {
+      return syncStatus.text(ERROR).addClass('alert-danger');
+    }
+  });
+  $(window).on('beforeunload', function() {
+    if (Backbone.ajax.pending) {
+      if (ATTEMPTS === MAX_ATTEMPTS) {
+        return "Unfortunately, your data hasn't been saved. The server                    or your Internet connection is acting up. Sorry!";
+      } else {
+        syncStatus.fadeIn(200);
+        return "Wow, you're quick! Your stuff is being saved.                    It will only take a moment.";
+      }
+    }
+  });
   $(function() {
-    $('[data-toggle=chosen]').chosen({
+    syncStatus.appendTo('body');
+    return $('[data-toggle=chosen]').chosen({
       allow_single_deselect: true
-    });
-    syncStatus = $('#sync-status');
-    $(document).ajaxSend(function(event, xhr, settings) {
-      var type;
-      syncStatus.removeClass('alert-danger');
-      if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
-        xhr.setRequestHeader('X-CSRFToken', CSRF_TOKEN);
-      }
-      type = (settings.type || 'get').toLowerCase();
-      if (type === 'get') {
-        return syncStatus.text(LOADING);
-      } else {
-        return syncStatus.text(SYNCING);
-      }
-    }).ajaxStop(function() {
-      var visible;
-      visible = syncStatus.is(':visible');
-      if (ATTEMPTS === MAX_ATTEMPTS && !visible) {
-        return syncStatus.fadeIn(200);
-      } else {
-        syncStatus.text(DONE);
-        if (visible) {
-          return syncStatus.fadeOut(200);
-        }
-      }
-    }).ajaxError(function(event, xhr, settings, error) {
-      if (error === 'timeout') {
-        return syncStatus.text(OFFLINE);
-      } else if (xhr.status >= 500) {
-        return syncStatus.text(ERROR).addClass('alert-danger');
-      }
-    });
-    return $(window).on('beforeunload', function() {
-      if (Backbone.ajax.pending) {
-        if (ATTEMPTS === MAX_ATTEMPTS) {
-          return "Unfortunately, your data hasn't been saved. The server                        or your Internet connection is acting up. Sorry!";
-        } else {
-          syncStatus.fadeIn(200);
-          return "Wow, you're quick! Your stuff is being saved.                        It will only take a moment.";
-        }
-      }
     });
   });
   _ajax = Backbone.ajax;
@@ -124,6 +124,8 @@ define(['jquery', 'underscore', 'backbone', 'bootstrap', 'jquery.chosen', 'jquer
           if (trigger) {
             return _this.requestNext();
           }
+        } else {
+          return _this.pending = false;
         }
       },
       success: function() {
