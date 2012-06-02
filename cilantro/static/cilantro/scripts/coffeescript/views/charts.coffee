@@ -1,10 +1,11 @@
 define [
     'environ'
+    'mediator'
     'jquery'
     'backbone'
     'charts/utils'
     'backbone.charts'
-], (environ, $, Backbone, utils) ->
+], (environ, mediator, $, Backbone, utils) ->
 
     urlTmpl = _.template environ.absolutePath '/api/fields/{{ id }}/dist/'
 
@@ -116,6 +117,9 @@ define [
                         @$form.hide()
                     if (expanded = @model.get 'expanded') then @expand() else @contract()
 
+            mediator.subscribe 'datacontext/change', @updateChart
+
+
         render: (options) ->
             if @chart then @chart.destroy?()
             @$label.hide().detach()
@@ -221,7 +225,7 @@ define [
                     @$renderArea.removeClass 'loading'
                     @render utils.processResponse resp, fields, seriesIdx
 
-        updateChart: (event) ->
+        updateChart: (event) =>
             if event then event.preventDefault()
             
             @collection.deferred.done =>
