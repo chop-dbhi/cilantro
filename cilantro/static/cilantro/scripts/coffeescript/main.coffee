@@ -9,6 +9,7 @@ define [
     'models/charts'
     'models/datafields'
     'models/dataconcepts'
+    'models/datacontexts'
 
     # Load shared views
     'views/queryviews'
