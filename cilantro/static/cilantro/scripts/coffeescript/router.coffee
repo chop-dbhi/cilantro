@@ -33,6 +33,11 @@ define [
         if App.views[name]? then throw new Error "#{ name } view already registered"
         App.views[name] = view
 
+        # Non-routable view.. loaded once
+        if route is false
+            view.load?()
+            return
+
         @router.route route, name, =>
             # First route handler, perform initial steps
             if not ROUTING

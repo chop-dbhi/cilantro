@@ -37,6 +37,12 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
       throw new Error("" + name + " view already registered");
     }
     App.views[name] = view;
+    if (route === false) {
+      if (typeof view.load === "function") {
+        view.load();
+      }
+      return;
+    }
     this.router.route(route, name, function() {
       var _i, _len, _name, _ref, _ref1, _ref2;
       if (!ROUTING) {
