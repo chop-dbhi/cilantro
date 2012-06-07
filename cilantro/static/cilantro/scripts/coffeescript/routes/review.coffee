@@ -34,7 +34,7 @@ define [
                 @columns.show()
 
             @$toolbar
-                .append $modifyColumns
+                .append $('<li>').html($modifyColumns)
 
             @table = new Table
             @$el.append @table.el
