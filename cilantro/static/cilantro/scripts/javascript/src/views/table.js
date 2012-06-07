@@ -25,6 +25,10 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
             </div>\
         ');
 
+    Table.prototype.events = {
+      'click tbody tr': 'highlightRow'
+    };
+
     Table.prototype.initialize = function() {
       this.setElement(this.template());
       this.$table = this.$('table');
@@ -59,6 +63,12 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
       }
       html.push('</tr>');
       return this.$thead.html(html.join(''));
+    };
+
+    Table.prototype.highlightRow = function(event) {
+      var target;
+      target = $(event.target).parent();
+      return target.toggleClass('highlight');
     };
 
     return Table;

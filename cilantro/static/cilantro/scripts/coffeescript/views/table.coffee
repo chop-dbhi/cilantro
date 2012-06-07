@@ -21,6 +21,9 @@ define [
             </div>
         '
 
+        events:
+            'click tbody tr': 'highlightRow'
+
         initialize: ->
             @setElement @template()
 
@@ -45,5 +48,9 @@ define [
                 html.push "<th>#{ data }</th>"
             html.push '</tr>'
             @$thead.html html.join ''
+
+        highlightRow: (event) ->
+            target = $(event.target).parent()
+            target.toggleClass 'highlight'
 
     return Table
