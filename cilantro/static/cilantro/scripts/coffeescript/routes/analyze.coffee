@@ -6,6 +6,8 @@ define [
     'views/charts'
 ], (environ, $, _, Backbone, Charts) ->
 
+    addChartButton = _.template '<button class=btn title="Add Chart"><i class=icon-signal alt="Add Chart"></i></button>'
+
     # Main view for the analysis components.
     # The components include:
     # - an area for displaying distribution charts and other data stats
@@ -34,14 +36,8 @@ define [
                             idx = charts.index view.el
                             view.model.set order: idx
 
-            $addChart = $('<button>')
-                .addClass('btn')
-                .append('<i>')
-                    .find('i')
-                        .addClass('icon-signal')
-                    .end()
-                .on 'click', (event) =>
-                    @addChart()
+            $addChart = $(addChartButton()).on 'click', (event) =>
+                @addChart()
 
             @$toolbar
                 .append $addChart

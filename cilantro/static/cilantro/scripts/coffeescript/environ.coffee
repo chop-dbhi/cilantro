@@ -63,7 +63,6 @@ define [
 
     # Setup the sync status text and the various global ajax
     # handlers.
-    # TODO keep track of ATTEMPTS
     syncStatus = $('<div id=sync-status></div>').addClass('alert')
 
     $(document)

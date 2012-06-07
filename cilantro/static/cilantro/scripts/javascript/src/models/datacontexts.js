@@ -48,12 +48,12 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
   App.DataContextHistory = new DataContextHistory;
   return App.DataContext.deferred.done(function() {
     var session;
-    session = App.DataContext.getSession();
-    if (!session) {
+    if (!(session = App.DataContext.getSession())) {
       session = App.DataContext.create({
         session: true
       });
     }
+    App.DataContext.session = session;
     return session.on('sync', function() {
       return mediator.publish('datacontext/change');
     });

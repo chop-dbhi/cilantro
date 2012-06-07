@@ -51,7 +51,9 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
       this.$controls = this.$el.find('.controls');
       this.$charts = this.$el.find('.charts');
       return mediator.subscribe('queryview', function(id, action) {
-        if (_this.model.get('id') === id && action === 'show') {
+        var ids;
+        ids = _.pluck(_this.model.get('fields'), 'id');
+        if (ids.indexOf(id) >= 0 && action === 'show') {
           _this.visible = true;
           return _this.render();
         } else {

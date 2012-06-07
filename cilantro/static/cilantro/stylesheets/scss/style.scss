@@ -24,6 +24,8 @@
 @import "modules/grouped-tables";
 @import "modules/data-concepts";
 @import "modules/data-filters";
+@import "modules/columns";
+@import "modules/table";
 
 * {
     @include user-select(none);

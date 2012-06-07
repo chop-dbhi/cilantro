@@ -10,9 +10,7 @@ define [
     'models/datafields'
     'models/dataconcepts'
     'models/datacontexts'
-
-    # Load shared views
-    'views/queryviews'
+    'models/dataviews'
 ], (environ, $) ->
 
     App.preferences.load()

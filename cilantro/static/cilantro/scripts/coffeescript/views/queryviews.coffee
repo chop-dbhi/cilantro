@@ -45,7 +45,8 @@ define [
             @$charts = @$el.find '.charts'
 
             mediator.subscribe 'queryview', (id, action) =>
-                if @model.get('id') is id and action is 'show'
+                ids = _.pluck @model.get('fields'), 'id'
+                if ids.indexOf(id) >= 0 and action is 'show'
                     @visible = true
                     @render()
                 else

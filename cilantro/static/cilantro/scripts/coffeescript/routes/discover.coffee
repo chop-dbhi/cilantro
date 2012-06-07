@@ -2,6 +2,10 @@ define [
     'environ'
     'jquery'
     'backbone'
+
+    # Load shared views
+    'forms/controls'
+    'views/queryviews'
 ], (environ, $, Backbone) ->
 
     # Provides the UI components for viewing expanded QueryView

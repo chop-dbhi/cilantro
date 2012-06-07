@@ -3,7 +3,8 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 define(['environ', 'jquery', 'underscore', 'backbone', 'views/charts'], function(environ, $, _, Backbone, Charts) {
-  var AnalysisArea;
+  var AnalysisArea, addChartButton;
+  addChartButton = _.template('<button class=btn title="Add Chart"><i class=icon-signal alt="Add Chart"></i></button>');
   AnalysisArea = (function(_super) {
 
     __extends(AnalysisArea, _super);
@@ -37,7 +38,7 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'views/charts'], function
           return _results;
         }
       });
-      $addChart = $('<button>').addClass('btn').append('<i>').find('i').addClass('icon-signal').end().on('click', function(event) {
+      $addChart = $(addChartButton()).on('click', function(event) {
         return _this.addChart();
       });
       this.$toolbar.append($addChart);
