@@ -15,7 +15,7 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
       return ReviewArea.__super__.constructor.apply(this, arguments);
     }
 
-    ReviewArea.prototype.id = '#review-area';
+    ReviewArea.prototype.id = 'review-area';
 
     ReviewArea.prototype.initialize = function() {
       var $modifyColumns,
@@ -32,32 +32,62 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
       this.$toolbar.append($('<li>').html($modifyColumns));
       this.table = new Table;
       this.$el.append(this.table.el);
-      this.loadData();
+      this.table.$el.scroller({
+        relative: 'table',
+        trigger: function() {
+          return _this.loadData(true);
+        }
+      });
       mediator.subscribe('dataview/change', this.loadData);
-      return mediator.subscribe('datacontext/change', this.loadData);
+      mediator.subscribe('datacontext/change', this.loadData);
+      this.page = 1;
+      return this.loadData();
     };
 
     ReviewArea.prototype.load = function() {
       this.$el.fadeIn(100);
-      return this.$toolbar.fadeIn(100);
+      this.$toolbar.fadeIn(100);
+      if (this.tableScrollTop) {
+        return this.table.$el.scrollTop(this.tableScrollTop);
+      }
     };
 
     ReviewArea.prototype.unload = function() {
+      this.tableScrollTop = this.table.$el.scrollTop();
       this.$el.hide();
       return this.$toolbar.hide();
     };
 
-    ReviewArea.prototype.loadData = function() {
-      var _this = this;
-      this.table.$el.addClass('loading');
+    ReviewArea.prototype.loadData = function(append) {
+      var url,
+        _this = this;
+      if (append == null) {
+        append = false;
+      }
+      if (this.page === (this.num_pages != null)) {
+        return;
+      }
+      url = '/api/data/';
+      if (append) {
+        url = url + '?page=' + (this.page + 1);
+      } else {
+        this.table.$el.addClass('loading');
+      }
       this.deferred = Backbone.ajax({
-        url: environ.absolutePath('/api/data/')
+        url: environ.absolutePath(url)
       });
       return this.deferred.done(function(resp) {
-        _this.table.setBody(resp.rows);
-        return _this.table.setHeader(resp.header);
+        if (append) {
+          _this.page++;
+        } else {
+          _this.page = 1;
+          _this.num_pages = resp.num_pages;
+          _this.table.setHeader(resp.header);
+        }
+        return _this.table.setBody(resp.rows, append);
       }).always(function() {
-        return _this.table.$el.removeClass('loading');
+        _this.table.$el.removeClass('loading');
+        return _this.table.$el.scroller('reset');
       });
     };
 

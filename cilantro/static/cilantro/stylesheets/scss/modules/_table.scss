@@ -12,6 +12,29 @@
         bottom: auto;
     }
 
+    .pinned-thead {
+        @include box-shadow(0 2px 5px #ccc);
+        @include border-radius(3px 3px 0 0);
+        display: none;
+        background-color: white;
+        position: fixed;
+        z-index: 20;
+        // A bit of a shortcut.. this assumes the table is in a fixed
+        // position in the UI
+        left: 21px;
+        right: 21px;
+
+        div {
+            @include inline-block;
+            cursor: pointer;
+            position: relative;
+            font-weight: bold;
+            padding: 8px;
+            line-height: 18px;
+            text-align: left;
+        }
+    }
+
     thead th {
         &:first-child {
             @include border-radius(3px 0 0 0);
@@ -64,6 +87,14 @@
         background-color: transparentize(yellow, 0.5);
     }
 
+    tbody {
+        position: relative;
+    }
+
+    thead tr {
+        @include transition(all, 0.3s);
+    }
+
     td .highlight, th .highlight {
         @include box-shadow(0 2px 1px #ddd);
         @include border-radius(3px);
@@ -81,6 +112,9 @@
     .help {
         color: #aaa;
     }
+
+    .no-data {
+        color: #aaa;
+        font-size: 12px;
+    }
 }
-
-

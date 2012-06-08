@@ -25,8 +25,8 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
                     <h3>Data Columns</h3>\
                 </div>\
                 <div class=modal-body>\
-                    <ul class="available-columns span4"></ul>\
-                    <ul class="selected-columns span4"></ul>\
+                    <ul class="available-columns span5"></ul>\
+                    <ul class="selected-columns span5"></ul>\
                 </div>\
                 <div class=modal-footer>\
                     <button data-save class="btn btn-primary">Save</button>\
@@ -48,7 +48,7 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
             <li data-id={{ id }}>\
                 {{ name }}\
                 <span class=controls>\
-                    <button class="btn btn-danger btn-mini">&mdash;</button>\
+                    <button class="btn btn-danger btn-mini">-</button>\
                 </span>\
             </li>\
         ');
@@ -57,11 +57,7 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
       'click [data-close]': 'hide',
       'click [data-save]': 'save',
       'click .available-columns button': 'clickAdd',
-      'click .selected-columns button': 'clickRemove',
-      'mouseenter .available-columns': 'showAvailableControls',
-      'mouseleave .available-columns': 'hideAvailableControls',
-      'mouseenter .selected-columns': 'showSelectedControls',
-      'mouseleave .selected-columns': 'hideSelectedControls'
+      'click .selected-columns button': 'clickRemove'
     };
 
     Columns.prototype.initialize = function() {
@@ -96,7 +92,9 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
       var availableHtml, model, selectedHtml, _i, _len, _ref;
       availableHtml = [];
       selectedHtml = [];
-      _ref = this.collection.models;
+      _ref = this.collection.filter(function(model) {
+        return model.get('formatter');
+      });
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         model = _ref[_i];
         availableHtml.push(this.availableItemTemplate(model.attributes));

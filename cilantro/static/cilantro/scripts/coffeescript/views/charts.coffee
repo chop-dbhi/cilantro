@@ -58,8 +58,7 @@ define [
 
             for model in @collection.models
                 # No good way to represent large string-based yet
-#                if (data = model.get('data')).searchable
-#                    continue
+                if (data = model.get('data')).searchable then continue
                 data = model.get('data')
                 if @enumerableOnly and not data.enumerable
                     continue
@@ -116,8 +115,6 @@ define [
                     if @model.get 'xAxis'
                         @$form.hide()
                     if (expanded = @model.get 'expanded') then @expand() else @contract()
-
-            mediator.subscribe 'datacontext/change', @updateChart
 
 
         render: (options) ->
@@ -225,7 +222,8 @@ define [
                     @$renderArea.removeClass 'loading'
                     @render utils.processResponse resp, fields, seriesIdx
 
-        updateChart: (event) =>
+        # Ensure rapid successions of this method do not occur
+        updateChart: (event) ->
             if event then event.preventDefault()
             
             @collection.deferred.done =>

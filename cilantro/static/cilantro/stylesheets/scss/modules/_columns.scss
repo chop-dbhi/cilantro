@@ -2,20 +2,20 @@
     display: none;
 
     margin-top: -300px;
-    width: 720px;
-    margin-left: -360px;
+    width: 810px;
+    margin-left: -405px;
 
     .modal-body {
         max-height: 450px;
         height: 450px;
-    }
 
-    .available-columns {
-        margin-right: 90px;
-    }
-
-    .selected-columns {
-        float: right;
+        > * {
+            @include inline-block;
+            min-height: 1px;
+            &:first-child {
+                margin-right: 20px;
+            }
+        }
     }
 
     .selected-columns li {
@@ -40,10 +40,13 @@
             border: 1px solid transparent;
 
             .controls {
-                display: none;
                 position: absolute;
                 top: 5px;
                 right: 5px;
+
+                button {
+                    width: 21px;
+                }
 
                 a {
                     color: #ddd;

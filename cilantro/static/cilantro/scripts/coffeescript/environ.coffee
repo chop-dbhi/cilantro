@@ -8,6 +8,7 @@ define [
     'jquery.chosen'
     'jquery.ui'
     'panels'
+    'utils/scroller'
 ], ($, _, Backbone) ->
 
     # Ajax states

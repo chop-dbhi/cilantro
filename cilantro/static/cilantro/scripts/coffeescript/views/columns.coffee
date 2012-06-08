@@ -15,8 +15,8 @@ define [
                     <h3>Data Columns</h3>
                 </div>
                 <div class=modal-body>
-                    <ul class="available-columns span4"></ul>
-                    <ul class="selected-columns span4"></ul>
+                    <ul class="available-columns span5"></ul>
+                    <ul class="selected-columns span5"></ul>
                 </div>
                 <div class=modal-footer>
                     <button data-save class="btn btn-primary">Save</button>
@@ -38,7 +38,7 @@ define [
             <li data-id={{ id }}>
                 {{ name }}
                 <span class=controls>
-                    <button class="btn btn-danger btn-mini">&mdash;</button>
+                    <button class="btn btn-danger btn-mini">-</button>
                 </span>
             </li>
         '
@@ -48,13 +48,6 @@ define [
             'click [data-save]': 'save'
             'click .available-columns button': 'clickAdd'
             'click .selected-columns button': 'clickRemove'
-
-            'mouseenter .available-columns': 'showAvailableControls'
-            'mouseleave .available-columns': 'hideAvailableControls'
-
-            'mouseenter .selected-columns': 'showSelectedControls'
-            'mouseleave .selected-columns': 'hideSelectedControls'
-
 
         initialize: ->
             @setElement @template()
@@ -80,7 +73,7 @@ define [
             availableHtml = []
             selectedHtml = []
 
-            for model in @collection.models
+            for model in @collection.filter((model) -> model.get('formatter'))
                 availableHtml.push @availableItemTemplate model.attributes
                 selectedHtml.push @selectedItemTemplate model.attributes
 

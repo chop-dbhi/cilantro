@@ -1,10 +1,11 @@
 define [
     'environ'
+    'mediator'
     'jquery'
     'underscore'
     'backbone'
     'views/charts'
-], (environ, $, _, Backbone, Charts) ->
+], (environ, mediator, $, _, Backbone, Charts) ->
 
     addChartButton = _.template '<button class=btn title="Add Chart"><i class=icon-signal alt="Add Chart"></i></button>'
 
@@ -16,6 +17,8 @@ define [
         id: '#analysis-area'
 
         initialize: ->
+            @deferredEvents = $.Deferred()
+
             @charts = []
 
             @$toolbar = $('<ul>')
@@ -42,22 +45,28 @@ define [
             @$toolbar
                 .append $addChart
 
-            App.Distribution.each (model) =>
-                @addChart model
+            @deferredEvents.then =>
+                (@addChart model for model in App.Distribution.models)
+                return
+
+            mediator.subscribe 'datacontext/change', @updateCharts
+
+        updateCharts: =>
+            @deferredEvents.then =>
+                (view.updateChart() for view in @charts)
+                return
 
         load: ->
             @$el.fadeIn 100
             @$toolbar.fadeIn 100
-            # Only render the charts after the view has been made visible
-            # to ensure the correct height and width
-            if not @loaded
-                for view in @charts
-                    view.updateChart()
-                @loaded = true
+
+            # Resolve any deferred events while this view was not visible/loaded
+            @deferredEvents.resolveWith @
 
         unload: ->
             @$el.hide()
             @$toolbar.hide()
+            @deferredEvents = $.Deferred()
 
         addChart: (attrs) ->
             if not attrs instanceof App.Distribution.model
@@ -72,7 +81,7 @@ define [
             @charts.push view
             @$el.append view.$el
 
-            if @loaded then view.updateChart()
+            view.updateChart()
 
 
     App.register 'analyze/', 'analyze', new AnalysisArea
