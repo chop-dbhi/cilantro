@@ -7,7 +7,7 @@ define [
     'bootstrap'
     'jquery.chosen'
     'jquery.ui'
-    'jquery.panels'
+    'panels'
 ], ($, _, Backbone) ->
 
     # Ajax states
