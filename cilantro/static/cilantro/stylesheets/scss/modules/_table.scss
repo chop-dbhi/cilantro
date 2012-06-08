@@ -13,6 +13,14 @@
     }
 
     thead th {
+        &:first-child {
+            @include border-radius(3px 0 0 0);
+        }
+
+        &:last-child {
+            @include border-radius(0 3px 0 0);
+        }
+
         position: relative;
         cursor: pointer;
 
@@ -49,10 +57,11 @@
 
 #report-table {
     @include border-radius(3px);
+    @include user-select(auto);
     margin-bottom: 0;
 
-    td, th, {
-        min-width: 64px;
+    tr.highlight td {
+        background-color: transparentize(yellow, 0.5);
     }
 
     td .highlight, th .highlight {

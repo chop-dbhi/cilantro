@@ -29,7 +29,7 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
       $modifyColumns = $(modifyColumnsButton()).on('click', function(event) {
         return _this.columns.show();
       });
-      this.$toolbar.append($modifyColumns);
+      this.$toolbar.append($('<li>').html($modifyColumns));
       this.table = new Table;
       this.$el.append(this.table.el);
       this.loadData();

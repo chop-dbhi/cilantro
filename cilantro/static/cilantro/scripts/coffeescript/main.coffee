@@ -5,6 +5,9 @@ define [
     # App router
     'router'
 
+    # Utils
+    'utils'
+
     # Load models/collections
     'models/charts'
     'models/datafields'
@@ -18,6 +21,7 @@ define [
     $ ->
         # Initialize and load the routes
         require [
+            'routes/app'
             'routes/workspace'
             'routes/discover'
             'routes/composite'
