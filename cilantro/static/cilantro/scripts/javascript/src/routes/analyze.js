@@ -15,7 +15,7 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
       return AnalysisArea.__super__.constructor.apply(this, arguments);
     }
 
-    AnalysisArea.prototype.id = '#analysis-area';
+    AnalysisArea.prototype.id = 'analysis-area';
 
     AnalysisArea.prototype.initialize = function() {
       var $addChart,

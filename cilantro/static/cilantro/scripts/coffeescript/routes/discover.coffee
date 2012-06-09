@@ -12,7 +12,7 @@ define [
     # representations. It also provides an interface for building
     # composite DataContexts
     class DiscoverArea extends Backbone.View
-        id: '#discover-area'
+        id: 'discover-area'
 
         initialize: ->
             @$el

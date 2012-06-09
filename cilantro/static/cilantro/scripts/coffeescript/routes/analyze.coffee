@@ -14,7 +14,7 @@ define [
     # - an area for displaying distribution charts and other data stats
     # - augmenting the toolbar with buttons to facilitate an analysis workflow
     class AnalysisArea extends Backbone.View
-        id: '#analysis-area'
+        id: 'analysis-area'
 
         initialize: ->
             @deferredEvents = $.Deferred()

@@ -12,7 +12,7 @@ define(['environ', 'jquery', 'backbone', 'forms/controls', 'views/queryviews'], 
       return DiscoverArea.__super__.constructor.apply(this, arguments);
     }
 
-    DiscoverArea.prototype.id = '#discover-area';
+    DiscoverArea.prototype.id = 'discover-area';
 
     DiscoverArea.prototype.initialize = function() {
       return this.$el.hide().css('margin-left', '250px').appendTo('#main-area .inner');
