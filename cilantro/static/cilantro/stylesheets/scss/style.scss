@@ -1,5 +1,7 @@
 @import "lib/bourbon/bourbon";
 @import "lib/bootstrap";
+@import "lib/chosen";
+@import "lib/select2";
 //@import "lib/bootstrap-responsive";
 
 @import "base/app";
@@ -19,19 +21,24 @@
 @import "modules/container";
 @import "modules/charts";
 @import "modules/accordian";
-@import "modules/form-fields";
 @import "modules/conditions";
 @import "modules/grouped-tables";
-@import "modules/data-concepts";
+@import "modules/data-conditions";
+@import "modules/queryviews";
 @import "modules/data-filters";
 @import "modules/columns";
 @import "modules/table";
+
+@import "routes/workspace";
+@import "routes/discover";
+@import "routes/analysis";
+@import "routes/review";
 
 * {
     @include user-select(none);
 }
 
-input, p {
+select, input, p, table {
     @include user-select(auto);
 }
 
