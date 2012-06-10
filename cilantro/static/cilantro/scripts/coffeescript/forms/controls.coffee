@@ -6,35 +6,66 @@ define [
     'backbone'
 ], (environ, mediator, $, _, Backbone) ->
 
+    formActionsTemplate = _.template '
+        <div class=form-actions>
+            <button class="btn btn-mini btn-danger" name=exclude title="Exclude the results that match">Exclude</button>
+            <button class="btn btn-mini btn-success" name=include title="Include the results that match">Include</button>
+        </div>
+    '
+
+
     # To reduce the number of possible operators (and confusion), operators
     # that support negation are presented via a button instead of a separate
     # operator.
     NEGATION_OPERATORS = {}
 
+    DEFAULT_EVENTS =
+        'submit': 'preventDefault'
+
+        'click [name=include]': 'submitInclude'
+        'click [name=exclude]': 'submitExclude'
+
+        'mouseenter': 'showControls'
+        'mouseleave': 'hideControls'
+        'change [name=operator]': 'toggleControls'
+
     class Control extends Backbone.View
-        events:
-            'submit': 'preventDefault'
+        events: DEFAULT_EVENTS
 
-            'click [name=include]': 'submitInclude'
-            'click [name=exclude]': 'submitExclude'
+        initialize: (options) ->
+            @options = options
 
-            'mouseenter': 'showControls'
-            'mouseleave': 'hideControls'
-            'change [name=operator]': 'toggleControls'
-
-        initialize: ->
             # Subscribe to edits for nodes relating to this DataField
             mediator.subscribe "datafield/#{ @model.id }/edit", (node) =>
                 if node is @node then return
-                @node = node
-                @set()
+                @set(node)
+
+            @setup()
 
         setup: ->
-            for [operator, text] in @model.get 'operators'
+            @$label = @$ '.control-label'
+            if @options.label is false
+                @$label.hide()
+
+            @$value = @$ '[name=value]'
+            @$operator = @$ '[name=operator]'
+            @$controls = @$ '.form-actions'
+
+            for [operator, text] in (operators = @model.get 'operators')
                 if operator.charAt(0) is '-'
                     NEGATION_OPERATORS[operator.substr(1)] = operator
                     continue
                 @$operator.append "<option value=#{ operator }>#{ text }</option>"
+
+            # If only one operator, don't bother displaying it
+            if @$operator.children().length is 1
+                @$operator.hide()
+
+            @$el.append formActionsTemplate()
+
+            @$include = @$ '[name=include]'
+            @$exclude = @$ '[name=exclude]'
+
 
         get: (options) ->
             id = @node.id
@@ -43,7 +74,9 @@ define [
 
             { id, operator, value }
 
-        set: ->
+        set: (node) ->
+            @node = node
+
             value = @node.get 'value'
             operator = @node.get 'operator'
 
@@ -52,23 +85,24 @@ define [
             @setValue value
             @setOperator operator
 
-        getValue: (options) ->
-            @value.val()
+        preventDefault: (event) ->
+            event.preventDefault()
 
-        getOperator: (options) ->
-            if options.negated and NEGATION_OPERATORS[(operator = @operator.val())]
+        getValue: (options) ->
+            @$value.val()
+
+        getOperator: (options={}) ->
+            operator = @$operator.val()
+            if options.negated and NEGATION_OPERATORS[operator]
                 operator = NEGATION_OPERATORS[operator]
             return operator
 
         setValue: (value) ->
-            @value.val value
+            @$value.val value
 
         setOperator: (value) ->
-            @operator.val value
+            @$operator.val value
             @toggleControls()
-
-        preventDefault: (event) ->
-            event.preventDefault()
 
         submitInclude: (event) ->
             event.preventDefault()
@@ -79,10 +113,10 @@ define [
             @node.set @get negated: true
 
         showControls: (event) ->
-            @$controls.fadeIn 300
+            @$controls.fadeTo 200, 1
 
         hideControls: (event) ->
-            @$controls.fadeOut 300
+            @$controls.fadeTo 400, 0.3
 
         toggleControls: (event) ->
             if NEGATION_OPERATORS[@$operator.val()]
@@ -94,93 +128,114 @@ define [
     class StringControl extends Control
         template: _.template '
             <div class=control-group>
-                <label class=control-label>{{ label }}</label>
+                <h4 class=control-label>{{ label }}</h4>
                 <div class=controls>
                     <select class=span4 name=operator></select>
                     <input class=span4 type=text name=value>
                     <p class=help-block>{{ help }}</p>
                 </div>
-                <div class=form-actions>
-                    <button class="btn btn-mini btn-danger" name=exclude>Exclude</button>
-                    <button class="btn btn-mini btn-success" name=include>Include</button>
-                </div>
             </div>
         '
-           
-        initialize: ->
-            super
 
+        initialize: ->
             @setElement @template
-                label: @model.get 'name'
+                label: @model.get('alt_name') or @model.get('name')
                 help: @model.get 'description'
 
-            @$value = @$ '[name=value]'
-            @$operator = @$ '[name=operator]'
-            @$controls = @$ '.form-actions'
+            super
 
-            @setup()
- 
 
     class NumberControl extends Control
         template: _.template '
             <div class=control-group>
-                <label class=control-label>{{ label }}</label>
+                <h4 class=control-label>{{ label }} <small class=units>({{ units }})</small></h4>
                 <div class=controls>
                     <select class=span4 name=operator></select>
                     <input class=span4 type=number name=value>
                     <input class=span4 type=number name=value-2>
-                    <span class=units>{{ units }}</span>
                     <p class=help-block>{{ help }}</p>
                 </div>
-                <div class=form-actions>
-                    <button class="btn btn-mini btn-danger" name=exclude>Exclude</button>
-                    <button class="btn btn-mini btn-success" name=include>Include</button>
+            </div>
+        '
+
+        events: _.extend({}, DEFAULT_EVENTS, {'change [name=operator]': 'toggleOperator'})
+
+        initialize: ->
+            @setElement @template
+                label: @model.get('alt_name') or @model.get('name')
+                units: (units = @model.get('data').plural_unit)
+                help: @model.get 'description'
+
+            if not units then @$('.units').hide()
+
+            super
+
+        setup: ->
+            super
+            # Hide the secondary value by default
+            @$value2 = @$('[name=value-2]').hide()
+
+        getValue: ->
+            if /range/.test @getOperator()
+                [@$value.val(), @$value2.val()]
+            else
+                @$value.val()
+
+        setValue: ->
+            value = @node.get 'value'
+            if /range/.test @node.get 'operator'
+                @$value.val value[0]
+                @$value2.val value[1]
+            else
+                @$value.val value
+
+        toggleOperator: ->
+            if /range/.test @getOperator()
+                @$value2.show()
+            else
+                @$value2.hide()
+
+
+    class EnumerableControl extends Control
+        template: _.template '
+            <div class=control-group>
+                <h4 class=control-label>{{ label }}</h4>
+                <div class=controls>
+                    <select class=span4 name=operator></select>
+                    <select class=span8 name=value multiple></select>
+                    <p class=help-block>{{ help }}</p>
                 </div>
             </div>
         '
-            
-        initialize: ->
-            super
 
+        initialize: ->
             @setElement @template
-                label: @model.get 'name'
-                units: @model.get 'units'
+                label: @model.get('alt_name') or @model.get('name')
                 help: @model.get 'description'
 
-            @$value = @$ '[name=value]'
-            @$value2 = @$ '[name=value-2]'
-            @$operator = @$ '[name=operator]'
-            @$controls = @$ '.form-actions'
+            super
 
-            @setup()
- 
+        setup: ->
+            super
+            @loadValues()
 
-    ###
-    class ControlGroup extends Backbone.View
-        template: _.template '
-            <div class=control-group>
-                <label class=control-label>{{ label }}</label>
-                <div class=controls></div>
-            </div>
-        '
 
-        initialize: (options) ->
-            @setElement @template()
-            @$label = @$el.find '.control-label'
-            @$controls = @$el.find '.controls'
-            @$helpBlock = @$el.find '.help-block'
-            @hasField = false
+        loadValues: ->
+            @$el.addClass 'loading'
 
-        addField: (el) ->
-            if @hasField
-                @$controls.find('input,select').after el
-            else
-                @$controls.prepend el
-                @hasField = true
+            Backbone.ajax
+                url: environ.absolutePath @model.get('links').values.href
+                success: (resp) =>
+                    for obj in resp
+                        @$value.append "<option value=#{obj.value}>#{obj.name} (#{obj.count})</option>"
+                    #@$value.select2()
+                    @$el.removeClass 'loading'
 
-    ###
-    
+
+
     App.StringControl = StringControl
     App.NumberControl = NumberControl
+    App.EnumerableControl = EnumerableControl
 
-    { StringControl, NumberControl }
+
+    { StringControl, NumberControl, EnumerableControl }
