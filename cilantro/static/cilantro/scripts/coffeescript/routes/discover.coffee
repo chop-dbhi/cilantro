@@ -4,7 +4,6 @@ define [
     'backbone'
 
     # Load shared views
-    'forms/controls'
     'views/queryviews'
 ], (environ, $, Backbone) ->
 
@@ -27,8 +26,6 @@ define [
         unload: ->
             @$el.hide()
             App.QueryViewsPanel.$el.panel 'close'
-
-        destroy: ->
 
 
     App.register 'discover/', 'discover', new DiscoverArea
