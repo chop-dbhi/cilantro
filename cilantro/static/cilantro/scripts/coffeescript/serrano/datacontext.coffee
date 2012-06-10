@@ -45,27 +45,18 @@ define [
         siblings: ->
             if @root then false else _.without @parent.get('children'), @
 
-        # Removes itself from it's parent. If a `node` is passed, this
-        # implies this node is a branch. When only one sibling remains in the
-        # respective branch, the sibling gets demoted.
-        remove: (node) ->
-            if @root then return false
+        # Creates a new branch and adds this node along with one or more other
+        # nodes to the branch
+        promote: (type, nodes...) ->
+            if type isnt 'and' and type isnt 'or'
+                throw new Error 'Type must be "and" or "or"'
+            if nodes.length is 0
+                throw new Error 'At least one other node must be supplied'
 
-            if node
-                if @type isnt 'branch'
-                    throw new Error 'Nodes can only be removed from branches'
-                children = @attributes.children
-            else
-                node = @
-                children = @parent.attributes.children
-
-            # Ensure the node exists, then splice it directly out of
-            # the attributes. This bypasses validation since this operation
-            # is recursive.
-            if (idx = children.indexOf node) >= 0
-                children.splice(idx, 1)[0]
-                if children.length is 1
-                    children[0].demote()
+            children = _.map [@toJSON(), nodes...], (attrs) =>
+                DataContextNode.parseAttrs attrs, @
+            @clear slient: true
+            @set type: type, children: children
             return @
 
         # Takes a node and removes it from the current branch and adds it
@@ -91,20 +82,6 @@ define [
             grand.attributes.children.push node
             return @
 
-        # Creates a new branch and adds this node along with one or more other
-        # nodes to the branch
-        promote: (type, nodes...) ->
-            if type isnt 'and' and type isnt 'or'
-                throw new Error 'Type must be "and" or "or"'
-            if nodes.length is 0
-                throw new Error 'At least one other node must be supplied'
-
-            children = _.map [@toJSON(), nodes...], (attrs) =>
-                DataContextNode.parseAttrs attrs, @
-            @clear slient: true
-            @set type: type, children: children
-            return @
-
         add: (nodes...) ->
             if @type isnt 'branch'
                 throw new Error 'Node is not a branch. Use "promote" to convert it into one'
@@ -112,7 +89,24 @@ define [
                 DataContextNode.parseAttrs attrs, @
             return @
 
-    DataContextNode.parseAttrs = (attrs, parent) ->
+        # Removes itself from it's parent. If a `node` is passed, this
+        # implies this node is a branch. When only one sibling remains in the
+        # respective branch, the sibling gets demoted.
+        remove: ->
+            if @root then return false
+            children = @parent.attributes.children
+
+            # Ensure the node exists, then splice it directly out of
+            # the attributes. This bypasses validation since this operation
+            # is recursive.
+            if (idx = children.indexOf @) >= 0
+                children.splice(idx, 1)[0]
+                if children.length is 1
+                    children[0].demote()
+            return @
+
+
+    DataContextNode.parseAttrs = (attrs, parent, callback) ->
         if not attrs
             node = new DataContextNode
         # Existing node. Note this assumes
@@ -140,16 +134,24 @@ define [
             delete node.root
         else
             node.root = true
+
+        callback?(node)
         return node
 
 
     class DataContext extends Backbone.Model
+        initialize: ->
+            @nodes ?= {}
+
         url: ->
             if @isNew() then super else @get 'url'
 
-        parse: (response) ->
+        parse: (response) =>
+            @nodes = {}
+
             if response
-                @node = DataContextNode.parseAttrs response.json
+                @node = DataContextNode.parseAttrs response.json, null, @cacheNode
+
             return response
 
         toJSON: ->
@@ -157,6 +159,27 @@ define [
             if @node
                 attrs.json = @node.toJSON()
             return attrs
+
+        cacheNode: (node) =>
+            if node.id
+                if not (cache = @nodes[node.id])
+                    cache = @nodes[node.id] = []
+                cache.push node
+
+        promote: (node, type, nodes...) ->
+            node.promote(type, nodes...)
+
+        demote: (node) ->
+            node.demote()
+
+        add: (node, nodes...) ->
+            node.add(nodes...)
+
+        remove: (node) ->
+            node.remove()
+            # Unreference it
+            if (idx = (cache = @nodes[node.id]).indexOf(node)) >= 0
+                cache.splice(idx)
 
 
     class DataContexts extends Backbone.Collection
