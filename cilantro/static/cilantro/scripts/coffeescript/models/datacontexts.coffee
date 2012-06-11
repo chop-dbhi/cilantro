@@ -34,3 +34,12 @@ define [
 
         session.on 'sync', ->
             mediator.publish 'datacontext/change'
+
+        session.on 'change', ->
+            session.save()
+
+        mediator.subscribe 'datacontext/add', (data) ->
+            if session.isCondition() or session.isComposite()
+                session.promote null, data
+            else
+                session.add null, data
