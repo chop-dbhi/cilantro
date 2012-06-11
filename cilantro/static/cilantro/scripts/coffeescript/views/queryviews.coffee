@@ -50,7 +50,8 @@ define [
                     @edit data
                     @show()
 
-            mediator.subscribe 'datacontext/change', @update
+            # Should be used only if the UI is relative to the datacontext
+            # mediator.subscribe 'datacontext/change', @update
 
             @deferredEvents = $.Deferred()
             @render()
@@ -63,14 +64,15 @@ define [
 
         render: ->
             # Create a collection of the fields
-            @fieldCollection = new Backbone.Collection @model.get 'fields'
+            fields = new Backbone.Collection @model.get 'fields'
 
             @charts = []
 
             options =
-                label: if @fieldCollection.length is 1 then false else true
+                label: if fields.length is 1 then false else true
 
-            for model in @fieldCollection.models
+            @controls = []
+            for model in fields.models
                 options.model = model
 
                 $controls = $ '<div class=span6></div>'
@@ -83,8 +85,12 @@ define [
                 else
                     control = new Controls.StringControl options
 
+                @controls.push control
+
                 chart = new Charts.Distribution
                     editable: false
+                    data:
+                        context: null
 
                 @charts.push [model, chart]
 
@@ -98,7 +104,9 @@ define [
 
         show: =>
             App.views.discover.$el.prepend @$el.detach()
-            @deferredEvents.resolveWith @
+            @deferredEvents.resolve()
+            for control in @controls
+                control.deferredEvents.resolve()
 
         hide: =>
             @$el.detach()
