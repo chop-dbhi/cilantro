@@ -54,15 +54,29 @@ define [
             @resizePinnedThead()
 
         setHeader: (header) ->
-            html = ['<tr>']
+            html = []
             pinned = []
             for data in header
-                html.push "<th>#{ data }</th>"
-                pinned.push "<div>#{ data }</div>"
-            html.push '</tr>'
+                th = $ "<th data-id=#{ data.id }>#{ data.name }</th>"
+                div = $ "<div data-id=#{ data.id }>#{ data.name }</div>"
+                if data.direction
+                    if data.direction is 'desc'
+                        th.append $("<i class=icon-chevron-down></i>")
+                        div.append $("<i class=icon-chevron-down></i>")
+                    else
+                        th.append $("<i class=icon-chevron-up></i>")
+                        div.append $("<i class=icon-chevron-up></i>")
+                    th.data 'direction', data.direction
+                    th.addClass data.direction
+                    div.data 'direction', data.direction
+                    div.addClass data.direction
 
-            @$thead.html html.join ''
-            @$pinnedThead.html pinned.join ''
+                html.push th
+                pinned.push div
+
+            @$pinnedThead.empty()
+            @$thead.html (row = $('<tr>')).append.apply row, html
+            @$pinnedThead.append.apply @$pinnedThead, pinned
 
         # Due to the way table cells size themselves, there is no way
         # in CSS to mimic this sizing behavior. Therefore each time the

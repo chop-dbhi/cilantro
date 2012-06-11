@@ -14,6 +14,10 @@ define [
     class ReviewArea extends Backbone.View
         id: 'review-area'
 
+        events:
+            'click table thead th': 'sort'
+            'click .pinned-thead div': 'sort'
+
         initialize: ->
             @$el
                 .hide()
@@ -58,7 +62,6 @@ define [
             if @tableScrollTop then @table.$el.scrollTop(@tableScrollTop)
             @deferredEvents.resolveWith @
 
-
         unload: ->
             # Track the scroll position since it resets when the element is hidden
             @tableScrollTop = @table.$el.scrollTop()
@@ -93,6 +96,26 @@ define [
                     .always =>
                         @table.$el.removeClass 'loading'
                         @table.$el.scroller 'reset'
+
+        sort: (event) ->
+            $target = $(event.target)
+
+            if not (prev = $target.data 'direction')
+                direction = 'asc'
+            else if prev is 'asc'
+                direction = 'desc'
+            else
+                direction = null
+            $target.data 'direction', direction
+            $target.removeClass(prev).addClass direction
+
+            json = App.DataView.session.get('json') or {}
+
+            if direction
+                json.ordering = [[$target.data('id'), direction]]
+            else
+                json.ordering = []
+            App.DataView.session.save 'json', json
 
 
     App.register 'review/', 'review', new ReviewArea
