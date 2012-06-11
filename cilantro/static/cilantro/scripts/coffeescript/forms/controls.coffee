@@ -107,8 +107,21 @@ define [
             else
                 @$exclude.prop 'disabled', true
 
+        coerceValue: (value) ->
+            type = @model.get('data').type
+            # Special case since datatypes can be null
+            if value is 'null' then return null
+            if type is 'boolean'
+                if value is 'false'
+                    return false
+                return true
+            if type is 'number'
+                return parseFloat(value)
+            return value
+
+
         getValue: (options) ->
-            @$value.val()
+            @coerceValue @$value.val()
 
         getOperator: (options={}) ->
             operator = @$operator.val()
@@ -195,10 +208,10 @@ define [
             # Hide the secondary value by default
             @$value2 = @$('[name=value-2]').hide()
 
-        getValue: ->
-            value = parseFloat @$value.val()
+        getValue: (options) ->
+            value = @coerceValue @$value.val()
             if /range/.test @getOperator()
-                value2 = parseFloat @$value2.val()
+                value2 = @coerceValue @$value2.val()
                 [value, value2]
             else
                 value
@@ -255,7 +268,8 @@ define [
                         @$value.append "<option value=#{obj.value}>#{obj.name} (#{obj.count})</option>"
                     #@$value.select2().css 'width', 'auto'
 
-
+        getValue: (options) ->
+            (@coerceValue value for value in @$value.val())
 
     App.StringControl = StringControl
     App.NumberControl = NumberControl
