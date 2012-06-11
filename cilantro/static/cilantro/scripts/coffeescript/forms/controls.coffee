@@ -235,6 +235,9 @@ define [
                 help: @model.get 'description'
             super
 
+            @deferredEvents.then =>
+                mediator.subscribe 'datacontext/change', @loadValues
+
         loadOperators: =>
             NEGATION_OPERATORS['-in'] = 'in'
             for [operator, text] in (operators = @model.get 'operators')
@@ -244,17 +247,13 @@ define [
             @$operator.hide()
 
         loadValues: =>
-            @$el.addClass 'loading'
-
             Backbone.ajax
                 url: environ.absolutePath @model.get('links').values.href
-                data:
-                    context: null
                 success: (resp) =>
+                    @$value.empty()
                     for obj in resp
                         @$value.append "<option value=#{obj.value}>#{obj.name} (#{obj.count})</option>"
                     #@$value.select2().css 'width', 'auto'
-                    @$el.removeClass 'loading'
 
 
 
