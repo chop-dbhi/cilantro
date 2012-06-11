@@ -3,37 +3,31 @@ define [
     'backbone'
 ], (_, Backbone) ->
 
+    isBranch = (attrs) ->
+        (attrs.type is 'and' or attrs.type is 'or') and attrs.children?.length >= 2
+
+    isCondition = (attrs) ->
+        attrs.operator and attrs.id and attrs.value isnt undefined
+
+    isComposite = (attrs) ->
+        attrs.composite is true and attrs.id
+
+
     class DataContextNode extends Backbone.Model
         validate: (attrs) ->
-            delete @type
+            # Some kind of node
+            if isBranch(attrs) or isCondition(attrs) or isComposite attrs
+                return
 
-            # Branch
-            if attrs.type isnt undefined
-                if attrs.type isnt 'and' and attrs.type isnt 'or'
-                    return 'Invalid logical operator between nodes'
-                if not attrs.children or attrs.children.length < 2
-                    return 'Branch nodes must contain two or more child nodes'
-                @type = 'branch'
+            # Check for all undefined values
+            for key, value of attrs
+                if value isnt undefined
+                    return 'Unknown node type'
 
-            # Condition
-            else if attrs.operator isnt undefined
-                if not attrs.id? or attrs.value is undefined
-                    return 'Condition nodes must have id, operator and value attributes'
-                @type = 'condition'
-
-            # Composite
-            else if attrs.composite is true
-                if not attrs.id?
-                    return 'Composite nodes must have an id attribute'
-                @type = 'composite'
-            else
-                for key, value of attrs
-                    if value isnt undefined
-                        return 'Unknown node type'
             return
 
         toJSON: ->
-            if @type is 'branch'
+            if @isBranch()
                 json =
                     type: @get 'type'
                     children: _.map(@get('children'), (model) -> model.toJSON())
@@ -45,16 +39,36 @@ define [
         siblings: ->
             if @root then false else _.without @parent.get('children'), @
 
+        # Proxy methods
+        isEmpty: ->
+            _.isEmpty @attributes
+
+        isBranch: ->
+            isBranch @attributes
+
+        isCondition: ->
+            isCondition @attributes
+
+        isComposite: ->
+            isComposite @attributes
+
         # Creates a new branch and adds this node along with one or more other
         # nodes to the branch
-        promote: (type, nodes...) ->
-            if type isnt 'and' and type isnt 'or'
-                throw new Error 'Type must be "and" or "or"'
+        promote: (nodes...) ->
+            if _.isString nodes[0]
+                type = nodes[0]
+                if type isnt 'and' and type isnt 'or'
+                    throw new Error 'Type must be "and" or "or"'
+                nodes.splice 0, 1
+            else
+                type = 'and'
+
             if nodes.length is 0
                 throw new Error 'At least one other node must be supplied'
 
             children = _.map [@toJSON(), nodes...], (attrs) =>
                 DataContextNode.parseAttrs attrs, @
+
             @clear slient: true
             @set type: type, children: children
             return @
@@ -83,7 +97,7 @@ define [
             return @
 
         add: (nodes...) ->
-            if @type isnt 'branch'
+            if not @isBranch()
                 throw new Error 'Node is not a branch. Use "promote" to convert it into one'
             @attributes.children.push.apply @attributes.children, _.map nodes, (attrs) =>
                 DataContextNode.parseAttrs attrs, @
@@ -109,23 +123,20 @@ define [
     DataContextNode.parseAttrs = (attrs, parent, callback) ->
         if not attrs
             node = new DataContextNode
-        # Existing node. Note this assumes
+        # Existing node
         else if attrs instanceof DataContextNode
             node = attrs
         # Branch
-        else if attrs.type is 'and' or attrs.type is 'or' and attrs.children?.length >= 2
+        else if isBranch attrs
             node = new DataContextNode type: attrs.type
-            children = _.map attrs.children, (_attrs) -> DataContextNode.parseAttrs _attrs, node
+            children = _.map attrs.children, (_attrs) -> DataContextNode.parseAttrs _attrs, node, callback
             node.set children: children
-            node.type = 'branch'
         # Condition
-        else if attrs.operator and attrs.id and attrs.value isnt undefined
+        else if isCondition attrs
             node = new DataContextNode attrs
-            node.type = 'condition'
         # Composite
-        else if attrs.composite is true and attrs.id
+        else if isComposite attrs
             node = new DataContextNode attrs
-            node.type = 'composite'
         else
             throw new Error 'Unknown node type'
 
@@ -147,9 +158,8 @@ define [
             if @isNew() then super else @get 'url'
 
         parse: (response) =>
-            @nodes = {}
-
             if response
+                @nodes = {}
                 @node = DataContextNode.parseAttrs response.json, null, @cacheNode
 
             return response
@@ -160,26 +170,55 @@ define [
                 attrs.json = @node.toJSON()
             return attrs
 
+        # Proxy methods
+        isEmpty: ->
+            @node.isEmpty()
+
+        isBranch: ->
+            @node.isBranch()
+
+        isCondition: ->
+            @node.isCondition()
+
+        isComposite: ->
+            @node.isComposite()
+
         cacheNode: (node) =>
             if node.id
                 if not (cache = @nodes[node.id])
                     cache = @nodes[node.id] = []
-                cache.push node
+                # Don't add redundant cache
+                if cache.indexOf(node) is -1
+                    cache.push node
 
-        promote: (node, type, nodes...) ->
-            node.promote(type, nodes...)
+        promote: (node, nodes...) ->
+            if node is null
+                @node.promote nodes...
+            else
+                node.promote nodes...
+            @set 'json', @node.toJSON()
 
         demote: (node) ->
             node.demote()
+            @set 'json', @node.toJSON()
 
         add: (node, nodes...) ->
-            node.add(nodes...)
+            if node is null
+                node = @node
+
+            if node.isEmpty()
+                node.set nodes[0].attributes or nodes[0]
+            else
+                node.add(nodes...)
+                @cacheNode node for node in node.get 'children'
+            @set 'json', @node.toJSON()
 
         remove: (node) ->
             node.remove()
-            # Unreference it
-            if (idx = (cache = @nodes[node.id]).indexOf(node)) >= 0
-                cache.splice(idx)
+            # Dereference it
+            if (cache = @nodes[node.id]) and (idx = cache.indexOf(node)) >= 0
+                cache.splice(idx, 1)
+            @set 'json', @node.toJSON()
 
 
     class DataContexts extends Backbone.Collection
