@@ -48,6 +48,7 @@ define [
         tagName: 'select'
 
         initialize: (options) ->
+            @options = options
             @enumerableOnly = options.enumerableOnly
 
             @collection.deferred.done =>
@@ -214,6 +215,7 @@ define [
             if @model then @model.destroy()
 
         renderChart: (url, data, fields, seriesIdx) ->
+            data = _.extend {}, data, @options.data
             Backbone.ajax
                 url: url
                 data: data
