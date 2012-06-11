@@ -36,7 +36,8 @@ define [
             mediator.publish 'datacontext/change'
 
         session.on 'change', ->
-            session.save()
+            # Mute the change event, circular calls are bad..
+            session.save null, silent: true
 
         mediator.subscribe 'datacontext/add', (data) ->
             if session.isCondition() or session.isComposite()
