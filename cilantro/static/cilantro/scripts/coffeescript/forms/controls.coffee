@@ -35,8 +35,10 @@ define [
         initialize: (options) ->
             @options = options
 
+            @deferredEvents = $.Deferred()
+
             # Subscribe to edits for nodes relating to this DataField
-            mediator.subscribe "datafield/#{ @model.id }/edit", (node) =>
+            mediator.subscribe "datacontext/#{ @model.id }/edit", (node) =>
                 if node is @node then return
                 @set(node)
 
@@ -51,6 +53,15 @@ define [
             @$operator = @$ '[name=operator]'
             @$controls = @$ '.form-actions'
 
+            @$el.append formActionsTemplate()
+
+            @$include = @$ '[name=include]'
+            @$exclude = @$ '[name=exclude]'
+
+            @deferredEvents.then @loadOperators
+            @deferredEvents.then @loadValues
+
+        loadOperators: =>
             for [operator, text] in (operators = @model.get 'operators')
                 if operator.charAt(0) is '-'
                     NEGATION_OPERATORS[operator.substr(1)] = operator
@@ -61,14 +72,10 @@ define [
             if @$operator.children().length is 1
                 @$operator.hide()
 
-            @$el.append formActionsTemplate()
-
-            @$include = @$ '[name=include]'
-            @$exclude = @$ '[name=exclude]'
-
+        loadValues: =>
 
         get: (options) ->
-            id = @node.id
+            id = @model.id
             operator = @getOperator options
             value = @getValue options
 
@@ -88,6 +95,18 @@ define [
         preventDefault: (event) ->
             event.preventDefault()
 
+        showControls: (event) ->
+            @$controls.fadeTo 200, 1
+
+        hideControls: (event) ->
+            @$controls.fadeTo 400, 0.3
+
+        toggleControls: (event) ->
+            if NEGATION_OPERATORS[@$operator.val()]
+                @$exclude.prop 'disabled', false
+            else
+                @$exclude.prop 'disabled', true
+
         getValue: (options) ->
             @$value.val()
 
@@ -106,23 +125,24 @@ define [
 
         submitInclude: (event) ->
             event.preventDefault()
-            @node.set @get()
+            @submit @get()
 
         submitExclude: (event) ->
             event.preventDefault()
-            @node.set @get negated: true
+            @submit @get negated: true
 
-        showControls: (event) ->
-            @$controls.fadeTo 200, 1
-
-        hideControls: (event) ->
-            @$controls.fadeTo 400, 0.3
-
-        toggleControls: (event) ->
-            if NEGATION_OPERATORS[@$operator.val()]
-                @$exclude.prop 'disabled', false
+        submit: (data) ->
+            if @node
+                @node.set data
             else
-                @$exclude.prop 'disabled', true
+                mediator.publish 'datacontext/add', data
+            @clear()
+
+        clear: ->
+            delete @node
+            @setValue()
+            @setOperator()
+
 
 
     class StringControl extends Control
@@ -176,14 +196,15 @@ define [
             @$value2 = @$('[name=value-2]').hide()
 
         getValue: ->
+            value = parseFloat @$value.val()
             if /range/.test @getOperator()
-                [@$value.val(), @$value2.val()]
+                value2 = parseFloat @$value2.val()
+                [value, value2]
             else
-                @$value.val()
+                value
 
-        setValue: ->
-            value = @node.get 'value'
-            if /range/.test @node.get 'operator'
+        setValue: (value) ->
+            if /range/.test @getOperator()
                 @$value.val value[0]
                 @$value2.val value[1]
             else
@@ -212,23 +233,27 @@ define [
             @setElement @template
                 label: @model.get('alt_name') or @model.get('name')
                 help: @model.get 'description'
-
             super
 
-        setup: ->
-            super
-            @loadValues()
+        loadOperators: =>
+            NEGATION_OPERATORS['-in'] = 'in'
+            for [operator, text] in (operators = @model.get 'operators')
+                if operator is 'in'
+                    @$operator.append "<option value=#{ operator }>#{ text }</option>"
+                    break
+            @$operator.hide()
 
-
-        loadValues: ->
+        loadValues: =>
             @$el.addClass 'loading'
 
             Backbone.ajax
                 url: environ.absolutePath @model.get('links').values.href
+                data:
+                    context: null
                 success: (resp) =>
                     for obj in resp
                         @$value.append "<option value=#{obj.value}>#{obj.name} (#{obj.count})</option>"
-                    #@$value.select2()
+                    #@$value.select2().css 'width', 'auto'
                     @$el.removeClass 'loading'
 
 
