@@ -31,14 +31,6 @@ define [
         interpolate: /\{\{\s*([^\s]+?)\s*\}\}/g
         escape: /\{\{\-\s*([^\s]+?)\s*\}\}/g
 
-    # No global jQuery..
-    # $.noConflict()
-
-    # Reasonable default timeout..
-    $.ajaxSetup
-        timeout: 5000
-
-
     # Checks for environment settings
     if (SCRIPT_NAME = @SCRIPT_NAME) is undefined
         throw Error 'Global "SCRIPT_NAME" not defined'
