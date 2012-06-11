@@ -27,36 +27,9 @@
         color: #666;
     }
 
-    .control-group {
-        padding: 0 10px;
-
-        .help-block {
-            margin-top: 9px;
-            color: #ccc;
-        }
-
-        .control-label {
-            color: #777;
-            margin-bottom: 18px;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .form-actions {
-            @include linear-gradient(#f5f5f5, #ffffff);
-            border-top: 0;
-            padding: 8px 10px 9px;
-            text-align: right;
-            margin-bottom: 9px;
-        }
-
-        .controls > * {
-            vertical-align: middle;
-        }
-    }
-
     form {
         margin-bottom: 0;
+
         .row-fluid {
             padding-top: 18px;
             border-top: 1px dashed #ccc;
@@ -66,6 +39,34 @@
 
             [class*=span] {
                 @include inline-block;
+            }
+        }
+
+        .control-group {
+            padding: 0 10px;
+
+            .help-block {
+                margin-top: 9px;
+                color: #ccc;
+            }
+
+            .control-label {
+                color: #777;
+                margin-bottom: 18px;
+                font-size: 16px;
+                font-weight: 500;
+            }
+
+            .form-actions {
+                @include linear-gradient(#f5f5f5, #ffffff);
+                border-top: 0;
+                padding: 8px 10px 9px;
+                text-align: right;
+                margin-bottom: 9px;
+            }
+
+            .controls > * {
+                vertical-align: middle;
             }
         }
     }
