@@ -215,7 +215,12 @@ define [
             if @model then @model.destroy()
 
         renderChart: (url, data, fields, seriesIdx) ->
-            data = _.extend {}, data, @options.data
+            if @options.data
+                for key, value of @options.data
+                    if not data
+                        data = "#{key}=#{value}"
+                    else
+                        data = data + "&#{key}=#{value}"
             Backbone.ajax
                 url: url
                 data: data
@@ -247,18 +252,16 @@ define [
                 @$renderArea.addClass 'loading'
                 url = urlTmpl id: xAxis.id
 
-                fields = []
-                data = ''
+                fields = [xAxis]
+                data = 'dimension=' + xAxis.id
 
-                if xAxis
-                    fields.push xAxis
-                    data += 'dimension=' + xAxis.id + '&'
                 if yAxis
                     fields.push yAxis
-                    data += 'dimension=' + yAxis.id + '&'
+                    data = data + '&dimension=' + yAxis.id
+
                 if series
                     seriesIdx = if yAxis then 2 else 1
-                    data += 'dimension=' + series.id
+                    data = data + '&dimension=' + series.id
 
                 if event and @model
                     @model.set
