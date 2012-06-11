@@ -260,9 +260,11 @@ define [
             @$operator.hide()
 
         loadValues: =>
+            @$value.addClass 'loading'
             Backbone.ajax
                 url: environ.absolutePath @model.get('links').values.href
                 success: (resp) =>
+                    @$value.removeClass 'loading'
                     @$value.empty()
                     for obj in resp
                         @$value.append "<option value=#{obj.value}>#{obj.name} (#{obj.count})</option>"
