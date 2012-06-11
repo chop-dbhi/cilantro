@@ -153,7 +153,7 @@ define [
         render: ->
             @$el.empty()
 
-            for model in @collection.models
+            for model in @collection.sortBy((model) -> (category = model.get('category'))?.order)
                 if not model.get 'queryview' then continue
                 category = model.get('category')
                 categoryName = if category then category.name else 'Other'
