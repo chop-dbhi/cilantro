@@ -11,6 +11,9 @@ define [
     'utils/scroller'
 ], ($, _, Backbone) ->
 
+    App.Models = {}
+    App.Views = {}
+
     # Ajax states
     LOADING = 'Loading'
     SYNCING = 'Syncing'
