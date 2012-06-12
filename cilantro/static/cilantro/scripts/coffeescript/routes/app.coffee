@@ -17,6 +17,9 @@ define [
 
             $('#subnav .nav.pull-left:first').append $('<li>').html @$uniqueCount
 
+            # Initialize modals
+            $('.modal').modal show: false
+
         updateCount: =>
             count = App.DataContext.session.get 'count'
             pretty = App.utils.intword count

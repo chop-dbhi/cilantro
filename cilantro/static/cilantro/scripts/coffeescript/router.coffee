@@ -18,12 +18,8 @@ define [
                 event.preventDefault()
                 App.router.navigate @pathname, trigger: true
 
-            # Initialize modals
-            $('.modal').modal show: false
-
 
     App.router = new Router
-
     App.views = {}
     App.loaded = []
 
