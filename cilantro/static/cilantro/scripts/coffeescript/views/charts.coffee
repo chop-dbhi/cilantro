@@ -224,7 +224,6 @@ define [
             Backbone.ajax
                 url: url
                 data: data
-                timeout: 10 * 1000 # 10 seconds
                 success: (resp) =>
                     @$renderArea.removeClass 'loading'
                     @render utils.processResponse resp, fields, seriesIdx
