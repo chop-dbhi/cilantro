@@ -2,14 +2,15 @@ define [
     'jquery'
     'underscore'
     'backbone'
+    'core/mixins'
 
     # Load various plugin-based modules for jQuery
     'bootstrap'
-    'jquery.chosen'
+    'select2'
     'jquery.ui'
     'panels'
     'utils/scroller'
-], ($, _, Backbone) ->
+], ($, _, Backbone, Mixins) ->
 
     App.Models = {}
     App.Views = {}
@@ -102,10 +103,13 @@ define [
                 return "Wow, you're quick! Your stuff is being saved.
                     It will only take a moment."
 
-    $ ->
-        syncStatus.appendTo('body')
-        $('[data-toggle=chosen]').chosen
-            allow_single_deselect: true
+
+    # Extend Backbone classes
+    _.extend Backbone.View::, Mixins.Deferrable
+    _.extend Backbone.Model::, Mixins.Deferrable
+    _.extend Backbone.Collection::, Mixins.Deferrable
+    _.extend Backbone.Router::, Mixins.Deferrable
+
 
     # Override `Backbone.ajax` to queue all requests.
     # Cache Backbone ajax function, by default, just $.ajax
@@ -189,5 +193,9 @@ define [
             @request options, promise
         return promise
 
+
+    # DOM-ready
+    $ ->
+        syncStatus.appendTo('body')
 
     { CSRF_TOKEN, SCRIPT_NAME, absolutePath }
