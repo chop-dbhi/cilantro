@@ -29,6 +29,8 @@ define [
     App.DataContext = new DataContexts
     App.DataContextHistory = new DataContextHistory
 
+    App.Models.DataContextNode = Serrano.DataContextNode
+
     # Special treatment for the session
     App.DataContext.when ->
         if not (session = App.DataContext.getSession())
@@ -39,9 +41,12 @@ define [
         session.on 'sync', ->
             mediator.publish 'datacontext/change'
 
-        session.on 'change', ->
+        session.on 'change:json', ->
             # Mute the change event, circular calls are bad..
             session.save null, silent: true
+
+        mediator.subscribe 'datacontext/remove', (node) ->
+            session.remove node
 
         mediator.subscribe 'datacontext/add', (data) ->
             if session.isCondition() or session.isComposite()
