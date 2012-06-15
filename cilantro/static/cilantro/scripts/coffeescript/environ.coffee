@@ -56,7 +56,7 @@ define [
     # Uses the globally defined `scriptName` variable to construct full URL
     # paths.
     absolutePath = (path) ->
-        if SCRIPT_NAME.chartAt(SCRIPT_NAME.length-1) isnt '/'
+        if SCRIPT_NAME?.charAt(SCRIPT_NAME.length-1) isnt '/'
             SCRIPT_NAME + '/' + path
         else
             SCRIPT_NAME + path

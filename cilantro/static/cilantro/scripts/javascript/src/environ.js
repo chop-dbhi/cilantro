@@ -35,7 +35,7 @@ define(['jquery', 'underscore', 'backbone', 'core/mixins', 'bootstrap', 'jquery.
     return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
   };
   absolutePath = function(path) {
-    if (SCRIPT_NAME.chartAt(SCRIPT_NAME.length - 1) !== '/') {
+    if ((SCRIPT_NAME != null ? SCRIPT_NAME.charAt(SCRIPT_NAME.length - 1) : void 0) !== '/') {
       return SCRIPT_NAME + '/' + path;
     } else {
       return SCRIPT_NAME + path;
