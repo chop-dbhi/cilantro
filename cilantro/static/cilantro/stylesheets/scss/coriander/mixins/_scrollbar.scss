@@ -1,0 +1,24 @@
+// WebKit only: sets the scrollbar to be thinner and less obtrusive
+@mixin vertical-thin-scrollbar {
+    &::-webkit-scrollbar { width: 5px; padding-right: 2px; }
+
+    &::-webkit-scrollbar-thumb {
+    
+        &:vertical {
+            background: rgba(0, 0, 0, 0.15);
+            -webkit-border-radius: 10px;
+        }
+    }    
+}
+
+// WebKit only: sets the scrollbar to be thinner and less obtrusive
+@mixin horizontal-thin-scrollbar {
+    &::-webkit-scrollbar { height: 5px; }
+
+    &::-webkit-scrollbar-thumb {
+        &:horizontal {
+            background: rgba(0, 0, 0, 0.15);
+            -webkit-border-radius: 10px;
+        }
+    }    
+}

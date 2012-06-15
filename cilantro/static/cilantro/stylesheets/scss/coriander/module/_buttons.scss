@@ -1,0 +1,24 @@
+.button, input[type=button], input[type=submit], button {
+    @include clean-button(#999, none, #fff);
+    padding: 4px 8px;
+    font-size: 11px;
+
+    &.delete, &.revert, &.red {
+        @include clean-button(rgb(194, 51, 55), none, #fff);
+    }
+
+    &.save, &.blue {
+        @include clean-button(#4290f1, none, #fff);
+    }
+}
+
+// a div containing multiple button for operations such
+// as save, cancel, and delete
+.controls {
+    text-align: right;
+    margin-top: 10px;
+
+    .delete, .revert, .red {
+        float: left;
+    }
+}

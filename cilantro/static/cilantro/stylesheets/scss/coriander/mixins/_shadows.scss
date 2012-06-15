@@ -1,0 +1,51 @@
+@mixin drop-shadow {
+    @include box-shadow(
+        0 1px 4px rgba(0, 0, 0, 0.3),
+        inset 0 0 40px rgba(0, 0, 0, 0.1)
+    );
+    position: relative;
+
+    &:before, &:after {
+        content: '';
+        position: absolute;
+        z-index: -2;
+    }
+}
+
+@mixin raised-drop-shadow {
+    @include drop-shadow;
+    @include box-shadow(
+        0 15px 10px -10px rgba(0, 0, 0, 0.5),
+        0 1px 4px rgba(0, 0, 0, 0.3),
+        inset 0 0 40px rgba(0, 0, 0, 0.1)
+    );
+}
+
+@mixin curves-drop-shadow {
+    @include drop-shadow;
+
+    &:before {
+        @include box-shadow(0 0 15px rgba(0, 0, 0, 0.6));
+        
+        top: 10px;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+    }
+}
+
+@mixin vertical-curves-drop-shadow {
+    @include curves-drop-shadow;
+    
+    &:before {
+        @include border-radius(10px / 100px);
+    }
+}
+
+@mixin horizontal-curves-drop-shadow {
+    @include curves-drop-shadow;
+
+    &:before {
+        @include border-radius(100px / 10px);
+    }
+}

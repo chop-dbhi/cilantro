@@ -1,0 +1,21 @@
+// disabled state for buttons
+input[type=button][disabled],
+input[type=button][disabled]:hover,
+input[type=button][disabled]:active,
+input[type=submit][disabled],
+input[type=submit][disabled]:hover,
+input[type=submit][disabled]:active,
+button[disabled],
+button[disabled]:hover,
+button[disabled]:active {
+    @include border-radius(3px);    
+    @include linear-gradient(top, #eee, #ccc);
+    @include box-shadow(none);
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #bbb;
+    color: #999;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 0 1px 0 #eee;
+    cursor: not-allowed;
+}

@@ -1,0 +1,44 @@
+@function is-dark-on-light($color, $bgcolor) {
+    @return lightness($bgcolor) > lightness($color);
+}
+
+@mixin clean-button($start, $stop: none, $color: #333) {
+    @if $stop == none {
+        $stop: darken($start, 20);
+    }
+
+    @include border-radius(3px);  
+    @include linear-gradient(top, $start, $stop);
+    @include box-shadow(0 1px 1px desaturate($start, 50));
+    
+    border: 1px solid darken($stop, 5);
+    border-bottom: 1px solid darken($stop, 10);
+    color: $color;
+    line-height: 1;
+    text-align: center;
+    font-weight: bold;
+
+    @if is-dark-on-light($color, $start) {
+        text-shadow: 0 1px 1px $start;
+    } @else {
+        text-shadow: 0 1px 1px darken($stop, 10);
+    }
+
+    &:hover {
+        @include linear-gradient(top, darken($start, 10), darken($stop, 10));
+        border: 1px solid darken($stop, 10);
+        border-bottom: 1px solid darken($stop, 20);
+        cursor: pointer;
+        @if is-dark-on-light($color, $start) {
+            text-shadow: 0 1px 1px darken($start, 10);
+        } @else {
+            text-shadow: 0 1px 1px darken($stop, 30);
+        }
+    }
+
+    &:active {
+        @include box-shadow(inset 0 0 5px darken($stop, 20), 0 1px 2px desaturate(lighten($start, 20), 20));
+        border: 1px solid darken($stop, 20);
+        border-bottom: 1px solid darken($stop, 30);
+    }
+}

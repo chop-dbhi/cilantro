@@ -1,0 +1,67 @@
+@mixin background-clip($clip) {
+	-webkit-background-clip: $clip;
+	-moz-background-clip: $clip;
+	background-clip: $clip;
+}
+
+@mixin user-select($value: text) {
+    -webkit-user-select: $value;
+    -khtml-user-select: $value;
+    -moz-user-select: $value;
+    -o-user-select: $value;
+    user-select: $value;
+}
+
+// sets the opacity of an element. this is not to be confused
+// with the official Sass function that "opacifies" a color
+// http://css-tricks.com/snippets/css/cross-browser-opacity/
+@mixin opacity($p) {
+    /* IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$p})";
+    /* IE 5-7 */
+    filter: alpha(opacity=$p);
+    -moz-opacity: $p/100;
+    -kthml-opacity: $p/100;
+    opacity: $p/100;
+}
+
+// adds a letter "press" effect to the text. this effects only works if the
+// surrounding color is lighter than the text color
+@mixin text-shadow($inset, $color: none, $blur: 2px) {
+    $bgcolor: none;
+    // shift arguments
+    @if $inset == inset {
+        $bgcolor: lighten($color, 70);
+    } @else {
+        $blur: $color;
+        $color: $inset;
+        $bgcolor: darken($color, 70);
+    }
+
+    color: $color;
+    text-shadow: 0 1px $blur $bgcolor;
+}
+
+// shorcut to set anchor colors for each pseudo state
+@mixin anchors($c1, $c2) {
+    a {
+        &:link, &:visited { color: $c1; }        
+        &:hover, &:active { color: $c2; }
+    }
+}
+
+// source: http://nicolasgallagher.com/micro-clearfix-hack/
+@mixin clearfix {
+    /* For modern browsers */
+    &:before, &:after {
+        content: "";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+
+    /* For IE 6/7 (trigger hasLayout) */
+    zoom: 1;
+}

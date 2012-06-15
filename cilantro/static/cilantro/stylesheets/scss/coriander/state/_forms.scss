@@ -1,0 +1,25 @@
+// wraps the form element and span element containing
+// the error message
+.form-error {
+    input, textarea, select {
+        display: block;
+        position: relative;
+        z-index: 5;
+    }
+    
+    span {
+        @include inline-block;
+        @include border-radius(0 0 3px 3px);
+        @include box-shadow(0 2px 3px #aaa);
+        border: 1px solid #c00;
+        border-top: none;
+        font-weight: 600;
+        color: #600;
+        background-color: #f99;
+        position: relative;
+        top: -1px;
+        padding: 3px;
+        vertical-align: top;
+        font-size: 11px;
+    }
+}

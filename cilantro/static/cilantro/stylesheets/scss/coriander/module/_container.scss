@@ -1,0 +1,193 @@
+@mixin container-title {
+    @include border-radius(3px 3px 0 0);
+    @include text-shadow(#eee);
+    @include box-shadow(inset 0 1px 2px #666, inset 0 -1px 2px #111);
+    @include user-select(none);
+
+    background-color: #333;
+    border: 1px solid #111;
+    padding: 4px 10px;
+    font-size: 1.1em;
+    
+    &::after {
+        border-bottom: 1px solid #fff;
+    }
+}
+
+.container {
+    @include box-shadow(0 2px 4px #999);
+    @include border-radius(3px);
+    @include inline-block;
+    background-color: #eee;
+    text-align: left;
+
+    // container title bar
+    > .title {
+        @include container-title;
+
+        // container title bar buttons
+        button {
+            @include border-radius(3px);
+            @include box-shadow(none);
+            @include linear-gradient(#444, #222);
+            
+            color: #ddd;
+            float: right;
+            text-shadow: none;
+            border-color: #000;
+            font-size: 0.8em;
+
+            padding: {
+                top: 3px;
+                bottom: 3px;
+            }
+
+            font-weight: 100;
+            
+            &:hover {
+                color: #fff;
+            }
+            
+            &:active {
+                @include linear-gradient(#222, #444);
+                background-color: #444;
+            }
+        }
+    }
+
+    > .toolbar {
+        @include box-raised(saturate(#dadfe8, 30));
+        @include text-shadow(inset, #333, 1px);
+
+        border-right: none;
+        border-left: none;
+
+        border-bottom-color: darken(#dadfe8, 30);
+
+        font-size: 0.9em;
+        padding: 3px 10px;
+
+        > * {
+            vertical-align: middle;
+            
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+       
+        // this is here only to account for the drop shadow of the container
+        // itself. to ensure the bottom border stands out, the color is
+        // darkened
+        &.footer {
+            @include border-radius(0 0 3px 3px);
+            border-bottom-color: darken(#dadfe8, 30);
+        }
+    }
+    
+    > .info {
+        @include box-shadow(0 2px 4px #ddd inset);
+        
+        font-size: inherit;
+        padding: 10px;
+        font-style: normal;
+        font-size: 0.9em;
+        border-bottom: 1px solid #ccc;
+        background-color: #f9f9f9;
+
+        > :first-child {
+            margin-top: 0;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // container content area, keep it simple...
+    > .content {
+        @include border-radius(0 0 3px 3px);
+        
+        padding: 10px;
+        text-shadow: 0 1px 1px #fff;
+
+        // ensure elements don't expand the edges..
+        > :first-child {
+            margin-top: 0;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .tabs {
+        @include user-select(none);
+        padding: 5px 0 7px 10px;
+        display: block;
+
+        > .tab {
+            @include box-shadow(inset, #444);
+            @include border-radius(10px);
+            color: #333;
+            padding: 2px 10px;
+            margin-right: 5px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            font-weight: 500;
+
+            &:hover {
+                cursor: pointer;
+                color: #000;
+            }
+
+            &.active {
+                @include box-inset(darken(#dadfe8, 40));
+                text-shadow: 0 1px 1px #333;
+                color: #fff;
+                border-color: darken(#dadfe8, 60);
+                cursor: auto;
+                text-decoration: none;
+                cursor: default;
+            }
+
+            &.disabled {
+                cursor: default;
+                color: darken(#dadfe8, 20);
+                border-color: transparent;
+                background-color: transparent;
+            }
+        }
+    }
+
+    &.no-title {
+        .info {
+            @include box-shadow(none);
+            @include border-radius(3px 3px 0 0);
+        }
+    }
+}
+
+
+
+// Begin IE fixes/mods...
+.ie7 {
+    .container {
+        border: 1px solid #f9f9f9;
+
+        > .title button {
+            font-size: 0.7em;
+        }
+
+        > .toolbar, > .info {
+            border-right: 1px solid #aaa;
+            border-left: 1px solid #aaa;
+        }
+
+        > .content {
+            border-top: none;
+            border-bottom: 1px solid #aaa;
+            border-right: 1px solid #aaa;
+            border-left: 1px solid #aaa;
+        }
+    }
+}

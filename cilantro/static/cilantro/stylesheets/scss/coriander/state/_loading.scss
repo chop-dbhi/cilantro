@@ -1,0 +1,4 @@
+.blocked {
+    @include opacity(70);
+    background: #fff url(../../images/loader.gif) no-repeat center;
+}

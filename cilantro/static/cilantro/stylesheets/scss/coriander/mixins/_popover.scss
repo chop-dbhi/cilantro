@@ -1,0 +1,36 @@
+// twitter bootstrap..
+@mixin popover-arrow-above($arrowWidth: 5px) {
+    bottom: 0;
+    left: 50%;
+    margin-left: -$arrowWidth;
+    border-left: $arrowWidth solid transparent;
+    border-right: $arrowWidth solid transparent;
+    border-top: $arrowWidth solid #000;
+}
+
+@mixin popover-arrow-left($arrowWidth: 5px) {
+    top: 50%;
+    right: 0;
+    margin-top: -$arrowWidth;
+    border-top: $arrowWidth solid transparent;
+    border-bottom: $arrowWidth solid transparent;
+    border-left: $arrowWidth solid #000;
+}
+
+@mixin popover-arrow-below($arrowWidth: 5px) {
+    top: 0;
+    left: 50%;
+    margin-left: -$arrowWidth;
+    border-left: $arrowWidth solid transparent;
+    border-right: $arrowWidth solid transparent;
+    border-bottom: $arrowWidth solid #000;
+}
+
+@mixin popover-arrow-right($arrowWidth: 5px) {
+    top: 50%;
+    left: 0;
+    margin-top: -$arrowWidth;
+    border-top: $arrowWidth solid transparent;
+    border-bottom: $arrowWidth solid transparent;
+    border-right: $arrowWidth solid #000;
+}

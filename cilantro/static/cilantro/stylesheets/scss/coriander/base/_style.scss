@@ -1,0 +1,110 @@
+// Overrides to the HTML5 Boilerplate Normalize CSS
+// No pink selection for us...
+
+/* j.mp/webkit-tap-highlight-color */
+a:link { -webkit-tap-highlight-color: inherit; }
+
+// Default styles
+
+h2 {
+    color: #8f1916;
+}
+
+input[type="checkbox"] { vertical-align: middle; }
+
+hr { margin: 5px 0; border-color: #ddd; }
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+table {
+    width: auto;
+    margin-bottom: 0;
+
+    td, th {
+        padding: 7px;
+        vertical-align: top;
+    }
+
+    table {
+        thead, tfoot {
+            td, th {
+                padding-top: 0;
+                padding-bottom: 7px;
+            }
+        }
+
+        td > * {
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
+}
+
+// the first cell in each row (assuming it is a th) needs some padding
+// so it does not bump up against the next cell
+table tbody tr > th:first-child {
+    text-align: right;
+    min-width: 75px;
+}
+
+label {
+    padding: 2px 0;
+}
+
+section {
+    @include box-inset(#fff);
+    @include border-radius(3px);
+
+    border-color: #aaa;
+    padding: 10px;
+
+    > :first-child {
+        margin-top: 0;
+    }
+}
+
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+// apply to all input types since there are quite a few in the HTML5 spec
+input, textarea {
+    @include box-inset(#f6f6f6);
+    @include border-radius(3px);
+
+    outline: none;
+    padding: 3px;
+    border: 1px solid #aaa;
+    background-color: #fff;
+
+    &:disabled {
+        background-color: #f6f6f6;
+    }
+}
+
+input[type=file] {
+    @include box-shadow(none);
+    @include border-radius(0);
+    border: none;
+}
+
+// reset width for other input types..
+input[type=submit], input[type=button] {
+    min-width: 75px;
+}
+
+input[type=radio], input[type=checkbox],
+input[type=file] {
+    min-width: 0;
+}
+
+textarea {
+    width: auto;
+    display: block; // webkit.. http://stackoverflow.com/questions/4457398/why-do-webkit-browsers-render-the-following-with-extra-padding-margin-on-the-bott
+    resize: vertical;
+}

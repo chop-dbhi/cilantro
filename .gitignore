@@ -1,3 +1,4 @@
+*.sw[po]
 .watch-pid
 .sass-cache
 .DS_Store
@@ -24,14 +25,11 @@ cilantro/static/cilantro/stylesheets/css/*.css
 cilantro/static/cilantro/stylesheets/css/coriander
 
 # Submodule code
-cilantro/static/cilantro/stylesheets/scss/coriander
 cilantro/static/cilantro/scripts/coffeescript/common
 cilantro/static/cilantro/scripts/javascript/src/vendor/jquery.idle.js
 cilantro/static/cilantro/scripts/javascript/src/vendor/highcharts.js
-cilantro/static/cilantro/scripts/javascript/src/vendor/jquery.js
 cilantro/static/cilantro/scripts/javascript/src/vendor/require.js
 cilantro/static/cilantro/scripts/javascript/src/order.js
-cilantro/static/cilantro/scripts/javascript/src/vendor/backbone.js
 cilantro/static/cilantro/scripts/javascript/src/vendor/underscore.js
 cilantro/static/cilantro/scripts/javascript/src/vendor/pubsub.js
 bin/r.js

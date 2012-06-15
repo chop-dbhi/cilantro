@@ -1,0 +1,26 @@
+$success: hsl(124, 73%, 20%);
+$warning: hsl(44, 73%, 20%);
+$error: hsl(0, 73%, 29%);
+$information: hsl(211, 73%, 20%);
+
+.messages {
+    .success { @include message($success, success); }
+    .warning { @include message($warning, warning); }
+    .error { @include message($error, error); }
+    .information { @include message($information, info); }
+}
+
+.message {
+    &.success { @include message($success, success); }
+    &.warning { @include message($warning, warning); }
+    &.error { @include message($error, error); }
+    &.information { @include message($information, info); }
+}
+
+.message-block {
+    &.success { @include message-block(#b4eb87, success); }
+    &.warning { @include message-block(lighten(#f9f482, 10), warning); }
+    &.error { @include message-block(#efa2a1, error); }
+    &.information { @include message-block(#aad8fb, info); }
+}
+

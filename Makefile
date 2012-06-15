@@ -57,13 +57,8 @@ init-submodules:
 		fi; \
 	fi;
 
-build-submodules: init-submodules coriander backbone-common jquery-idle-timeout highcharts \
-	requirejs rjs backbone underscore pubsub
-
-coriander:
-	@echo 'Setting up Coriander...'
-	@rm -rf ${SASS_DIR}/coriander
-	@cp -r ./modules/coriander ${SASS_DIR}/coriander
+build-submodules: init-submodules backbone-common jquery-idle-timeout highcharts \
+	requirejs rjs underscore pubsub
 
 backbone-common:
 	@echo 'Setting up Backbone-common...'
@@ -88,15 +83,6 @@ rjs:
 	@cd ./modules/rjs && node dist.js
 	@mkdir -p ./bin
 	@cp ./modules/rjs/r.js ./bin
-
-jquery:
-	@echo 'Setting up jQuery...'
-	@cd ./modules/jquery && make
-	@cp ./modules/jquery/dist/jquery.js ${JS_SRC_DIR}/vendor/jquery.js
-
-backbone:
-	@echo 'Setting up Backbone...'
-	@cp ./modules/backbone/backbone.js ${JS_SRC_DIR}/vendor/backbone.js
 
 underscore:
 	@echo 'Setting up Underscore...'
