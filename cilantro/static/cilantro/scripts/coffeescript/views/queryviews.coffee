@@ -48,12 +48,6 @@ define [
             mediator.subscribe 'queryview/show', (id) =>
                 if @model.id is id then @show()
 
-            mediator.subscribe 'queryview/edit', (data) =>
-                ids = _.pluck(@model.get('fields'), 'id')
-                if ids.indexOf(data.id) >= 0
-                    @edit data
-                    @show()
-
             # Should be used only if the UI is relative to the datacontext
             # mediator.subscribe 'datacontext/change', @update
 
@@ -69,41 +63,43 @@ define [
             # Create a collection of the fields
             fields = new Backbone.Collection @model.get 'fields'
 
+            @controls = []
             @charts = []
 
             options =
                 label: if fields.length is 1 then false else true
 
-            @controls = []
             for model in fields.models
                 options.model = model
 
                 $controls = $ '<div class=span6></div>'
                 $charts = $ '<div class="span6 charts"></div>'
 
-                if (data = model.get 'data').enumerable
-                    control = new Controls.EnumerableControl options
+                if (data = model.get 'data').searchable
+                    controlClass = Controls.SearchableControl
+                else if data.enumerable
+                    controlClass = Controls.EnumerableControl
                 else if data.type is 'number'
-                    control = new Controls.NumberControl options
+                    controlClass = Controls.NumberControl
                 else
-                    control = new Controls.StringControl options
-
-                @controls.push control
+                    controlClass = Controls.Control
 
                 chart = new Charts.Distribution
                     editable: false
                     data:
                         context: null
 
+                @controls.push (control = new controlClass options)
                 @charts.push [model, chart]
 
                 $controls.append control.render().$el
                 $charts.append chart.$el
 
+                if (conditions = App.DataContext.session.getNodes(model.id)) and conditions[0]
+                    control.set conditions[0]
 
-                @$form.append $('<div class=row-fluid>').append($controls, $charts, $conditions)
-
-            @deferredEvents.then @update
+                @$form.append $('<div class=row-fluid>').append($controls, $charts)
+                @update()
 
         show: =>
             @resolve()
