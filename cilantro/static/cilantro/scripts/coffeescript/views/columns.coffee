@@ -59,15 +59,14 @@ define [
                 placeholder: 'placeholder'
 
             @$el.addClass 'loading'
-            @collection.deferred.done =>
+            @collection.when =>
                 @$el.removeClass 'loading'
                 @render()
 
-            App.DataView.deferred.done =>
-                @collection.deferred.done =>
-                    if (json = App.DataView.session.get 'json')
-                        @add id for id in json.concepts
-                    return
+            $.when App.DataView, @collection, =>
+                if (json = App.DataView.session.get 'json')
+                    @add id for id in json.concepts
+                return
 
         render: =>
             availableHtml = []

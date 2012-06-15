@@ -28,7 +28,11 @@ define [
         events:
             'click [data-toggle=detail]': 'toggleDetail'
 
+        deferred:
+            'update': true
+
         initialize: ->
+            super
             attrs =
                 name: @model.get 'name'
                 category: if (cat = @model.get 'category') then cat.name else ''
@@ -53,7 +57,6 @@ define [
             # Should be used only if the UI is relative to the datacontext
             # mediator.subscribe 'datacontext/change', @update
 
-            @deferredEvents = $.Deferred()
             @render()
 
         toggleDetail: ->
@@ -103,24 +106,24 @@ define [
             @deferredEvents.then @update
 
         show: =>
+            @resolve()
+            # Move to the top
             App.views.discover.$el.prepend @$el.detach()
-            @deferredEvents.resolve()
-            for control in @controls
-                control.deferredEvents.resolve()
+            (control.show() for control in @controls)
+            return @
 
         hide: =>
+            @pending()
             @$el.detach()
-            @deferredEvents = $.Deferred()
+            (control.hide() for control in @controls)
+            return @
 
         update: =>
-            @deferredEvents.then =>
-                for [model, chart] in @charts
-                    url = environ.absolutePath("/api/fields/#{ model.id }/dist/")
-                    chart.renderChart url, null, [model]
-                return
+            for [model, chart] in @charts
+                url = environ.absolutePath("/api/fields/#{ model.id }/dist/")
+                chart.renderChart url, null, [model]
+            return
 
-        edit: (data) =>
-            @form.edit(data)
 
     # Accordian representation of the data filters
     class QueryViewsAccordian extends Backbone.View

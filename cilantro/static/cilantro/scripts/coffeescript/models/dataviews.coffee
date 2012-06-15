@@ -9,7 +9,9 @@ define [
         url: environ.absolutePath '/api/views/'
 
         initialize: ->
-            @deferred = @fetch()
+            @pending()
+            @on 'reset', -> @resolve()
+            @fetch()
 
         getNamed: ->
             @filter (model) -> model.get('name')
@@ -19,14 +21,16 @@ define [
         url: environ.absolutePath '/api/views/history/'
 
          initialize: ->
-            @deferred = @fetch()
+            @pending()
+            @on 'reset', -> @resolve()
+            @fetch()
 
 
     App.DataView = new DataViews
     App.DataViewHistory = new DataViewHistory
 
     # Special treatment for the session
-    App.DataView.deferred.done ->
+    App.DataView.when ->
         if not (session = App.DataView.getSession())
             session = App.DataView.create session: true
 

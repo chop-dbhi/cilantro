@@ -11,7 +11,6 @@ define [
 
         # Initialize shared components
         initialize: ->
-
             # Bind all route-enabled links on the page and ensure they
             # stay in sync relative to all other links
             $('body').on 'click', '[data-route]', (event) ->
@@ -32,6 +31,7 @@ define [
         # Non-routable view.. loaded once
         if route is false
             view.load?()
+            view.resolve?()
             return
 
         @router.route route, name, =>
@@ -40,12 +40,15 @@ define [
                 ROUTING = true
                 # Unload existing views, check for existence in case the
                 # view had been destroyed in the meantime
-                (App.views[_name]?.unload?() for _name in @loaded)
+                for _name in @loaded
+                    App.views[_name].unload?()
+                    App.views[_name].pending?()
                 @loaded = []
                 # Defer to end of call stack
                 _.defer -> ROUTING = false
 
-            App.views[name]?.load?()
+            App.views[name].load?()
+            App.views[name].resolve?()
             @loaded.push name
 
         @router.on "route:#{ name }", ->

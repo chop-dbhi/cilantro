@@ -16,9 +16,10 @@ define [
     class AnalysisArea extends Backbone.View
         id: 'analysis-area'
 
-        initialize: ->
-            @deferredEvents = $.Deferred()
+        deferred:
+            'updateCharts': true
 
+        initialize: ->
             @charts = []
 
             @$toolbar = $('<ul>')
@@ -42,31 +43,22 @@ define [
             $addChart = $(addChartButton()).on 'click', (event) =>
                 @addChart()
 
-            @$toolbar
-                .append $addChart
+            @$toolbar.append $addChart
 
-            @deferredEvents.then =>
-                (@addChart model for model in App.Distribution.models)
-                return
-
+            @defer => @addChart model for model in App.Distribution.models
             mediator.subscribe 'datacontext/change', @updateCharts
 
         updateCharts: =>
-            @deferredEvents.then =>
-                (view.updateChart() for view in @charts)
-                return
+            (view.updateChart() for view in @charts)
+            return
 
         load: ->
             @$el.fadeIn 100
             @$toolbar.fadeIn 100
 
-            # Resolve any deferred events while this view was not visible/loaded
-            @deferredEvents.resolveWith @
-
         unload: ->
             @$el.hide()
             @$toolbar.hide()
-            @deferredEvents = $.Deferred()
 
         addChart: (attrs) ->
             if not attrs instanceof App.Distribution.model

@@ -1,5 +1,11 @@
 define ['jquery', 'underscore'], ($, _) ->
 
+    addOnceDeferreds = (obj) ->
+        # Populate the once-deferred handlers
+        for name, [func, args] of obj._deferred.once
+            obj._deferred.done do (args) ->
+                func args...
+
     Deferrable =
         deferred: {}
 
@@ -35,13 +41,16 @@ define ['jquery', 'underscore'], ($, _) ->
             return @
 
         # Resolve the deferred object
-        resolve: ->
+        resolve: (context=@)->
             if @_deferred
-                # Populate the once-deferred handlers
-                for name, [func, args] of @_deferred.once
-                    @_deferred.done do (args) ->
-                        func args...
-                @_deferred.resolveWith @
+                addOnceDeferreds @
+                @_deferred.resolveWith context
+            return @
+
+        reject: (context=@) ->
+            if @_deferred
+                addOnceDeferreds @
+                @_deferred.rejectWith context
             return @
 
         # Implements the promise interface
@@ -49,5 +58,13 @@ define ['jquery', 'underscore'], ($, _) ->
             if not @_deferred? then @pending()
             return @_deferred.promise arguments...
 
+        when: (func) ->
+            $.when(@).done(func)
+
+        state: ->
+            @_deferred.state()
+
+    Deferrable.resolveWith = Deferrable.resolve
+    Deferrable.rejectWith = Deferrable.reject
 
     { Deferrable }

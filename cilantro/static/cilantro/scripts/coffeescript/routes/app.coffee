@@ -13,7 +13,7 @@ define [
             @$uniqueCount = $ '<span class=stat></span>'
 
             mediator.subscribe 'datacontext/change', @updateCount
-            App.DataContext.deferred.done @updateCount
+            App.DataContext.when @updateCount
 
             $('#subnav .nav.pull-left:first').append $('<li>').html @$uniqueCount
 

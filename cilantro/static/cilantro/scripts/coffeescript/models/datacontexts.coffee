@@ -9,7 +9,9 @@ define [
         url: environ.absolutePath '/api/contexts/'
 
         initialize: ->
-            @deferred = @fetch()
+            @pending()
+            @on 'reset', -> @resolve()
+            @fetch()
 
         getNamed: ->
             @filter (model) -> model.get('name')
@@ -19,14 +21,16 @@ define [
         url: environ.absolutePath '/api/contexts/history/'
 
          initialize: ->
-            @deferred = @fetch()
+            @pending()
+            @on 'reset', -> @resolve()
+            @fetch()
 
 
     App.DataContext = new DataContexts
     App.DataContextHistory = new DataContextHistory
 
     # Special treatment for the session
-    App.DataContext.deferred.done ->
+    App.DataContext.when ->
         if not (session = App.DataContext.getSession())
             session = App.DataContext.create session: true
 
