@@ -1,0 +1,1 @@
+var __slice=[].slice;define(["underscore","serrano/datafield","serrano/dataconcept","serrano/datacontext","serrano/dataview"],function(){var modules,_;return _=arguments[0],modules=2<=arguments.length?__slice.call(arguments,1):[],_.extend.apply(_,[{}].concat(__slice.call(modules)))})
