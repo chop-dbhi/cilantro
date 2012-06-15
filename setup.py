@@ -75,10 +75,10 @@ setup(
     name = 'cilantro',
     author = 'Byron Ruth',
     author_email = 'ruthb@email.chop.edu',
-    description = 'A client implementation for Serrano',
+    description = 'A client implementation for Serrano 1.x',
     license = 'BSD',
     keywords = 'snippets tools utilities',
-    url = 'https://github.com/cbmi/django-cilantro',
+    url = 'https://github.com/cbmi/cilantro',
 
     packages = packages,
     cmdclass = cmdclasses,
