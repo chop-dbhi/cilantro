@@ -22,10 +22,7 @@ define ['underscore'], (_) ->
             for handler in handlers
                 # Catch any errors, allow all handlers to finish prior to
                 # throwing the exception.
-                try
-                    if handler then handler args...
-                catch error
-                    setTimeout -> throw error
+                if handler then handler args...
             setTimeout -> channels[channel] = _.compact handlers
             return
 
