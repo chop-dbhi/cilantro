@@ -13,17 +13,18 @@ define [
         attrs.composite is true and attrs.id
 
 
+    # Represents a single node within a DataContext tree. Non-branch nodes
+    # must be carefully handled and not removed from the tree unless explicitly
+    # removed
     class DataContextNode extends Backbone.Model
         validate: (attrs) ->
             # Some kind of node
-            if isBranch(attrs) or isCondition(attrs) or isComposite attrs
+            if isBranch(attrs) or isCondition(attrs) or isComposite(attrs)
                 return
-
             # Check for all undefined values
             for key, value of attrs
                 if value isnt undefined
                     return 'Unknown node type'
-
             return
 
         toJSON: ->
@@ -35,54 +36,56 @@ define [
                 json = super
             return json
 
+        isRoot: -> not @parent?
+
+        isEmpty: -> _.isEmpty @attributes
+
+        isBranch: -> isBranch @attributes
+
+        isCondition: -> isCondition @attributes
+
+        isComposite: -> isComposite @attributes
+
         # Retrieve this node's siblings
         siblings: ->
-            if @root then false else _.without @parent.get('children'), @
-
-        # Proxy methods
-        isEmpty: ->
-            _.isEmpty @attributes
-
-        isBranch: ->
-            isBranch @attributes
-
-        isCondition: ->
-            isCondition @attributes
-
-        isComposite: ->
-            isComposite @attributes
+            if @isRoot() then false else _.without @parent.get('children'), @
 
         # Creates a new branch and adds this node along with one or more other
         # nodes to the branch
         promote: (nodes...) ->
-            if _.isString nodes[0]
-                type = nodes[0]
-                if type isnt 'and' and type isnt 'or'
-                    throw new Error 'Type must be "and" or "or"'
-                nodes.splice 0, 1
-            else
-                type = 'and'
-
             if nodes.length is 0
-                throw new Error 'At least one other node must be supplied'
+                throw new Error 'At least one node must be supplied'
 
-            children = _.map [@toJSON(), nodes...], (attrs) =>
+            if @isRoot()
+                type = 'and'
+            # Alternate operators at each level. If the parent and child
+            # branches have the same operator, the child can be demoted.
+            else
+                type = if @parent.get('type') is 'and' then 'or' else 'and'
+
+            # Pass this node's attributes in the map parser to convert into
+            # a newly referenced node.
+            children = _.map [@attributes, nodes...], (attrs) =>
                 DataContextNode.parseAttrs attrs, @
 
+            # Clear the existing attributes and set the new ones
             @clear slient: true
             @set type: type, children: children
             return @
 
         # Takes a node and removes it from the current branch and adds it
-        # to the branch's parent.
+        # to the branch's parent. If the branch has only one node left, it
+        # too gets demoted and the branch is destroyed.
         demote: ->
-            # If this is the root node or it's parent is, this node cannot
-            # be promoted
-            if @root then return false
+            # Nothing to do if this is the root
+            if @isRoot() then return false
 
-            # If the parent is root and this is the only child node, can
-            # it be demoted.
-            if @parent.root
+            # If the parent is the root and this is the only child node, can
+            # it be demoted. This is a special case when the root is a branch
+            # and one of the children has been removed. Since this will cause
+            # the other sibling to be demoted, this will ensure the single
+            # condition becomes the root.
+            if @parent.isRoot()
                 if @siblings().length is 0
                     @parent.clear silent: true
                     @parent.set @attributes
@@ -90,33 +93,33 @@ define [
                 return false
 
             # Check the state of the siblings. If only one sibling is left,
-            # promote the parent instead
-            node = @parent.remove @
-            grand = @parent.parent
-            grand.attributes.children.push node
+            # demote the parent instead
+            @parent.parent.get('children').push @remove()
             return @
 
+        # Add one or more nodes to this branch.
         add: (nodes...) ->
             if not @isBranch()
                 throw new Error 'Node is not a branch. Use "promote" to convert it into one'
-            @attributes.children.push.apply @attributes.children, _.map nodes, (attrs) =>
+            (children = @get('children')).push.apply children, _.map nodes, (attrs) =>
                 DataContextNode.parseAttrs attrs, @
             return @
 
-        # Removes itself from it's parent. If a `node` is passed, this
-        # implies this node is a branch. When only one sibling remains in the
+        # Removes itself from it's parent. When only one sibling remains in the
         # respective branch, the sibling gets demoted.
         remove: ->
-            if @root then return false
-            children = @parent.attributes.children
-
-            # Ensure the node exists, then splice it directly out of
-            # the attributes. This bypasses validation since this operation
-            # is recursive.
-            if (idx = children.indexOf @) >= 0
-                children.splice(idx, 1)[0]
-                if children.length is 1
-                    children[0].demote()
+            # If this is the root, simply clear the attributes
+            if @isRoot()
+                @clear()
+            else
+                children = @parent.get 'children'
+                # Ensure the node exists, then splice it directly out of
+                # the attributes. This bypasses validation since this operation
+                # is recursive.
+                if (idx = children.indexOf @) >= 0
+                    children.splice(idx, 1)[0]
+                    if children.length is 1
+                        children[0].demote()
             return @
 
 
@@ -129,7 +132,8 @@ define [
         # Branch
         else if isBranch attrs
             node = new DataContextNode type: attrs.type
-            children = _.map attrs.children, (_attrs) -> DataContextNode.parseAttrs _attrs, node, callback
+            children = _.map attrs.children, (_attrs) ->
+                DataContextNode.parseAttrs _attrs, node, callback
             node.set children: children
         # Condition
         else if isCondition attrs
@@ -142,12 +146,18 @@ define [
 
         if parent
             node.parent = parent
-            delete node.root
-        else
-            node.root = true
 
         callback?(node)
         return node
+
+
+    DataContextNode.updateAttrs = (node, attrs) ->
+        if node.isBranch()
+            children = node.get('children')
+            for _attrs, i in attrs.children
+                DataContextNode.updateAttrs children[i], _attrs
+        else
+            node.set attrs
 
 
     class DataContext extends Backbone.Model
@@ -157,20 +167,23 @@ define [
         url: ->
             if @isNew() then super else @get 'url'
 
-        parse: (response) =>
-            if response
-                @nodes = {}
-                @node = DataContextNode.parseAttrs response.json, null, @cacheNode
-
-            return response
+        parse: (resp) =>
+            if resp
+                if not @node
+                    @nodes = {}
+                    @node = DataContextNode.parseAttrs resp.json, null, @_cacheNode
+                else
+                    DataContextNode.updateAttrs @node, resp.json
+            return resp
 
         toJSON: ->
             attrs = super
-            if @node
-                attrs.json = @node.toJSON()
+            if @node then attrs.json = @node.toJSON()
             return attrs
 
-        # Proxy methods
+        isRoot: ->
+            @node.isRoot()
+
         isEmpty: ->
             @node.isEmpty()
 
@@ -183,7 +196,10 @@ define [
         isComposite: ->
             @node.isComposite()
 
-        cacheNode: (node) =>
+        # Each condition or composite node has a reference stored in
+        # a array grouped by `id` to enable manipulating nodes in flat
+        # means.
+        _cacheNode: (node) =>
             if node.id
                 if not (cache = @nodes[node.id])
                     cache = @nodes[node.id] = []
@@ -191,34 +207,45 @@ define [
                 if cache.indexOf(node) is -1
                     cache.push node
 
+        _deferenceNode: (node) =>
+            if (cache = @nodes[node.id]) and (idx = cache.indexOf(node)) >= 0
+                cache.splice(idx, 1)
+
+        # Returns an array of nodes for the provided `id`.
+        getNodes: (id) ->
+            @nodes[id] or []
+
+        # Promotes the given `node` to a branch
         promote: (node, nodes...) ->
             if node is null
                 @node.promote nodes...
             else
                 node.promote nodes...
-            @set 'json', @node.toJSON()
+            @save()
 
         demote: (node) ->
             node.demote()
-            @set 'json', @node.toJSON()
+            @save()
 
         add: (node, nodes...) ->
-            if node is null
-                node = @node
-
-            if node.isEmpty()
-                node.set nodes[0].attributes or nodes[0]
-            else
-                node.add(nodes...)
-                @cacheNode node for node in node.get 'children'
-            @set 'json', @node.toJSON()
+            # Attempt to add to the root node. If the root is empty, so
+            # replace it with this node
+            if not node
+                if @node.isEmpty()
+                    @node = nodes[0]
+                    @_cacheNode @node
+                else
+                    node = @node
+            if node
+                node.add nodes...
+                @_cacheNode node for node in node.get 'children'
+            @save()
 
         remove: (node) ->
+            node = node or @node
             node.remove()
-            # Dereference it
-            if (cache = @nodes[node.id]) and (idx = cache.indexOf(node)) >= 0
-                cache.splice(idx, 1)
-            @set 'json', @node.toJSON()
+            if not node.isRoot() then @_deferenceNode node
+            @save()
 
 
     class DataContexts extends Backbone.Collection
