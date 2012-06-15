@@ -3,3 +3,7 @@
 *.py[co]
 .sass-cache
 *.swn
+.watch-pid
+modules
+dist
+MANIFEST
