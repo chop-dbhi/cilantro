@@ -73,17 +73,32 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
     };
 
     Table.prototype.setHeader = function(header) {
-      var data, html, pinned, _i, _len;
-      html = ['<tr>'];
+      var data, div, html, pinned, row, th, _i, _len;
+      html = [];
       pinned = [];
       for (_i = 0, _len = header.length; _i < _len; _i++) {
         data = header[_i];
-        html.push("<th>" + data + "</th>");
-        pinned.push("<div>" + data + "</div>");
+        th = $("<th data-id=" + data.id + ">" + data.name + "</th>");
+        div = $("<div data-id=" + data.id + ">" + data.name + "</div>");
+        if (data.direction) {
+          if (data.direction === 'desc') {
+            th.append($("<i class=icon-chevron-down></i>"));
+            div.append($("<i class=icon-chevron-down></i>"));
+          } else {
+            th.append($("<i class=icon-chevron-up></i>"));
+            div.append($("<i class=icon-chevron-up></i>"));
+          }
+          th.data('direction', data.direction);
+          th.addClass(data.direction);
+          div.data('direction', data.direction);
+          div.addClass(data.direction);
+        }
+        html.push(th);
+        pinned.push(div);
       }
-      html.push('</tr>');
-      this.$thead.html(html.join(''));
-      return this.$pinnedThead.html(pinned.join(''));
+      this.$pinnedThead.empty();
+      this.$thead.html((row = $('<tr>')).append.apply(row, html));
+      return this.$pinnedThead.append.apply(this.$pinnedThead, pinned);
     };
 
     Table.prototype.resizePinnedThead = function() {

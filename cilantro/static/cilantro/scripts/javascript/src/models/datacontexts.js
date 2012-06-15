@@ -15,7 +15,11 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
     DataContexts.prototype.url = environ.absolutePath('/api/contexts/');
 
     DataContexts.prototype.initialize = function() {
-      return this.deferred = this.fetch();
+      this.pending();
+      this.on('reset', function() {
+        return this.resolve();
+      });
+      return this.fetch();
     };
 
     DataContexts.prototype.getNamed = function() {
@@ -37,7 +41,11 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
 
     DataContextHistory.prototype.url = environ.absolutePath('/api/contexts/history/', {
       initialize: function() {
-        return this.deferred = this.fetch();
+        this.pending();
+        this.on('reset', function() {
+          return this.resolve();
+        });
+        return this.fetch();
       }
     });
 
@@ -46,7 +54,8 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
   })(Serrano.DataContexts);
   App.DataContext = new DataContexts;
   App.DataContextHistory = new DataContextHistory;
-  return App.DataContext.deferred.done(function() {
+  App.Models.DataContextNode = Serrano.DataContextNode;
+  return App.DataContext.when(function() {
     var session;
     if (!(session = App.DataContext.getSession())) {
       session = App.DataContext.create({
@@ -54,8 +63,23 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
       });
     }
     App.DataContext.session = session;
-    return session.on('sync', function() {
+    session.on('sync', function() {
       return mediator.publish('datacontext/change');
+    });
+    session.on('change:json', function() {
+      return session.save(null, {
+        silent: true
+      });
+    });
+    mediator.subscribe('datacontext/remove', function(node) {
+      return session.remove(node);
+    });
+    return mediator.subscribe('datacontext/add', function(data) {
+      if (session.isCondition() || session.isComposite()) {
+        return session.promote(null, data);
+      } else {
+        return session.add(null, data);
+      }
     });
   });
 });

@@ -17,9 +17,19 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
 
     ReviewArea.prototype.id = 'review-area';
 
+    ReviewArea.prototype.events = {
+      'click table thead th': 'sort',
+      'click .pinned-thead div': 'sort'
+    };
+
+    ReviewArea.prototype.deferred = {
+      'loadData': true
+    };
+
     ReviewArea.prototype.initialize = function() {
       var $modifyColumns,
         _this = this;
+      ReviewArea.__super__.initialize.apply(this, arguments);
       this.$el.hide().appendTo('#main-area .inner');
       this.$toolbar = $('<ul>').addClass('nav pull-right').hide().appendTo('#subnav .container-fluid');
       this.columns = new Columns({
@@ -59,7 +69,7 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
     };
 
     ReviewArea.prototype.loadData = function(append) {
-      var url,
+      var deferred, url,
         _this = this;
       if (append == null) {
         append = false;
@@ -73,10 +83,10 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
       } else {
         this.table.$el.addClass('loading');
       }
-      this.deferred = Backbone.ajax({
+      deferred = Backbone.ajax({
         url: environ.absolutePath(url)
       });
-      return this.deferred.done(function(resp) {
+      return deferred.done(function(resp) {
         if (append) {
           _this.page++;
         } else {
@@ -89,6 +99,27 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
         _this.table.$el.removeClass('loading');
         return _this.table.$el.scroller('reset');
       });
+    };
+
+    ReviewArea.prototype.sort = function(event) {
+      var $target, direction, json, prev;
+      $target = $(event.target);
+      if (!(prev = $target.data('direction'))) {
+        direction = 'asc';
+      } else if (prev === 'asc') {
+        direction = 'desc';
+      } else {
+        direction = null;
+      }
+      $target.data('direction', direction);
+      $target.removeClass(prev).addClass(direction);
+      json = App.DataView.session.get('json') || {};
+      if (direction) {
+        json.ordering = [[$target.data('id'), direction]];
+      } else {
+        json.ordering = [];
+      }
+      return App.DataView.session.save('json', json);
     };
 
     return ReviewArea;

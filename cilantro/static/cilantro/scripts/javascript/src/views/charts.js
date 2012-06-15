@@ -48,6 +48,7 @@ define(['environ', 'mediator', 'jquery', 'backbone', 'charts/utils', 'backbone.c
 
     DataFieldDistribution.prototype.initialize = function(options) {
       var _this = this;
+      this.options = options;
       this.enumerableOnly = options.enumerableOnly;
       return this.collection.deferred.done(function() {
         return _this.render();
@@ -268,11 +269,22 @@ define(['environ', 'mediator', 'jquery', 'backbone', 'charts/utils', 'backbone.c
     };
 
     DistributionChart.prototype.renderChart = function(url, data, fields, seriesIdx) {
-      var _this = this;
+      var key, value, _ref,
+        _this = this;
+      if (this.options.data) {
+        _ref = this.options.data;
+        for (key in _ref) {
+          value = _ref[key];
+          if (!data) {
+            data = "" + key + "=" + value;
+          } else {
+            data = data + ("&" + key + "=" + value);
+          }
+        }
+      }
       return Backbone.ajax({
         url: url,
         data: data,
-        timeout: 10 * 1000,
         success: function(resp) {
           _this.$renderArea.removeClass('loading');
           return _this.render(utils.processResponse(resp, fields, seriesIdx));
@@ -308,19 +320,15 @@ define(['environ', 'mediator', 'jquery', 'backbone', 'charts/utils', 'backbone.c
         url = urlTmpl({
           id: xAxis.id
         });
-        fields = [];
-        data = '';
-        if (xAxis) {
-          fields.push(xAxis);
-          data += 'dimension=' + xAxis.id + '&';
-        }
+        fields = [xAxis];
+        data = 'dimension=' + xAxis.id;
         if (yAxis) {
           fields.push(yAxis);
-          data += 'dimension=' + yAxis.id + '&';
+          data = data + '&dimension=' + yAxis.id;
         }
         if (series) {
           seriesIdx = yAxis ? 2 : 1;
-          data += 'dimension=' + series.id;
+          data = data + '&dimension=' + series.id;
         }
         if (event && _this.model) {
           _this.model.set({

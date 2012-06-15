@@ -1,8 +1,5 @@
 @import "lib/bourbon/bourbon";
 @import "lib/bootstrap";
-@import "lib/chosen";
-@import "lib/select2";
-//@import "lib/bootstrap-responsive";
 
 @import "base/app";
 @import "base/modal";
@@ -16,7 +13,6 @@
 @import "state/sync";
 @import "state/loading";
 
-@import "modules/chosen";
 @import "modules/icons";
 @import "modules/container";
 @import "modules/charts";

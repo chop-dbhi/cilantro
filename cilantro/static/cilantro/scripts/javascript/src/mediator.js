@@ -28,14 +28,8 @@ define(['underscore'], function(_) {
       }
       for (_i = 0, _len = handlers.length; _i < _len; _i++) {
         handler = handlers[_i];
-        try {
-          if (handler) {
-            handler.apply(null, args);
-          }
-        } catch (error) {
-          setTimeout(function() {
-            throw error;
-          });
+        if (handler) {
+          handler.apply(null, args);
         }
       }
       setTimeout(function() {

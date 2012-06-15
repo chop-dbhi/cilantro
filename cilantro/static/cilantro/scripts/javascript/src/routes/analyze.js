@@ -17,10 +17,13 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
 
     AnalysisArea.prototype.id = 'analysis-area';
 
+    AnalysisArea.prototype.deferred = {
+      'updateCharts': true
+    };
+
     AnalysisArea.prototype.initialize = function() {
       var $addChart,
         _this = this;
-      this.deferredEvents = $.Deferred();
       this.charts = [];
       this.$toolbar = $('<ul>').addClass('nav pull-right').hide().appendTo('#subnav .container-fluid');
       this.$el.hide().appendTo('#main-area .inner').addClass('row-fluid').sortable({
@@ -45,39 +48,36 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
         return _this.addChart();
       });
       this.$toolbar.append($addChart);
-      this.deferredEvents.then(function() {
-        var model, _i, _len, _ref;
+      this.defer(function() {
+        var model, _i, _len, _ref, _results;
         _ref = App.Distribution.models;
+        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           model = _ref[_i];
-          _this.addChart(model);
+          _results.push(_this.addChart(model));
         }
+        return _results;
       });
       return mediator.subscribe('datacontext/change', this.updateCharts);
     };
 
     AnalysisArea.prototype.updateCharts = function() {
-      var _this = this;
-      return this.deferredEvents.then(function() {
-        var view, _i, _len, _ref;
-        _ref = _this.charts;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          view = _ref[_i];
-          view.updateChart();
-        }
-      });
+      var view, _i, _len, _ref;
+      _ref = this.charts;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        view = _ref[_i];
+        view.updateChart();
+      }
     };
 
     AnalysisArea.prototype.load = function() {
       this.$el.fadeIn(100);
-      this.$toolbar.fadeIn(100);
-      return this.deferredEvents.resolveWith(this);
+      return this.$toolbar.fadeIn(100);
     };
 
     AnalysisArea.prototype.unload = function() {
       this.$el.hide();
-      this.$toolbar.hide();
-      return this.deferredEvents = $.Deferred();
+      return this.$toolbar.hide();
     };
 
     AnalysisArea.prototype.addChart = function(attrs) {

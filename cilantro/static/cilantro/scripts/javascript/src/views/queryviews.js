@@ -3,7 +3,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts'], function(environ, mediator, $, _, Backbone, Charts) {
+define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts', 'forms/controls'], function(environ, mediator, $, _, Backbone, Charts, Controls) {
   var QueryView, QueryViewsAccordian, QueryViewsPanel, QueryViewsSearchForm;
   QueryView = (function(_super) {
 
@@ -11,6 +11,10 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
 
     function QueryView() {
       this.update = __bind(this.update, this);
+
+      this.hide = __bind(this.hide, this);
+
+      this.show = __bind(this.show, this);
       return QueryView.__super__.constructor.apply(this, arguments);
     }
 
@@ -25,10 +29,8 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
                 <div class=details>\
                     <div class=description>{{ description }}</div>\
                 </div>\
-                <div class="content row-fluid">\
-                    <div class="span6 controls"></div>\
-                    <div class="span6 charts"></div>\
-                </div>\
+                <form class=form-inline>\
+                </form>\
             </div>\
         ');
 
@@ -36,31 +38,29 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
       'click [data-toggle=detail]': 'toggleDetail'
     };
 
+    QueryView.prototype.deferred = {
+      'update': true
+    };
+
     QueryView.prototype.initialize = function() {
       var attrs, cat,
         _this = this;
+      QueryView.__super__.initialize.apply(this, arguments);
       attrs = {
         name: this.model.get('name'),
         category: (cat = this.model.get('category')) ? cat.name : '',
         description: this.model.get('description')
       };
       this.setElement(this.template(attrs));
-      this.$heading = this.$el.find('.heading');
-      this.$content = this.$el.find('.content');
-      this.$details = this.$el.find('.details');
-      this.$controls = this.$el.find('.controls');
-      this.$charts = this.$el.find('.charts');
-      return mediator.subscribe('queryview', function(id, action) {
-        var ids;
-        ids = _.pluck(_this.model.get('fields'), 'id');
-        if (ids.indexOf(id) >= 0 && action === 'show') {
-          _this.visible = true;
-          return _this.render();
-        } else {
-          _this.visible = false;
-          return _this.$el.detach();
+      this.$heading = this.$('.heading');
+      this.$details = this.$('.details');
+      this.$form = this.$('form');
+      mediator.subscribe('queryview/show', function(id) {
+        if (_this.model.id === id) {
+          return _this.show();
         }
       });
+      return this.render();
     };
 
     QueryView.prototype.toggleDetail = function() {
@@ -72,40 +72,79 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
     };
 
     QueryView.prototype.render = function() {
-      var _this = this;
-      if (!this.loaded) {
-        mediator.subscribe('datacontext/change', this.update);
-        this.fieldCollection = new Backbone.Collection(this.model.get('fields'));
-        this.charts = [];
-        this.fieldCollection.each(function(model, i) {
-          var chart;
-          chart = new Charts.Distribution({
-            editable: false
-          });
-          _this.charts.push([model, chart]);
-          return _this.$charts.append(chart.$el);
+      var $charts, $controls, chart, conditions, control, controlClass, data, fields, model, options, _i, _len, _ref, _results;
+      fields = new Backbone.Collection(this.model.get('fields'));
+      this.controls = [];
+      this.charts = [];
+      options = {
+        label: fields.length === 1 ? false : true
+      };
+      _ref = fields.models;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        model = _ref[_i];
+        options.model = model;
+        $controls = $('<div class=span6></div>');
+        $charts = $('<div class="span6 charts"></div>');
+        if ((data = model.get('data')).searchable) {
+          controlClass = Controls.SearchableControl;
+        } else if (data.enumerable) {
+          controlClass = Controls.EnumerableControl;
+        } else if (data.type === 'number') {
+          controlClass = Controls.NumberControl;
+        } else {
+          controlClass = Controls.Control;
+        }
+        chart = new Charts.Distribution({
+          editable: false,
+          data: {
+            context: null
+          }
         });
-        this.pendingUpdate = true;
-        this.loaded = true;
+        this.controls.push((control = new controlClass(options)));
+        this.charts.push([model, chart]);
+        $controls.append(control.render().$el);
+        $charts.append(chart.$el);
+        if ((conditions = App.DataContext.session.getNodes(model.id)) && conditions[0]) {
+          control.set(conditions[0]);
+        }
+        this.$form.append($('<div class=row-fluid>').append($controls, $charts));
+        _results.push(this.update());
       }
-      if (this.pendingUpdate) {
-        this.update();
+      return _results;
+    };
+
+    QueryView.prototype.show = function() {
+      var control, _i, _len, _ref;
+      this.resolve();
+      App.views.discover.$el.prepend(this.$el.detach());
+      _ref = this.controls;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        control = _ref[_i];
+        control.show();
       }
-      App.router.navigate('discover');
-      return App.views.discover.$el.append(this.$el);
+      return this;
+    };
+
+    QueryView.prototype.hide = function() {
+      var control, _i, _len, _ref;
+      this.pending();
+      this.$el.detach();
+      _ref = this.controls;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        control = _ref[_i];
+        control.hide();
+      }
+      return this;
     };
 
     QueryView.prototype.update = function() {
       var chart, model, url, _i, _len, _ref, _ref1;
-      if (this.visible) {
-        _ref = this.charts;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          _ref1 = _ref[_i], model = _ref1[0], chart = _ref1[1];
-          url = environ.absolutePath("/api/fields/" + model.id + "/dist/");
-          chart.renderChart(url, null, [model]);
-        }
-      } else {
-        this.pendingUpdate = true;
+      _ref = this.charts;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        _ref1 = _ref[_i], model = _ref1[0], chart = _ref1[1];
+        url = environ.absolutePath("/api/fields/" + model.id + "/dist/");
+        chart.renderChart(url, null, [model]);
       }
     };
 
@@ -157,7 +196,10 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
     QueryViewsAccordian.prototype.render = function() {
       var category, categoryName, group, groupName, id, model, _i, _len, _ref;
       this.$el.empty();
-      _ref = this.collection.models;
+      _ref = this.collection.sortBy(function(model) {
+        var category, _ref;
+        return (_ref = (category = model.get('category'))) != null ? _ref.order : void 0;
+      });
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         model = _ref[_i];
         if (!model.get('queryview')) {
@@ -181,10 +223,8 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
     };
 
     QueryViewsAccordian.prototype.show = function(event) {
-      var targetId;
       event.preventDefault();
-      targetId = $(event.target).data('target');
-      return mediator.publish('queryview', targetId, 'show');
+      return mediator.publish('queryview/show', $(event.target).data('target'));
     };
 
     return QueryViewsAccordian;

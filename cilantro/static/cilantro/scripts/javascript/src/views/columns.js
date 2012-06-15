@@ -70,21 +70,19 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
         placeholder: 'placeholder'
       });
       this.$el.addClass('loading');
-      this.collection.deferred.done(function() {
+      this.collection.when(function() {
         _this.$el.removeClass('loading');
         return _this.render();
       });
-      return App.DataView.deferred.done(function() {
-        return _this.collection.deferred.done(function() {
-          var id, json, _i, _len, _ref;
-          if ((json = App.DataView.session.get('json'))) {
-            _ref = json.concepts;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              id = _ref[_i];
-              _this.add(id);
-            }
+      return $.when(App.DataView, this.collection, function() {
+        var id, json, _i, _len, _ref;
+        if ((json = App.DataView.session.get('json'))) {
+          _ref = json.concepts;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            id = _ref[_i];
+            _this.add(id);
           }
-        });
+        }
       });
     };
 

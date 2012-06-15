@@ -15,7 +15,11 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
     DataViews.prototype.url = environ.absolutePath('/api/views/');
 
     DataViews.prototype.initialize = function() {
-      return this.deferred = this.fetch();
+      this.pending();
+      this.on('reset', function() {
+        return this.resolve();
+      });
+      return this.fetch();
     };
 
     DataViews.prototype.getNamed = function() {
@@ -37,7 +41,11 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
 
     DataViewHistory.prototype.url = environ.absolutePath('/api/views/history/', {
       initialize: function() {
-        return this.deferred = this.fetch();
+        this.pending();
+        this.on('reset', function() {
+          return this.resolve();
+        });
+        return this.fetch();
       }
     });
 
@@ -46,7 +54,7 @@ define(['environ', 'mediator', 'underscore', 'serrano'], function(environ, media
   })(Serrano.DataViews);
   App.DataView = new DataViews;
   App.DataViewHistory = new DataViewHistory;
-  return App.DataView.deferred.done(function() {
+  return App.DataView.when(function() {
     var session;
     if (!(session = App.DataView.getSession())) {
       session = App.DataView.create({

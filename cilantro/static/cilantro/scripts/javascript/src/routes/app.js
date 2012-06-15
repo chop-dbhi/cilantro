@@ -19,8 +19,11 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
     AppArea.prototype.load = function() {
       this.$uniqueCount = $('<span class=stat></span>');
       mediator.subscribe('datacontext/change', this.updateCount);
-      App.DataContext.deferred.done(this.updateCount);
-      return $('#subnav .nav.pull-left:first').append($('<li>').html(this.$uniqueCount));
+      App.DataContext.when(this.updateCount);
+      $('#subnav .nav.pull-left:first').append($('<li>').html(this.$uniqueCount));
+      return $('.modal').modal({
+        show: false
+      });
     };
 
     AppArea.prototype.updateCount = function() {

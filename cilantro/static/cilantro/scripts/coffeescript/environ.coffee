@@ -6,7 +6,6 @@ define [
 
     # Load various plugin-based modules for jQuery
     'bootstrap'
-    'select2'
     'jquery.ui'
     'panels'
     'utils/scroller'

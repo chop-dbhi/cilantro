@@ -13,14 +13,11 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
     }
 
     Router.prototype.initialize = function() {
-      $('body').on('click', '[data-route]', function(event) {
+      return $('body').on('click', '[data-route]', function(event) {
         event.preventDefault();
         return App.router.navigate(this.pathname, {
           trigger: true
         });
-      });
-      return $('.modal').modal({
-        show: false
       });
     };
 
@@ -41,19 +38,23 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
       if (typeof view.load === "function") {
         view.load();
       }
+      if (typeof view.resolve === "function") {
+        view.resolve();
+      }
       return;
     }
     this.router.route(route, name, function() {
-      var _i, _len, _name, _ref, _ref1, _ref2;
+      var _base, _base1, _base2, _base3, _i, _len, _name, _ref;
       if (!ROUTING) {
         ROUTING = true;
         _ref = _this.loaded;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           _name = _ref[_i];
-          if ((_ref1 = App.views[_name]) != null) {
-            if (typeof _ref1.unload === "function") {
-              _ref1.unload();
-            }
+          if (typeof (_base = App.views[_name]).unload === "function") {
+            _base.unload();
+          }
+          if (typeof (_base1 = App.views[_name]).pending === "function") {
+            _base1.pending();
           }
         }
         _this.loaded = [];
@@ -61,10 +62,11 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
           return ROUTING = false;
         });
       }
-      if ((_ref2 = App.views[name]) != null) {
-        if (typeof _ref2.load === "function") {
-          _ref2.load();
-        }
+      if (typeof (_base2 = App.views[name]).load === "function") {
+        _base2.load();
+      }
+      if (typeof (_base3 = App.views[name]).resolve === "function") {
+        _base3.resolve();
       }
       return _this.loaded.push(name);
     });

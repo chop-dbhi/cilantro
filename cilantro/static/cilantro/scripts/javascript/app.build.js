@@ -27,7 +27,6 @@
             exports: 'Highcharts'
         },
         'bootstrap': ['jquery'],
-        'jquery.chosen': ['jquery'],
         'jquery.ui': ['jquery']
     },
 

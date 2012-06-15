@@ -7,3 +7,5 @@
 modules
 dist
 MANIFEST
+
+cilantro/static/cilantro/scripts/javascript/min
