@@ -410,7 +410,7 @@ define(['jquery', 'cilantro/define/form', 'cilantro/define/viewelement', 'cilant
          },
          render: function(){
              this.range_form.find("input").css("margin","10px");
-             var chart_dom = $('<div></div>');
+             var chart_dom = $('<div class="chart"></div>');
              var dom = this.dom = $('<div class="chart"></div>');
              dom.append(chart_dom);
 
