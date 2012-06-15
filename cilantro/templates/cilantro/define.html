@@ -23,7 +23,10 @@
 
             {% spaceless %}
             <div id="tabs">
-                <input id="concept-search" type="text" name="q" autocomplete="off" placeholder="Search...">
+                <div id="concept-search-wrap">
+                    <input id="concept-search" type="text" name="q" autocomplete="off" placeholder="Search...">
+                    <img id="concept-search-toggle" src="{{ CILANTRO_STATIC_URL }}images/icons/search.png">
+                </div>
                 <div id="domains"></div>
             </div>
  

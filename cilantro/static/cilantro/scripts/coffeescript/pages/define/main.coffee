@@ -68,6 +68,23 @@ define [
             success: -> App.pending--
 
         conceptResults.fetch()
-
         conditions.fetch()
         sessionReport.fetch()
+
+        $ ->
+            searchWrap = $('#concept-search-wrap')
+
+            openSearch = ->
+                searchWrap.addClass 'open'
+                searchInput.focus()
+
+            closeSearch = ->
+                searchWrap.removeClass 'open'
+
+            searchToggle = $('#concept-search-toggle').click openSearch
+
+            searchInput = $('#concept-search').on
+                blur: (event) ->
+                    closeSearch()
+
+

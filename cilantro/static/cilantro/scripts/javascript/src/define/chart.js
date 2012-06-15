@@ -270,7 +270,7 @@ define(['jquery', 'cilantro/define/form', 'cilantro/define/viewelement', 'cilant
         },
         render: function(){
             // Add this instance's details
-            this.dom = $('<div style="height:450px;" class="chart"></div>');
+            this.dom = $('<div class="chart"></div>');
             this.options.chart.renderTo = this.dom.get(0);
             var objRef = this;
             this.options.tooltip.formatter = function(){
@@ -297,7 +297,7 @@ define(['jquery', 'cilantro/define/form', 'cilantro/define/viewelement', 'cilant
      var BarChart = ChoiceChart.extend({
          render: function(){
              var objRef = this;
-             this.dom = $('<div style="height:450px;" class="chart"></div>');
+             this.dom = $('<div class="chart"></div>');
              this.options.chart.marginBottom = this.viewset.data.coords.length > 6 ? 100 : 50;
              this.options.chart.renderTo =  this.dom.get(0);
              this.options.chart.defaultSeriesType = 'column';
@@ -410,7 +410,7 @@ define(['jquery', 'cilantro/define/form', 'cilantro/define/viewelement', 'cilant
          },
          render: function(){
              this.range_form.find("input").css("margin","10px");
-             var chart_dom = $('<div style="height:450px;width:500px;"></div>');
+             var chart_dom = $('<div></div>');
              var dom = this.dom = $('<div class="chart"></div>');
              dom.append(chart_dom);
 

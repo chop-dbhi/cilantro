@@ -21,7 +21,8 @@
 }
 
 #center-pane {
-    min-height: 300px;
+    position: relative;
+    height: 550px;
 }
 
 #right-pane {
@@ -37,6 +38,7 @@
     display: none;
     height: 37px;
     border-bottom: 1px solid #999;
+    position: relative;
 
     > * {
         vertical-align: bottom;
@@ -45,6 +47,7 @@
 
 #domains {
     @include inline-block;
+    @include box-sizing(border-box);
 
     font-size: 13px;
     font-weight: 600;
@@ -70,9 +73,14 @@
         }
 
         > span {
+            @include inline-block;
             vertical-align: middle;
             position: relative;
             top: 2px;
+            white-space: pre; // fix line-breaks
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 100%;
         }
     }
 
@@ -207,12 +215,40 @@
     }
 }
 
+#concept-search-wrap {
+    @include border-radius(3px);
+    position: absolute;
+    right: 0;
+    top: 3px;
+    border: 1px solid #aaa;
+    background-color: #fff;
+    padding: 3px 5px;
+    z-index: 10;
+
+    &.open {
+        @include box-shadow(-2px 2px 5px #ccc);
+        padding: 11px 10px 10px 10px;
+        top: -8px;
+        #concept-search-toggle {
+            display: none;
+        }
+        #concept-search {
+            display: inline;
+        }
+    }
+}
+
+#concept-search-toggle {
+    position: relative;
+    top: 2px;
+    cursor: pointer;
+}
+
 #concept-search {
     @include search-box;
-    float: right;
     min-width: 120px;
-    width: 120px;
-    margin-top: 5px;
+    width: 200px;
+    display: none;
 }
 
 #concept-search-results {
@@ -244,13 +280,18 @@
 }
 
 #plugin-panel {
+    @include inline-block;
+    position: absolute;
     margin: 0;
-    float: right;
     width: 515px;
+    right: 0;
+    top: 0;
+    bottom: 0;
     display: none;
 
     .content {
         @include box-shadow(none);
+        height: 100%;
         padding: 0;
     }
 }
@@ -288,6 +329,10 @@
 
     [data-validate=date], [data-validate=number] {
         width: 50px;
+    }
+
+    select {
+        max-width: 250px;
     }
 
     h2 {
