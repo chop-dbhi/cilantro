@@ -55,7 +55,11 @@ define [
 
     # Uses the globally defined `scriptName` variable to construct full URL
     # paths.
-    absolutePath = (path) -> SCRIPT_NAME + path
+    absolutePath = (path) ->
+        if SCRIPT_NAME.chartAt(SCRIPT_NAME.length-1) isnt '/'
+            SCRIPT_NAME + '/' + path
+        else
+            SCRIPT_NAME + path
 
     # Setup the sync status text and the various global ajax
     # handlers.

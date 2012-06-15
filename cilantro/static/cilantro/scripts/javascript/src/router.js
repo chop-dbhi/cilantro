@@ -30,6 +30,9 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'session'], function(envi
   ROUTING = false;
   return App.register = function(route, name, view) {
     var _this = this;
+    if ((route = environ.absolutePath(route)).charAt(0) === '/') {
+      route = route.substr(1);
+    }
     if (App.views[name] != null) {
       throw new Error("" + name + " view already registered");
     }

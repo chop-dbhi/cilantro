@@ -25,6 +25,7 @@ define [
     ROUTING = false
 
     App.register = (route, name, view) ->
+        if (route = environ.absolutePath route).charAt(0) is '/' then route = route.substr(1)
         if App.views[name]? then throw new Error "#{ name } view already registered"
         App.views[name] = view
 

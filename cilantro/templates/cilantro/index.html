@@ -45,10 +45,10 @@
 
 {% block header_content %}
     <ul class=nav>
-        <li><a href={{ request.meta.SCRIPT_NAME }}/ data-route=workspace>Workspace</a>
-        <li><a href={{ request.meta.SCRIPT_NAME }}/discover/ data-route=discover>Discover</a>
-        <li><a href={{ request.meta.SCRIPT_NAME }}/analyze/ data-route=analyze>Analyze</a>
-        <li><a href={{ request.meta.SCRIPT_NAME }}/review/ data-route=review>Review</a>
+        <li><a href={{ request.META.SCRIPT_NAME }}/ data-route=workspace>Workspace</a>
+        <li><a href={{ request.META.SCRIPT_NAME }}/discover/ data-route=discover>Discover</a>
+        <li><a href={{ request.META.SCRIPT_NAME }}/analyze/ data-route=analyze>Analyze</a>
+        <li><a href={{ request.META.SCRIPT_NAME }}/review/ data-route=review>Review</a>
     </ul>
 {% endblock %}
 

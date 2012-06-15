@@ -35,7 +35,11 @@ define(['jquery', 'underscore', 'backbone', 'core/mixins', 'bootstrap', 'jquery.
     return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
   };
   absolutePath = function(path) {
-    return SCRIPT_NAME + path;
+    if (SCRIPT_NAME.chartAt(SCRIPT_NAME.length - 1) !== '/') {
+      return SCRIPT_NAME + '/' + path;
+    } else {
+      return SCRIPT_NAME + path;
+    }
   };
   syncStatus = $('<div id=sync-status></div>').addClass('alert');
   $(document).ajaxSend(function(event, xhr, settings) {
