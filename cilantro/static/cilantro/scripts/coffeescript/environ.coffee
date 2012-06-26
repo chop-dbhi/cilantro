@@ -2,13 +2,17 @@ define [
     'jquery'
     'underscore'
     'backbone'
+
+    # Core extensions
     'core/mixins'
 
-    # Load various plugin-based modules for jQuery
+    # Third-party libraries and plugins
     'bootstrap'
     'jquery.ui'
-    'panels'
-    'utils/scroller'
+
+    # Built-in plugins
+    'plugins/panels'
+    'plugins/scroller'
 ], ($, _, Backbone, Mixins) ->
 
     App.Models = {}
@@ -197,7 +201,6 @@ define [
         return promise
 
 
-    # DOM-ready
     $ ->
         syncStatus.appendTo('body')
 

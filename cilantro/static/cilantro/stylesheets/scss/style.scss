@@ -5,9 +5,10 @@
 
 @import "layouts/subnav";
 @import "layouts/scrollable-column";
-@import "layouts/panels";
 @import "layouts/main-area";
 @import "layouts/analysis-area";
+
+@import "plugins/panels";
 
 @import "state/sync";
 @import "state/loading";

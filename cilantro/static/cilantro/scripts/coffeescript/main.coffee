@@ -19,6 +19,20 @@ define [
     App.preferences.load()
 
     $ ->
+
+        # Bootstrap pre-rendered DOM elements
+        $('.panel').panel()
+
+        $('[data-toggle*=panel]').each ->
+            (toggle = $(this)).on 'click', ->
+                # If this data-toggle specifies a target, use that, otherwise assume
+                # it is a .panel-toggle within the panel itself.
+                if toggle.data 'target'
+                    panel = $ toggle.data('target')
+                else
+                    panel = toggle.parent()
+                panel.panel 'toggle'
+
         # Initialize and load the routes
         require [
             'routes/app'
