@@ -6,7 +6,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts'], function(environ, mediator, $, _, Backbone, Charts) {
   var AnalysisArea, addChartButton;
   addChartButton = _.template('<button class=btn title="Add Chart"><i class=icon-signal alt="Add Chart"></i></button>');
-  AnalysisArea = (function(_super) {
+  return AnalysisArea = (function(_super) {
 
     __extends(AnalysisArea, _super);
 
@@ -99,5 +99,4 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/charts
     return AnalysisArea;
 
   })(Backbone.View);
-  return App.register('analyze/', 'analyze', new AnalysisArea);
 });

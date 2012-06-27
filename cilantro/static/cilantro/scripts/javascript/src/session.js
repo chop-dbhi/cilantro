@@ -35,7 +35,7 @@ define(['environ', 'mediator', 'underscore', 'backbone'], function(environ, medi
       _ref = this.attributes.session;
       for (key in _ref) {
         data = _ref[key];
-        mediator.publish('session/load/' + key, data);
+        mediator.publish("session/load/" + key, data);
       }
     };
 

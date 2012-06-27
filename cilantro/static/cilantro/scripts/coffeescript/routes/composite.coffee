@@ -5,22 +5,14 @@ define [
     'backbone'
 ], (environ, $, _, Backbone) ->
 
-    # `App` should be marked as to whether a composite datacontext is in use
-
-    # Enable a simply registration mechanism for the various views on the
-    # page. This enables extending the UI programatically.
+    # XXX: Not Implemented
+    # The composite area enables arranging and chaining together conditions
+    # as well as saved off DataContexts for more logically complex queries.
     class CompositeArea extends Backbone.View
-        id: '#composite-area'
-
-        initialize: ->
+        id: 'composite-area'
 
         load: ->
             @$el.fadeIn()
 
         unload: ->
             @$el.hide()
-
-        destroy: ->
-
-
-    App.register 'discover/composite/', 'composite', new CompositeArea

@@ -4,7 +4,7 @@ var __hasProp = {}.hasOwnProperty,
 
 define(['environ', 'jquery', 'backbone', 'views/queryviews'], function(environ, $, Backbone) {
   var DiscoverArea;
-  DiscoverArea = (function(_super) {
+  return DiscoverArea = (function(_super) {
 
     __extends(DiscoverArea, _super);
 
@@ -31,5 +31,4 @@ define(['environ', 'jquery', 'backbone', 'views/queryviews'], function(environ, 
     return DiscoverArea;
 
   })(Backbone.View);
-  return App.register('discover/', 'discover', new DiscoverArea);
 });

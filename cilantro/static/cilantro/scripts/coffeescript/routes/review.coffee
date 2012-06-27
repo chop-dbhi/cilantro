@@ -115,6 +115,3 @@ define [
             else
                 json.ordering = []
             App.DataView.session.save 'json', json
-
-
-    App.register 'review/', 'review', new ReviewArea

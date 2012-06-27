@@ -6,6 +6,10 @@ define [
     # Core extensions
     'core/mixins'
 
+    # Utilities
+    'utils/grouper'
+    'utils/numbers'
+
     # Third-party libraries and plugins
     'bootstrap'
     'jquery.ui'
@@ -13,8 +17,12 @@ define [
     # Built-in plugins
     'plugins/panels'
     'plugins/scroller'
-], ($, _, Backbone, Mixins) ->
+], ($, _, Backbone, Mixins, grouper, numbers) ->
 
+    # Populate an object of utilities
+    App.utils = _.extend {}, grouper, numbers
+
+    # Container for classes
     App.Models = {}
     App.Views = {}
 
@@ -60,10 +68,7 @@ define [
     # Uses the globally defined `scriptName` variable to construct full URL
     # paths.
     absolutePath = (path) ->
-        if SCRIPT_NAME?.charAt(SCRIPT_NAME.length-1) isnt '/'
-            SCRIPT_NAME + '/' + path
-        else
-            SCRIPT_NAME + path
+        SCRIPT_NAME + path
 
     # Setup the sync status text and the various global ajax
     # handlers.

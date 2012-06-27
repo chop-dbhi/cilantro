@@ -26,6 +26,3 @@ define [
         unload: ->
             @$el.hide()
             App.QueryViewsPanel.$el.panel 'close'
-
-
-    App.register 'discover/', 'discover', new DiscoverArea

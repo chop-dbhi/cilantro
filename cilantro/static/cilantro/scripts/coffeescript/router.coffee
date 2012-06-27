@@ -3,31 +3,28 @@ define [
     'jquery'
     'underscore'
     'backbone'
-    'session'
-], (environ, $, _, Backbone, session) ->
-
-    # Router setup
-    class Router extends Backbone.Router
-
-        # Initialize shared components
-        initialize: ->
-            # Bind all route-enabled links on the page and ensure they
-            # stay in sync relative to all other links
-            $('body').on 'click', '[data-route]', (event) ->
-                event.preventDefault()
-                App.router.navigate @pathname, trigger: true
-
-
-    App.router = new Router
-    App.views = {}
-    App.loaded = []
+], (environ, $, _, Backbone) ->
 
     ROUTING = false
 
+    # Keep track of routes and the currently loaded views relative to
+    # a given route.
+    App.routes = {}
+    App.loaded = []
+
+    App.router = new Backbone.Router
+
+    # Light wrapper for `Router.route` method which can load and unload views
+    # relative to the current route. In addition, links with '[data-route]'
+    # attribute are marked as active/inactive.
+
+    # If `route` is `false`, the view is loaded only once and does not unload
+    # when other routes are triggered. This is useful for static or once-loaded
+    # views applicable to the app as a whole.
+
     App.register = (route, name, view) ->
-        if (route = environ.absolutePath route).charAt(0) is '/' then route = route.substr(1)
-        if App.views[name]? then throw new Error "#{ name } view already registered"
-        App.views[name] = view
+        if App.routes[name]? then throw new Error "#{ name } view already registered"
+        App.routes[name] = view
 
         # Non-routable view.. loaded once
         if route is false
@@ -42,14 +39,14 @@ define [
                 # Unload existing views, check for existence in case the
                 # view had been destroyed in the meantime
                 for _name in @loaded
-                    App.views[_name].unload?()
-                    App.views[_name].pending?()
+                    App.routes[_name].unload?()
+                    App.routes[_name].pending?()
                 @loaded = []
                 # Defer to end of call stack
                 _.defer -> ROUTING = false
 
-            App.views[name].load?()
-            App.views[name].resolve?()
+            App.routes[name].load?()
+            App.routes[name].resolve?()
             @loaded.push name
 
         @router.on "route:#{ name }", ->

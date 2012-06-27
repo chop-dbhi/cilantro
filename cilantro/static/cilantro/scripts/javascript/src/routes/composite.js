@@ -4,7 +4,7 @@ var __hasProp = {}.hasOwnProperty,
 
 define(['environ', 'jquery', 'underscore', 'backbone'], function(environ, $, _, Backbone) {
   var CompositeArea;
-  CompositeArea = (function(_super) {
+  return CompositeArea = (function(_super) {
 
     __extends(CompositeArea, _super);
 
@@ -12,9 +12,7 @@ define(['environ', 'jquery', 'underscore', 'backbone'], function(environ, $, _, 
       return CompositeArea.__super__.constructor.apply(this, arguments);
     }
 
-    CompositeArea.prototype.id = '#composite-area';
-
-    CompositeArea.prototype.initialize = function() {};
+    CompositeArea.prototype.id = 'composite-area';
 
     CompositeArea.prototype.load = function() {
       return this.$el.fadeIn();
@@ -24,10 +22,7 @@ define(['environ', 'jquery', 'underscore', 'backbone'], function(environ, $, _, 
       return this.$el.hide();
     };
 
-    CompositeArea.prototype.destroy = function() {};
-
     return CompositeArea;
 
   })(Backbone.View);
-  return App.register('discover/composite/', 'composite', new CompositeArea);
 });

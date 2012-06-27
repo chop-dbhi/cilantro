@@ -6,9 +6,9 @@ define [
     'backbone'
 ], (environ, mediator, $, _, Backbone) ->
 
+    # TODO these smaller components should really be broken out and named
+    # appropriately.
     class AppArea extends Backbone.View
-        initialize: ->
-
         load: ->
             @$uniqueCount = $ '<span class=stat></span>'
 
@@ -22,8 +22,6 @@ define [
 
         updateCount: =>
             count = App.DataContext.session.get 'count'
-            pretty = App.utils.intword count
-            @$uniqueCount.text(pretty).attr('title', App.utils.intcomma(count))
-
-
-    App.register false, 'app', new AppArea
+            pretty = App.utils.numberWithSuffix count
+            commaed = App.utils.numberWithSeperator count
+            @$uniqueCount.text(pretty).attr('title', commaed)

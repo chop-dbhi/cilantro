@@ -5,7 +5,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
 define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(environ, mediator, $, _, Backbone) {
   var AppArea;
-  AppArea = (function(_super) {
+  return AppArea = (function(_super) {
 
     __extends(AppArea, _super);
 
@@ -13,8 +13,6 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
       this.updateCount = __bind(this.updateCount, this);
       return AppArea.__super__.constructor.apply(this, arguments);
     }
-
-    AppArea.prototype.initialize = function() {};
 
     AppArea.prototype.load = function() {
       this.$uniqueCount = $('<span class=stat></span>');
@@ -27,14 +25,14 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone'], function(env
     };
 
     AppArea.prototype.updateCount = function() {
-      var count, pretty;
+      var commaed, count, pretty;
       count = App.DataContext.session.get('count');
-      pretty = App.utils.intword(count);
-      return this.$uniqueCount.text(pretty).attr('title', App.utils.intcomma(count));
+      pretty = App.utils.numberWithSuffix(count);
+      commaed = App.utils.numberWithSeperator(count);
+      return this.$uniqueCount.text(pretty).attr('title', commaed);
     };
 
     return AppArea;
 
   })(Backbone.View);
-  return App.register(false, 'app', new AppArea);
 });

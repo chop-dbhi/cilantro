@@ -1,9 +1,4 @@
-((root, factory) ->
-    if typeof define is 'function' and define.amd
-        define ['underscore'], factory
-    else
-        root.grouper = factory root._
-) @, (_) ->
+define ['underscore'], (_) ->
 
     sortedGroupBy = (list, groupBy, sortBy) ->
         if _.isArray(groupBy)
@@ -60,4 +55,4 @@
 
         return html
 
-    { sortedGroupBy, renderTable}
+    { sortedGroupBy, renderTable }

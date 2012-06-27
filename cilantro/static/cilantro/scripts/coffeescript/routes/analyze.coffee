@@ -74,6 +74,3 @@ define [
             @$el.append view.$el
 
             view.updateChart()
-
-
-    App.register 'analyze/', 'analyze', new AnalysisArea

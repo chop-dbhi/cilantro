@@ -6,7 +6,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/columns', 'views/table'], function(environ, mediator, $, _, Backbone, Columns, Table) {
   var ReviewArea, modifyColumnsButton;
   modifyColumnsButton = _.template('<button class=btn title="Show/Hide Columns"><i class=icon-list alt="Show/Hide Columns"></i></button>');
-  ReviewArea = (function(_super) {
+  return ReviewArea = (function(_super) {
 
     __extends(ReviewArea, _super);
 
@@ -125,5 +125,4 @@ define(['environ', 'mediator', 'jquery', 'underscore', 'backbone', 'views/column
     return ReviewArea;
 
   })(Backbone.View);
-  return App.register('review/', 'review', new ReviewArea);
 });

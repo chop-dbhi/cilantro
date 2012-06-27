@@ -2,9 +2,9 @@
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-define(['environ', 'jquery', 'underscore', 'backbone', 'views'], function(environ, $, _, Backbone, views) {
+define(['environ', 'jquery', 'underscore', 'backbone', 'views/containers'], function(environ, $, _, Backbone, Containers) {
   var WorkspaceArea;
-  WorkspaceArea = (function(_super) {
+  return WorkspaceArea = (function(_super) {
 
     __extends(WorkspaceArea, _super);
 
@@ -12,19 +12,17 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'views'], function(enviro
       return WorkspaceArea.__super__.constructor.apply(this, arguments);
     }
 
-    WorkspaceArea.prototype.id = '#workspace-area';
+    WorkspaceArea.prototype.id = 'workspace-area';
 
     WorkspaceArea.prototype.initialize = function() {
-      this.activity = new views.Container;
+      this.activity = new Containers.Container;
       this.activity.$el.addClass('span4');
       this.activity.heading.text('Activity');
-      this.queries = new views.Container;
+      this.queries = new Containers.Container;
       this.queries.$el.addClass('span4');
       this.queries.heading.text('Queries');
       return this.$el.hide().appendTo('#main-area .inner').addClass('row-fluid').append(this.activity.el, this.queries.el);
     };
-
-    WorkspaceArea.prototype.initialize = function() {};
 
     WorkspaceArea.prototype.load = function() {
       return this.$el.fadeIn();
@@ -37,5 +35,4 @@ define(['environ', 'jquery', 'underscore', 'backbone', 'views'], function(enviro
     return WorkspaceArea;
 
   })(Backbone.View);
-  return App.register('', 'workspace', new WorkspaceArea);
 });

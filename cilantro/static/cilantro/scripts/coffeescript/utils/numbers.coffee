@@ -15,7 +15,7 @@ define ->
         [100, 'googol']
     ]
 
-    intword = (value) ->
+    numberWithSuffix = (value) ->
         if value < 1000
             return intcomma(value)
 
@@ -25,7 +25,7 @@ define ->
                 new_value = Math.round(value / largeNum * 10) / 10
                 return "#{ new_value } #{ suffix }"
 
-    intcomma = (value, sep=',') ->
+     numberWithSeperator = (value, sep=',') ->
         arr = value.toString().split('')
         len = arr.length
         i = len % 3 or 3
@@ -33,7 +33,7 @@ define ->
         while i < len
             arr.splice i, 0, ','
             i = i+4
-        return arr.join('') 
+        return arr.join('')
 
 
-    App.utils = { intword, intcomma }
+    { numberWithSuffix, numberWithSeperator }
