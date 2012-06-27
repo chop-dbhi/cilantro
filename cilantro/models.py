@@ -10,9 +10,10 @@ class SiteConfiguration(models.Model):
     title = models.CharField(max_length=50, blank=True,
         help_text=_('If left blank the name will be derived from the site or the hostname'))
     subtitle = models.CharField(max_length=100, blank=True)
+    label = models.CharField('status label', max_length=20, blank=True)
     site_logo = models.FileField(upload_to='cilantro/sites', null=True, blank=True)
-    site = models.ForeignKey(Site, related_name='configurations', null=True,
-        blank=True, help_text=_('Leave empty to be the default configuration for all sites'))
+    site = models.OneToOneField(Site, related_name='configuration', blank=True,
+        help_text=_('Leave empty to be the default configuration for all sites'))
     footer_content = models.TextField(help_text='Markdown enabled', blank=True)
     google_analytics = models.CharField(max_length=20, null=True, blank=True,
         help_text=_('Just the UA-XXXXXX-XXX code'))
@@ -20,13 +21,14 @@ class SiteConfiguration(models.Model):
     objects = SiteConfigurationManager()
 
     def __unicode__(self):
-        if self.site_id:
-            return u'{0} Site Configuration'.format(self.site)
-        return u'Default Site Configuration'
+        text = u'"{}"'.format(self.title or self.site)
+        if self.label:
+            text = '{} ({})'.format(text, self.label)
+        return text
 
     @property
     def site_name(self):
-        return self.name or self.site.name
+        return self.title or self.site.name
 
     @property
     def site_domain(self):

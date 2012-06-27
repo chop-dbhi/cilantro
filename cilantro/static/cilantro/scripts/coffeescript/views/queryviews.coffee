@@ -177,7 +177,7 @@ define [
     class QueryViewsSearchForm extends Backbone.View
         template: _.template '
             <form id=data-filters-search class=form-search action=>
-                <input class=search-query placeholder=Search>
+                <input type=text class=search-query placeholder=Search>
             </form>
         '
 

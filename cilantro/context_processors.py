@@ -1,4 +1,6 @@
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import get_current_site
+from cilantro.models import SiteConfiguration
+
 
 def media(request):
     from django.conf import settings
@@ -7,10 +9,10 @@ def media(request):
     if static_url is None:
         static_url = settings.STATIC_URL + 'cilantro/'
 
-    javascript_url = '{0}scripts/javascript/{1}/'.format(static_url,
+    javascript_url = '{}scripts/javascript/{}/'.format(static_url,
         'src' if settings.DEBUG else 'min')
 
-    css_url = '{0}stylesheets/css/'.format(static_url)
+    css_url = '{}stylesheets/css/'.format(static_url)
 
     return {
         'CILANTRO_STATIC_URL': static_url,
@@ -18,8 +20,13 @@ def media(request):
         'CILANTRO_CSS_URL': css_url,
     }
 
-def settings(request):
-    site = Site.objects.get_current()
+
+def configuration(request):
+    site = get_current_site(request)
+    try:
+        config = site.configuration
+    except SiteConfiguration.DoesNotExist:
+        config = None
     return {
-        'CILANTRO': site.cilantro_settings,
+        'CILANTRO_CONFIG': config,
     }

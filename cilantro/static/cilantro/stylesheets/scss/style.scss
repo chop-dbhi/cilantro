@@ -3,7 +3,9 @@
 
 @import "base/modal";
 
+@import "layouts/nav";
 @import "layouts/subnav";
+@import "layouts/dropdown";
 @import "layouts/scrollable-column";
 @import "layouts/main-area";
 @import "layouts/analysis-area";
@@ -43,7 +45,6 @@ body {
     background: #f9f9f9 url(../../images/fabric_plaid.png);
     // Padding for navigation bars
     padding-top: 77px;
-    font-size: 16px;
 }
 
 h1 {
