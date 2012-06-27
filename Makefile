@@ -41,9 +41,8 @@ unwatch:
 		rm ${PID_FILE}; \
 	fi;
 
-optimize:
+optimize: clean
 	@echo 'Optimizing the javascript...'
-	@rm -rf ${JS_MIN_DIR}
 	@mkdir -p ${JS_MIN_DIR}
 	@${REQUIRE_OPTIMIZE} > /dev/null
 
