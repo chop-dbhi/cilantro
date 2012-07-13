@@ -25,6 +25,8 @@ define [
     # basic client-side session timer
     $.idleTimer 10 * 1000
 
+    pendingRequests = 0
+
     $(document).bind
         'idle.idleTimer': ->
             App.hub.publish 'session/idle'
@@ -32,8 +34,18 @@ define [
         'active.idleTimer': ->
             App.hub.publish 'session/resume'
 
+    safeMethod = (method) ->
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method)
+
+    $(document).on
+        ajaxSend: (evt, xhr, settings) ->
+            if not safeMethod(settings.type)
+                pendingRequests++
+        ajaxComplete: (evt, xhr, settings) ->
+            if not safeMethod(settings.type)
+                pendingRequests--
+
 
     $(window).on 'beforeunload', ->
-        if $.active
-            return "Whoa you're quick! We are saving your stuff,
-                it will only take a moment."
+        if pendingRequests
+            return "Whoa you're quick! We are saving your stuff, it will only take a moment."
