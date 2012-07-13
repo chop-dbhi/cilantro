@@ -288,10 +288,10 @@
     top: 0;
     bottom: 0;
     display: none;
+    overflow: auto;
 
     .content {
         @include box-shadow(none);
-        height: 100%;
         padding: 0;
     }
 }
