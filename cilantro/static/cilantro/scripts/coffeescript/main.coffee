@@ -32,3 +32,8 @@ define [
         'active.idleTimer': ->
             App.hub.publish 'session/resume'
 
+
+    $(window).on 'beforeunload', ->
+        if $.active
+            return "Whoa you're quick! We are saving your stuff,
+                it will only take a moment."
