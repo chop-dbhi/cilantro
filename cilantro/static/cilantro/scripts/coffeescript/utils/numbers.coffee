@@ -1,3 +1,12 @@
+# utils/numbers
+#
+#   Utilities to formating numbers in a human-readable way.
+#
+#   * toSuffixedNumber - for numbers greater than or equal to 1000,
+#       the output is a suffixed number
+#   * toDelimitedNumber - returns a delimited string representation
+#       of the number
+
 define ->
 
     suffixes = [
@@ -15,9 +24,9 @@ define ->
         [100, 'googol']
     ]
 
-    numberWithSuffix = (value) ->
+    toSuffixedNumber = (value) ->
         if value < 1000
-            return intcomma(value)
+            return toDelimitedNumber value
 
         for [exp, suffix] in suffixes
             largeNum = Math.pow 10, exp
@@ -25,15 +34,15 @@ define ->
                 new_value = Math.round(value / largeNum * 10) / 10
                 return "#{ new_value } #{ suffix }"
 
-     numberWithSeperator = (value, sep=',') ->
-        arr = value.toString().split('')
+     toDelimitedNumber = (value, delim=',') ->
+        arr = value.toString().split ''
         len = arr.length
         i = len % 3 or 3
 
         while i < len
-            arr.splice i, 0, ','
+            arr.splice i, 0, delim
             i = i+4
-        return arr.join('')
+        return arr.join ''
 
 
-    { numberWithSuffix, numberWithSeperator }
+    { toSuffixedNumber, toDelimitedNumber }

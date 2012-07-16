@@ -22,6 +22,6 @@ define [
 
         updateCount: =>
             count = App.DataContext.session.get 'count'
-            pretty = App.utils.numberWithSuffix count
-            commaed = App.utils.numberWithSeperator count
+            pretty = App.utils.toSuffixedNumber count
+            commaed = App.utils.toDelimitedNumber count
             @$uniqueCount.text(pretty).attr('title', commaed)
