@@ -124,7 +124,7 @@ define [
 
 
     DataContextNode.parseAttrs = (attrs, parent, callback) ->
-        if not attrs
+        if not attrs or _.isEmpty attrs
             node = new DataContextNode
         # Existing node
         else if attrs instanceof DataContextNode
