@@ -33,5 +33,10 @@
         input[class*=span], select[class*=span], {
             display: inline;
         }
+
+        // Remove extra margin on the last child element
+        > :last-child {
+            margin-bottom: 0;
+        }
     }
 }

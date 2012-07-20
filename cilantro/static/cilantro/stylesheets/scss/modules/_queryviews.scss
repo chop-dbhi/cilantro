@@ -31,8 +31,10 @@
         margin-bottom: 0;
 
         .row-fluid {
+            position: relative;
             padding-top: 18px;
             border-top: 1px dashed #ccc;
+
             &:first-child {
                 border-top: 0;
             }
@@ -80,12 +82,13 @@
         .heading {
             display: none;
         }
+
         .btn-toolbar {
             display: none;
         }
+
         .chart {
-            height: 160px;
-            margin: 0;
+            height: auto;
         }
     }
 }

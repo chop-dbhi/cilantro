@@ -20,6 +20,10 @@
     .inner {
         height: 100%;
         padding: 10px;
+
+        .row-fluid {
+            margin-bottom: 20px;
+        }
     }
 
     // For a simple layout
