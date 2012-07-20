@@ -25,6 +25,7 @@ define ->
     ]
 
     toSuffixedNumber = (value) ->
+        if not value? then return
         if value < 1000
             return toDelimitedNumber value
 
@@ -35,6 +36,7 @@ define ->
                 return "#{ new_value } #{ suffix }"
 
      toDelimitedNumber = (value, delim=',') ->
+        if not value? then return
         arr = value.toString().split ''
         len = arr.length
         i = len % 3 or 3
