@@ -19,6 +19,8 @@ define [
     'plugins/scroller'
 ], ($, _, Backbone, Mixins, grouper, numbers) ->
 
+    App = @App or {}
+
     # Populate an object of utilities
     App.utils = _.extend {}, grouper, numbers
 

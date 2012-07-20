@@ -62,4 +62,3 @@ define [
             $('body').on 'click', '[data-route]', (event) ->
                 event.preventDefault()
                 App.router.navigate @pathname, trigger: true
-

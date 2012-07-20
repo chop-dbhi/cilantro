@@ -1,3 +1,4 @@
+{% load url from future %}
 <!doctype html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
 <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang=en> <![endif]-->
@@ -19,7 +20,9 @@
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
-    {% block styles %}{% endblock %}
+    {% block styles %}
+        <link rel=stylesheet href={{ CILANTRO_CSS_URL }}style.css>
+    {% endblock %}
 
     <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 </head>
@@ -34,8 +37,11 @@
             <div class=navbar-inner>
                 <div class=container-fluid>
                     {% block header_content %}
-                    <a class=brand href=/>{% firstof CILANTRO_CONFIG.title site.name site.domain "Cilantro" %}{% if CILANTRO_CONFIG.label %}
-                        <span class="label label-info">{{ CILANTRO_CONFIG.label }}</span>{% endif %}</a>
+                    <a class=brand href=/>{% firstof CILANTRO_CONFIG.title site.name site.domain "Cilantro" %}
+                        {% if CILANTRO_CONFIG.label %}<span class="label label-info">{{ CILANTRO_CONFIG.label }}</span>{% endif %}</a>
+                        {% if CILANTRO_CONFIG.subtitle %}
+                        <span class=subtitle>{{ CILANTRO_CONFIG.subtitle }}</span>
+                        {% endif %}
                         <ul class=nav>
                             {% block header_links %}{% endblock %}
                         </ul>
@@ -45,10 +51,10 @@
                                     <i class="icon-user icon-white"></i> Account <b class=caret></b>
                                 </a>
                                 <ul class=dropdown-menu>
-                                    <li><a href={% url admin:index %}>Admin</a></li>
+                                    <li><a href={% url "admin:index" %}>Admin</a></li>
                                     {% if user.is_authenticated %}
                                         <li class=divider></li>
-                                        <li><a href={% url admin:logout %}>Logout</a></li>
+                                        <li><a href={% url "admin:logout" %}>Logout</a></li>
                                     {% endif %}
                                 </ul>
                             </li>
@@ -78,7 +84,40 @@
 
     <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+        <script>
+            var
+                // Used by `environ.js` to correctly prefix URL paths
+                SCRIPT_NAME = '{{ request.META.SCRIPT_NAME }}',
+
+                // Used for non-safe requests, also defined in `environ.js`
+                CSRF_TOKEN = '{{ csrf_token }}';
+
+
+            // Pre-configuration, everything is relative to Cilantro's path. For
+            // integration of external scripts, create a contexted `require`
+            // function. See http://requirejs.org/docs/api.html#multiversion.
+            // Note that all existing scripts defined here can be used
+            var require = {
+                baseUrl: '{{ CILANTRO_JAVASCRIPT_URL }}',
+                shim: {
+                    'underscore': {
+                        exports: '_'
+                    },
+                    'backbone': {
+                        deps: ['underscore', 'jquery'],
+                        exports: 'Backbone'
+                    },
+                    'highcharts': {
+                        exports: 'Highcharts'
+                    },
+                    'bootstrap': ['jquery'],
+                    'jquery.ui': ['jquery']
+                }
+            };
+        </script>
+        <script data-main=environ src={{ CILANTRO_JAVASCRIPT_URL }}require.js></script>
+    {% endblock %}
 
     <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
              mathiasbynens.be/notes/async-analytics-snippet -->
