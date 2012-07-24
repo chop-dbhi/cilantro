@@ -288,7 +288,11 @@ define [
                 success: (resp) =>
                     @$value.empty()
                     for obj in resp
-                        @$value.append "<option value=\"#{obj.value}\">#{obj.name} (#{obj.count})</option>"
+                        html = "<option value=\"#{obj.value}\">#{obj.name}"
+                        if obj.count?
+                            html += " (#{obj.count})"
+                        html += "</option>"
+                        @$value.append html
                     @set()
 
 
