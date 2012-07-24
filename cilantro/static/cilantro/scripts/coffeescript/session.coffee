@@ -17,7 +17,7 @@ define [
             # Any object can publish data to the session by publishing to
             # `session/save` and providing the property key and data to save.
             # The subscription will ensure this data is saved off immediately.
-            mediator.subscribe 'session/save', (key, data) =>
+            mediator.subscribe 'session/save', @when (key, data) =>
                 session = @get 'session'
                 session[key] = data
                 @save session: session
@@ -34,4 +34,5 @@ define [
     # This looks strange, but the preferences prior to the this call is
     # simply an object. This is being passed in as the data to initialize
     # the Preferences model.
-    App.preferences = new Preferences App.preferences
+    App.preferences = new Preferences
+    App.preferences.fetch()

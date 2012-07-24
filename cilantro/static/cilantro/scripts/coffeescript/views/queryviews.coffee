@@ -140,7 +140,7 @@ define [
         '
 
         initialize: ->
-            @collection.deferred.done =>
+            @collection.when =>
                 @render()
                 @collection.each (model, i) ->
                     if model.get 'queryview'

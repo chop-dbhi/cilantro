@@ -29,6 +29,8 @@ define ['jquery', 'underscore'], ($, _) ->
         defer: (name, func, once=false, args) ->
             if not @_deferred? then @pending()
             if _.isString name
+                # Shift arguments, assume `name` is a function name on
+                # this object
                 if _.isBoolean func
                     once = func
                     func = @[name]
@@ -53,7 +55,8 @@ define ['jquery', 'underscore'], ($, _) ->
                 @_deferred.rejectWith context
             return @
 
-        # Implements the promise interface
+        # Implements the promise interface which can be used with the
+        # `$.when` function
         promise: ->
             if not @_deferred? then @pending()
             return @_deferred.promise arguments...
@@ -62,7 +65,7 @@ define ['jquery', 'underscore'], ($, _) ->
             $.when(@).done(func)
 
         state: ->
-            @_deferred.state()
+            @_deferred?.state()
 
     Deferrable.resolveWith = Deferrable.resolve
     Deferrable.rejectWith = Deferrable.reject

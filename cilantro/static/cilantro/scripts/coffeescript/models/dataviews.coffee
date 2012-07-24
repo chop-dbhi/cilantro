@@ -9,8 +9,8 @@ define [
         url: environ.absolutePath '/api/views/'
 
         initialize: ->
-            @pending()
-            @on 'reset', -> @resolve()
+            super
+            @on 'reset', @resolve
             @fetch()
 
         getNamed: ->
@@ -21,8 +21,8 @@ define [
         url: environ.absolutePath '/api/views/history/'
 
          initialize: ->
-            @pending()
-            @on 'reset', -> @resolve()
+            super
+            @on 'reset', @resolve
             @fetch()
 
 

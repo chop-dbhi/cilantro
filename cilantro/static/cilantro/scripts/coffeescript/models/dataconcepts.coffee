@@ -7,6 +7,8 @@ define [
         url: environ.absolutePath '/api/concepts/'
 
         initialize: ->
-            @deferred = @fetch()
+            super
+            @on 'reset', @resolve
+            @fetch()
 
     App.DataConcept = new DataConcepts
