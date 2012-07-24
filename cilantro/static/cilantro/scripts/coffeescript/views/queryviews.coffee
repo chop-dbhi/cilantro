@@ -72,12 +72,11 @@ define [
             for model in fields.models
                 options.model = model
 
-                $controls = $ '<div class=span6></div>'
-                $charts = $ '<div class="span6 charts"></div>'
+                $controls = $ '<div></div>'
 
-                if (data = model.get 'data').searchable
-                    controlClass = Controls.SearchableControl
-                else if data.enumerable
+                #if (data = model.get 'data').searchable
+                #    controlClass = Controls.SearchableControl
+                if (data = model.get 'data').enumerable
                     controlClass = Controls.EnumerableControl
                 else if data.type is 'number'
                     controlClass = Controls.NumberControl
@@ -93,18 +92,17 @@ define [
                 @charts.push [model, chart]
 
                 $controls.append control.render().$el
-                $charts.append chart.$el
 
                 if (conditions = App.DataContext.session.getNodes(model.id)) and conditions[0]
                     control.set conditions[0]
 
-                @$form.append $('<div class=row-fluid>').append($controls, $charts)
+                @$form.append $controls, chart.$el
                 @update()
 
         show: =>
             @resolve()
             # Move to the top
-            App.views.discover.$el.prepend @$el.detach()
+            App.routes.discover.$el.prepend @$el.detach()
             (control.show() for control in @controls)
             return @
 
@@ -211,12 +209,12 @@ define [
                 collection: @collection
 
             @$('.panel-content').append @$form.el, @$browser.el
-            $('body').append @$el
-
-            @$el.panel()
+            $('body').append @$el.panel()
 
 
-    $ ->
-
-        App.QueryViewsPanel = new QueryViewsPanel
-            collection: App.DataConcept
+    {
+        View: QueryView
+        Panel: QueryViewsPanel
+        SearchForm: QueryViewsSearchForm
+        Accordian: QueryViewsAccordian
+    }
