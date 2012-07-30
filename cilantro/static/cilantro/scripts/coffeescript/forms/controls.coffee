@@ -31,7 +31,6 @@ define [
     NEGATION_OPERATORS = {}
 
     DEFAULT_EVENTS =
-        'submit': 'preventDefault'
         'click [name=remove]': 'clearFilter'
         'click [name=include]': 'submitInclude'
         'click [name=exclude]': 'submitExclude'
@@ -304,7 +303,11 @@ define [
         # Override to split and clean values
         getValue: ->
             if not (value = @$value.val()) then return
-            (@coerceValue val.trim() for val in value.split /,/)
+            vals = []
+            for val in value.split /,/
+                if (val = val.trim())
+                    vals.push @coerceValue val
+            return vals
 
         loadOperators: =>
             NEGATION_OPERATORS['-in'] = 'in'
