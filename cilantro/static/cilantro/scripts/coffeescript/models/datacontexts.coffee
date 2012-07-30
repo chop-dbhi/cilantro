@@ -53,3 +53,6 @@ define [
                 session.promote null, data
             else
                 session.add null, data
+
+        mediator.subscribe 'datacontext/update', (node) ->
+            session.save()

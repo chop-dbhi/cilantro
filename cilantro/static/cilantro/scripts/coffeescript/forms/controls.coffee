@@ -1,3 +1,14 @@
+# Form Control Views
+#
+# Each view corresponds to a particular datatype and representation
+# appropriate for the type of data.
+#
+# Supported types include:
+#
+# - NumberControl
+# - EnumerableControl
+# - SearchableControl
+
 define [
     'environ'
     'mediator'
@@ -8,7 +19,8 @@ define [
 
     formActionsTemplate = _.template '
         <div class=form-actions>
-            <button class="btn btn-mini btn-danger" name=exclude title="Exclude results from query">Exclude</button>
+            <button class="btn btn-mini btn-danger pull-left" name=remove title="Remove filter">Remove</button>
+            <button class="btn btn-mini btn-warning" name=exclude title="Exclude results from query">Exclude</button>
             <button class="btn btn-mini btn-success" name=include title="Include results in query">Include</button>
         </div>
     '
@@ -20,12 +32,10 @@ define [
 
     DEFAULT_EVENTS =
         'submit': 'preventDefault'
+        'click [name=remove]': 'clearFilter'
         'click [name=include]': 'submitInclude'
         'click [name=exclude]': 'submitExclude'
-        'mouseenter': 'showActions'
-        'mouseleave': 'hideActions'
-        'change [name=operator]': 'toggleActions'
-
+        'change [name=operator]': 'toggleOperator'
 
     class Control extends Backbone.View
         template: _.template '
@@ -75,6 +85,7 @@ define [
             @$actions = @$ '.form-actions'
             @$include = @$ '[name=include]'
             @$exclude = @$ '[name=exclude]'
+            @$remove = @$('[name=remove]').hide()
 
             # Post-processing of elements
             if @options.label is false
@@ -98,11 +109,8 @@ define [
         preventDefault: (event) ->
             event.preventDefault()
 
-        showActions: (event) ->
-            @$actions.fadeTo 200, 1
-
-        hideActions: (event) ->
-            @$actions.fadeTo 400, 0.3
+        toggleOperator: (event) ->
+            @toggleActions()
 
         toggleActions: (event) ->
             if NEGATION_OPERATORS[@$operator.val()]
@@ -118,6 +126,13 @@ define [
             event.preventDefault()
             @submit @get negated: true
 
+        clearFilter: (event) ->
+            event.preventDefault()
+            @clear()
+
+        clear: ->
+            if @node then @submit()
+            @$remove.hide()
 
         validate: ->
 
@@ -168,7 +183,7 @@ define [
                 operator = NEGATION_OPERATORS[operator]
             return operator
 
-        setValue: (value) ->
+        setValue: (value=null) ->
             if @$value.is '[type=checkbox],[type=radio]'
                 @$value.prop 'checked', value
             else
@@ -176,7 +191,7 @@ define [
 
         setOperator: (value) ->
             @$operator.val value
-            @toggleActions()
+            @toggleOperator()
 
         get: (options) ->
             id: @model.id
@@ -195,14 +210,18 @@ define [
 
             @setOperator operator
             @setValue value
+            @$remove.show()
 
-        submit: (data) ->
+        submit: (data={}) ->
             # If the value is undefined, the condition may be removed
             if data.value is undefined
                 if @node
+                    @setOperator()
+                    @setValue()
                     mediator.publish 'datacontext/remove', @node
                     delete @node
-                    return
+                    @$remove.hide()
+                return
 
             # Validate the data
             if (message = @validate(data))
@@ -211,15 +230,11 @@ define [
 
             if @node
                 @node.set data
-                App.DataContext.session.save()
+                mediator.publish 'datacontext/update', @node
             else
                 @node = new App.Models.DataContextNode data
                 mediator.publish 'datacontext/add', @node
-
-        clear: ->
-            delete @node
-            @setValue()
-            @setOperator()
+            @$remove.show()
 
 
     # Add Events interface
@@ -227,23 +242,32 @@ define [
 
 
     class NumberControl extends Control
-        events: _.extend({}, DEFAULT_EVENTS, {'change [name=operator]': 'toggleOperator'})
-
+        template: _.template '
+            <div class=control-group>
+                <h4 class=control-label>{{ label }} <small class=units>({{ units }})</small></h4>
+                <div class=controls>
+                    <select class=span4 name=operator></select>
+                    <input class=span4 type=text name=value>
+                    <input class=span4 type=text name=value-2>
+                    <p class=help-block>{{ help }}</p>
+                </div>
+            </div>
+        '
         render: ->
             super
             # Hide the secondary value by default
-            @$controls.append (@$value2 = @$('[name=value-2]').hide())
+            @$value2 = @$('[name=value-2]').hide()
             return @
 
         getValue: (options) ->
-            if (value = super) then return
+            if not (value = super) then return
             if /range/.test @getOperator()
                 value2 = @coerceValue @$value2.val()
                 [value, value2]
             else
                 value
 
-        setValue: (value) ->
+        setValue: (value=null) ->
             if /range/.test @getOperator()
                 @$value.val value[0]
                 @$value2.val(value[1]).show()
@@ -251,6 +275,7 @@ define [
                 @$value.val value
 
         toggleOperator: ->
+            super
             if /range/.test @getOperator()
                 @$value2.show()
             else
@@ -263,15 +288,23 @@ define [
                 <h4 class=control-label>{{ label }} <small class=units>({{ units }})</small></h4>
                 <div class=controls>
                     <select class=span4 name=operator></select>
-                    <select class=span12 name=value multiple=multiple></select>
+                    <input class=span8 name=value>
                     <p class=help-block>{{ help }}</p>
                 </div>
             </div>
         '
 
-        initialize: ->
+        initialize: (options) ->
             super
             mediator.subscribe 'datacontext/change', @loadValues
+
+        setValue: (value) ->
+            if value then @$value.val value.join ', '
+
+        # Override to split and clean values
+        getValue: ->
+            if not (value = @$value.val()) then return
+            (@coerceValue val.trim() for val in value.split /,/)
 
         loadOperators: =>
             NEGATION_OPERATORS['-in'] = 'in'
@@ -281,19 +314,17 @@ define [
                     break
             @$operator.hide()
 
-        # Load values remotely
+        # Load remote values, cache locally
         loadValues: =>
+            @$el.addClass 'loading'
             Backbone.ajax
                 url: environ.absolutePath @model.get('links').values.href
                 success: (resp) =>
-                    @$value.empty()
-                    for obj in resp
-                        html = "<option value=\"#{obj.value}\">#{obj.name}"
-                        if obj.count?
-                            html += " (#{obj.count})"
-                        html += "</option>"
-                        @$value.append html
+                    @$value.typeahead
+                        source: _.pluck resp, 'value'
+                        mode: 'multiple'
                     @set()
+                    @$el.removeClass 'loading'
 
 
     class SearchableControl extends EnumerableControl

@@ -1537,8 +1537,11 @@
     })
   })
 
-}(window.jQuery);/* =============================================================
- * bootstrap-typeahead.js v2.0.3
+}(window.jQuery);
+
+
+/* =============================================================
+ * bootstrap-typeahead.js v2.0.4
  * http://twitter.github.com/bootstrap/javascript.html#typeahead
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -1556,16 +1559,11 @@
  * limitations under the License.
  * ============================================================ */
 
+!function( $ ){
 
-!function($){
+  "use strict"
 
-  "use strict"; // jshint ;_;
-
-
- /* TYPEAHEAD PUBLIC CLASS DEFINITION
-  * ================================= */
-
-  var Typeahead = function (element, options) {
+  var Typeahead = function ( element, options ) {
     this.$element = $(element)
     this.options = $.extend({}, $.fn.typeahead.defaults, options)
     this.matcher = this.options.matcher || this.matcher
@@ -1575,6 +1573,9 @@
     this.$menu = $(this.options.menu).appendTo('body')
     this.source = this.options.source
     this.shown = false
+    this.delimiter = this.options.delimiter || this.delimiter
+    this.mode = this.options.mode || this.mode
+    this.selections = []
     this.listen()
   }
 
@@ -1584,13 +1585,17 @@
 
   , select: function () {
       var val = this.$menu.find('.active').attr('data-value')
+      if( this.mode === 'multiple' ) {
+        this.selections.push(val)
+        val = this.selections.join(this.formatteddelimiter()) + this.formatteddelimiter()
+      }
       this.$element
         .val(this.updater(val))
         .change()
       return this.hide()
     }
 
-  , updater: function (item) {
+  , updater: function(item) {
       return item
     }
 
@@ -1619,15 +1624,18 @@
       var that = this
         , items
         , q
+        , input = this.mode === 'multiple' ? this.$element.val().split(this.formatteddelimiter()) : [this.$element.val()]
 
-      this.query = this.$element.val()
+      this.selections = input.slice(0, input.length - 1)
+
+      this.query = $.trim(input[input.length - 1])
 
       if (!this.query) {
         return this.shown ? this.hide() : this
       }
 
       items = $.grep(this.source, function (item) {
-        return that.matcher(item)
+        if (that.matcher(item)) return item
       })
 
       items = this.sorter(items)
@@ -1716,7 +1724,14 @@
         .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
     }
 
+  , formatteddelimiter: function(){
+      return this.delimiter + ' '
+    }
+
   , keyup: function (e) {
+      e.stopPropagation()
+      e.preventDefault()
+
       switch(e.keyCode) {
         case 40: // down arrow
         case 38: // up arrow
@@ -1729,7 +1744,6 @@
           break
 
         case 27: // escape
-          if (!this.shown) return
           this.hide()
           break
 
@@ -1737,11 +1751,11 @@
           this.lookup()
       }
 
-      e.stopPropagation()
-      e.preventDefault()
   }
 
   , keypress: function (e) {
+      e.stopPropagation()
+
       if (!this.shown) return
 
       switch(e.keyCode) {
@@ -1763,12 +1777,12 @@
           this.next()
           break
       }
-
-      e.stopPropagation()
     }
 
   , blur: function (e) {
       var that = this
+      e.stopPropagation()
+      e.preventDefault()
       setTimeout(function () { that.hide() }, 150)
     }
 
@@ -1789,7 +1803,7 @@
   /* TYPEAHEAD PLUGIN DEFINITION
    * =========================== */
 
-  $.fn.typeahead = function (option) {
+  $.fn.typeahead = function ( option ) {
     return this.each(function () {
       var $this = $(this)
         , data = $this.data('typeahead')
@@ -1804,6 +1818,8 @@
   , items: 8
   , menu: '<ul class="typeahead dropdown-menu"></ul>'
   , item: '<li><a href="#"></a></li>'
+  , delimiter: ','
+  , mode: 'single'
   }
 
   $.fn.typeahead.Constructor = Typeahead
@@ -1821,4 +1837,4 @@
     })
   })
 
-}(window.jQuery);
+}( window.jQuery )
