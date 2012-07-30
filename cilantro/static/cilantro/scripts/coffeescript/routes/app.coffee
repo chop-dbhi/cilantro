@@ -15,7 +15,11 @@ define [
             mediator.subscribe 'datacontext/change', @updateCount
             App.DataContext.when @updateCount
 
-            $('#subnav .nav.pull-left:first').append $('<li>').html @$uniqueCount
+            @$toolbar = $('<ul>')
+                .addClass('nav pull-left')
+                .appendTo '#subnav .container-fluid'
+
+            @$toolbar.append $('<li>').html @$uniqueCount
 
             # Initialize modals
             $('.modal').modal show: false
