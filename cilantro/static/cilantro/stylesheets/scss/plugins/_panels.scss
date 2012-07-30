@@ -11,6 +11,10 @@
         @include box-shadow(-2px 0 10px #bbb);
         border-left: 1px solid #999;
     }
+
+    .panel-content {
+        padding: 10px;
+    }
 }
 
 .panel > * {

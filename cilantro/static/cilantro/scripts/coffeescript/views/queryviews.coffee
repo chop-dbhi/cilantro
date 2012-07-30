@@ -42,7 +42,7 @@ define [
             @setElement @template attrs
 
             @$heading = @$ '.heading'
-            @$details = @$  '.details'
+            @$details = @$ '.details'
             @$form = @$ 'form'
 
             mediator.subscribe 'queryview/show', (id) =>
@@ -78,7 +78,7 @@ define [
                 #    controlClass = Controls.SearchableControl
                 if (data = model.get 'data').enumerable
                     controlClass = Controls.EnumerableControl
-                else if data.type is 'number'
+                else if data.simple_type is 'number'
                     controlClass = Controls.NumberControl
                 else
                     controlClass = Controls.Control
@@ -125,7 +125,7 @@ define [
 
         className: 'accordian'
 
-        grouptTemplate: _.template '
+        groupTemplate: _.template '
             <div class=accordian-group>
                 <div class=accordian-heading>
                     <a class=accordian-toggle data-toggle=collapse data-parent={{ parent }} href=#{{ slug }}>{{ name }}</a>
@@ -138,7 +138,9 @@ define [
         '
 
         initialize: ->
+            @$el.addClass 'loading'
             @collection.when =>
+                @$el.removeClass 'loading'
                 @render()
                 @collection.each (model, i) ->
                     if model.get 'queryview'
@@ -158,7 +160,7 @@ define [
                 if not groupName or categoryName isnt groupName
                     groupName = categoryName
                     id = @$el.prop('id')
-                    group = $ @grouptTemplate
+                    group = $ @groupTemplate
                         name: groupName
                         parent: id
                         slug: "#{ id }-#{ groupName.toLowerCase() }"
@@ -199,17 +201,24 @@ define [
             </div>
         '
 
-        initialize: ->
+        initialize: (options) ->
             @setElement @template()
+            content = @$('.panel-content')
 
             @$browser = new QueryViewsAccordian
                 collection: @collection
 
-            @$form = new QueryViewsSearchForm
-                collection: @collection
+            # Enable search, the collection is expected to provide a
+            # search API
+            if options.enableSearch
+                @$form = new QueryViewsSearchForm
+                    collection: @collection
+                content.append @$form.el
 
-            @$('.panel-content').append @$form.el, @$browser.el
-            $('body').append @$el.panel()
+            content.append @$browser.el
+
+            $('body').append @$el
+            @$el.panel()
 
 
     {

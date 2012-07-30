@@ -28,6 +28,7 @@
     }
 
     form {
+        padding: 10px;
         margin-bottom: 0;
 
         .row-fluid {
@@ -38,15 +39,13 @@
             &:first-child {
                 border-top: 0;
             }
+        }
 
-            [class*=span] {
-                @include inline-block;
-            }
+        [class*=span] {
+            @include inline-block;
         }
 
         .control-group {
-            padding: 0 10px;
-
             .help-block {
                 margin-top: 9px;
                 color: #ccc;
@@ -63,7 +62,7 @@
                 background: none;
                 border-top: 0;
                 padding: 0;
-                margin: 8px 0;
+                margin-top: 10px;
                 text-align: right;
             }
 
