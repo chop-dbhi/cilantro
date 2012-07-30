@@ -71,7 +71,7 @@ define [
 
         loadData: (append=false) =>
             # Check if the lastest page is the last page
-            if @page is @num_pages? then return
+            if @page is @num_pages then return
 
             url = '/api/data/'
 
