@@ -63,7 +63,7 @@ define [
                 @$el.removeClass 'loading'
                 @render()
 
-            $.when App.DataView, @collection, =>
+            $.when(App.DataView, @collection).then =>
                 if (json = App.DataView.session.get 'json')
                     @add id for id in json.concepts
                 return
