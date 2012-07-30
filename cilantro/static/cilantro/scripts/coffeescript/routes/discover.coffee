@@ -24,16 +24,10 @@ define [
             @queryViewsPanel = new QueryViews.Panel
                 collection: App.DataConcept
 
-            mediator.subscribe 'queryviews-panel/open', =>
-                @queryViewsPanel.$el.panel 'open'
-
-            mediator.subscribe 'queryviews-panel/close', =>
-                @queryViewsPanel.$el.panel 'close'
-
         load: ->
             @$el.fadeIn()
-            mediator.publish 'queryviews-panel/open'
+            @queryViewsPanel.$el.panel 'open'
 
         unload: ->
             @$el.hide()
-            mediator.publish 'queryviews-panel/close'
+            @queryViewsPanel.$el.panel 'close'
