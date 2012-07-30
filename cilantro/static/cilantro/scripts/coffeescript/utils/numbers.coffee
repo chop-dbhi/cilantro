@@ -37,14 +37,18 @@ define ->
 
      toDelimitedNumber = (value, delim=',') ->
         if not value? then return
-        arr = value.toString().split ''
+        [int, decimal] = value.toString().split('.')
+        arr = int.toString().split ''
         len = arr.length
         i = len % 3 or 3
 
         while i < len
             arr.splice i, 0, delim
             i = i+4
-        return arr.join ''
+        text = arr.join ''
+        if decimal
+            text += ".#{decimal}"
+        return text
 
 
     { toSuffixedNumber, toDelimitedNumber }
