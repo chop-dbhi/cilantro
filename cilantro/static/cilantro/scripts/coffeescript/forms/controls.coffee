@@ -96,6 +96,8 @@ define [
             @loadOperators()
             @loadValues()
 
+            @defer 'loadStats', true
+
             return @
 
         show: ->
@@ -134,6 +136,32 @@ define [
             @$remove.hide()
 
         validate: ->
+
+        # Load the stats for the model and appends a representation of
+        # them to the controls area. If not stats are returned, nothing
+        # is appended
+        loadStats: =>
+            url = @model.get('links').stats.href
+            Backbone.ajax
+                url: url
+                success: (resp) =>
+                    text = []
+                    for key, value of resp
+                        if key isnt 'links' and value isnt null
+                            key = key.charAt(0).toUpperCase() + key.substr(1)
+                            if _.isNumber value
+                                _avalue = Math.abs(value)
+                                if _avalue < 0.01
+                                    value = value.toExponential(2)
+                                else if Math.round(value) isnt value
+                                    value = App.utils.toDelimitedNumber(value.toPrecision(3))
+                            text.push "#{key}: #{value}"
+
+                    if text.length
+                        $('<p>')
+                            .addClass('help-block')
+                            .text(text.join(', '))
+                            .appendTo @$controls
 
         # Data processing-related methods
         loadOperators: =>
