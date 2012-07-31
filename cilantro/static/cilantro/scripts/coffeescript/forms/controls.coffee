@@ -149,7 +149,7 @@ define [
                     for key, value of resp
                         if key isnt 'links' and value isnt null
                             key = key.charAt(0).toUpperCase() + key.substr(1)
-                            if _.isNumber value
+                            if _.isNumber(value) and value isnt 0
                                 _avalue = Math.abs(value)
                                 if _avalue < 0.01
                                     value = value.toExponential(2)
