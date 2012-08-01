@@ -1,11 +1,5 @@
 define ['jquery', 'underscore'], ($, _) ->
 
-    addOnceDeferreds = (obj) ->
-        # Populate the once-deferred handlers
-        for name, [func, args] of obj._deferred.once
-            obj._deferred.done do (args) ->
-                func args...
-
     Deferrable =
         deferred: {}
 
@@ -14,9 +8,11 @@ define ['jquery', 'underscore'], ($, _) ->
             # Takes an object of method names and flags for implicitly
             # wrapping class methods in a deferred execution
             for method, once of @deferred
-                func = @[method]
-                @[method] = =>
-                    @defer method, func, once, arguments
+                do (method, once) =>
+                    func = @[method]
+                    @[method] = =>
+                        @defer method, func, once, arguments
+            return
 
         # Initializes (or resets) the deferred object
         pending: ->
@@ -34,9 +30,11 @@ define ['jquery', 'underscore'], ($, _) ->
                 if _.isBoolean func
                     once = func
                     func = @[name]
-                if once and @_deferred.state() is 'pending'
-                    @_deferred.once[name] = [func, args]
-                    return @
+                # If this is a one-time deferral, ensure it has not
+                # already been queued
+                if once
+                    if @_deferred[name] then return @
+                    @_deferred.once[name] = true
             else
                 func = name
             @_deferred.done -> func args...
@@ -44,15 +42,11 @@ define ['jquery', 'underscore'], ($, _) ->
 
         # Resolve the deferred object
         resolve: (context=@)->
-            if @_deferred
-                addOnceDeferreds @
-                @_deferred.resolveWith context
+            if @_deferred then @_deferred.resolveWith context
             return @
 
         reject: (context=@) ->
-            if @_deferred
-                addOnceDeferreds @
-                @_deferred.rejectWith context
+            if @_deferred then @_deferred.rejectWith context
             return @
 
         # Implements the promise interface which can be used with the
