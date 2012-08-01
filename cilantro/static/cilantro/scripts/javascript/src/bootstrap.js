@@ -1584,11 +1584,19 @@
     constructor: Typeahead
 
   , select: function () {
-      var val = this.$menu.find('.active').attr('data-value')
-      if( this.mode === 'multiple' ) {
+      var val = JSON.parse(this.$menu.find('.active').attr('data-value'))
+
+      if (this.mode === 'multiple') {
+        var vals = []
         this.selections.push(val)
-        val = this.selections.join(this.formatteddelimiter()) + this.formatteddelimiter()
+        for (var i = 0; i < this.selections.length; i++) {
+          vals.push(this.parse(this.selections[i]))
+        }
+        val = vals.join(this.delimiter) + this.delimiter
+      } else {
+        val = this.parse(val)
       }
+
       this.$element
         .val(this.updater(val))
         .change()
@@ -1620,18 +1628,39 @@
       return this
     }
 
+  , process: function(results) {
+      if (!results.length) {
+        return this.shown ? this.hide() : this
+      }
+      return this.render(results.slice(0, this.options.items)).show()
+    }
+
+  , parse: function(value) {
+      if (typeof value == 'string')
+        return value
+      return value[this.options.property]
+    }
+
   , lookup: function (event) {
       var that = this
         , items
-        , q
-        , input = this.mode === 'multiple' ? this.$element.val().split(this.formatteddelimiter()) : [this.$element.val()]
+        , value
+        , input = this.mode === 'multiple' ? this.$element.val().split(this.delimiter): [this.$element.val()]
 
       this.selections = input.slice(0, input.length - 1)
 
       this.query = $.trim(input[input.length - 1])
 
-      if (!this.query) {
+      if ((this.query && this.query.length < this.options.minLength) || (typeof this.source == 'function' && !this.query)) {
         return this.shown ? this.hide() : this
+      }
+
+      if (typeof this.source == 'function') {
+        if (!(items = this.source(this, this.query))) return
+        if (items instanceof $.Deferred) {
+          items.then(this.process)
+          return
+        }
       }
 
       items = $.grep(this.source, function (item) {
@@ -1640,15 +1669,11 @@
 
       items = this.sorter(items)
 
-      if (!items.length) {
-        return this.shown ? this.hide() : this
-      }
-
-      return this.render(items.slice(0, this.options.items)).show()
+      return this.process(items)
     }
 
   , matcher: function (item) {
-      return ~item.toLowerCase().indexOf(this.query.toLowerCase())
+      return ~this.parse(item).toLowerCase().indexOf(this.query.toLowerCase())
     }
 
   , sorter: function (items) {
@@ -1656,10 +1681,12 @@
         , caseSensitive = []
         , caseInsensitive = []
         , item
+        , sortby
 
       while (item = items.shift()) {
-        if (!item.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item)
-        else if (~item.indexOf(this.query)) caseSensitive.push(item)
+        sortby = this.parse(item)
+        if (!sortby.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item)
+        else if (~sortby.indexOf(this.query)) caseSensitive.push(item)
         else caseInsensitive.push(item)
       }
 
@@ -1677,8 +1704,8 @@
       var that = this
 
       items = $(items).map(function (i, item) {
-        i = $(that.options.item).attr('data-value', item)
-        i.find('a').html(that.highlighter(item))
+        i = $(that.options.item).attr('data-value', JSON.stringify(item))
+        i.find('a').html(that.highlighter(that.parse(item)))
         return i[0]
       })
 
@@ -1724,16 +1751,11 @@
         .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
     }
 
-  , formatteddelimiter: function(){
-      return this.delimiter + ' '
-    }
-
   , keyup: function (e) {
       e.stopPropagation()
       e.preventDefault()
 
       switch(e.keyCode) {
-        case 40: // down arrow
         case 38: // up arrow
           break
 
@@ -1746,6 +1768,9 @@
         case 27: // escape
           this.hide()
           break
+
+        case 40: // down arrow
+          if (this.shown) break
 
         default:
           this.lookup()
@@ -1814,12 +1839,14 @@
   }
 
   $.fn.typeahead.defaults = {
-    source: []
+    source: null
   , items: 8
   , menu: '<ul class="typeahead dropdown-menu"></ul>'
   , item: '<li><a href="#"></a></li>'
-  , delimiter: ','
+  , delimiter: ', '
   , mode: 'single'
+  , property: 'value'
+  , minLength: 1
   }
 
   $.fn.typeahead.Constructor = Typeahead

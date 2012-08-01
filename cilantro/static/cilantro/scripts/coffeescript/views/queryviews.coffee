@@ -26,6 +26,7 @@ define [
         '
 
         events:
+            'submit form,button,input,select': 'preventDefault'
             'click [data-toggle=detail]': 'toggleDetail'
 
         deferred:
@@ -53,6 +54,9 @@ define [
 
             @render()
 
+        preventDefault: (event) ->
+            event.preventDefault()
+
         toggleDetail: ->
             if @$details.is(':visible')
                 @$details.slideUp 300
@@ -74,10 +78,12 @@ define [
 
                 $controls = $ '<div></div>'
 
-                #if (data = model.get 'data').searchable
-                #    controlClass = Controls.SearchableControl
-                if (data = model.get 'data').enumerable
+                if (data = model.get 'data').simple_type is 'boolean'
+                    controlClass = Controls.BooleanControl
+                else if data.enumerable
                     controlClass = Controls.EnumerableControl
+                else if data.searchable
+                    controlClass = Controls.SearchableControl
                 else if data.simple_type is 'number'
                     controlClass = Controls.NumberControl
                 else
@@ -152,21 +158,48 @@ define [
         render: ->
             @$el.empty()
 
-            for model in @collection.sortBy((model) -> (category = model.get('category'))?.order)
-                if not model.get 'queryview' then continue
+            # Keep track if there are any categories. If none are present,
+            # remove the header and uncollpase the list
+            noCategories = true
+
+            sorted = @collection.sortBy (model) ->
                 category = model.get('category')
-                categoryName = if category then category.name else 'Other'
+                if category
+                    noCategories = false
+                    parseInt("#{category.order}000#{model.order}")
+                else
+                    model.order or model.name
 
-                if not groupName or categoryName isnt groupName
-                    groupName = categoryName
-                    id = @$el.prop('id')
-                    group = $ @groupTemplate
-                        name: groupName
-                        parent: id
-                        slug: "#{ id }-#{ groupName.toLowerCase() }"
-                    @$el.append group
+            for model in sorted
+                if not model.get 'queryview' then continue
+                if noCategories
+                    if not group
+                        group = $ @groupTemplate
+                            name: ''
+                            parent: 0
+                            slug: "#{ 0 }-default"
+                        group.find('.accordian-heading').remove()
+                        group.find('.accordian-body').removeClass('collapse')
+                        @$el.append group
+                else
+                    category = model.get('category')
+                    categoryName = if category then category.name else 'Other'
 
-                group.find('.nav').append $ "<li><a href=# data-toggle=queryview data-target=#{ model.id }>#{ model.get 'name' }</a> <i class=icon-filter></i></li>"
+                    if not groupName or categoryName isnt groupName
+                        groupName = categoryName
+                        id = @$el.prop('id')
+                        group = $ @groupTemplate
+                            name: groupName
+                            parent: id
+                            slug: "#{ id }-#{ groupName.toLowerCase() }"
+                        @$el.append group
+
+                group.find('.nav').append $ "
+                    <li><a href=# data-toggle=queryview data-target=#{ model.id }>#{ model.get 'name' }</a>
+                        <i class=icon-filter></i>
+                    </li>
+                "
+
             return @
         
         show: (event) ->
@@ -197,7 +230,7 @@ define [
         template: _.template '
             <div id=data-filters-panel class="panel panel-left scrollable-column closed">
                 <div class="inner panel-content"></div>
-                <div class=panel-toggle data-toggle=panel></div>
+                <div class=panel-toggle></div>
             </div>
         '
 

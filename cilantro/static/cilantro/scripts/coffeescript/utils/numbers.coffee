@@ -50,5 +50,14 @@ define ->
             text += ".#{decimal}"
         return text
 
+    prettyNumber = (value) ->
+        if value isnt 0
+            # Small float
+            if Math.abs(value) < 0.01
+                return value.toExponential(2)
+            # Other floats
+            if Math.round(value) isnt value
+                value = value.toPrecision(3)
+        return toSuffixedNumber(value)
 
-    { toSuffixedNumber, toDelimitedNumber }
+    { toSuffixedNumber, toDelimitedNumber, prettyNumber }

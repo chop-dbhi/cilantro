@@ -50,9 +50,6 @@ define [
 
         events: DEFAULT_EVENTS
 
-        deferred:
-            'loadValues': true
-
         initialize: (options) ->
             super
             @options = options
@@ -61,8 +58,6 @@ define [
             mediator.subscribe "datacontext/#{ @model.id }/edit", (node) =>
                 if node is @node then return
                 @set(node)
-
-            @render()
 
         getTemplateData: ->
             label: @model.get('alt_name') or @model.get('name')
@@ -94,9 +89,8 @@ define [
                 @$('.units').hide()
 
             @loadOperators()
-            @loadValues()
-
-            @defer 'loadStats', true
+            @defer @loadValues
+            @defer @loadStats
 
             return @
 
@@ -142,19 +136,17 @@ define [
         # is appended
         loadStats: =>
             url = @model.get('links').stats.href
+
             Backbone.ajax
                 url: url
                 success: (resp) =>
                     text = []
                     for key, value of resp
                         if key isnt 'links' and value isnt null
+                            key = key.replace(/[_-\s]+/, ' ').trim()
                             key = key.charAt(0).toUpperCase() + key.substr(1)
-                            if _.isNumber(value) and value isnt 0
-                                _avalue = Math.abs(value)
-                                if _avalue < 0.01
-                                    value = value.toExponential(2)
-                                else if Math.round(value) isnt value
-                                    value = App.utils.toDelimitedNumber(value.toPrecision(3))
+                            if _.isNumber value
+                                value = App.utils.prettyNumber value
                             text.push "#{key}: #{value}"
 
                     if text.length
@@ -198,7 +190,7 @@ define [
             else
                 value = @$value.val()
                 if value is '' or value is null then return
-                if @$value.is 'select'
+                if @$value.is 'select[multiple]'
                     value = (@coerceValue val for val in value)
                 else
                     value = @coerceValue value
@@ -323,43 +315,108 @@ define [
 
         initialize: (options) ->
             super
-            mediator.subscribe 'datacontext/change', @loadValues
+            #mediator.subscribe 'datacontext/change', @loadValues
 
+        # TODO can this be populated through typeahead?
         setValue: (value) ->
             if value then @$value.val value.join ', '
 
-        # Override to split and clean values
+        # Override to extract from the typeahead plugin
         getValue: ->
-            if not (value = @$value.val()) then return
-            vals = []
-            for val in value.split /,/
-                if (val = val.trim())
-                    vals.push @coerceValue val
-            return vals
+            data = @$value.data('typeahead')
+            values = (@coerceValue data.parse(val) for val in data.selections)
+            if not (values.length) then return
+            return values
 
         loadOperators: =>
-            NEGATION_OPERATORS['-in'] = 'in'
-            for [operator, text] in (operators = @model.get 'operators')
-                if operator is 'in'
-                    @$operator.append "<option value=\"#{ operator }\">#{ text }</option>"
-                    break
-            @$operator.hide()
+            super
+            @$operator.val('in').hide()
 
         # Load remote values, cache locally
         loadValues: =>
-            @$el.addClass 'loading'
+            @set()
+
+            # Start with an empty source
+            @$value.typeahead
+                mode: 'multiple'
+                items: 50
+                source: []
+
+            typeahead = @$value.data('typeahead')
+
             Backbone.ajax
                 url: environ.absolutePath @model.get('links').values.href
+
+                # Mark is as being loaded
+                beforeSend: =>
+                    typeahead.$menu.addClass 'loading'
+
+                # Update internal source, remove loading mark
                 success: (resp) =>
-                    @$value.typeahead
-                        source: _.pluck resp, 'value'
-                        mode: 'multiple'
-                    @set()
-                    @$el.removeClass 'loading'
+                    typeahead.source = resp
+                    typeahead.$menu.removeClass 'loading'
 
 
     class SearchableControl extends EnumerableControl
+        # Setup typeahead to query remote values
         loadValues: =>
+            @set()
+
+            url = environ.absolutePath @model.get('links').values.href
+            lastQuery = null
+
+            @$value.typeahead
+                mode: 'multiple'
+                items: 50
+                source: _.debounce (typeahead, query) =>
+                    # Do not process if this is the same query as the last
+                    if query is lastQuery then return
+
+                    # Show the menu, mark as loading
+                    typeahead.show().$menu.addClass 'loading'
+
+                    # Temporarily disable the input box
+                    @$value.prop 'disabled', true
+
+                    Backbone.ajax
+                        url: "#{ url }?query=#{ query }"
+                        success: (resp) =>
+                            lastQuery = query
+                            typeahead.$menu.removeClass 'loading'
+                            typeahead.process(resp)
+                            @$value.prop 'disabled', false
+                    return
+                , 500
 
 
-    { Control, NumberControl, EnumerableControl, SearchableControl }
+    class BooleanControl extends Control
+        template: _.template '
+            <div class=control-group>
+                <h4 class=control-label>{{ label }} <small class=units>({{ units }})</small></h4>
+                <div class=controls>
+                    <select class=span4 name=operator></select>
+                    <select class=span4 name=value>
+                        <option value=>---</option>
+                    </select>
+                    <p class=help-block>{{ help }}</p>
+                </div>
+            </div>
+        '
+
+        loadOperators: ->
+            super
+            # Ensure it is set to `exact`
+            @$operator.val('exact').hide()
+
+        loadValues: ->
+            @$value.addClass 'loading'
+            Backbone.ajax
+                url: environ.absolutePath @model.get('links').values.href
+                success: (resp) =>
+                    @$value.removeClass 'loading'
+                    for option in resp
+                        @$value.append "<option value=\"#{option.value}\">#{option.label}</option>"
+                    @set()
+
+
+    { Control, NumberControl, EnumerableControl, SearchableControl, BooleanControl }
