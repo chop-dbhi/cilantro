@@ -61,4 +61,7 @@ define [
             # stay in sync relative to all other links
             $('body').on 'click', '[data-route]', (event) ->
                 event.preventDefault()
-                App.router.navigate @pathname, trigger: true
+                frag = $(@).data('route')
+                if frag.substr(frag.length-1) isnt '/'
+                    frag = frag + '/'
+                App.router.navigate frag, trigger: true
