@@ -254,9 +254,64 @@ define [
             @$el.panel()
 
 
+    class QueryViewFilterList extends Backbone.View
+        template: _.template '
+            <div id=data-filters-list-panel class="panel panel-right scrollable-column closed">
+                <div class="inner panel-content"></div>
+                <div class=panel-toggle></div>
+            </div>
+        '
+
+        initialize: (options) ->
+            @setElement @template()
+            @$content = @$('.panel-content')
+            $('body').append @$el
+            @$el.panel()
+
+            mediator.subscribe 'datacontext/changing', =>
+                @$content.addClass 'loading'
+
+            mediator.subscribe 'datacontext/change', @render
+
+            App.DataContext.when =>
+                @render()
+
+        _parse: (node, html=[]) ->
+            if node.children
+                html.push "<ul><li class=nav-header>#{ node.type }'ed</li>"
+                for child in node.children
+                    @_parse child, html
+                html.push "</ul>"
+            else
+                if not html.length
+                    html.push "<ul>"
+                html.push "<li>#{ node.language }</li>"
+                if not html.length
+                    html.push "</ul>"
+
+            return html
+
+
+        render: =>
+            @$content.removeClass 'loading'
+            node = App.DataContext.session.get('language')
+            @$content.html '<h3><i class=icon-filter></i> Applied Filters</h3>'
+
+            # Not filters
+            if not node or _.isEmpty(node)
+                @$content.append '<em>No filters are applied</em>'
+            else
+                ul = $(@_parse(node).join '').addClass 'nav nav-list'
+                @$content.append ul
+            @$el
+
+
+
+
     {
         View: QueryView
         Panel: QueryViewsPanel
         SearchForm: QueryViewsSearchForm
         Accordian: QueryViewsAccordian
+        List: QueryViewFilterList
     }
