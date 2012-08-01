@@ -64,6 +64,11 @@
             top: 9px;
         }
     }
+
+    tbody td em {
+        font-size: 0.9em;
+        color: #ccc;
+    }
 }
 
 #report-alert {

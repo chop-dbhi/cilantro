@@ -51,8 +51,13 @@ define [
                 trigger: =>
                     @loadData true
 
-            mediator.subscribe 'dataview/change', @loadData
-            mediator.subscribe 'datacontext/change', @loadData
+            mediator.subscribe 'dataview/change', =>
+                @xhr?.abort()
+                @loadData
+
+            mediator.subscribe 'datacontext/change', =>
+                @xhr?.abort()
+                @loadData()
 
             @page = 1
             @loadData()
@@ -70,6 +75,8 @@ define [
             @$toolbar.hide()
 
         loadData: (append=false) =>
+            @xhr?.abort()
+
             # Check if the lastest page is the last page
             if @page is @num_pages then return
 
@@ -80,11 +87,9 @@ define [
             else
                 @table.$el.addClass 'loading'
 
-            deferred = Backbone.ajax
+            @xhr = $.ajax
                 url: environ.absolutePath url
-
-            deferred
-                .done (resp) =>
+                success: (resp) =>
                     if append
                         @page++
                     else
@@ -92,7 +97,7 @@ define [
                         @num_pages = resp.num_pages
                         @table.setHeader resp.header
                     @table.setBody resp.rows, append
-                .always =>
+                complete: =>
                     @table.$el.removeClass 'loading'
                     @table.$el.scroller 'reset'
 

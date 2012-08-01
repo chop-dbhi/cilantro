@@ -55,4 +55,5 @@ define [
                 session.add null, data
 
         mediator.subscribe 'datacontext/update', (node) ->
+            mediator.publish 'datacontext/changing'
             session.save()

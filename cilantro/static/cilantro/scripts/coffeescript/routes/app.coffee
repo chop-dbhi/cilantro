@@ -6,13 +6,10 @@ define [
     'backbone'
 ], (environ, mediator, $, _, Backbone) ->
 
-    # TODO these smaller components should really be broken out and named
-    # appropriately.
     class AppArea extends Backbone.View
         load: ->
             @$uniqueCount = $ '<span class=stat></span>'
 
-            mediator.subscribe 'datacontext/change', @updateCount
             App.DataContext.when @updateCount
 
             @$toolbar = $('<ul>')
@@ -21,10 +18,14 @@ define [
 
             @$toolbar.append $('<li>').html @$uniqueCount
 
-            # Initialize modals
-            $('.modal').modal show: false
+            mediator.subscribe 'datacontext/changing', =>
+                @$uniqueCount.addClass 'loading'
+
+            mediator.subscribe 'datacontext/change', @updateCount
+
 
         updateCount: =>
+            @$uniqueCount.removeClass 'loading'
             count = App.DataContext.session.get 'count'
             pretty = App.utils.toSuffixedNumber count
             commaed = App.utils.toDelimitedNumber count
