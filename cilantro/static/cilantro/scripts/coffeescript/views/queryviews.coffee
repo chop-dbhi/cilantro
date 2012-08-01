@@ -99,11 +99,13 @@ define [
 
                 $controls.append control.render().$el
 
-                if (conditions = App.DataContext.session.getNodes(model.id)) and conditions[0]
-                    control.set conditions[0]
+                App.DataContext.when do (model, control) ->
+                    if (conditions = App.DataContext.session.getNodes(model.id)) and conditions[0]
+                        control.set conditions[0]
 
                 @$form.append $controls, chart.$el
-                @update()
+            @update()
+            @$el
 
         show: =>
             @resolve()
