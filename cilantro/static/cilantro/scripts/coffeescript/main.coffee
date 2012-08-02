@@ -32,10 +32,14 @@ define [
         App.register 'analyze/', 'analyze', new AnalysisArea
         App.register 'review/', 'review', new ReviewArea
 
+        root = environ.SCRIPT_NAME or '/'
+        if root.substr(root-1) isnt '/'
+            root = root + '/'
+
         # Start up the history now that all the main routes are registered
         Backbone.history.start
             pushState: true
-            root: environ.SCRIPT_NAME or '/'
+            root: root
 
         # Load preferences after everything is loaded to ensure all the
         # subscribers are... subscribed.
