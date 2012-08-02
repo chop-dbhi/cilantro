@@ -53,7 +53,7 @@ define [
 
             mediator.subscribe 'dataview/change', =>
                 @xhr?.abort()
-                @loadData
+                @loadData()
 
             mediator.subscribe 'datacontext/change', =>
                 @xhr?.abort()
