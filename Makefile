@@ -19,7 +19,7 @@ REQUIRE_OPTIMIZE = `which node` bin/r.js -o ${JAVASCRIPT_DIR}/app.build.js
 
 all: build watch
 
-build: clean sass coffee optimize
+build: sass coffee optimize
 
 sass:
 	@echo 'Compiling Sass...'
