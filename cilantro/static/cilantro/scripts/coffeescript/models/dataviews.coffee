@@ -10,11 +10,18 @@ define [
 
         initialize: ->
             super
-            @on 'reset', @resolve
-            @fetch()
+            @on 'reset', ->
+                # Special treatment for the session
+                if not (@session = @getSession())
+                    @session = @create session: true
 
-        getNamed: ->
-            @filter (model) -> model.get('name')
+                @session.on 'sync', ->
+                    mediator.publish 'dataview/change'
+
+                # Resolve all pending handlers
+                @resolve()
+
+            @fetch()
 
 
     class DataViewHistory extends Serrano.DataViews
@@ -28,13 +35,3 @@ define [
 
     App.DataView = new DataViews
     App.DataViewHistory = new DataViewHistory
-
-    # Special treatment for the session
-    App.DataView.when ->
-        if not (session = App.DataView.getSession())
-            session = App.DataView.create session: true
-
-        App.DataView.session = session
-
-        session.on 'sync', ->
-            mediator.publish 'dataview/change'
