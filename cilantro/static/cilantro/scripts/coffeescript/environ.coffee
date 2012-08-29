@@ -12,6 +12,7 @@ define [
 
     # Third-party libraries and plugins
     'bootstrap'
+    'bootstrap-typeahead'
     'jquery.ui'
 
     # Built-in plugins
