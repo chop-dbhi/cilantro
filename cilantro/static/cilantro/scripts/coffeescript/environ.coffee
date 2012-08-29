@@ -77,14 +77,14 @@ define [
     # handlers.
     syncStatus = $('<div id=sync-status></div>').addClass('alert')
 
+    $.ajaxPrefilter (options, origOptions, xhr) ->
+        # For all same origin, non-safe requests add the X-CSRFToken header
+        if not safeMethod(options.type) and sameOrigin(options.url)
+            xhr.setRequestHeader 'X-CSRFToken', CSRF_TOKEN
+
     $(document)
         .ajaxSend (event, xhr, settings) ->
             syncStatus.removeClass 'alert-danger'
-
-            # For all same origin, non-safe requests add the X-CSRFToken header
-            if not safeMethod(settings.type) and sameOrigin(settings.url)
-                xhr.setRequestHeader 'X-CSRFToken', CSRF_TOKEN
-
             type = (settings.type or 'get').toLowerCase()
             if type is 'get'
                 syncStatus.text LOADING
