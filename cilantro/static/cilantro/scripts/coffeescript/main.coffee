@@ -8,10 +8,10 @@ define [
 
     # Load models/collections
     'models/charts'
-    'models/datafields'
-    'models/dataconcepts'
-    'models/datacontexts'
-    'models/dataviews'
+    'models/datafield'
+    'models/dataconcept'
+    'models/datacontext'
+    'models/dataview'
 ], (environ, $) ->
 
     # Initialize and load the routes.

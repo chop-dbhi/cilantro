@@ -31,9 +31,17 @@ define [
             if @isBranch()
                 json =
                     type: @get 'type'
-                    children: _.map(@get('children'), (model) -> model.toJSON())
+                    children: @get 'children'
+            else if @isComposite()
+                json =
+                    id: @get 'id'
+                    composite: @get 'composite'
             else
-                json = super
+                json =
+                    id: @get 'id'
+                    operator: @get 'operator'
+                    value: @get 'value'
+
             return json
 
         isRoot: -> not @parent?
@@ -101,8 +109,7 @@ define [
         add: (nodes...) ->
             if not @isBranch()
                 throw new Error 'Node is not a branch. Use "promote" to convert it into one'
-            (children = @get('children')).push.apply children, _.map nodes, (attrs) =>
-                DataContextNode.parseAttrs attrs, @
+            @get('children').push nodes...
             return @
 
         # Removes itself from it's parent. When only one sibling remains in the
@@ -162,39 +169,40 @@ define [
 
     class DataContext extends Backbone.Model
         initialize: ->
+            # Node hash based on `id`
             @nodes ?= {}
+            # Node has based on `cid`
+            @clientNodes ?= {}
+            @root ?= new DataContextNode
 
         url: ->
             if @isNew() then super else @get 'url'
 
         parse: (resp) =>
             if resp
-                if not @node
+                if not @root
                     @nodes = {}
-                    @node = DataContextNode.parseAttrs resp.json, null, @_cacheNode
+                    @clientNodes = {}
+                    @root = DataContextNode.parseAttrs resp.json, null, @_cacheNode
                 else
-                    DataContextNode.updateAttrs @node, resp.json
+                    DataContextNode.updateAttrs @root, resp.json
             return resp
 
         toJSON: ->
-            attrs = super
-            if @node then attrs.json = @node.toJSON()
+            attrs =
+                id: @get 'id'
+                name: @get 'name'
+                json: null
+                description: @get 'description'
+                keywords: @get 'keywords'
+                published: @get 'published'
+                archived: @get 'archived'
+                composite: @get 'composite'
+                session: @get 'session'
+
+            if @root and not @root.isEmpty()
+                attrs.json = @root.toJSON()
             return attrs
-
-        isRoot: ->
-            @node.isRoot()
-
-        isEmpty: ->
-            @node.isEmpty()
-
-        isBranch: ->
-            @node.isBranch()
-
-        isCondition: ->
-            @node.isCondition()
-
-        isComposite: ->
-            @node.isComposite()
 
         # Each condition or composite node has a reference stored in
         # a array grouped by `id` to enable manipulating nodes in flat
@@ -206,46 +214,47 @@ define [
                 # Don't add redundant cache
                 if cache.indexOf(node) is -1
                     cache.push node
+                # This is to keep track of references for all node objects
+                @clientNodes[node.cid] = node
 
         _deferenceNode: (node) =>
             if (cache = @nodes[node.id]) and (idx = cache.indexOf(node)) >= 0
                 cache.splice(idx, 1)
+            delete @clientNodes[node.cid]
 
         # Returns an array of nodes for the provided `id`.
         getNodes: (id) ->
             @nodes[id] or []
 
-        # Promotes the given `node` to a branch
-        promote: (node, nodes...) ->
-            if node is null
-                @node.promote nodes...
-            else
-                node.promote nodes...
-            @save()
-
-        demote: (node) ->
-            node.demote()
-            @save()
-
-        add: (node, nodes...) ->
-            # Attempt to add to the root node. If the root is empty, so
-            # replace it with this node
-            if not node
-                if @node.isEmpty()
-                    @node = nodes[0]
-                    @_cacheNode @node
+        # Add a node to the data context. If no root is defined, this node
+        # becomes the root. Otherwise, a new branch node is created and the
+        # current root changed to a child node
+        add: (node) ->
+            if not @clientNodes[node.cid]
+                @_cacheNode node
+                if @root.isEmpty()
+                    @root = node
+                # If the root is already a branch and simply a container,
+                # add it as a child
+                else if @root.isBranch() and not @root.id
+                    @root.get('children').push node
                 else
-                    node = @node
-            if node
-                node.add nodes...
-                @_cacheNode node for node in node.get 'children'
-            @save()
+                    branch = new DataContextNode
+                        type: 'and'
+                        children: [@root, node]
+                    @root = branch
 
         remove: (node) ->
-            node = node or @node
-            node.remove()
-            if not node.isRoot() then @_deferenceNode node
-            @save()
+            if @clientNodes[node.cid]
+                if node is @root
+                    @root = new DataContextNode
+                else if @root.isBranch()
+                    children = @root.get('children')
+                    if (idx = children.indexOf(node)) >= 0
+                        children.splice(idx, 1)[0]
+                    if children.length is 1
+                        @root = children[0]
+                @_deferenceNode node
 
 
     class DataContexts extends Backbone.Collection

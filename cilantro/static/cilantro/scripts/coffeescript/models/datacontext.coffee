@@ -22,16 +22,13 @@ define [
                     # Mute the change event, circular calls are bad..
                     @session.save null, silent: true
 
-                mediator.subscribe 'datacontext/remove', (node) =>
+                mediator.subscribe 'datacontext/delete', (node) =>
                     @session.remove node
 
-                mediator.subscribe 'datacontext/add', (data) =>
-                    if @session.isCondition() or @session.isComposite()
-                        @session.promote null, data
-                    else
-                        @session.add null, data
+                mediator.subscribe 'datacontext/put', (node) =>
+                    @session.add node
 
-                mediator.subscribe 'datacontext/update', (node) =>
+                mediator.subscribe 'datacontext/save', =>
                     mediator.publish 'datacontext/sync'
                     @session.save()
 
