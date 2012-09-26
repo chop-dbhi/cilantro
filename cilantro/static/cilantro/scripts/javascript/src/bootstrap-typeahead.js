@@ -33,6 +33,7 @@
     this.shown = false
     this.delimiter = this.options.delimiter || this.delimiter
     this.mode = this.options.mode || this.mode
+    this.renderItem = this.options.renderItem
     this.selections = []
     this.listen()
   }
@@ -42,7 +43,7 @@
     constructor: Typeahead
 
   , select: function () {
-      var val = JSON.parse(this.$menu.find('.active').attr('data-value'))
+      var val = this.$menu.find('.active').attr('data-value')
 
       if (this.mode === 'multiple') {
         var vals = []
@@ -108,17 +109,11 @@
       // If this is a function, it can either return an array of items or kick
       // off an asynchronous request
       if ($.isFunction(this.source)) {
-        items = this.source(this.query, $.proxy(this.process, this))
+        items = this.source(this.query, this)
         // Function resulted was an async call, process the results after the
         // fact
-        if (items instanceof $.Deferred) {
-          items.then(function(items) {
-            if (!items.length) {
-              return this.shown ? this.hide() : this
-            }
-            return this.render(items.slice(0, this.options.items)).show()
-          })
-          return
+        if (!$.isArray(items)) {
+            return
         }
       } else {
         items = this.source
@@ -174,11 +169,15 @@
   , render: function (items) {
       var that = this
 
-      items = $(items).map(function (i, item) {
-        i = $(that.options.item).attr('data-value', JSON.stringify(item))
-        i.find('a').html(that.highlighter(that.parse(item)))
-        return i[0]
-      })
+      if (this.renderItem) {
+        items = $(items).map(this.renderItem)
+      } else {
+        items = $(items).map(function(i, item) {
+          i = $(that.options.item).attr('data-value', JSON.stringify(item))
+          i.find('a').html(that.highlighter(that.parse(item)))
+          return i[0];
+        });
+      }
 
       items.first().addClass('active')
       this.$menu.html(items)
@@ -321,6 +320,7 @@
   , delimiter: ', '
   , mode: 'single'
   , property: 'value'
+  , renderItem: null
   , minLength: 1
   }
 
