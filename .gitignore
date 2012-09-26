@@ -1,28 +1,12 @@
 *.DS_Store
-*.sw[po]
-*.py[co]
+*.py?
+*.sw?
+*.egg-info
 .sass-cache
-*.swn
 .watch-pid
 modules
 dist
 MANIFEST
 
-cilantro/static/cilantro/scripts/javascript/src/charts
-cilantro/static/cilantro/scripts/javascript/src/core
-cilantro/static/cilantro/scripts/javascript/src/environ.js
-cilantro/static/cilantro/scripts/javascript/src/forms
-cilantro/static/cilantro/scripts/javascript/src/main.js
-cilantro/static/cilantro/scripts/javascript/src/mediator.js
-cilantro/static/cilantro/scripts/javascript/src/models
-cilantro/static/cilantro/scripts/javascript/src/plugins
-cilantro/static/cilantro/scripts/javascript/src/router.js
-cilantro/static/cilantro/scripts/javascript/src/routes
-cilantro/static/cilantro/scripts/javascript/src/serrano
-cilantro/static/cilantro/scripts/javascript/src/serrano.js
-cilantro/static/cilantro/scripts/javascript/src/session.js
-cilantro/static/cilantro/scripts/javascript/src/utils
-cilantro/static/cilantro/scripts/javascript/src/views
-cilantro/static/cilantro/scripts/javascript/src/js.js
 
 cilantro/static/cilantro/stylesheets/css/style.css
