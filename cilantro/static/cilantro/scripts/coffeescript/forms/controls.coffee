@@ -249,10 +249,9 @@ define [
 
             if @node
                 @node.set data
-                mediator.publish 'datacontext/update', @node
             else
                 @node = new App.Models.DataContextNode data
-                mediator.publish 'datacontext/add', @node
+            mediator.publish 'datacontext/add', @node
             @$remove.show()
 
 
@@ -315,7 +314,7 @@ define [
 
         initialize: (options) ->
             super
-            #mediator.subscribe 'datacontext/change', @loadValues
+            #mediator.subscribe 'datacontext/synced', @loadValues
 
         # TODO can this be populated through typeahead?
         setValue: (value) ->

@@ -14,28 +14,31 @@ define [
                 # Special treatment for the session
                 if not (@session = @getSession())
                     @session = @create session: true
+                else
+                    # Initial publish of being synced since Backbone does
+                    # not consider a fetch or reset to be a _sync_ operation
+                    # in this version. This has been changed in Backbone
+                    # @ commit 1f3f4525
+                    mediator.publish 'datacontext/synced'
 
                 @session.on 'sync', =>
-                    mediator.publish 'datacontext/change'
+                    mediator.publish 'datacontext/synced'
 
-                @session.on 'change:json', =>
-                    # Mute the change event, circular calls are bad..
-                    @session.save null, silent: true
+                mediator.subscribe 'datacontext/changed', =>
+                    mediator.publish 'datacontext/syncing'
+                    @session.save()
 
-                mediator.subscribe 'datacontext/delete', (node) =>
+                mediator.subscribe 'datacontext/remove', (node) =>
                     @session.remove node
 
-                mediator.subscribe 'datacontext/put', (node) =>
+                mediator.subscribe 'datacontext/add', (node) =>
                     @session.add node
-
-                mediator.subscribe 'datacontext/save', =>
-                    mediator.publish 'datacontext/sync'
-                    @session.save()
 
                 # Resolve all pending handlers
                 @resolve()
 
             @fetch()
+
 
     class DataContextHistory extends Serrano.DataContexts
         url: environ.absolutePath '/api/contexts/history/'

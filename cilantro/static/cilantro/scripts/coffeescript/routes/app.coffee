@@ -18,10 +18,10 @@ define [
 
             @$toolbar.append $('<li>').html @$uniqueCount
 
-            mediator.subscribe 'datacontext/changing', =>
+            mediator.subscribe 'datacontext/syncing', =>
                 @$uniqueCount.addClass 'loading'
 
-            mediator.subscribe 'datacontext/change', @updateCount
+            mediator.subscribe 'datacontext/synced', @updateCount
 
 
         updateCount: =>

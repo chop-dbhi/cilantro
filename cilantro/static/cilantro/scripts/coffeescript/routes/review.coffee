@@ -18,9 +18,6 @@ define [
             'click table thead th': 'sort'
             'click .pinned-thead div': 'sort'
 
-        deferred:
-            'loadData': true
-
         initialize: ->
             super
             @$el
@@ -51,16 +48,14 @@ define [
                 trigger: =>
                     @loadData true
 
-            mediator.subscribe 'dataview/change', =>
-                @xhr?.abort()
-                @loadData()
+            mediator.subscribe 'dataview/synced', =>
+                @defer 'loadData'
 
-            mediator.subscribe 'datacontext/change', =>
-                @xhr?.abort()
-                @loadData()
+            mediator.subscribe 'datacontext/synced', =>
+                @defer 'loadData'
 
             @page = 1
-            @loadData()
+            @defer 'loadData'
 
         load: ->
             @$el.fadeIn 100
@@ -75,8 +70,6 @@ define [
             @$toolbar.hide()
 
         loadData: (append=false) =>
-            @xhr?.abort()
-
             # Check if the lastest page is the last page
             if @page is @num_pages then return
 
@@ -87,7 +80,7 @@ define [
             else
                 @table.$el.addClass 'loading'
 
-            @xhr = $.ajax
+            @xhr = Backbone.ajax
                 url: environ.absolutePath url
                 success: (resp) =>
                     if append

@@ -50,7 +50,7 @@ define [
                 if @model.id is id then @show()
 
             # Should be used only if the UI is relative to the datacontext
-            # mediator.subscribe 'datacontext/change', @update
+            # mediator.subscribe 'datacontext/synced', @update
 
             @render()
 
@@ -271,10 +271,10 @@ define [
             $('body').append @$el
             @$el.panel()
 
-            mediator.subscribe 'datacontext/changing', =>
+            mediator.subscribe 'datacontext/syncing', =>
                 @$content.addClass 'loading'
 
-            mediator.subscribe 'datacontext/change', @render
+            mediator.subscribe 'datacontext/synced', @render
 
             App.DataContext.when =>
                 @render()

@@ -46,7 +46,7 @@ define [
             @$toolbar.append $addChart
 
             @defer => @addChart model for model in App.Distribution.models
-            mediator.subscribe 'datacontext/change', @updateCharts
+            mediator.subscribe 'datacontext/synced', @updateCharts
 
         updateCharts: =>
             (view.updateChart() for view in @charts)
