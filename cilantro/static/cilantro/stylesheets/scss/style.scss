@@ -34,12 +34,7 @@
 @import "routes/review";
 
 * {
-    @include user-select(none);
     @include transition(opacity, 0.4s, ease-in-out);
-}
-
-select, input, p, table {
-    @include user-select(auto);
 }
 
 body {

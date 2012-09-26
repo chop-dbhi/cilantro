@@ -73,6 +73,7 @@ $subnav-bgcolor: #d3e3f2;
         @include linear-gradient(lighten($subnav-bgcolor, 10), $subnav-bgcolor);
         border: 1px solid darken($subnav-bgcolor, 15);
         color: darken($subnav-bgcolor, 50);
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
 
         &:hover {
             background-color: $subnav-bgcolor;
