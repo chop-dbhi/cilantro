@@ -69,9 +69,10 @@ define [
         /^(GET|HEAD|OPTIONS|TRACE)$/.test method
 
     # Uses the globally defined `scriptName` variable to construct full URL
-    # paths.
+    # paths. Ensure redundant slashes are removed
     absolutePath = (path) ->
-        SCRIPT_NAME + path
+        path = "#{ SCRIPT_NAME }/#{ path }"
+        path.replace /\/+/g, '/'
 
     # Setup the sync status text and the various global ajax
     # handlers.

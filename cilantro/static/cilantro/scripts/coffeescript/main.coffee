@@ -33,7 +33,7 @@ define [
         App.register 'review/', 'review', new ReviewArea
 
         root = environ.SCRIPT_NAME or '/'
-        if root.substr(root-1) isnt '/'
+        if root.substr(root.length-1) isnt '/'
             root = root + '/'
 
         # Start up the history now that all the main routes are registered
