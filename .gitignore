@@ -8,5 +8,16 @@ modules
 dist
 MANIFEST
 
+cilantro/static/cilantro/scripts/javascript/min
+cilantro/static/cilantro/scripts/javascript/src
+
+!cilantro/static/cilantro/scripts/javascript/src/backbone.charts.js
+!cilantro/static/cilantro/scripts/javascript/src/backbone.js
+!cilantro/static/cilantro/scripts/javascript/src/bootstrap.js
+!cilantro/static/cilantro/scripts/javascript/src/highcharts.js
+!cilantro/static/cilantro/scripts/javascript/src/jquery.js
+!cilantro/static/cilantro/scripts/javascript/src/jquery.ui.js
+!cilantro/static/cilantro/scripts/javascript/src/require.js
+!cilantro/static/cilantro/scripts/javascript/src/underscore.js
 
 cilantro/static/cilantro/stylesheets/css/style.css
