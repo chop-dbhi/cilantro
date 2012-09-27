@@ -27,6 +27,9 @@ define [
         updateCount: =>
             @$uniqueCount.removeClass 'loading'
             count = App.DataContext.session.get 'count'
-            pretty = App.utils.toSuffixedNumber count
-            commaed = App.utils.toDelimitedNumber count
-            @$uniqueCount.text(pretty).attr('title', commaed)
+            if count?
+                pretty = App.utils.toSuffixedNumber count
+                commaed = App.utils.toDelimitedNumber count
+                @$uniqueCount.text(pretty).attr('title', commaed)
+            else
+                @$uniqueCount.html('&infin;')
