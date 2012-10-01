@@ -2,7 +2,7 @@ from django.contrib.sites.models import get_current_site
 from cilantro.models import SiteConfiguration
 
 
-def media(request):
+def static(request):
     from django.conf import settings
     static_url = getattr(settings, 'CILANTRO_STATIC_URL', None)
 
