@@ -17,6 +17,7 @@ class SiteConfiguration(models.Model):
     footer_content = models.TextField(help_text='Markdown enabled', blank=True)
     google_analytics = models.CharField(max_length=20, null=True, blank=True,
         help_text=_('Just the UA-XXXXXX-XXX code'))
+    auth_required = models.BooleanField(default=False)
 
     objects = SiteConfigurationManager()
 
@@ -39,6 +40,9 @@ class UserPreferences(models.Model):
     json = jsonfield.JSONField(default=dict)
     user = models.ForeignKey(User, null=True, blank=True)
     session_key = models.CharField(max_length=40, null=True, blank=True)
+
+    class Meta(object):
+        verbose_name_plural = 'user preferences'
 
     def __unicode__(self):
         if self.user_id:

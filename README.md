@@ -1,12 +1,6 @@
 # Cilantro
 #### _Client for the Serrano and Avocado stack_
 
-- [Background]
-- [Install]
-- [Configure]
-- [Customize]
-- [Contribute]
-
 ## Background
 
 Cilantro is a modular Web browser-based client for the [Serrano](http://cbmi.github.com/serrano/) hypermedia API implementation of [Avocado](http://cbmi.github.com/avocado/).
@@ -17,8 +11,10 @@ Since this is a client for supporting data discovery applications, the UI must b
 
 ## Install
 
-```
-pip install cilantro
+This will install a variety of dependencies including Serrano and Avocado.
+
+```bash
+$ pip install cilantro
 ```
 
 ## Configure
@@ -29,8 +25,25 @@ Include `cilantro.urls` in your `ROOT_URLCONF` (the main **urls.py**):
 urlpatterns = patterns('',
     ...
     url(r'', include('cilantro.urls')),
-    ...
 )
+```
+
+Add the Cilantro context processor:
+
+```python
+# The easiest way is to import and augment the default one...
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+
+TEMPLATE_CONTEXT_PROCESSORS += (
+    'django.core.context_processors.request',
+    'cilantro.context_processors.cilantro',
+)
+```
+
+Migrate the Cilantro tables:
+
+```bash
+$ manage.py migrate cilantro
 ```
 
 ## Customize

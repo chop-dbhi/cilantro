@@ -1,0 +1,8 @@
+{% load url from future %}
+
+<a class=brand href={% url "index" %}>
+    {% firstof cilantro.config.title site.name site.domain "Cilantro" %}
+    {% if cilantro.config.label %}
+        <span class="label label-info">{{ cilantro.config.label }}</span>
+    {% endif %}
+</a>
