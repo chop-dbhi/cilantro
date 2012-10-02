@@ -12,7 +12,7 @@ class SiteConfiguration(models.Model):
     subtitle = models.CharField(max_length=100, blank=True)
     label = models.CharField('status label', max_length=20, blank=True)
     site_logo = models.FileField(upload_to='cilantro/sites', null=True, blank=True)
-    site = models.OneToOneField(Site, related_name='configuration', blank=True,
+    site = models.OneToOneField(Site, related_name='configuration+', null=True, blank=True,
         help_text=_('Leave empty to be the default configuration for all sites'))
     footer_content = models.TextField(help_text='Markdown enabled', blank=True)
     google_analytics = models.CharField(max_length=20, null=True, blank=True,
