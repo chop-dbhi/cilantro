@@ -47,9 +47,9 @@
                         {% block header_nav %}
                             <ul class="nav pull-right">
                                 {% if user.is_authenticated %}
-                                    {% include "cilantro/_auth-header-nav.html" %}
+                                    {% include "cilantro/_nav-auth.html" %}
                                 {% elif cilantro.config.auth_required %}
-                                    {% include "cilantro/_header-nav.html" %}
+                                    {% include "cilantro/_nav.html" %}
                                 {% endif %}
                             </ul>
                         {% endblock %}
