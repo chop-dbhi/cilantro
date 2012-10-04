@@ -1,53 +1,24 @@
 {% extends "cilantro/base.html" %}
+{% load url from future %}
 
 {% block scripts %}
-    <script>
-        var
-            // Used by `environ.js` to correctly prefix URL paths
-            SCRIPT_NAME = '{{ request.META.SCRIPT_NAME }}',
-
-            // Used for non-safe requests, also defined in `environ.js`
-            CSRF_TOKEN = '{{ csrf_token }}';
-
-        // Pre-configuration, everything is relative to Cilantro's path. For
-        // integration of external scripts, create a contexted `require`
-        // function. See http://requirejs.org/docs/api.html#multiversion.
-        // Note that all existing scripts defined here can be used
-        var require = {
-            baseUrl: '{{ CILANTRO_JAVASCRIPT_URL }}',
-            deps: ['js'],
-            shim: {
-                'underscore': {
-                    exports: '_'
-                },
-                'backbone': {
-                    deps: ['underscore', 'jquery'],
-                    exports: 'Backbone'
-                },
-                'highcharts': {
-                    exports: 'Highcharts'
-                },
-                'bootstrap': ['jquery'],
-                'jquery.ui': ['jquery']
-            }
-        };
-    </script>
-
     <script data-main=main src={{ cilantro.javascript_url }}/require.js></script>
 {% endblock scripts %}
 
 {% block header_nav %}
     <ul class="nav pull-left">
-        <li><a href={{ request.META.SCRIPT_NAME }}/ data-route=workspace>Workspace</a>
-        <li><a href={{ request.META.SCRIPT_NAME }}/discover/ data-route=discover>Discover</a>
-        <li><a href={{ request.META.SCRIPT_NAME }}/analyze/ data-route=analyze>Analyze</a>
-        <li><a href={{ request.META.SCRIPT_NAME }}/review/ data-route=review>Review</a>
+        <li><a href={% url "cilantro:workspace" %} data-route=workspace>Workspace</a>
+        <li><a href={% url "cilantro:discover" %} data-route=discover>Discover</a>
+        <li><a href={% url "cilantro:analyze" %} data-route=analyze>Analyze</a>
+        <li><a href={% url "cilantro:review" %} data-route=review>Review</a>
     </ul>
     {{ block.super }}
 {% endblock header_nav %}
 
 {% block content %}
-    <div id=main-area class=scrollable-column>
-        <div class=inner></div>
+    <div class=row-fluid>
+        <div id=main-area class=scrollable-column>
+            <div class=inner></div>
+        </div>
     </div>
 {% endblock content %}

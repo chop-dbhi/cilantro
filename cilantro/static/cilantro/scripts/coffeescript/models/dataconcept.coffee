@@ -4,11 +4,12 @@ define [
 ], (environ, Serrano) ->
 
     class DataConcepts extends Serrano.DataConcepts
-        url: environ.absolutePath '/api/concepts/'
+        url: App.urls.dataconcepts
 
         initialize: ->
             super
             @on 'reset', @resolve
             @fetch()
+
 
     App.DataConcept = new DataConcepts

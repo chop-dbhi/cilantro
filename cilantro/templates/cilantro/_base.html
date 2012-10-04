@@ -77,21 +77,36 @@
 
     <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
-    {% block scripts %}
+    {% block jsconfig %}
         <script>
-            var
-                // Used by `environ.js` to correctly prefix URL paths
-                SCRIPT_NAME = '{{ request.META.SCRIPT_NAME }}',
+            var App = {
+                // Used by the pushState history to correctly define the
+                // root URL
+                SCRIPT_NAME: '{{ request.META.SCRIPT_NAME }}',
 
                 // Used for non-safe requests, also defined in `environ.js`
-                CSRF_TOKEN = '{{ csrf_token }}';
+                CSRF_TOKEN: '{{ csrf_token }}',
+
+                urls: {
+                    dataviews: '{% url "serrano:dataviews" %}',
+                    datacontexts: '{% url "serrano:datacontexts" %}',
+                    dataconcepts: '{% url "serrano:dataconcepts" %}',
+                    datafields: '{% url "serrano:datafields" %}',
+
+                    preferences: '{% url "cilantro:preferences" %}',
+                    workspace: '{% url "cilantro:workspace" %}',
+                    discover: '{% url "cilantro:discover" %}',
+                    analyze: '{% url "cilantro:analyze" %}',
+                    review: '{% url "cilantro:review" %}'
+                }
+            },
 
 
             // Pre-configuration, everything is relative to Cilantro's path. For
             // integration of external scripts, create a contexted `require`
             // function. See http://requirejs.org/docs/api.html#multiversion.
             // Note that all existing scripts defined here can be used
-            var require = {
+            require = {
                 baseUrl: '{{ cilantro.javascript_url }}',
                 shim: {
                     'underscore': {
@@ -104,14 +119,18 @@
                     'highcharts': {
                         exports: 'Highcharts'
                     },
-                    'bootstrap': ['jquery'],
-                    'bootstrap-typeahead': ['jquery'],
-                    'jquery.ui': ['jquery']
+                    'plugins/bootstrap': ['jquery'],
+                    'plugins/bootstrap-typeahead': ['jquery'],
+                    'plugins/jquery-ui': ['jquery']
                 }
             };
         </script>
-    {% endblock %}
+    {% endblock jsconfig %}
+
+
+    {% block scripts %}
         <script data-main=environ src={{ cilantro.javascript_url }}/require.js></script>
+    {% endblock scripts %}
 
     <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
              mathiasbynens.be/notes/async-analytics-snippet -->

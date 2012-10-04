@@ -1,3 +1,7 @@
+# Simple _mediator_ implementation. This utilizes the Pub/Sub pattern for
+# decoupling the way modules 'communicate'. Currently there is no permission
+# support to restrict communication to specific modules.
+
 define ['underscore'], (_) ->
 
     channels = {}

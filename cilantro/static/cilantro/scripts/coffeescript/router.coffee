@@ -9,8 +9,8 @@ define [
 
     # Keep track of routes and the currently loaded views relative to
     # a given route.
-    App.routes = {}
-    App.loaded = []
+    registeredRoutes = {}
+    loadedRoutes = []
 
     App.router = new Backbone.Router
 
@@ -23,8 +23,8 @@ define [
     # views applicable to the app as a whole.
 
     App.register = (route, name, view) ->
-        if App.routes[name]? then throw new Error "#{ name } view already registered"
-        App.routes[name] = view
+        if registeredRoutes[name]? then throw new Error "#{ name } view already registered"
+        loadedRoutes[name] = view
 
         # Non-routable view.. loaded once
         if route is false
@@ -39,15 +39,15 @@ define [
                 # Unload existing views, check for existence in case the
                 # view had been destroyed in the meantime
                 for _name in @loaded
-                    App.routes[_name].unload?()
-                    App.routes[_name].pending?()
-                @loaded = []
+                    registeredRoutes[_name].unload?()
+                    registeredRoutes[_name].pending?()
+                loadedRoutes = []
                 # Defer to end of call stack
                 _.defer -> ROUTING = false
 
-            App.routes[name].load?()
-            App.routes[name].resolve?()
-            @loaded.push name
+            registeredRoutes[name].load?()
+            registeredRoutes[name].resolve?()
+            loadedRoutes.push name
 
         @router.on "route:#{ name }", ->
             links = $('[data-route]')
