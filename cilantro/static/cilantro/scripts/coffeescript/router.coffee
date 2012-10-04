@@ -24,7 +24,7 @@ define [
 
     App.register = (route, name, view) ->
         if registeredRoutes[name]? then throw new Error "#{ name } view already registered"
-        loadedRoutes[name] = view
+        registeredRoutes[name] = view
 
         # Non-routable view.. loaded once
         if route is false
@@ -38,7 +38,7 @@ define [
                 ROUTING = true
                 # Unload existing views, check for existence in case the
                 # view had been destroyed in the meantime
-                for _name in @loaded
+                for _name in loadedRoutes
                     registeredRoutes[_name].unload?()
                     registeredRoutes[_name].pending?()
                 loadedRoutes = []
