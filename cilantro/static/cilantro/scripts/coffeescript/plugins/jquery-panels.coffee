@@ -32,13 +32,13 @@ define ['jquery'], ($) ->
     Panel = (element) ->
         @element = $(element)
         # Total width of panel
-        @slideWidth = @element.outerWidth()
+        @slideWidth = @element.width()
 
         # If a .panel-toggle exists within the panel, substract the width
         # to it is still visible for use
         if (toggle = @element.children('.panel-toggle'))[0]
             toggle.on 'click', => @element.panel 'toggle'
-            @slideWidth -= toggle.outerWidth()
+            @slideWidth -= toggle.width()
 
         @state = 1
 
