@@ -135,6 +135,32 @@ define [
             return
 
 
+    class ConceptItemView extends Backbone.View
+        tagName: 'li'
+
+        events:
+            'click a': 'click'
+
+        initialize: ->
+            # Reflect the active state when the shown
+            mediator.subscribe 'queryview/show', (id) =>
+                if id is @model.id
+                    @$el.addClass 'active'
+                else
+                    @$el.removeClass 'active'
+
+            # Reflect the non-active state when hidden
+            mediator.subscribe 'queryview/hide', (id) =>
+                if id is @model.id then @$el.removeClass 'active'
+
+        render: ->
+            @$el.html "<a href=#>#{ @model.get 'name' }</a>"
+
+        click: (event) ->
+            event.preventDefault()
+            mediator.publish 'queryview/show', @model.id
+
+
     # Accordian representation of the data filters
     class QueryViewsAccordian extends Backbone.View
         id: 'data-filters-accordian'
@@ -144,11 +170,11 @@ define [
         groupTemplate: _.template '
             <div class=accordian-group>
                 <div class=accordian-heading>
-                    <a class=accordian-toggle data-toggle=collapse data-parent={{ parent }} href=#{{ slug }}>{{ name }}</a>
+                    <a class=accordian-toggle data-toggle=collapse href="#category-{{ id }}">{{ name }}</a>
                     <i class=icon-filter></i>
                 </div>
-                <div id={{ slug }} class="accordian-body collapse">
-                    <ul class=nav></ul>
+                <div id="category-{{ id }}" class="accordian-body collapse">
+                    <ul class="nav nav-list"></ul>
                 </div>
             </div> 
         '
@@ -163,60 +189,82 @@ define [
                     if model.get 'queryview'
                         new QueryView model: model
 
-        events:
-            'click [data-toggle=queryview]': 'show'
-
         render: ->
-            @$el.empty()
+            tree = categories: []
 
-            # Keep track if there are any categories. If none are present,
-            # remove the header and uncollpase the list
-            noCategories = true
-
-            sorted = @collection.sortBy (model) ->
-                category = model.get('category')
-                if category
-                    noCategories = false
-                    parseInt("#{category.order}000#{model.order}")
-                else
-                    model.order or model.name
-
-            for model in sorted
+            for model in @collection.models
                 if not model.get 'queryview' then continue
-                if noCategories
-                    if not group
-                        group = $ @groupTemplate
-                            name: ''
-                            parent: 0
-                            slug: "#{ 0 }-default"
-                        group.find('.accordian-heading').remove()
-                        group.find('.accordian-body').removeClass('collapse')
-                        @$el.append group
-                else
-                    category = model.get('category')
-                    categoryName = if category then category.name else 'Other'
+                attrs = model.attributes
 
-                    if not groupName or categoryName isnt groupName
-                        groupName = categoryName
-                        id = @$el.prop('id')
-                        group = $ @groupTemplate
-                            name: groupName
-                            parent: id
-                            slug: "#{ id }-#{ groupName.toLowerCase() }"
-                        @$el.append group
+                cat = null
+                sub = null
 
-                group.find('.nav').append $ "
-                    <li><a href=# data-toggle=queryview data-target=#{ model.id }>#{ model.get 'name' }</a>
-                        <i class=icon-filter></i>
-                    </li>
-                "
+                if attrs.category
+                    if attrs.category.parent_id
+                        cat = attrs.category.parent_id
+                        sub = attrs.category.id
+                    else
+                        cat = attrs.category.id
+                    
+                if not (subtree = tree[cat])
+                    if cat then tree.categories.push attrs.category
+                    subtree = tree[cat] = categories: []
+                if not (models = subtree[sub])
+                    if sub then subtree.categories.push attrs.category
+                    models = subtree[sub] = []
 
-            return @
+                # Models will be sorted relative to their groups later
+                models.push model
+
+
+            # Build the DOM tree
+            cats = _.sortBy tree.categories, 'order'
+            if tree[null] then cats.push null
+
+            # Process each category in the tree
+            for cat in cats
+                if not cat
+                    cat = id: null, name: 'Other'
+
+                $group = $ @groupTemplate cat
+                @$el.append $group
+                $list = $group.find '.accordian-body ul'
+
+                subtree = tree[cat.id]
+                subcats = _.sortBy subtree.categories, 'order'
+                if subtree[null] then subcats.push null
+
+                # Process each category in the subtree
+                for sub in subcats
+                    if sub
+                        id = sub.id
+                        name = sub.name
+                    else
+                        id = null
+                        name = 'Other'
+
+                    # Add section header in group list
+                    $list.append "<li class=nav-header>#{ name }</li>"
+                    $list.append "<li class=divider>#{ name }</li>"
+
+                    models = subtree[id]
+
+                    for model in models
+                        view = new ConceptItemView model: model
+                        $list.append view.render()
+
+                if subcats.length is 1
+                    $list.find('.nav-header').remove()
+                    $list.find('.divider').remove()
+                    
+            # Single category items, hide the only group
+            # heading for simplicity
+            if cats.length is 1
+                $group.find('.accordian-heading').remove()
+                $group.find('.accordian-body').removeClass('collapse')
+
+            return @$el
         
-        show: (event) ->
-            event.preventDefault()
-            mediator.publish 'queryview/show', $(event.target).data('target')
-
 
     # Represents a search form that will filter down the query options
     class QueryViewsSearchForm extends Backbone.View
