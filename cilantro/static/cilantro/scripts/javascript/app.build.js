@@ -26,8 +26,9 @@
         'highcharts': {
             exports: 'Highcharts'
         },
-        'bootstrap': ['jquery'],
-        'jquery.ui': ['jquery']
+        'plugins/bootstrap': ['jquery'],
+        'plugins/bootstrap-typeahead': ['jquery'],
+        'plugins/jquery-ui': ['jquery']
     },
 
     name: 'main'
