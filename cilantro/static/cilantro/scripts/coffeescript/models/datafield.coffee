@@ -4,9 +4,7 @@ define [
 ], (environ, Serrano) ->
 
     class DataFields extends Serrano.DataFields
-        url: environ.absolutePath '/api/fields/'
+        url: App.urls.datafields
 
-        initialize: ->
-            @deferred = @fetch()
 
     App.DataField = new DataFields

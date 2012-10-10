@@ -344,7 +344,7 @@ define [
             typeahead = @$value.data('typeahead')
 
             Backbone.ajax
-                url: environ.absolutePath @model.get('_links').values.href
+                url: @model.get('_links').values.href
 
                 # Mark is as being loaded
                 beforeSend: =>
@@ -362,7 +362,7 @@ define [
         loadValues: =>
             @set()
 
-            url = environ.absolutePath @model.get('_links').values.href
+            url = @model.get('_links').values.href
             lastQuery = null
 
             @$value.typeahead
@@ -411,7 +411,7 @@ define [
         loadValues: ->
             @$value.addClass 'loading'
             Backbone.ajax
-                url: environ.absolutePath @model.get('_links').values.href
+                url: @model.get('_links').values.href
                 success: (resp) =>
                     @$value.removeClass 'loading'
                     for option in resp
