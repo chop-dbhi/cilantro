@@ -4,7 +4,8 @@ define [
     'jquery'
     'underscore'
     'backbone'
-], (environ, mediator, $, _, Backbone) ->
+    'serrano/channels'
+], (environ, mediator, $, _, Backbone, channels) ->
 
     class Columns extends Backbone.View
 
@@ -49,7 +50,13 @@ define [
             'click .available-columns button': 'clickAdd'
             'click .selected-columns button': 'clickRemove'
 
+        deferred:
+            'add': false
+            'remove': false
+
         initialize: ->
+            super
+
             @setElement @template()
 
             @$available = @$ '.available-columns'
@@ -62,17 +69,18 @@ define [
             @collection.when =>
                 @$el.removeClass 'loading'
                 @render()
+                @resolve()
 
-            $.when(App.DataView, @collection).then =>
-                if (json = App.DataView.session.get 'json')
-                    @add id for id in json.concepts
+            mediator.subscribe channels.DATAVIEW_SYNCED, (model) =>
+                if model.isSession() and (json = model.get('json'))
+                    @add id for id in json.columns
                 return
 
         render: =>
             availableHtml = []
             selectedHtml = []
 
-            for model in @collection.filter((model) -> model.get('formatter'))
+            for model in @collection.filter((model) -> model.get('formatter_name'))
                 availableHtml.push @availableItemTemplate model.attributes
                 selectedHtml.push @selectedItemTemplate model.attributes
 
@@ -80,26 +88,6 @@ define [
             @$selected.html selectedHtml.join ''
             return @
 
-        showAvailableControls: (event) ->
-            clearTimeout @_availableControlsTimer
-            @$available.find('.controls').fadeIn 100
-
-        hideAvailableControls: (event) ->
-            clearTimeout @_availableControlsTimer
-            @_availableControlsTimer = _.delay =>
-                @$available.find('.controls').fadeOut 100
-            , 300
-
-        showSelectedControls: (event) ->
-            clearTimeout @_selectedControlsTimer
-            @$selected.find('.controls').fadeIn 100
-
-        hideSelectedControls: (event) ->
-            clearTimeout @_selectedControlsTimer
-            @_selectedControlsTimer = _.delay =>
-                @$selected.find('.controls').fadeOut 100
-            , 300
-        
         show: ->
             @$el.modal 'show'
 
@@ -109,12 +97,10 @@ define [
         save: ->
             @hide()
             ids = $.map @$selected.children(), (elem) ->
-                if (data = $(elem).data()).selected
+                if (data = $(elem).data()).selected and data.id
                     return data.id
 
-            json = App.DataView.session.get('json') or {}
-            json.concepts = ids
-            App.DataView.session.save 'json', json
+            mediator.publish channels.DATAVIEW_COLUMNS, ids
 
         add: (id) =>
             @$available
@@ -125,7 +111,6 @@ define [
             # Re-append the item to the botton of the list
             @$selected
                 .find("[data-id=#{ id }]")
-                .detach()
                 .appendTo(@$selected)
                 .show()
                 .data('selected', true)

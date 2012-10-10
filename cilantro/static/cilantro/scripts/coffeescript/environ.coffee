@@ -1,5 +1,8 @@
 define [
     'jquery'
+
+    'utils/numbers'
+    'utils/grouper'
     
     # Plugins that may affect the behavior of the application from the user's
     # point-of-view, e.g. triggered alerts, dialogs.
@@ -11,6 +14,9 @@ define [
     'plugins/backbone-ajax-queue'
     'plugins/backbone-deferrable'
 
+    # Use Mustache style syntax rather than ERB
+    'plugins/underscore-mustache'
+
     'plugins/bootstrap'
     'plugins/bootstrap-typeahead'
 
@@ -19,9 +25,12 @@ define [
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
 
-], ($) ->
+], ($, Numbers, Grouper) ->
 
     App = @App
+
+    App.Numbers = Numbers
+    App.Grouper = Grouper
 
     # Checks for environment settings
     if not App.SCRIPT_NAME?

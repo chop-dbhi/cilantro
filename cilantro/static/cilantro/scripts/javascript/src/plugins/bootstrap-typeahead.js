@@ -43,17 +43,17 @@
     constructor: Typeahead
 
   , select: function () {
-      var val = this.$menu.find('.active').attr('data-value')
+      var val = JSON.parse(this.$menu.find('.active').attr('data-value'))
 
       if (this.mode === 'multiple') {
         var vals = []
         this.selections.push(val)
         for (var i = 0; i < this.selections.length; i++) {
-          vals.push(this.parse(this.selections[i]))
+          vals.push(this.label(this.selections[i]))
         }
         val = vals.join(this.delimiter) + this.delimiter
       } else {
-        val = this.parse(val)
+        val = this.label(val)
       }
 
       this.$element
@@ -93,6 +93,12 @@
       return value[this.options.property]
     }
 
+  , label: function(value) {
+      if (typeof value == 'string')
+          return value
+      return value[this.options.label]
+    }
+
   , lookup: function(event) {
       var items
         // split the input by the delimiter
@@ -102,7 +108,7 @@
       this.query = $.trim(input[input.length - 1])
 
       // Ensure the query is the minimum length processing
-      if (!this.query || this.query.length < this.options.minLength) {
+      if (this.query && this.query.length < this.options.minLength) {
         return this.shown ? this.hide() : this
       }
 
@@ -256,6 +262,10 @@
   , keyup: function (e) {
       switch(e.keyCode) {
         case 40: // down arrow
+            if (!this.shown) {
+              this.lookup()
+              break
+            }
         case 38: // up arrow
           break
 
@@ -295,7 +305,6 @@
       this.$menu.find('.active').removeClass('active')
       $(e.currentTarget).addClass('active')
     }
-
   }
 
 
@@ -320,6 +329,7 @@
   , delimiter: ', '
   , mode: 'single'
   , property: 'value'
+  , label: 'label'
   , renderItem: null
   , minLength: 1
   }

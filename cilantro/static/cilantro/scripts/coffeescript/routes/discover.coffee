@@ -41,8 +41,6 @@ define [
             @$toolbar
                 .append $('<li>').html($queryViewsListToggle)
 
-
-
         load: ->
             @$el.fadeIn()
             @queryViewsPanel.$el.panel 'open'

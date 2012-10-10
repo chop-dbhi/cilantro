@@ -4,9 +4,10 @@ define [
     'jquery'
     'underscore'
     'backbone'
+    'serrano/channels'
     'views/charts'
     'forms/controls'
-], (environ, mediator, $, _, Backbone, Charts, Controls) ->
+], (environ, mediator, $, _, Backbone, channels, Charts, Controls) ->
 
     class QueryView extends Backbone.View
         template: _.template '
@@ -34,6 +35,7 @@ define [
 
         initialize: ->
             super
+
             attrs =
                 name: @model.get 'name'
                 category: if (cat = @model.get 'category') then cat.name else ''
@@ -46,17 +48,16 @@ define [
             @$details = @$ '.details'
             @$form = @$ 'form'
 
+            # Subscribe to when the queryview should render/show itself
             mediator.subscribe 'queryview/show', (id) =>
                 if @model.id is id then @show()
-
-            # Should be used only if the UI is relative to the datacontext
-            # mediator.subscribe 'datacontext/synced', @update
 
             @render()
 
         preventDefault: (event) ->
             event.preventDefault()
 
+        # Toggle the details of the concept
         toggleDetail: ->
             if @$details.is(':visible')
                 @$details.slideUp 300
@@ -78,40 +79,46 @@ define [
 
                 $controls = $ '<div></div>'
 
-                if (data = model.get 'data').simple_type is 'boolean'
+                attrs = model.attributes
+                if attrs.simple_type is 'boolean'
                     controlClass = Controls.BooleanControl
-                else if data.enumerable
+                else if attrs.enumerable
                     controlClass = Controls.EnumerableControl
-                else if data.searchable
+                else if attrs.searchable
                     controlClass = Controls.SearchableControl
-                else if data.simple_type is 'number'
+                else if attrs.simple_type is 'number'
                     controlClass = Controls.NumberControl
                 else
                     controlClass = Controls.Control
 
-                chart = new Charts.Distribution
-                    editable: false
-                    data:
-                        context: null
+                if model.get('_links').distribution
+                    chart = new Charts.Distribution
+                        editable: false
+                        data:
+                            context: null
+                else
+                    chart = null
 
                 @controls.push (control = new controlClass options)
                 @charts.push [model, chart]
 
                 $controls.append control.render().$el
-
-                do (model, control) ->
-                    App.DataContext.when ->
-                        if (conditions = App.DataContext.session.getNodes(model.id)) and conditions[0]
-                            control.set conditions[0]
-
                 @$form.append $controls, chart.$el
+
+            # Subscribe to the session datacontext
+            mediator.subscribe channels.DATACONTEXT_SYNCED, (model) =>
+                if model.isSession()
+                    for control in @controls
+                        if (conditions = model.getNodes(control.model.id)) and conditions[0]
+                            control.set conditions[0]
             @update()
             @$el
 
         show: =>
             @resolve()
             # Move to the top
-            App.routes.discover.$el.prepend @$el.detach()
+            $parent = $('#discover-area')
+            @$el.prependTo $parent
             (control.show() for control in @controls)
             return @
 
@@ -123,7 +130,7 @@ define [
 
         update: =>
             for [model, chart] in @charts
-                url = environ.absolutePath("/api/fields/#{ model.id }/dist/")
+                url = model.get('_links').distribution.href
                 chart.renderChart url, null, [model]
             return
 
@@ -148,6 +155,7 @@ define [
 
         initialize: ->
             @$el.addClass 'loading'
+
             @collection.when =>
                 @$el.removeClass 'loading'
                 @render()
@@ -210,6 +218,7 @@ define [
             mediator.publish 'queryview/show', $(event.target).data('target')
 
 
+    # Represents a search form that will filter down the query options
     class QueryViewsSearchForm extends Backbone.View
         template: _.template '
             <form id=data-filters-search class=form-search action=>
@@ -229,6 +238,7 @@ define [
         search: ->
     
 
+    # Renders the panel which displays all the available query options
     class QueryViewsPanel extends Backbone.View
         template: _.template '
             <div id=data-filters-panel class="panel panel-left scrollable-column closed">
@@ -241,17 +251,17 @@ define [
             @setElement @template()
             content = @$('.panel-content')
 
-            @$browser = new QueryViewsAccordian
+            @browser = new QueryViewsAccordian
                 collection: @collection
 
             # Enable search, the collection is expected to provide a
             # search API
             if options.enableSearch
-                @$form = new QueryViewsSearchForm
+                @form = new QueryViewsSearchForm
                     collection: @collection
-                content.append @$form.el
+                content.append @form.el
 
-            content.append @$browser.el
+            content.append @browser.el
 
             $('body').append @$el
             @$el.panel()
@@ -271,13 +281,11 @@ define [
             $('body').append @$el
             @$el.panel()
 
-            mediator.subscribe 'datacontext/syncing', =>
+            mediator.subscribe channels.DATACONTEXT_SYNCING, =>
                 @$content.addClass 'loading'
 
-            mediator.subscribe 'datacontext/synced', @render
-
-            App.DataContext.when =>
-                @render()
+            mediator.subscribe channels.DATACONTEXT_SYNCED, (model) =>
+                if model.isSession() then @render(model)
 
         _parse: (node, html=[]) ->
             if node.children
@@ -294,10 +302,9 @@ define [
 
             return html
 
-
-        render: =>
+        render: (model) =>
             @$content.removeClass 'loading'
-            node = App.DataContext.session.get('language')
+            node = model.get('language')
             @$content.html '<h3><i class=icon-filter></i> Applied Filters</h3>'
 
             # Not filters
@@ -307,8 +314,6 @@ define [
                 ul = $(@_parse(node).join '').addClass 'nav nav-list'
                 @$content.append ul
             @$el
-
-
 
 
     {

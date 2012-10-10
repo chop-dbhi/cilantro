@@ -31,49 +31,23 @@
              chromium.org/developers/how-tos/chrome-frame-getting-started -->
     <!--[if lt IE 9]><p class=chromeframe>Your browser is <em>ancient!</em> <a href=http://browsehappy.com/>Upgrade to a different browser</a> or <a href=http://www.google.com/chromeframe/?redirect=true>install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
-    <!-- Add your site or application content here -->
     {% block header %}
-        <div class="navbar navbar-fixed-top navbar-inverse">
-            <div class=navbar-inner>
-                <div class=container-fluid>
-                    {% block header_content %}
-
-                        {% include "cilantro/_brand.html" %}
-
-                        {% if cilantro.config.subtitle %}
-                            <span class=subtitle>{{ cilantro.config.subtitle }}</span>
-                        {% endif %}
-
-                        {% block header_nav %}
-                            <ul class="nav pull-right">
-                                {% if user.is_authenticated %}
-                                    {% include "cilantro/_nav-auth.html" %}
-                                {% elif cilantro.config.auth_required %}
-                                    {% include "cilantro/_nav.html" %}
-                                {% endif %}
-                            </ul>
-                        {% endblock %}
-
-                    {% endblock %}
-                </div>
-            </div>
-        </div> {% endblock %}
-
-    {% block subnav %}
-        <div id=subnav class="navbar navbar-fixed-top">
-            <div class=navbar-inner>
-                <div class=container-fluid>{% block subnav_content %}{% endblock %}</div>
-            </div>
-        </div>
+        {% include "cilantro/_header.html" %}
     {% endblock %}
 
-    <div class=container-fluid>
-        {% block content %}
-        {% endblock content %}
-    </div>
+    {% block subnav %}
+        {% include "cilantro/_subnav.html" %}
+    {% endblock %}
+
+    {% block content %}
+        {% include "cilantro/_content.html" %}
+    {% endblock %}
+
+    {% block footer %}
+        {% include "cilantro/_footer.html" %}
+    {% endblock %}
 
     {% block extra_content %}{% endblock %}
-
 
     <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
@@ -89,16 +63,39 @@
 
                 urls: {
                     dataviews: '{% url "serrano:dataviews" %}',
+                    dataviewHistory: '{% url "serrano:dataview-history" %}',
                     datacontexts: '{% url "serrano:datacontexts" %}',
+                    datacontextHistory: '{% url "serrano:datacontext-history" %}',
                     dataconcepts: '{% url "serrano:dataconcepts" %}',
                     datafields: '{% url "serrano:datafields" %}',
 
-                    preferences: '{% url "cilantro:preferences" %}',
-                    workspace: '{% url "cilantro:workspace" %}',
-                    discover: '{% url "cilantro:discover" %}',
-                    analyze: '{% url "cilantro:analyze" %}',
-                    review: '{% url "cilantro:review" %}'
-                }
+                    preferences: '{% url "cilantro:preferences" %}'
+                },
+
+                routes: [{
+                    name: 'app',
+                    module: 'routes/app',
+                }, {
+//                    name: 'workspace',
+//                    module: 'routes/workspace',
+//                    url: '{% url "cilantro:workspace" %}',
+//                    label: 'Workspace'
+                }, {
+                    name: 'discover',
+                    module: 'routes/discover',
+                    url: '{% url "cilantro:discover" %}',
+                    label: 'Discover'
+                }, {
+//                    name: 'analyze',
+//                    module: 'routes/analyze',
+//                    url: '{% url "cilantro:analyze" %}',
+//                    label: 'Analyze'
+                }, {
+                    name: 'review',
+                    module: 'routes/review',
+                    url: '{% url "cilantro:review" %}',
+                    label: 'Review'
+                }]
             },
 
 

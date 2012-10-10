@@ -1,17 +1,102 @@
 define [
+    'environ'
+    'mediator'
+    'underscore'
     'backbone'
-], (Backbone) ->
+    'serrano/channels'
+], (environ, mediator, _, Backbone, channels) ->
 
     class DataView extends Backbone.Model
         url: ->
-            if @isNew() then super else @get 'url'
+            if @isNew() then return super
+            return @get('_links').self.href
+
+        deferred:
+            save: true
+
+        initialize: ->
+            super
+
+            # Initial publish of being synced since Backbone does
+            # not consider a fetch or reset to be a _sync_ operation
+            # in this version. This has been changed in Backbone
+            # @ commit 1f3f4525
+            @on 'sync', ->
+                if @get 'session'
+                    console.log 'synced'
+                mediator.publish channels.DATAVIEW_SYNCED, @, 'success'
+
+            # If the sync fails on the server
+            @on 'error', ->
+                mediator.publish channels.DATAVIEW_SYNCED, @, 'error'
+
+            # Notify subscribers the this object has changed
+            @on 'change', ->
+                mediator.publish channels.DATAVIEW_CHANGED, @
+
+            # Pause syncing with the server
+            mediator.subscribe channels.DATAVIEW_PAUSE, (id) =>
+                if @id is id or not id and @isSession()
+                    @pending()
+
+            # Resume syncing with the server
+            mediator.subscribe channels.DATAVIEW_RESUME, (id) =>
+                if @id is id or not id and @isSession()
+                    @resolve()
+
+            mediator.subscribe channels.DATAVIEW_COLUMNS, (id, columns) =>
+                if _.isArray id
+                    columns = id
+                    id = null
+                if @id is id or not id and @isSession()
+                    if not (json = @get 'json')
+                        json = {}
+                    json.columns = columns
+                    @set 'json', json
+                    @save()
+
+            mediator.subscribe channels.DATAVIEW_ORDERING, (id, ordering) =>
+                if _.isArray id
+                    ordering = id
+                    id = null
+                if @id is id or not id and @isSession()
+                    if not (json = @get 'json')
+                        json = {}
+                    json.ordering = ordering
+                    @set 'json', json
+                    @save()
+
+            @resolve()
+
+        isSession: ->
+            @get 'session'
+
+        toJSON: ->
+            id: @id
+            json: @get 'json'
+            session: @get 'session'
+            archived: @get 'archived'
+            published: @get 'published'
+
+        save: ->
+            mediator.publish channels.DATAVIEW_SYNCING, @
+            super
 
 
     class DataViews extends Backbone.Collection
         model: DataView
 
-        getSession: ->
-            (@filter (model) -> model.get 'session')[0]
+        initialize: ->
+            super
+            # Mimic the initial sync for each model
+            @on 'reset', (collection) ->
+                @resolve()
+                for model in collection.models
+                    model.trigger 'sync'
+            return
+
+        hasSession: ->
+            !!(@filter (model) -> model.get 'session')[0]
 
 
     { DataView, DataViews }

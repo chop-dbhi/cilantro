@@ -2,23 +2,15 @@
 {% load url from future %}
 
 {% block scripts %}
-    <script data-main=main src={{ cilantro.javascript_url }}/require.js></script>
+    <script data-main=main src="{{ cilantro.javascript_url }}/require.js"></script>
 {% endblock scripts %}
 
-{% block header_nav %}
-    <ul class="nav pull-left">
-        <li><a href={% url "cilantro:workspace" %} data-route=workspace>Workspace</a>
-        <li><a href={% url "cilantro:discover" %} data-route=discover>Discover</a>
-        <li><a href={% url "cilantro:analyze" %} data-route=analyze>Analyze</a>
-        <li><a href={% url "cilantro:review" %} data-route=review>Review</a>
-    </ul>
-    {{ block.super }}
-{% endblock header_nav %}
-
 {% block content %}
-    <div class=row-fluid>
-        <div id=main-area class=scrollable-column>
-            <div class=inner></div>
+    <div class=container-fluid>
+        <div class=row-fluid>
+            <div id=main-area class=scrollable-column>
+                <div class=inner></div>
+            </div>
         </div>
     </div>
 {% endblock content %}

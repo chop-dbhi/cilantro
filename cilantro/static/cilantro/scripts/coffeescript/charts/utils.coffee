@@ -1,4 +1,6 @@
-define ['highcharts'], (Highcharts) ->
+define [
+    'highcharts'
+], (Highcharts) ->
 
     # MAX_RADIUS = 10
     # MIN_RADIUS = 3
@@ -30,13 +32,13 @@ define ['highcharts'], (Highcharts) ->
         [xField, yField] = fields
 
         xName = xField.get 'name'
-        xEnum = xField.get('data').enumerable or xField.get('data').type is 'boolean'
-        xType = if xField.get('data').type is 'date' then 'datetime' else 'linear'
+        xEnum = xField.get('enumerable') or xField.get('simple_type') is 'boolean'
+        xType = if xField.get('simple_type') is 'date' then 'datetime' else 'linear'
 
         if yField
             yName = yField.get 'name'
-            yEnum = yField.get('data').enumerable or yField.get('data').type is 'boolean'
-            yType = if yField.get('data').type is 'date' then 'datetime' else 'linear'
+            yEnum = yField.get('enumerable') or yField.get('simple_type') is 'boolean'
+            yType = if yField.get('simple_type') is 'date' then 'datetime' else 'linear'
         else
             yName = 'Frequency'
             yEnum = false

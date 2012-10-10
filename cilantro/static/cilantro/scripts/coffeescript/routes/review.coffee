@@ -5,9 +5,10 @@ define [
     'underscore'
     'backbone'
 
+    'serrano/channels'
     'views/columns'
     'views/table'
-], (environ, mediator, $, _, Backbone, Columns, Table) ->
+], (environ, mediator, $, _, Backbone, channels, Columns, Table) ->
 
     modifyColumnsButton = _.template '<button class=btn title="Show/Hide Columns"><i class=icon-list alt="Show/Hide Columns"></i></button>'
 
@@ -17,6 +18,9 @@ define [
         events:
             'click table thead th': 'sort'
             'click .pinned-thead div': 'sort'
+
+        deferred:
+            loadData: true
 
         initialize: ->
             super
@@ -48,11 +52,11 @@ define [
                 trigger: =>
                     @loadData true
 
-            mediator.subscribe 'dataview/synced', =>
-                @defer 'loadData'
+            mediator.subscribe channels.DATAVIEW_SYNCED, =>
+                @loadData()
 
-            mediator.subscribe 'datacontext/synced', =>
-                @defer 'loadData'
+            mediator.subscribe channels.DATACONTEXT_SYNCED, =>
+                @loadData()
 
             @page = 1
             @defer 'loadData'
@@ -106,10 +110,8 @@ define [
             $target.data 'direction', direction
             $target.removeClass(prev).addClass direction
 
-            json = App.DataView.session.get('json') or {}
-
             if direction
-                json.ordering = [[$target.data('id'), direction]]
+                ordering = [[$target.data('id'), direction]]
             else
-                json.ordering = []
-            App.DataView.session.save 'json', json
+                ordering = []
+            mediator.publish channels.DATAVIEW_ORDERING, ordering

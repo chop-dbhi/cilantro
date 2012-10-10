@@ -7,34 +7,26 @@ define [
     'session'
 
     # Load models/collections
-    'models/charts'
     'models/datafield'
     'models/dataconcept'
-    'models/datacontext'
-    'models/dataview'
 ], (environ, $) ->
 
-    # Initialize and load the routes.
-    require [
-        'routes/app'
-        'routes/workspace'
-        'routes/discover'
-        'routes/composite'
-        'routes/analyze'
-        'routes/review'
-    ], (AppArea, WorkspaceArea, DiscoverArea, CompositeArea, AnalysisArea, ReviewArea) ->
+    routes = App.routes
 
-        # Register top-level routes
-        App.register false, 'app', new AppArea
-        App.register '', 'workspace', new WorkspaceArea
-        App.register 'discover/', 'discover', new DiscoverArea
-        App.register 'discover/composite/', 'composite', new CompositeArea
-        App.register 'analyze/', 'analyze', new AnalysisArea
-        App.register 'review/', 'review', new ReviewArea
+    # Pluck out just the module names
+    modules = _.pluck routes, 'module'
+
+    # Initialize and load the routes.
+    require modules, (klasses...) ->
 
         root = environ.SCRIPT_NAME or '/'
         if root.substr(root.length - 1) isnt '/'
             root = root + '/'
+
+        for config, i in routes
+            if not config.module then continue
+            fragment = if config.url then config.url.substr(root.length) else false
+            App.register fragment, config.name, new klasses[i]
 
         # Start up the history now that all the main routes are registered
         Backbone.history.start
@@ -45,21 +37,24 @@ define [
         # subscribers are... subscribed.
         App.preferences.load()
 
+        require [
+            'models/datacontext'
+            'models/dataview'
+        ]
+
         # Setup various DOM events
         $ ->
 
-            # Bootstrap pre-rendered DOM elements
-            $('.panel').panel()
+            nav = $('<ul class="nav pull-left" />')
 
-            $('[data-toggle*=panel]').each ->
-                (toggle = $(this)).on 'click', ->
-                    # If this data-toggle specifies a target, use that, otherwise assume
-                    # it is a .panel-toggle within the panel itself.
-                    if toggle.data 'target'
-                        panel = $ toggle.data('target')
-                    else
-                        panel = toggle.parent()
-                    panel.panel 'toggle'
+            # Populate the main navigation if a fragment is associated with
+            # the route
+            for route in routes
+                if not route.url then continue
+                li = $ "<li><a href=\"#{ route.url }\" data-route=\"#{ route.name }\">#{ route.label }</a></li>"
+                nav.append li
+
+            nav.appendTo 'header .container-fluid'
 
             # Bind all route-enabled links on the page and ensure they
             # stay in sync relative to all other links

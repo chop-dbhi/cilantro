@@ -1,0 +1,25 @@
+<header class="navbar navbar-fixed-top navbar-inverse">
+    <div class=navbar-inner>
+        <div class=container-fluid>
+            {% block header_content %}
+
+                {% include "cilantro/_brand.html" %}
+
+                {% if cilantro.config.subtitle %}
+                    <span class=subtitle>{{ cilantro.config.subtitle }}</span>
+                {% endif %}
+
+                {% block header_nav %}
+                    <ul class="nav pull-right">
+                        {% if user.is_authenticated %}
+                            {% include "cilantro/_nav-auth.html" %}
+                        {% elif cilantro.config.auth_required %}
+                            {% include "cilantro/_nav.html" %}
+                        {% endif %}
+                    </ul>
+                {% endblock %}
+
+            {% endblock %}
+        </div>
+    </div>
+</header>

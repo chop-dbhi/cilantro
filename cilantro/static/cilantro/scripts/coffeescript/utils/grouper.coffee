@@ -1,4 +1,6 @@
-define ['underscore'], (_) ->
+define [
+    'underscore'
+], (_) ->
 
     sortedGroupBy = (list, groupBy, sortBy) ->
         if _.isArray(groupBy)

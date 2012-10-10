@@ -4,7 +4,7 @@ define [
     'jquery'
     'backbone'
     'charts/utils'
-    'backbone.charts'
+    'charts/backbone-charts'
 ], (environ, mediator, $, Backbone, utils) ->
 
     urlTmpl = _.template environ.absolutePath '/api/fields/{{ id }}/dist/'
@@ -51,7 +51,7 @@ define [
             @options = options
             @enumerableOnly = options.enumerableOnly
 
-            @collection.deferred.done =>
+            @collection.when =>
                 @render()
 
         render: ->
@@ -232,7 +232,7 @@ define [
         updateChart: (event) ->
             if event then event.preventDefault()
             
-            @collection.deferred.done =>
+            @collection.when =>
                 # TODO fix this nonsense
                 if not event?
                     if (xAxis = @model.get 'xAxis')

@@ -1,7 +1,9 @@
 define [
+    'mediator'
     'underscore'
     'backbone'
-], (_, Backbone) ->
+    'serrano/channels'
+], (mediator, _, Backbone, channels) ->
 
     isBranch = (attrs) ->
         (attrs.type is 'and' or attrs.type is 'or') and attrs.children?.length >= 2
@@ -32,6 +34,7 @@ define [
                 json =
                     type: @get 'type'
                     children: @get 'children'
+
             else if @isComposite()
                 json =
                     id: @get 'id'
@@ -168,15 +171,71 @@ define [
 
 
     class DataContext extends Backbone.Model
+        deferred:
+            save: true
+
         initialize: ->
+            super
+
             # Node hash based on `id`
             @nodes ?= {}
+
             # Node has based on `cid`
             @clientNodes ?= {}
+
+            # Define an initial bare root node
             @root ?= new DataContextNode
 
+            # Initial publish of being synced since Backbone does
+            # not consider a fetch or reset to be a _sync_ operation
+            # in this version. This has been changed in Backbone
+            # @ commit 1f3f4525
+            @on 'sync', ->
+                mediator.publish channels.DATACONTEXT_SYNCED, @, 'success'
+
+            # If the sync fails on the server
+            @on 'error', ->
+                mediator.publish channels.DATACONTEXT_SYNCED, @, 'error'
+
+            # Notify subscribers the this object has changed
+            @on 'change', ->
+                mediator.publish channels.DATACONTEXT_CHANGED, @
+
+            # Pause syncing with the server
+            mediator.subscribe channels.DATACONTEXT_PAUSE, (id) =>
+                if @id is id or not id and @get 'session'
+                    @pending()
+
+            # Resume syncing with the server
+            mediator.subscribe channels.DATACONTEXT_RESUME, (id) =>
+                if @id is id or not id and @get 'session'
+                    @resolve()
+
+            # Add a node. Either an ID must be explicitly defined or
+            # if no ID is defined and this is the session context
+            mediator.subscribe channels.DATACONTEXT_ADD, (node, id) =>
+                # Shift arguments for session
+                if _.isBoolean id
+                    sync = id
+                    id = null
+                if @id is id or not id and @get 'session'
+                    @add node
+
+            # Remove a node. Either an ID must be explicitly defined or
+            # if no ID is defined and this is the session context
+            mediator.subscribe channels.DATACONTEXT_REMOVE, (node, id) =>
+                # Shift arguments for session
+                if _.isBoolean id
+                    sync = id
+                    id = null
+                if @id is id or not id and @get 'session'
+                    @remove node
+
+            @resolve()
+
         url: ->
-            if @isNew() then super else @get 'url'
+            if @isNew() then return super
+            return @get('_links').self.href
 
         parse: (resp) =>
             if resp
@@ -188,9 +247,13 @@ define [
                     DataContextNode.updateAttrs @root, resp.json
             return resp
 
+        save: ->
+            mediator.publish channels.DATACONTEXT_SYNCING, @
+            super
+
         toJSON: ->
             attrs =
-                id: @get 'id'
+                id: @id
                 name: @get 'name'
                 json: null
                 description: @get 'description'
@@ -222,6 +285,9 @@ define [
                 cache.splice(idx, 1)
             delete @clientNodes[node.cid]
 
+        isSession: ->
+            @get 'session'
+
         # Returns an array of nodes for the provided `id`.
         getNodes: (id) ->
             @nodes[id] or []
@@ -243,6 +309,7 @@ define [
                         type: 'and'
                         children: [@root, node]
                     @root = branch
+            @save()
 
         remove: (node) ->
             if @clientNodes[node.cid]
@@ -255,14 +322,26 @@ define [
                     if children.length is 1
                         @root = children[0]
                 @_deferenceNode node
+            @save()
 
 
     class DataContexts extends Backbone.Collection
         model: DataContext
 
-        getSession: ->
-            (@filter (model) -> model.get 'session')[0]
+        initialize: ->
+            super
+
+            # Mimic the initial sync for each model
+            @on 'reset', (collection) ->
+                @resolve()
+                for model in collection.models
+                    model.trigger 'sync'
+            return
+
+        hasSession: ->
+            !!(@filter (model) -> model.get 'session')[0]
 
 
+    App.DataContextNode = DataContextNode
 
     { DataContextNode, DataContext, DataContexts }

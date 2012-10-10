@@ -1,0 +1,6 @@
+{% load markup %}
+<footer>
+{% if cilantro.config.footer_content %}
+{{ cilantro.config.footer_content|markdown }}
+{% endif %}
+</footer>

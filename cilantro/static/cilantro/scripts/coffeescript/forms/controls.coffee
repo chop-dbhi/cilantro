@@ -15,7 +15,8 @@ define [
     'jquery'
     'underscore'
     'backbone'
-], (environ, mediator, $, _, Backbone) ->
+    'serrano/channels'
+], (environ, mediator, $, _, Backbone, channels) ->
 
     formActionsTemplate = _.template '
         <div class=form-actions>
@@ -35,6 +36,7 @@ define [
         'click [name=include]': 'submitInclude'
         'click [name=exclude]': 'submitExclude'
         'change [name=operator]': 'toggleOperator'
+
 
     class Control extends Backbone.View
         template: _.template '
@@ -61,7 +63,7 @@ define [
 
         getTemplateData: ->
             label: @model.get('alt_name') or @model.get('name')
-            units: @model.get('data').plural_unit
+            units: @model.get 'plural_unit'
             help: @model.get 'description'
 
         renderTemplate: ->
@@ -135,18 +137,18 @@ define [
         # them to the controls area. If not stats are returned, nothing
         # is appended
         loadStats: =>
-            url = @model.get('links').stats.href
+            url = @model.get('_links').stats.href
 
             Backbone.ajax
                 url: url
                 success: (resp) =>
                     text = []
                     for key, value of resp
-                        if key isnt 'links' and value isnt null
+                        if key isnt '_links' and value isnt null
                             key = key.replace(/[_-\s]+/, ' ').trim()
                             key = key.charAt(0).toUpperCase() + key.substr(1)
                             if _.isNumber value
-                                value = App.utils.prettyNumber value
+                                value = App.Numbers.prettyNumber value
                             text.push "#{key}: #{value}"
 
                     if text.length
@@ -171,7 +173,7 @@ define [
             @set()
 
         coerceValue: (value) ->
-            type = @model.get('data').type
+            type = @model.get 'simple_type'
 
             # Special case since datatypes can be null
             if value is 'null'
@@ -237,7 +239,7 @@ define [
                 if @node
                     @setOperator()
                     @setValue()
-                    mediator.publish 'datacontext/remove', @node
+                    mediator.publish channels.DATACONTEXT_REMOVE, @node
                     delete @node
                     @$remove.hide()
                 return
@@ -250,8 +252,8 @@ define [
             if @node
                 @node.set data
             else
-                @node = new App.Models.DataContextNode data
-            mediator.publish 'datacontext/add', @node
+                @node = new App.DataContextNode data
+            mediator.publish channels.DATACONTEXT_ADD, @node
             @$remove.show()
 
 
@@ -314,7 +316,6 @@ define [
 
         initialize: (options) ->
             super
-            #mediator.subscribe 'datacontext/synced', @loadValues
 
         # TODO can this be populated through typeahead?
         setValue: (value) ->
@@ -333,18 +334,17 @@ define [
 
         # Load remote values, cache locally
         loadValues: =>
-            @set()
-
             # Start with an empty source
             @$value.typeahead
                 mode: 'multiple'
                 items: 50
                 source: []
+                property: 'label'
 
             typeahead = @$value.data('typeahead')
 
             Backbone.ajax
-                url: environ.absolutePath @model.get('links').values.href
+                url: environ.absolutePath @model.get('_links').values.href
 
                 # Mark is as being loaded
                 beforeSend: =>
@@ -354,6 +354,7 @@ define [
                 success: (resp) =>
                     typeahead.source = resp
                     typeahead.$menu.removeClass 'loading'
+                    @set()
 
 
     class SearchableControl extends EnumerableControl
@@ -361,7 +362,7 @@ define [
         loadValues: =>
             @set()
 
-            url = environ.absolutePath @model.get('links').values.href
+            url = environ.absolutePath @model.get('_links').values.href
             lastQuery = null
 
             @$value.typeahead
@@ -410,7 +411,7 @@ define [
         loadValues: ->
             @$value.addClass 'loading'
             Backbone.ajax
-                url: environ.absolutePath @model.get('links').values.href
+                url: environ.absolutePath @model.get('_links').values.href
                 success: (resp) =>
                     @$value.removeClass 'loading'
                     for option in resp

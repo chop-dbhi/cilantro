@@ -8,7 +8,7 @@ define [
     # User preferences and session-related classes
 
     class Preferences extends Backbone.Model
-        url: environ.absolutePath '/api/preferences/'
+        url: App.urls.preferences
 
         defaults:
             session: {}
@@ -39,8 +39,6 @@ define [
             return
  
 
-    # This looks strange, but the preferences prior to the this call is
-    # simply an object. This is being passed in as the data to initialize
-    # the Preferences model.
+    # Fetch the preferences
     App.preferences = new Preferences
     App.preferences.fetch()
