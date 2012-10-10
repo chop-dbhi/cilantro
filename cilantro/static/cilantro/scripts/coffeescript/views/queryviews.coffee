@@ -16,7 +16,8 @@ define [
                     {{ name }} <small>{{ category }}</small>
                 </h3>
                 <div class=btn-toolbar>
-                    <button data-toggle=detail class="btn btn-small"><i class=icon-info-sign></i></button>
+                    <button data-toggle=detail class="btn btn-small"><i class=icon-info-sign></i> Info</button>
+                    <button data-toggle=hide class="btn btn-small"><i class=icon-minus></i> Hide</button>
                 </div>
                 <div class=details>
                     <div class=description>{{ description }}</div>
@@ -27,8 +28,9 @@ define [
         '
 
         events:
-            'submit form,button,input,select': 'preventDefault'
+            'click [data-toggle=hide]': 'toggleHide'
             'click [data-toggle=detail]': 'toggleDetail'
+            'submit form,button,input,select': 'preventDefault'
 
         deferred:
             'update': true
@@ -44,13 +46,17 @@ define [
             # Reset the element for the template
             @setElement @template attrs
 
+            @$form = @$ 'form'
             @$heading = @$ '.heading'
             @$details = @$ '.details'
-            @$form = @$ 'form'
 
             # Subscribe to when the queryview should render/show itself
             mediator.subscribe 'queryview/show', (id) =>
                 if @model.id is id then @show()
+
+            # Subscribe to when the queryview should hide itself
+            mediator.subscribe 'queryview/hide', (id) =>
+                if @model.id is id then @hide()
 
             @render()
 
@@ -63,6 +69,10 @@ define [
                 @$details.slideUp 300
             else
                 @$details.slideDown 300
+
+        toggleHide: (event) ->
+            event.preventDefault()
+            mediator.publish 'queryview/hide', @model.id
 
         render: ->
             # Create a collection of the fields
@@ -123,9 +133,26 @@ define [
             return @
 
         hide: =>
+            reset =
+                top: 'auto'
+                left: 'auto'
+                zIndex: 'auto'
+                position: @$el.css 'position'
+
+            offset = @$el.offset()
+            @$el.css
+                top: offset.top
+                left: offset.left
+                position: 'fixed'
+                zIndex: -1
+
+            @$el.animate
+                top: -@$el.height()
+            ,
+                duration: 600
+                easing: 'easeOutQuad'
+                complete: => @$el.detach().css reset
             @pending()
-            @$el.detach()
-            (control.hide() for control in @controls)
             return @
 
         update: =>

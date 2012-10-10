@@ -22,6 +22,7 @@ define [
 
     'plugins/jquery-csrf'
     'plugins/jquery-ui'
+    'plugins/jquery-easing'
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
 
