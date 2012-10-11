@@ -94,7 +94,10 @@
                     name: 'review',
                     module: 'routes/review',
                     url: '{% url "cilantro:review" %}',
-                    label: 'Review'
+                    label: 'Review',
+                    options: {
+                        perPage: 100
+                    }
                 }]
             },
 

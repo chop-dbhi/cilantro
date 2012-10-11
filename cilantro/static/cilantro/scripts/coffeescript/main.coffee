@@ -26,7 +26,7 @@ define [
         for config, i in routes
             if not config.module then continue
             fragment = if config.url then config.url.substr(root.length) else false
-            App.register fragment, config.name, new klasses[i]
+            App.register fragment, config.name, new klasses[i] config.options
 
         # Start up the history now that all the main routes are registered
         Backbone.history.start
