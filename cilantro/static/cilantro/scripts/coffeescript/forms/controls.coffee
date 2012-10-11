@@ -145,7 +145,7 @@ define [
                     text = []
                     for key, value of resp
                         if key isnt '_links' and value isnt null
-                            key = key.replace(/[_-\s]+/, ' ').trim()
+                            key = key.replace(/[_\-\s]+/, ' ').trim()
                             key = key.charAt(0).toUpperCase() + key.substr(1)
                             if _.isNumber value
                                 value = App.Numbers.prettyNumber value
