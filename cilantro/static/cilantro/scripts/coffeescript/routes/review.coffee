@@ -15,6 +15,9 @@ define [
     class ReviewArea extends Backbone.View
         id: 'review-area'
 
+        options:
+            perPage: 100
+
         events:
             'click table thead th': 'sort'
             'click .pinned-thead div': 'sort'
@@ -59,7 +62,9 @@ define [
                 @loadData()
 
             @page = 1
-            @defer 'loadData'
+            @perPage = @options.perPage
+
+            @loadData()
 
         load: ->
             @$el.fadeIn 100
@@ -75,23 +80,23 @@ define [
 
         loadData: (append=false) =>
             # Check if the lastest page is the last page
-            if @page is @num_pages then return
+            if @page is @numPages then return
 
-            url = '/api/data/'
+            url = "#{ App.urls.exporter }?per_page=#{ @perPage }"
 
             if append
-                url = url + '?page=' + (@page + 1)
+                url = "#{ url }&page=#{ @page + 1 }"
             else
                 @table.$el.addClass 'loading'
 
-            @xhr = Backbone.ajax
-                url: environ.absolutePath url
+            Backbone.ajax
+                url: url
                 success: (resp) =>
                     if append
                         @page++
                     else
                         @page = 1
-                        @num_pages = resp.num_pages
+                        @numPages = resp.num_pages
                         @table.setHeader resp.header
                     @table.setBody resp.rows, append
                 complete: =>

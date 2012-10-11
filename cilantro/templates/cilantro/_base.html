@@ -62,13 +62,13 @@
                 CSRF_TOKEN: '{{ csrf_token }}',
 
                 urls: {
+                    exporter: '{% url "serrano:exporter" %}',
                     dataviews: '{% url "serrano:dataviews" %}',
                     dataviewHistory: '{% url "serrano:dataview-history" %}',
                     datacontexts: '{% url "serrano:datacontexts" %}',
                     datacontextHistory: '{% url "serrano:datacontext-history" %}',
                     dataconcepts: '{% url "serrano:dataconcepts" %}',
                     datafields: '{% url "serrano:datafields" %}',
-
                     preferences: '{% url "cilantro:preferences" %}'
                 },
 
