@@ -224,21 +224,21 @@ define [
                 attrs = model.attributes
 
                 cat = null
-                sub = null
+                sub = id: null
 
                 if attrs.category
-                    if attrs.category.parent_id
-                        cat = attrs.category.parent_id
-                        sub = attrs.category.id
+                    if attrs.category.parent
+                        cat = attrs.category.parent
+                        sub = attrs.category
                     else
-                        cat = attrs.category.id
+                        cat = attrs.category
                     
-                if not (subtree = tree[cat])
-                    if cat then tree.categories.push attrs.category
-                    subtree = tree[cat] = categories: []
-                if not (models = subtree[sub])
-                    if sub then subtree.categories.push attrs.category
-                    models = subtree[sub] = []
+                if not (subtree = tree[cat.id])
+                    tree.categories.push cat
+                    subtree = tree[cat.id] = categories: []
+                if not (models = subtree[sub.id])
+                    if sub.id then subtree.categories.push sub
+                    models = subtree[sub.id] = []
 
                 # Models will be sorted relative to their groups later
                 models.push model
