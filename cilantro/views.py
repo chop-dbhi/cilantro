@@ -8,6 +8,8 @@ def app(request):
     if hasattr(request, 'user') and request.user.is_authenticated():
         kwargs = {'user': request.user}
     else:
+        if request.session.session_key is None:
+            request.session.create()
         kwargs = {'session_key': request.session.session_key}
 
     obj, created = UserPreferences.objects.get_or_create(**kwargs)
@@ -23,6 +25,8 @@ def preferences(request):
     if hasattr(request, 'user') and request.user.is_authenticated():
         kwargs = {'user': request.user}
     else:
+        if request.session.session_key is None:
+            request.session.create()
         kwargs = {'session_key': request.session.session_key}
 
     # Get it, if it exists
