@@ -80,7 +80,7 @@ define [
 
         loadData: (append=false) =>
             # Check if the lastest page is the last page
-            if @page is @numPages then return
+            if append and @page is @numPages then return
 
             url = "#{ App.urls.exporter }?per_page=#{ @perPage }"
 
