@@ -74,12 +74,11 @@
 
     .chart-container {
         @include box-shadow(none);
-        border: none;
         margin: 0;
         width: 100%;
 
         .heading {
-            display: none;
+            cursor: auto;
         }
 
         .btn-toolbar {
@@ -87,7 +86,7 @@
         }
 
         .chart {
-            height: auto;
+            height: 200px;
         }
     }
 }

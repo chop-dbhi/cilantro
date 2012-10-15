@@ -33,7 +33,7 @@ define [
             'submit form,button,input,select': 'preventDefault'
 
         deferred:
-            'update': true
+            update: true
 
         initialize: ->
             super
@@ -112,8 +112,9 @@ define [
                 @controls.push (control = new controlClass options)
                 @charts.push [model, chart]
 
-                $controls.append control.render().$el
-                @$form.append $controls, chart.$el
+                $controls.append control.render()
+                @$form.append $controls
+                if chart then @$form.append chart.render()
 
             # Subscribe to the session datacontext
             mediator.subscribe channels.DATACONTEXT_SYNCED, (model) =>
@@ -157,8 +158,9 @@ define [
 
         update: =>
             for [model, chart] in @charts
-                url = model.get('_links').distribution.href
-                chart.renderChart url, null, [model]
+                if chart
+                    url = model.get('_links').distribution.href
+                    chart.update url, null, [model]
             return
 
 

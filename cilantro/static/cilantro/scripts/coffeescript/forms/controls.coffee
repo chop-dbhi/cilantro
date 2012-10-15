@@ -52,6 +52,10 @@ define [
 
         events: DEFAULT_EVENTS
 
+        deferred:
+            loadStats: true
+            loadValues: true
+
         initialize: (options) ->
             super
             @options = options
@@ -91,10 +95,10 @@ define [
                 @$('.units').hide()
 
             @loadOperators()
-            @defer @loadValues
-            @defer @loadStats
+            @loadValues()
+            @loadStats()
 
-            return @
+            return @$el
 
         show: ->
             @resolve()
@@ -137,10 +141,11 @@ define [
         # them to the controls area. If not stats are returned, nothing
         # is appended
         loadStats: =>
-            url = @model.get('_links').stats.href
+            if not (stats = @model.get('_links').stats)
+                return
 
             Backbone.ajax
-                url: url
+                url: stats.href
                 success: (resp) =>
                     text = []
                     for key, value of resp
@@ -277,7 +282,7 @@ define [
             super
             # Hide the secondary value by default
             @$value2 = @$('[name=value-2]').hide()
-            return @
+            return @$el
 
         getValue: (options) ->
             if not (value = super) then return
@@ -337,9 +342,6 @@ define [
             # Start with an empty source
             @$value.typeahead
                 mode: 'multiple'
-                items: 50
-                source: []
-                property: 'label'
 
             typeahead = @$value.data('typeahead')
 
@@ -367,8 +369,8 @@ define [
 
             @$value.typeahead
                 mode: 'multiple'
-                items: 50
-                source: _.debounce (typeahead, query) =>
+                items: 20
+                source: _.debounce (query, typeahead) =>
                     # Do not process if this is the same query as the last
                     if query is lastQuery then return
 

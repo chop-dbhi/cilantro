@@ -5,9 +5,7 @@ define [
     'backbone'
     'charts/utils'
     'charts/backbone-charts'
-], (environ, mediator, $, Backbone, utils) ->
-
-    urlTmpl = _.template environ.absolutePath '/api/fields/{{ id }}/dist/'
+], (environ, mediator, $, Backbone, ChartUtils) ->
 
     chartTmpl = _.template '
         <div class="area-container chart-container">
@@ -42,19 +40,17 @@ define [
     '
 
 
-    # Represents a list of possible fields for use with a distribution
-    # chart
+    # Represents a list of possible fields for use with a distribution chart
     class DataFieldDistribution extends Backbone.View
         tagName: 'select'
 
-        initialize: (options) ->
-            @options = options
-            @enumerableOnly = options.enumerableOnly
+        options:
+            enumerableOnly: false
 
-            @collection.when =>
-                @render()
+        initialize: ->
+            @collection.when @render
 
-        render: ->
+        render: =>
             @$el.append '<option value=>---</option>'
 
             for model in @collection.models
@@ -63,14 +59,17 @@ define [
                 data = model.get('data')
                 if @enumerableOnly and not data.enumerable
                     continue
-                @$el.append "<option value=#{ model.id }>#{ model.get 'name' } [#{ model.get 'model_name' }]</option>"
-            return @
+                @$el.append "<option value=\"#{ model.id }\">#{ model.get 'name' }</option>"
+            return @$el
 
         getSelected: ->
             return @collection.get parseInt @$el.val()
 
 
     class DistributionChart extends Backbone.Chart
+        options:
+            editable: true
+
         events:
             # Toolbar
             'mouseenter': 'showToolbar'
@@ -81,10 +80,12 @@ define [
             'click .remove': 'removeChart'
 
             # Edit form
-            'submit': 'updateChart'
+            'submit': 'changeChart'
             'change .editable select': 'disableRedundantFields'
 
-        initialize: (options) ->
+        initialize: ->
+            super
+
             @setElement chartTmpl()
 
             @$heading = @$ '.heading'
@@ -94,7 +95,7 @@ define [
             @$fullsizeToggle = @$ '.fullsize'
             @$form = @$ '.editable'
 
-            if options and options.editable is false
+            if @options.editable is false
                 @$form.detach()
                 @$toolbar.detach()
             else
@@ -113,23 +114,22 @@ define [
                     collection: @collection
 
                 if @model
-                    if @model.get 'xAxis'
-                        @$form.hide()
+                    if @model.get 'xAxis' then @$form.hide()
                     if (expanded = @model.get 'expanded') then @expand() else @contract()
 
+        render: -> @$el
 
-        render: (options) ->
+        renderChart: (options) ->
             if @chart then @chart.destroy?()
-            @$label.hide().detach()
+            @$label.detach()
 
-            # Set the chart title in the
             @$heading.text options.title.text
             options.title.text = ''
 
             # Check if any data is present
             if not options.series[0]
-                @$renderArea.html '<h3 class=no-data>One or more of the selected
-                    dimensions does not contain any data. Please change your selection.</h3>'
+                @$renderArea.html '<p class=no-data>Unfortunately, there is
+                    no data to graph here.</p>'
                 return
 
             @$form.hide()
@@ -214,22 +214,24 @@ define [
             @$el.remove()
             if @model then @model.destroy()
 
-        renderChart: (url, data, fields, seriesIdx) ->
+        update: (url, data, fields, seriesIdx) ->
             if @options.data
                 for key, value of @options.data
                     if not data
                         data = "#{key}=#{value}"
                     else
                         data = data + "&#{key}=#{value}"
+
+            @$el.addClass 'loading'
             Backbone.ajax
                 url: url
                 data: data
                 success: (resp) =>
-                    @$renderArea.removeClass 'loading'
-                    @render utils.processResponse resp, fields, seriesIdx
+                    @$el.removeClass 'loading'
+                    @renderChart ChartUtils.processResponse resp, fields, seriesIdx
 
         # Ensure rapid successions of this method do not occur
-        updateChart: (event) ->
+        changeChart: (event) ->
             if event then event.preventDefault()
             
             @collection.when =>
@@ -248,8 +250,7 @@ define [
 
                 if not xAxis then return
 
-                @$renderArea.addClass 'loading'
-                url = urlTmpl id: xAxis.id
+                url = @model.get('_links').distribution.href
 
                 fields = [xAxis]
                 data = 'dimension=' + xAxis.id
@@ -268,7 +269,7 @@ define [
                         yAxis: if yAxis then yAxis.id
                         series: if series then series.id
 
-                @renderChart url, data, fields, seriesIdx
+                @update url, data, fields, seriesIdx
 
 
     { Distribution: DistributionChart }
