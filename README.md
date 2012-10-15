@@ -46,6 +46,19 @@ Migrate the Cilantro models:
 $ manage.py migrate cilantro
 ```
 
+## Site Configuration
+
+Login to the Admin and create a new Site Configuration. This is a simple way to customize various _branding_ parts of the site without having override the templates (below). These include:
+
+- `title` - The title of the site that will be appear in the upper left corner of the site
+- `subtitle` - The _subtitle_ or tagline which will appear to the right of the title
+- `status_label` - An optional label that will appear next to the title used to mark the site as "beta", "alpha", "dev", etc.
+- `site` - Optionally associate this configuration with a site. Multiple configurations can be created for different domains, but if no site is specified, this will be used across all sites.
+- `footer_content` - Footer content that will appear across pages. This area is Markdown-enabled
+- `google_analytics` - Specify a Google Analytics tracking ID
+- `auth_required` - Flag a site to require users to be authenticated when using the site.
+
+
 ## Customize
 
 ### Templates
@@ -115,6 +128,41 @@ Obviously for complete control, `cilantro/index.html` could not extend `cilantro
 ## JavaScript API
 
 Cilantro makes use of the [AMD API](http://requirejs.org/docs/whyamd.html) for defining script _modules_. Modules are broken up in various groups depending on the functionality including third-party libraries, _core_ modules, library plugins, and finally Cilantro-specific modules.
+
+### Configuration
+
+Cilantro is designed to be modular and extensible via JavaScript. There are a few configuration options that can be set before all the JavaScript loads to customize the which components get loaded.
+
+A few of them are defined ahead such as the Serrano endpoints Cilantro will use to interact with the data. Unless you decide to not use Serrano or you need to override a particular endpoint, you should not changes the `urls` object.
+
+```javascript
+var cilantro = {
+    urls: {
+        datafields: '/api/fields/',
+        dataconcepts: '/api/concepts/',
+        datacontexts: '/api/contexts/',
+        datacontextHistory: '/api/contexts/history/',
+        dataviews: '/api/views/',
+        dataviewHistory: '/api/views/history/',
+        preferences: '/api/preferences/'
+    },
+    routes: [{
+        name: 'app',
+        module: 'routes/app',
+    }, {
+        name: 'discover',
+        module: 'routes/discover',
+        url: '/discover/',
+        label: 'Discover'
+    }, {
+        name: 'review',
+        module: 'routes/review',
+        url: '/review/',
+        label: 'Review'
+    }]
+};
+```
+
 
 ### Modules
 
