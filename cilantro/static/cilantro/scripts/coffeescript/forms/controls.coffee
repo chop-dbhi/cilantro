@@ -307,13 +307,31 @@ define [
                 @$value2.hide()
 
 
+    placeholderText = (values, parse) ->
+        len = Math.max(values.length - 1, 0)
+        # Set a random select of values as the placeholder
+        if not len then return
+
+        examples = []
+        indexes = []
+
+        for i in [0..Math.min(3, len)]
+            idx = parseInt(Math.random() * len)
+            if indexes.indexOf(idx) is -1
+                indexes.push idx
+                if (value = parse values[idx])
+                    examples.push value
+        return "e.g. #{ examples.join ', ' }"
+
     class EnumerableControl extends Control
         template: _.template '
             <div class=control-group>
                 <h4 class=control-label>{{ label }} <small class=units>({{ units }})</small></h4>
                 <div class=controls>
                     <select class=span4 name=operator></select>
-                    <input class=span8 name=value>
+                    <div class="input-prepend">
+                        <span class=add-on><i class=icon-search></i></span><input type=text name=value autocomplete=off>
+                    </div>
                     <p class=help-block>{{ help }}</p>
                 </div>
             </div>
@@ -358,6 +376,9 @@ define [
                     typeahead.$menu.removeClass 'loading'
                     @set()
 
+                    if (text = placeholderText(resp, (x) -> x.value))
+                        @$value.attr 'placeholder', text
+
 
     class SearchableControl extends EnumerableControl
         # Setup typeahead to query remote values
@@ -366,6 +387,13 @@ define [
 
             url = @model.get('_links').values.href
             lastQuery = null
+
+            Backbone.ajax
+                url: "#{ url }?random=3"
+                success: (resp) =>
+                    if (text = placeholderText resp, (x) -> x.value)
+                        @$value.attr 'placeholder', text
+
 
             @$value.typeahead
                 mode: 'multiple'
@@ -417,7 +445,7 @@ define [
                 success: (resp) =>
                     @$value.removeClass 'loading'
                     for option in resp
-                        @$value.append "<option value=\"#{option.value}\">#{option.label}</option>"
+                        @$value.append "<option value=\"#{ option.value }\">#{ option.label }</option>"
                     @set()
 
 

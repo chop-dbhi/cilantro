@@ -69,6 +69,13 @@
             .controls > * {
                 vertical-align: middle;
             }
+
+            .input-prepend {
+                display: block;
+                input {
+                    width: 70%;
+                }
+            }
         }
     }
 
