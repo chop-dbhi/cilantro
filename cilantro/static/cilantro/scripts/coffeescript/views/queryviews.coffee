@@ -181,6 +181,8 @@ define [
                 if id is @model.id then @$el.removeClass 'active'
 
         render: ->
+            if not @model.get 'published'
+                @$el.addClass('staff-only').attr('data-placement', 'right')
             @$el.html "<a href=#>#{ @model.get 'name' }</a>"
 
         click: (event) ->

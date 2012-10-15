@@ -90,7 +90,10 @@
   , parse: function(value) {
       if (typeof value == 'string')
         return value
-      return value[this.options.property]
+      var nvalue = value[this.options.property]
+      if (nvalue != null)
+        return nvalue.toString()
+      return ''
     }
 
   , label: function(value) {

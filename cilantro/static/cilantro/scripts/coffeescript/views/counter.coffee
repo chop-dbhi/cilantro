@@ -27,7 +27,7 @@ define [
                     @render(model)
 
         render: (model) =>
-            if model and (count = model.get 'count')
+            if model and (count = model.get 'count')?
                 suffixed = App.Numbers.toSuffixedNumber count
                 delimited = App.Numbers.toDelimitedNumber count
                 # Set the visible text to be the suffixed number, but also
@@ -35,6 +35,11 @@ define [
                 # number.
                 @$el.text(suffixed)
                     .attr('title', delimited)
+
+                if count is 0
+                    @$el.addClass 'text-error'
+                else
+                    @$el.removeClass 'text-error'
             else
                 @$el.html('&infin;')
 

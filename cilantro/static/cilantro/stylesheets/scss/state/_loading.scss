@@ -1,10 +1,12 @@
 @mixin loader($size: tiny) {
-    background: transparent url(../../images/loader-#{$size}.gif);
+    background-image: url(../../images/loader-#{$size}.gif);
     background-repeat: no-repeat;
     background-position: center;
-    // Fade out child components while loading
+
+    color: #999 !important;
+
     > * {
-        opacity: 0.4
+        color: #999 !important;
     }
 }
 

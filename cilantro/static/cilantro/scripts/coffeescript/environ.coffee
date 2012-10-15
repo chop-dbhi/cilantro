@@ -7,6 +7,7 @@ define [
     # Plugins that may affect the behavior of the application from the user's
     # point-of-view, e.g. triggered alerts, dialogs.
     'behavior/pending-requests'
+    'behavior/staff-only'
 
     # Plugins that extend various libraries such as Backbone and jQuery.
     # These do not have return values, but rather extend the library

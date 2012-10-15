@@ -203,12 +203,12 @@ define [
 
             # Pause syncing with the server
             mediator.subscribe channels.DATACONTEXT_PAUSE, (id) =>
-                if @id is id or not id and @get 'session'
+                if @id is id or not id and @isSession()
                     @pending()
 
             # Resume syncing with the server
             mediator.subscribe channels.DATACONTEXT_RESUME, (id) =>
-                if @id is id or not id and @get 'session'
+                if @id is id or not id and @isSession()
                     @resolve()
 
             # Add a node. Either an ID must be explicitly defined or
@@ -218,7 +218,7 @@ define [
                 if _.isBoolean id
                     sync = id
                     id = null
-                if @id is id or not id and @get 'session'
+                if @id is id or not id and @isSession()
                     @add node
 
             # Remove a node. Either an ID must be explicitly defined or
@@ -228,7 +228,7 @@ define [
                 if _.isBoolean id
                     sync = id
                     id = null
-                if @id is id or not id and @get 'session'
+                if @id is id or not id and @isSession()
                     @remove node
 
             @resolve()
