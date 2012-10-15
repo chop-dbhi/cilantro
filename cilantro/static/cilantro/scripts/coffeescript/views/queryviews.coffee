@@ -345,6 +345,9 @@ define [
 
 
     class QueryViewFilterList extends Backbone.View
+        events:
+            'click [data-toggle=clear]': 'clear'
+
         template: _.template '
             <div id=data-filters-list-panel class="panel panel-right scrollable-column closed">
                 <div class="inner panel-content"></div>
@@ -382,7 +385,12 @@ define [
         render: (model) =>
             @$content.removeClass 'loading'
             node = model.get('language')
-            @$content.html '<h3><i class=icon-filter></i> Applied Filters</h3>'
+            @$content.html '
+                <h4>Applied Filters
+                    <button data-toggle=clear class="btn btn-mini pull-right">
+                        <i class="icon-ban-circle"></i> Clear</button>
+                </h4>
+            '
 
             # Not filters
             if not node or _.isEmpty(node)
@@ -392,6 +400,9 @@ define [
                 @$content.append ul
             @$el
 
+        clear: (event) ->
+            event.preventDefault()
+            mediator.publish channels.DATACONTEXT_CLEAR
 
     {
         View: QueryView

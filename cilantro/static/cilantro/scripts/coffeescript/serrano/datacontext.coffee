@@ -231,6 +231,11 @@ define [
                 if @id is id or not id and @isSession()
                     @remove node
 
+            # Clear all nodes from the datacontext
+            mediator.subscribe channels.DATACONTEXT_CLEAR, (id) =>
+                if @id is id or not id and @isSession()
+                    @clear()
+
             @resolve()
 
         url: ->
@@ -322,6 +327,16 @@ define [
                     if children.length is 1
                         @root = children[0]
                 @_deferenceNode node
+            @save()
+
+        # Removes all nodes from this context
+        clear: ->
+            @nodes = {}
+            @clientNodes = {}
+            if @root.id
+                @root = new DataContextNode
+            else
+                @root.clear()
             @save()
 
 

@@ -39,6 +39,7 @@ define
     # well as a flag to sync immediately with the server.
     DATACONTEXT_ADD: 'datacontext/add'
     DATACONTEXT_REMOVE: 'datacontext/remove'
+    DATACONTEXT_CLEAR: 'datacontext/clear'
 
     # Published by DataViews
     DATAVIEW_CHANGED: 'dataview/changed'
