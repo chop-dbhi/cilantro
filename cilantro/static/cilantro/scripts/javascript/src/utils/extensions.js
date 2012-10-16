@@ -31,6 +31,55 @@ if (!Array.prototype.map) {
 
 (function($) {
 
+    var ajaxQueue = [],
+        ajaxPending = false;
+
+    function requestNext() {
+        if (!ajaxQueue.length) {
+            ajaxPending = false;
+        } else {
+            ajaxPending = true;
+            var options = ajaxQueue.shift(),
+                promise = options.promise;
+
+            delete options.promise;
+
+            var success = options.success,
+                error = options.error,
+                complete = options.complete;
+
+            var params = {
+                complete: function(xhr, status) {
+                    if (complete) complete.apply(this, arguments);
+                    requestNext();
+                },
+                success: function() {
+                    if (success) success.apply(this, arguments);
+                    promise.resolveWith(this, arguments);
+                },
+                error: function(xhr, status, err) {
+                    if (error) error.apply(this, arguments);
+                    promise.rejectWith(this, arguments);
+                }
+            };
+            params = $.extend({}, options, params);
+            $.ajax(params);
+        }
+    }
+
+    function queueRequest(options) {
+        var promise = $.Deferred();
+        options.promise = promise;
+
+        // Add it to the queue
+        ajaxQueue.push(options);
+
+        // Immediately fire if no request is pending
+        if (!ajaxPending) requestNext();
+
+        return promise;
+    }
+
     $.extend({
         putJSON: function(url, data, callback, type) {
             return $.ajax({
@@ -55,7 +104,7 @@ if (!Array.prototype.map) {
         },
 
         patchJSON: function(url, data, callback, type) {
-            return $.ajax({
+            return queueRequest({
                 type: 'PATCH',
                 url: url,
                 contentType: 'application/json',
