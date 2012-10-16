@@ -72,6 +72,13 @@
                     preferences: '{% url "cilantro:preferences" %}'
                 },
 
+                // Simple way of defining default values for new DataView
+                // and DataContext objects. 
+                defaults: {
+                    dataview: {},
+                    datacontext: {}
+                },
+
                 routes: [{
                     name: 'app',
                     module: 'routes/app',

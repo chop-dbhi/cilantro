@@ -1,6 +1,7 @@
 define [
+    'underscore'
     'serrano'
-], (Serrano) ->
+], (_, Serrano) ->
 
     class DataContexts extends Serrano.DataContexts
         url: App.urls.datacontexts
@@ -13,7 +14,9 @@ define [
     contexts = new DataContexts
     contexts.on 'reset', ->
         if not contexts.hasSession()
-            contexts.create session: true
+            defaults = session: true
+            defaults.json = App.defaults.datacontext
+            contexts.create defaults
 
     history = new DataContextHistory
 
