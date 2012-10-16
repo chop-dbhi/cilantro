@@ -32,19 +32,31 @@
     width: 250px;
 
     .panel-content {
-        h3 [class*="icon-"] {
-            margin-top: 5px;
+        > .muted {
+            padding: 10px 0;
+            font-style: italic;
         }
 
-        ul.nav {
-            list-style: disc;
+        .actions {
+            margin-top: 10px;
+            padding: 10px 0;
+            border-top: 1px dashed #ddd;
+        }
+
+        ul.nav-list {
+            padding: 0;
 
             li {
-                margin-left: 25px;
-            }
+                background-color: whiteSmoke;
+                padding: 10px;
+                margin-bottom: 10px;
 
-            li.nav-header {
-                margin-left: 0;
+                &.nav-header {
+                    margin: 0 0 10px 0;
+                    padding: 0;
+                    background-color: inherit;
+                    border: 0;
+                }
             }
         }
     }

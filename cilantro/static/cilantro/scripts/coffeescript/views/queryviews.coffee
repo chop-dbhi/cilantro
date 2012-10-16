@@ -387,20 +387,26 @@ define [
         render: (model) =>
             @$content.removeClass 'loading'
             node = model.get('language')
-            @$content.html '
-                <h4>Applied Filters
-                    <button data-toggle=clear class="btn btn-mini pull-right">
-                        <i class="icon-ban-circle"></i> Clear</button>
-                </h4>
-            '
+            @$content.html '<h4>Applied Filters</h4>'
 
             # Not filters
             if not node or _.isEmpty(node)
-                @$content.append '<em>No filters are applied</em>'
+                @$content.append '<div class=muted>No filters are applied</div>'
             else
-                ul = $(@_parse(node).join '').addClass 'nav nav-list'
+                ul = $(@_parse(node).join '').addClass 'unstyled nav-list'
                 @$content.append ul
+
+            # Append actions
+            @$content.append '
+                <div class=actions>
+                    <button data-route=review class="btn btn-small btn-primary">View Results</button>
+                    <button data-toggle=clear class="btn btn-small btn-danger pull-right" title="Clear All">
+                        <i class="icon-ban-circle icon-white"></i></button>
+                </div>
+            '
+
             @$el
+
 
         clear: (event) ->
             event.preventDefault()
