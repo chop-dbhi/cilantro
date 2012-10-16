@@ -1,7 +1,6 @@
 define [
     'backbone'
-    'common/models/polling'
-], (Backbone, polling) ->
+], (Backbone) ->
 
     class Report extends Backbone.Model
         url: ->
@@ -14,14 +13,14 @@ define [
             @bind 'change', -> App.hub.publish 'report/change', @
 
 
-    class ReportCollection extends polling.Collection
+    class ReportCollection extends Backbone.Collection
         url: App.endpoints.reports
         model: Report
         comparator: (model) ->
             return -Number(new Date model.get 'modified')
 
 
-    class SessionReport extends polling.Model
+    class SessionReport extends Backbone.Model
         url: App.endpoints.session.report
 
         defaults:

@@ -1,8 +1,8 @@
 define [
-    'common/models/polling'
-], (polling) ->
+    'backbone'
+], (Backbone) ->
 
-    class SessionScope extends polling.Model
+    class SessionScope extends Backbone.Model
         url: App.endpoints.session.scope
 
         initialize: ->

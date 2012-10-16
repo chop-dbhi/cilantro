@@ -26,12 +26,6 @@ define [
     App.session = {}
     App.ready -> domains.at(0).activate()
 
-    App.hub.subscribe 'session/idle', ->
-        sessionReport.stopPolling()
-
-    App.hub.subscribe 'session/resume', ->
-        sessionReport.startPolling()
-
     $ ->
 
         ConceptInterface = new Interface.ConceptInterfaceView

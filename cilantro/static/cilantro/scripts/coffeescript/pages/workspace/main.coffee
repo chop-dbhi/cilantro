@@ -12,18 +12,6 @@ define [
     sessionScope = new Scope.Models.Session
     sessionPerspective = new Perspective.Models.Session
 
-    App.hub.subscribe 'session/idle', ->
-        reports.stopPolling()
-        sessionReport.stopPolling()
-        sessionScope.stopPolling()
-        sessionPerspective.stopPolling()
-
-    App.hub.subscribe 'session/resume', ->
-        reports.startPolling()
-        sessionReport.startPolling()
-        sessionScope.startPolling()
-        sessionPerspective.startPolling()
-
     $ ->
 
         $('#new-report').click ->
