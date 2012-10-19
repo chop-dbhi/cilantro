@@ -1,60 +1,42 @@
 import json
 from django.http import HttpResponse
 from django.shortcuts import render
+from preserialize.serialize import serialize
 from cilantro.models import UserPreferences
 
 
+template = {
+    'fields': [':pk', 'json']
+}
+
+
 def app(request):
-    if hasattr(request, 'user') and request.user.is_authenticated():
-        kwargs = {'user': request.user}
-    else:
-        if request.session.session_key is None:
-            request.session.create()
-        kwargs = {'session_key': request.session.session_key}
-
-    obj, created = UserPreferences.objects.get_or_create(**kwargs)
-    preferences = obj.json
-    preferences['id'] = obj.pk
-
-    return render(request, 'cilantro/index.html', {
-        'user_preferences': json.dumps(preferences),
-    })
+    return render(request, 'cilantro/index.html')
 
 
 def preferences(request):
+    # Get a user's preferences
     if hasattr(request, 'user') and request.user.is_authenticated():
         kwargs = {'user': request.user}
-    else:
-        if request.session.session_key is None:
-            request.session.create()
+    # Get this session's preferences
+    elif request.session.session_key:
         kwargs = {'session_key': request.session.session_key}
-
-    # Get it, if it exists
-    if request.method == 'GET':
-        try:
-            obj = UserPreferences.objects.get(**kwargs)
-            preferences = obj.json
-            preferences['id'] = obj.pk
-            return HttpResponse(json.dumps(preferences))
-        except UserPreferences.DoesNotExist:
-            return HttpResponse(status=204)
-
-    # Preferences are being updated
-    if request.method == 'PUT':
-        preferences = json.loads(request.body)
-        preferences.pop('id', None)
-        UserPreferences.objects.filter(**kwargs).update(json=preferences)
+    # Bots..
+    else:
         return HttpResponse(status=204)
 
-    # First time preferences are being saved
-    if request.method == 'POST':
-        obj, created = UserPreferences.objects.get_or_create(defaults={
-            'json': json.loads(request.body),
-        }, **kwargs)
+    # Creating the preferences are transparent, create them if they
+    # don't already exist for this user or session.
+    preferences, created = UserPreferences.objects.get_or_create(**kwargs)
 
-        if created:
-            return HttpResponse(status=204)
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(serialize(preferences, **template)))
 
-        preferences = obj.json
-        preferences['id'] = obj.pk
-        return HttpResponse(json.dumps(preferences), status=201)
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        data.pop('id', None)
+        preferences.json = data
+        preferences.save()
+        return HttpResponse(status=204)
+
+    return HttpResponse(status=405)

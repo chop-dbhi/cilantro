@@ -11,7 +11,7 @@ define [
         url: App.urls.preferences
 
         defaults:
-            session: {}
+            json: {}
 
         initialize: ->
             # Initialize deferred components
@@ -21,9 +21,11 @@ define [
             # the channel and providing the property key and data to save.
             # The subscription will ensure this data is saved off immediately.
             mediator.subscribe 'session/changed', @when (key, data) =>
-                session = @get 'session'
+                json = @get 'json'
+                if not (session = json.session)
+                    session = json.session = {}
                 session[key] = data
-                @save session: session
+                @save()
 
             # Once synced with the server, notify over the channel
             @on 'sync', ->
@@ -34,7 +36,8 @@ define [
         load: ->
             # For each property on the session object, the contents
             # are published.
-            for key, data of @attributes.session
+            json = @get 'json'
+            for key, data of (json.session or {})
                 mediator.publish "session/load/#{ key }", data
             return
  
