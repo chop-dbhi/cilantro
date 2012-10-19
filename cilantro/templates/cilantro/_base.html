@@ -1,137 +1,127 @@
-{% load url from future %}
-<!doctype html>
-<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang=en> <![endif]-->
-<!--[if IE 7]> <html class="lt-ie9 lt-ie8" lang=en> <![endif]-->
-<!--[if IE 8]> <html class="lt-ie9" lang=en> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang=en> <!--<![endif]-->
-<head>
-    <meta charset=utf-8>
+{% load url from future %}<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <!-- Use the .htaccess and remove these lines to avoid edge case issues.
-             More info: h5bp.com/i/378 -->
-    <meta http-equiv=X-UA-Compatible content=IE=edge,chrome=1>
+        <title>{% block head_title %}{{ cilantro.config.title }}{% endblock %}</title>
+        <meta name="description" content="{{ cilantro.config.subtitle }}">
 
-    <title>{% block head_title %}{{ cilantro.config.title }}{% endblock %}</title>
-    <meta name=description content="{{ cilantro.config.subtitle }}">
+        <!-- Mobile viewport optimized: h5bp.com/viewport -->
+        <meta name="viewport" content="width=device-width">
 
-    <!-- Mobile viewport optimized: h5bp.com/viewport -->
-    <meta name=viewport content=width=device-width>
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
+        {% block styles %}
+            <link rel=stylesheet href="{{ cilantro.css_url }}/style.css">
+        {% endblock %}
+        <script src="{{ cilantro.javascript_url }}/modernizr.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 9]><p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p><![endif]-->
 
-    {% block styles %}
-        <link rel=stylesheet href={{ cilantro.css_url }}/style.css>
-    {% endblock %}
+        {% block header %}
+            {% include "cilantro/_header.html" %}
+        {% endblock %}
 
-    <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
-</head>
-<body>
-    <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
-             chromium.org/developers/how-tos/chrome-frame-getting-started -->
-    <!--[if lt IE 9]><p class=chromeframe>Your browser is <em>ancient!</em> <a href=http://browsehappy.com/>Upgrade to a different browser</a> or <a href=http://www.google.com/chromeframe/?redirect=true>install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+        {% block subnav %}
+            {% include "cilantro/_subnav.html" %}
+        {% endblock %}
 
-    {% block header %}
-        {% include "cilantro/_header.html" %}
-    {% endblock %}
+        {% block content %}
+            {% include "cilantro/_content.html" %}
+        {% endblock %}
 
-    {% block subnav %}
-        {% include "cilantro/_subnav.html" %}
-    {% endblock %}
+        {% block footer %}
+            {% include "cilantro/_footer.html" %}
+        {% endblock %}
 
-    {% block content %}
-        {% include "cilantro/_content.html" %}
-    {% endblock %}
+        {% block extra_content %}{% endblock %}
 
-    {% block footer %}
-        {% include "cilantro/_footer.html" %}
-    {% endblock %}
+        <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
-    {% block extra_content %}{% endblock %}
+        {% block jsconfig %}
+            <script>
+                var App = {
+                    // Used by the pushState history to correctly define the
+                    // root URL
+                    SCRIPT_NAME: '{{ request.META.SCRIPT_NAME }}',
 
-    <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
+                    // Used for non-safe requests, also defined in `environ.js`
+                    CSRF_TOKEN: '{{ csrf_token }}',
 
-    {% block jsconfig %}
+                    urls: {
+                        exporter: '{% url "serrano:exporter" %}',
+                        dataviews: '{% url "serrano:dataviews" %}',
+                        dataviewHistory: '{% url "serrano:dataview-history" %}',
+                        datacontexts: '{% url "serrano:datacontexts" %}',
+                        datacontextHistory: '{% url "serrano:datacontext-history" %}',
+                        dataconcepts: '{% url "serrano:dataconcepts" %}',
+                        datafields: '{% url "serrano:datafields" %}',
+                        preferences: '{% url "cilantro:preferences" %}'
+                    },
+
+                    // Simple way of defining default values for new DataView
+                    // and DataContext objects. 
+                    defaults: {
+                        dataview: {},
+                        datacontext: {}
+                    },
+
+                    routes: [{
+                        name: 'app',
+                        module: 'routes/app',
+                    }, {
+    //                    name: 'workspace',
+    //                    module: 'routes/workspace',
+    //                    url: '{% url "cilantro:workspace" %}',
+    //                    label: 'Workspace'
+                    }, {
+                        name: 'discover',
+                        module: 'routes/discover',
+                        url: '{% url "cilantro:discover" %}',
+                        label: 'Discover'
+                    }, {
+    //                    name: 'analyze',
+    //                    module: 'routes/analyze',
+    //                    url: '{% url "cilantro:analyze" %}',
+    //                    label: 'Analyze'
+                    }, {
+                        name: 'review',
+                        module: 'routes/review',
+                        url: '{% url "cilantro:review" %}',
+                        label: 'Review',
+                        options: {
+                            perPage: 100
+                        }
+                    }]
+                },
+
+                // Pre-configuration, everything is relative to Cilantro's path. For
+                // integration of external scripts, create a contexted `require`
+                // function. See http://requirejs.org/docs/api.html#multiversion.
+                // Note that all existing scripts defined here can be used
+                require = {
+                    baseUrl: '{{ cilantro.javascript_url }}'
+                };
+            </script>
+        {% endblock jsconfig %}
+
+        {% block scripts %}
+            <script data-main=environ src="{{ cilantro.javascript_url }}/require.js"></script>
+        {% endblock scripts %}
+
+        <!-- Google Analytics: Change UA-XXXXX-X to be your site's ID. -->
+        {% if cilantro.config.google_analytics %}
         <script>
-            var App = {
-                // Used by the pushState history to correctly define the
-                // root URL
-                SCRIPT_NAME: '{{ request.META.SCRIPT_NAME }}',
-
-                // Used for non-safe requests, also defined in `environ.js`
-                CSRF_TOKEN: '{{ csrf_token }}',
-
-                urls: {
-                    exporter: '{% url "serrano:exporter" %}',
-                    dataviews: '{% url "serrano:dataviews" %}',
-                    dataviewHistory: '{% url "serrano:dataview-history" %}',
-                    datacontexts: '{% url "serrano:datacontexts" %}',
-                    datacontextHistory: '{% url "serrano:datacontext-history" %}',
-                    dataconcepts: '{% url "serrano:dataconcepts" %}',
-                    datafields: '{% url "serrano:datafields" %}',
-                    preferences: '{% url "cilantro:preferences" %}'
-                },
-
-                // Simple way of defining default values for new DataView
-                // and DataContext objects. 
-                defaults: {
-                    dataview: {},
-                    datacontext: {}
-                },
-
-                routes: [{
-                    name: 'app',
-                    module: 'routes/app',
-                }, {
-//                    name: 'workspace',
-//                    module: 'routes/workspace',
-//                    url: '{% url "cilantro:workspace" %}',
-//                    label: 'Workspace'
-                }, {
-                    name: 'discover',
-                    module: 'routes/discover',
-                    url: '{% url "cilantro:discover" %}',
-                    label: 'Discover'
-                }, {
-//                    name: 'analyze',
-//                    module: 'routes/analyze',
-//                    url: '{% url "cilantro:analyze" %}',
-//                    label: 'Analyze'
-                }, {
-                    name: 'review',
-                    module: 'routes/review',
-                    url: '{% url "cilantro:review" %}',
-                    label: 'Review',
-                    options: {
-                        perPage: 100
-                    }
-                }]
-            },
-
-            // Pre-configuration, everything is relative to Cilantro's path. For
-            // integration of external scripts, create a contexted `require`
-            // function. See http://requirejs.org/docs/api.html#multiversion.
-            // Note that all existing scripts defined here can be used
-            require = {
-                baseUrl: '{{ cilantro.javascript_url }}',
-            };
+            var _gaq=[['_setAccount','{{ cilantro.config.google_analytics }}'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
-    {% endblock jsconfig %}
-
-
-    {% block scripts %}
-        <script data-main=environ src="{{ cilantro.javascript_url }}/require.js"></script>
-    {% endblock scripts %}
-
-    <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
-             mathiasbynens.be/notes/async-analytics-snippet -->
-    {% if cilantro.config.google_analytics %}
-    <script>
-        var _gaq=[['_setAccount','{{ cilantro.config.google_analytics }}'],['_trackPageview']];
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-        s.parentNode.insertBefore(g,s)}(document,'script'));
-    </script>
-    {% endif %}
-</body>
+        {% endif %}
+    </body>
 </html>
