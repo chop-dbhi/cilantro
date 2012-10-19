@@ -19,22 +19,6 @@
     // no CSS optimization is necessary since we use the sass optimization tool
     optimizeCss: 'none',
 
-    shim: {
-        'underscore': {
-            exports: '_'
-        },
-        'backbone': {
-            deps: ['underscore', 'jquery'],
-            exports: 'Backbone'
-        },
-        'highcharts': {
-            exports: 'Highcharts'
-        },
-        'plugins/bootstrap': ['jquery'],
-        'plugins/bootstrap-typeahead': ['jquery'],
-        'plugins/jquery-ui': ['jquery']
-    },
-
     modules: [{
         name: 'environ',
         include: [
@@ -53,7 +37,7 @@
             'plugins/jquery-panels',
             'plugins/jquery-scroller'
         ],
-        exclude: ['jquery', 'backbone', 'underscore', 'mediator']
+        exclude: ['jquery', 'backbone', 'underscore', 'mediator'],
     }, {
         name: 'main',
         include: [
@@ -73,11 +57,8 @@
         exclude: ['environ', 'jquery', 'backbone', 'underscore', 'mediator']
     }, {
         name: 'routes/app',
-        include: [
-            'views/counter'
-        ],
-        exclude: ['environ', 'main', 'jquery', 'backbone', 'underscore',
-            'mediator']
+        include: ['views/counter'],
+        exclude: ['environ', 'jquery', 'backbone', 'underscore', 'mediator']
     }, {
         name: 'routes/discover',
         include: [
@@ -89,15 +70,10 @@
             'charts/backbone-charts',
             'charts/options'
         ],
-        exclude: ['environ', 'main', 'jquery', 'backbone', 'underscore',
-            'mediator']
+        exclude: ['environ', 'jquery', 'backbone', 'underscore', 'mediator']
     }, {
         name: 'routes/review',
-        include: [
-            'views/table',
-            'views/columns'
-        ],
-        exclude: ['environ', 'main', 'jquery', 'backbone', 'underscore',
-            'mediator']
+        include: ['views/table', 'views/columns'],
+        exclude: ['environ', 'jquery', 'backbone', 'underscore', 'mediator']
     }]
 })

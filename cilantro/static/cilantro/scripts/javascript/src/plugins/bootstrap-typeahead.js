@@ -1,3 +1,4 @@
+define(['jquery'], function($) {
 /* =============================================================
  * bootstrap-typeahead.js v2.1.1 (MODIFIED: Multi-select, Ajax)
  * http://twitter.github.com/bootstrap/javascript.html#typeahead
@@ -353,3 +354,4 @@
   })
 
 }(window.jQuery)
+});

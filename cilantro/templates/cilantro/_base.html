@@ -108,35 +108,19 @@
                 }]
             },
 
-
             // Pre-configuration, everything is relative to Cilantro's path. For
             // integration of external scripts, create a contexted `require`
             // function. See http://requirejs.org/docs/api.html#multiversion.
             // Note that all existing scripts defined here can be used
             require = {
                 baseUrl: '{{ cilantro.javascript_url }}',
-                shim: {
-                    'underscore': {
-                        exports: '_'
-                    },
-                    'backbone': {
-                        deps: ['underscore', 'jquery'],
-                        exports: 'Backbone'
-                    },
-                    'highcharts': {
-                        exports: 'Highcharts'
-                    },
-                    'plugins/bootstrap': ['jquery'],
-                    'plugins/bootstrap-typeahead': ['jquery'],
-                    'plugins/jquery-ui': ['jquery']
-                }
             };
         </script>
     {% endblock jsconfig %}
 
 
     {% block scripts %}
-        <script data-main=environ src={{ cilantro.javascript_url }}/require.js></script>
+        <script data-main=environ src="{{ cilantro.javascript_url }}/require.js"></script>
     {% endblock scripts %}
 
     <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.

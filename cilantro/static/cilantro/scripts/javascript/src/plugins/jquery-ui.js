@@ -1,3 +1,4 @@
+define(['jquery'], function(jQuery) {
 /*! jQuery UI - v1.9.0 - 2012-10-09
 * http://jqueryui.com
 * Includes: jquery.ui.core.js, jquery.ui.widget.js, jquery.ui.mouse.js, jquery.ui.position.js, jquery.ui.draggable.js, jquery.ui.resizable.js, jquery.ui.sortable.js, jquery.ui.button.js, jquery.ui.datepicker.js, jquery.ui.dialog.js
@@ -7211,3 +7212,4 @@ $.extend( $.ui.dialog.overlay.prototype, {
 });
 
 }( jQuery ) );
+});

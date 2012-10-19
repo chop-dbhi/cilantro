@@ -12,7 +12,7 @@
 // JSLint options:
 /*global Highcharts, document, window, navigator, setInterval, clearInterval, clearTimeout, setTimeout, location, jQuery, $, console */
 
-(function () {
+define(function () {
 // encapsulated variables
 var UNDEFINED,
 	doc = document,
@@ -14678,4 +14678,5 @@ extend(Highcharts, {
 	product: 'Highcharts',
 	version: '2.2.5'
 });
-}());
+return Highcharts;
+});

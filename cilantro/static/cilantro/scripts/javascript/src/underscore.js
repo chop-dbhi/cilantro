@@ -6,7 +6,7 @@
 //     For all details and documentation:
 //     http://documentcloud.github.com/underscore
 
-(function() {
+define(function() {
 
   // Baseline setup
   // --------------
@@ -49,6 +49,7 @@
   // Create a safe reference to the Underscore object for use below.
   var _ = function(obj) { return new wrapper(obj); };
 
+  /* ---AMD---
   // Export the Underscore object for **Node.js**, with
   // backwards-compatibility for the old `require()` API. If we're in
   // the browser, add `_` as a global object via a string identifier,
@@ -61,6 +62,7 @@
   } else {
     root['_'] = _;
   }
+  */
 
   // Current version.
   _.VERSION = '1.3.3';
@@ -1099,4 +1101,6 @@
     return this._wrapped;
   };
 
-}).call(this);
+  return _;
+
+});//.call(this);

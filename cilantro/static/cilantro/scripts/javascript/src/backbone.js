@@ -5,47 +5,61 @@
 //     For all details and documentation:
 //     http://backbonejs.org
 
-(function(){
+define(['jquery', 'underscore'], function($, _) {
 
   // Initial Setup
   // -------------
 
   // Save a reference to the global object (`window` in the browser, `global`
   // on the server).
+
+  /* ---AMD---
   var root = this;
 
   // Save the previous value of the `Backbone` variable, so that it can be
   // restored later on, if `noConflict` is used.
   var previousBackbone = root.Backbone;
+  */
 
   // Create a local reference to splice.
   var splice = Array.prototype.splice;
 
   // The top-level namespace. All public Backbone classes and modules will
   // be attached to this. Exported for both CommonJS and the browser.
+
+  /* ---AMD---
   var Backbone;
   if (typeof exports !== 'undefined') {
     Backbone = exports;
   } else {
     Backbone = root.Backbone = {};
   }
+  */
+  Backbone = {};
 
   // Current version of the library. Keep in sync with `package.json`.
   Backbone.VERSION = '0.9.2';
 
   // Require Underscore, if we're on the server, and it's not already present.
+  /* ---AMD---
   var _ = root._;
   if (!_ && (typeof require !== 'undefined')) _ = require('underscore');
+  */
 
   // For Backbone's purposes, jQuery, Zepto, or Ender owns the `$` variable.
+  /* ---AMD---
   Backbone.$ = root.jQuery || root.Zepto || root.ender;
+  */
+  Backbone.$ = $;
 
   // Runs Backbone.js in *noConflict* mode, returning the `Backbone` variable
   // to its previous owner. Returns a reference to this Backbone object.
+  /* ---AMD---
   Backbone.noConflict = function() {
     root.Backbone = previousBackbone;
     return this;
   };
+  */
 
   // Turn on `emulateHTTP` to support legacy HTTP servers. Setting this option
   // will fake `"PUT"` and `"DELETE"` requests via the `_method` parameter and
@@ -1439,4 +1453,6 @@
     throw new Error('A "url" property or function must be specified');
   };
 
-}).call(this);
+  return Backbone;
+
+});//.call(this);

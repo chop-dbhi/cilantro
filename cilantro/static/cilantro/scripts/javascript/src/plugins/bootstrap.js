@@ -1,3 +1,4 @@
+define(['jquery'], function($) {
 /* ===================================================
  * bootstrap-transition.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#transitions
@@ -1725,3 +1726,4 @@
 
 
 }(window.jQuery);
+});
