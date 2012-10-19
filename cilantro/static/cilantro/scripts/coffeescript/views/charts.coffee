@@ -2,10 +2,11 @@ define [
     'environ'
     'mediator'
     'jquery'
+    'underscore'
     'backbone'
     'charts/utils'
     'charts/backbone-charts'
-], (environ, mediator, $, Backbone, ChartUtils) ->
+], (environ, mediator, $, _, Backbone, ChartUtils) ->
 
     chartTmpl = _.template '
         <div class="area-container chart-container">
