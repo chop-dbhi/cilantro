@@ -23,7 +23,7 @@
 #   - `resume` - Publishing to this channel will trigger the target object to
 #       resume syncing with the server if it had been paused (see above).
 
-define
+define ->
 
     # Published by DataContext
     DATACONTEXT_CHANGED: 'datacontext/changed'

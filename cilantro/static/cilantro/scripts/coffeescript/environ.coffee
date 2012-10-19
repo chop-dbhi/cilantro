@@ -12,6 +12,7 @@ define [
     # Plugins that extend various libraries such as Backbone and jQuery.
     # These do not have return values, but rather extend the library
     # in-place.
+    'plugins/js'
     'plugins/backbone-ajax-queue'
     'plugins/backbone-deferrable'
 

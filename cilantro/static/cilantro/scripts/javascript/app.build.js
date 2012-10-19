@@ -12,6 +12,10 @@
     // explicitly specify the optimization method
     optimize: 'uglify',
 
+    removeCombined: true,
+
+    preserveLicenseComments: false,
+
     // no CSS optimization is necessary since we use the sass optimization tool
     optimizeCss: 'none',
 
@@ -31,5 +35,69 @@
         'plugins/jquery-ui': ['jquery']
     },
 
-    name: 'main'
+    modules: [{
+        name: 'environ',
+        include: [
+            'utils/numbers',
+            'utils/grouper',
+            'behavior/pending-requests',
+            'behavior/staff-only',
+            'plugins/backbone-ajax-queue',
+            'plugins/backbone-deferrable',
+            'plugins/underscore-mustache',
+            'plugins/bootstrap',
+            'plugins/bootstrap-typeahead',
+            'plugins/jquery-csrf',
+            'plugins/jquery-ui',
+            'plugins/jquery-easing',
+            'plugins/jquery-panels',
+            'plugins/jquery-scroller'
+        ],
+        exclude: ['jquery', 'backbone', 'underscore', 'mediator']
+    }, {
+        name: 'main',
+        include: [
+            'router',
+            'session',
+            'serrano',
+            'serrano/channels',
+            'serrano/datafield',
+            'serrano/dataconcept',
+            'serrano/datacontext',
+            'serrano/dataview',
+            'models/datafield',
+            'models/dataconcept',
+            'models/datacontext',
+            'models/dataview'
+        ],
+        exclude: ['environ', 'jquery', 'backbone', 'underscore', 'mediator']
+    }, {
+        name: 'routes/app',
+        include: [
+            'views/counter'
+        ],
+        exclude: ['environ', 'main', 'jquery', 'backbone', 'underscore',
+            'mediator']
+    }, {
+        name: 'routes/discover',
+        include: [
+            'highcharts',
+            'views/queryviews',
+            'views/charts',
+            'forms/controls',
+            'charts/utils',
+            'charts/backbone-charts',
+            'charts/options'
+        ],
+        exclude: ['environ', 'main', 'jquery', 'backbone', 'underscore',
+            'mediator']
+    }, {
+        name: 'routes/review',
+        include: [
+            'views/table',
+            'views/columns'
+        ],
+        exclude: ['environ', 'main', 'jquery', 'backbone', 'underscore',
+            'mediator']
+    }]
 })

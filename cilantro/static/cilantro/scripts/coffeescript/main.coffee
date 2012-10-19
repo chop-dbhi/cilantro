@@ -1,6 +1,8 @@
 define [
     'environ'
     'jquery'
+    'underscore'
+    'backbone'
 
     # App router
     'router'
@@ -9,7 +11,7 @@ define [
     # Load models/collections
     'models/datafield'
     'models/dataconcept'
-], (environ, $) ->
+], (environ, $, _, Backbone) ->
 
     routes = App.routes
 
