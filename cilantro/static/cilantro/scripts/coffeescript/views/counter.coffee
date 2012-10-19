@@ -33,7 +33,8 @@ define [
                 # Set the visible text to be the suffixed number, but also
                 # set the title attr (for the hover over) to be the exact
                 # number.
-                @$el.text(suffixed)
+                label = if count is 1 then model.get 'object_name' else model.get 'object_name_plural'
+                @$el.html("#{ suffixed } <span class=muted>#{ label or '' }</span>")
                     .attr('title', delimited)
 
                 if count is 0

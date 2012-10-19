@@ -37,13 +37,11 @@ define [
             $(window).on 'resize', =>
                 @resizePinnedThead()
 
-        setBody: (rows, append=false) ->
+        setBody: (objects, append=false) ->
             html = []
-            for row in rows
+            for object in objects
                 html.push '<tr>'
-                for data, i in row
-                    # Skip the primary key
-                    if i is 0 then continue
+                for data in object.values
                     if not data then data = '<span class=no-data>(no data)</span>'
                     html.push "<td>#{ data }</td>"
                 html.push '</tr>'

@@ -97,8 +97,8 @@ define [
                     else
                         @page = 1
                         @numPages = resp.num_pages
-                        @table.setHeader resp.header
-                    @table.setBody resp.rows, append
+                        @table.setHeader resp.keys
+                    @table.setBody resp.objects, append
                 complete: =>
                     @table.$el.removeClass 'loading'
                     @table.$el.scroller 'reset'
