@@ -7,7 +7,7 @@ kwargs = {
 
     # Dependencies
     'install_requires': [
-        'serrano>=2.0a',  # Hack, to work with the dependency link
+        'serrano>=2.0,<2.1',
     ],
 
     # Test dependencies
@@ -18,11 +18,6 @@ kwargs = {
     # Optional dependencies
     'extras_require': {},
 
-    # Resources unavailable on PyPi
-    'dependency_links': [
-        'https://github.com/cbmi/serrano/tarball/2.x#egg=serrano-2.0',
-    ],
-
     # Metadata
     'name': 'cilantro',
     'version': __import__('cilantro').get_version(),
@@ -30,8 +25,8 @@ kwargs = {
     'author_email': 'b@devel.io',
     'description': 'A client implementation for Serrano 2.x',
     'license': 'BSD',
-    'keywords': 'snippets tools utilities',
-    'url': 'https://github.com/cbmi/cilantro',
+    'keywords': 'harvest serrano client avocado',
+    'url': 'http://cbmi.github.com/cilantro',
     'classifiers': [
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: BSD License',
