@@ -10,10 +10,8 @@
         <title>{% block head_title %}{{ cilantro.config.title }}{% endblock %}</title>
         <meta name="description" content="{{ cilantro.config.subtitle }}">
 
-        <!-- Mobile viewport optimized: h5bp.com/viewport -->
+        <!-- Mobile viewport optimized -->
         <meta name="viewport" content="width=device-width">
-
-        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
         {% block styles %}
             <link rel=stylesheet href="{{ cilantro.css_url }}/style.css">
@@ -40,8 +38,6 @@
         {% endblock %}
 
         {% block extra_content %}{% endblock %}
-
-        <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
 
         {% block jsconfig %}
             <script>
@@ -73,7 +69,7 @@
 
                     routes: [{
                         name: 'app',
-                        module: 'routes/app',
+                        module: 'routes/app'
                     }, {
     //                    name: 'workspace',
     //                    module: 'routes/workspace',
@@ -114,8 +110,7 @@
             <script data-main=environ src="{{ cilantro.javascript_url }}/require.js"></script>
         {% endblock scripts %}
 
-        <!-- Google Analytics: Change UA-XXXXX-X to be your site's ID. -->
-        {% if cilantro.config.google_analytics %}
+        {% if not debug and cilantro.config.google_analytics %}
         <script>
             var _gaq=[['_setAccount','{{ cilantro.config.google_analytics }}'],['_trackPageview']];
             (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
