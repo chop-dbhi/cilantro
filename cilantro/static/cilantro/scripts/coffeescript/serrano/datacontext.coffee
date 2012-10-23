@@ -213,20 +213,20 @@ define [
 
             # Add a node. Either an ID must be explicitly defined or
             # if no ID is defined and this is the session context
-            mediator.subscribe channels.DATACONTEXT_ADD, (node, id) =>
+            mediator.subscribe channels.DATACONTEXT_ADD, (id, node) =>
                 # Shift arguments for session
-                if _.isBoolean id
-                    sync = id
+                if not _.isNumber id
+                    node = id
                     id = null
                 if @id is id or not id and @isSession()
                     @add node
 
             # Remove a node. Either an ID must be explicitly defined or
             # if no ID is defined and this is the session context
-            mediator.subscribe channels.DATACONTEXT_REMOVE, (node, id) =>
+            mediator.subscribe channels.DATACONTEXT_REMOVE, (id, node) =>
                 # Shift arguments for session
-                if _.isBoolean id
-                    sync = id
+                if not _.isNumber id
+                    node = id
                     id = null
                 if @id is id or not id and @isSession()
                     @remove node
