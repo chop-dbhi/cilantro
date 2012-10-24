@@ -6,16 +6,21 @@ define [
     'serrano/channels'
 ], (environ, mediator, _, Backbone, channels) ->
 
+
     class DataView extends Backbone.Model
+        deferred:
+            save: true
+
         url: ->
             if @isNew() then return super
             return @get('_links').self.href
 
-        deferred:
-            save: true
-
         initialize: ->
             super
+
+            if @isArchived()
+                @resolve()
+                return
 
             # Initial publish of being synced since Backbone does
             # not consider a fetch or reset to be a _sync_ operation
@@ -46,9 +51,9 @@ define [
                 if _.isArray id
                     columns = id
                     id = null
+
                 if @id is id or not id and @isSession()
-                    if not (json = @get 'json')
-                        json = {}
+                    json = @get('json') or {}
                     json.columns = columns
                     @set 'json', json
                     @save()
@@ -57,9 +62,9 @@ define [
                 if _.isArray id
                     ordering = id
                     id = null
+
                 if @id is id or not id and @isSession()
-                    if not (json = @get 'json')
-                        json = {}
+                    json = @get('json') or {}
                     json.ordering = ordering
                     @set 'json', json
                     @save()
@@ -69,6 +74,9 @@ define [
         isSession: ->
             @get 'session'
 
+        isArchived: ->
+            @get 'archived'
+
         toJSON: ->
             id: @id
             json: @get 'json'
@@ -77,8 +85,9 @@ define [
             published: @get 'published'
 
         save: ->
-            mediator.publish channels.DATAVIEW_SYNCING, @
             super
+            mediator.publish channels.DATAVIEW_SYNCING, @
+            @pending()
 
 
     class DataViews extends Backbone.Collection
@@ -86,12 +95,13 @@ define [
 
         initialize: ->
             super
+
             # Mimic the initial sync for each model
             @on 'reset', (collection) ->
                 @resolve()
                 for model in collection.models
                     model.trigger 'sync'
-            return
+                return
 
         hasSession: ->
             !!(@filter (model) -> model.get 'session')[0]

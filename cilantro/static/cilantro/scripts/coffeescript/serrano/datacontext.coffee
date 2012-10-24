@@ -5,11 +5,12 @@ define [
     'serrano/channels'
 ], (mediator, _, Backbone, channels) ->
 
+
     isBranch = (attrs) ->
         (attrs.type is 'and' or attrs.type is 'or') and attrs.children?.length >= 2
 
     isCondition = (attrs) ->
-        attrs.operator and attrs.id and attrs.value isnt undefined
+        attrs.operator and attrs.id and attrs.value?
 
     isComposite = (attrs) ->
         attrs.composite is true and attrs.id
@@ -19,27 +20,32 @@ define [
     # must be carefully handled and not removed from the tree unless explicitly
     # removed
     class DataContextNode extends Backbone.Model
+
         validate: (attrs) ->
             # Some kind of node
             if isBranch(attrs) or isCondition(attrs) or isComposite(attrs)
                 return
+
             # Check for all undefined values
             for key, value of attrs
-                if value isnt undefined
-                    return 'Unknown node type'
+                if not value? then return 'Unknown node type'
+
             return
 
         toJSON: ->
+            json = null
+
             if @isBranch()
                 json =
                     type: @get 'type'
-                    children: @get 'children'
+                    children: (node.toJSON() for node in @get 'children')
 
             else if @isComposite()
                 json =
                     id: @get 'id'
                     composite: @get 'composite'
-            else
+
+            else if @isCondition()
                 json =
                     id: @get 'id'
                     operator: @get 'operator'
@@ -77,7 +83,7 @@ define [
             # Pass this node's attributes in the map parser to convert into
             # a newly referenced node.
             children = _.map [@attributes, nodes...], (attrs) =>
-                DataContextNode.parseAttrs attrs, @
+                parseAttrs attrs, @
 
             # Clear the existing attributes and set the new ones
             @clear slient: true
@@ -133,24 +139,29 @@ define [
             return @
 
 
-    DataContextNode.parseAttrs = (attrs, parent, callback) ->
+    parseAttrs = (attrs, parent, callback) ->
         if not attrs or _.isEmpty attrs
             node = new DataContextNode
+
         # Existing node
         else if attrs instanceof DataContextNode
             node = attrs
+
         # Branch
         else if isBranch attrs
             node = new DataContextNode type: attrs.type
             children = _.map attrs.children, (_attrs) ->
-                DataContextNode.parseAttrs _attrs, node, callback
+                parseAttrs _attrs, node, callback
             node.set children: children
+
         # Condition
         else if isCondition attrs
             node = new DataContextNode attrs
+
         # Composite
         else if isComposite attrs
             node = new DataContextNode attrs
+
         else
             throw new Error 'Unknown node type'
 
@@ -161,18 +172,34 @@ define [
         return node
 
 
-    DataContextNode.updateAttrs = (node, attrs) ->
+    updateAttrs = (node, attrs) ->
         if node.isBranch()
-            children = node.get('children')
+            children = node.get 'children'
             for _attrs, i in attrs.children
-                DataContextNode.updateAttrs children[i], _attrs
+                updateAttrs children[i], _attrs
         else
             node.set attrs
 
 
     class DataContext extends Backbone.Model
+
         deferred:
+            # Defer and only execute once
             save: true
+            clear: true
+
+            # Defer (and queue) add and remove operations to ensure the tree
+            # does not change as a sync occurs. This is due to the entire
+            # tree being sent (via PUT) rather than a single node (via PATCH).
+            # An example is when a node from a root branch is removed which
+            # demotes the sibling node to the root. The response would attempt
+            # to update those nodes, but now their structure has changed.
+            add: false
+            remove: false
+
+        url: ->
+            if @isNew() then return super
+            return @get('_links').self.href
 
         initialize: ->
             super
@@ -186,11 +213,17 @@ define [
             # Define an initial bare root node
             @root ?= new DataContextNode
 
+            # Early exit for archived objects
+            if @isArchived()
+                @resolve()
+                return
+
             # Initial publish of being synced since Backbone does
             # not consider a fetch or reset to be a _sync_ operation
             # in this version. This has been changed in Backbone
             # @ commit 1f3f4525
             @on 'sync', ->
+                @resolve()
                 mediator.publish channels.DATACONTEXT_SYNCED, @, 'success'
 
             # If the sync fails on the server
@@ -238,23 +271,21 @@ define [
 
             @resolve()
 
-        url: ->
-            if @isNew() then return super
-            return @get('_links').self.href
-
         parse: (resp) =>
             if resp
                 if not @root
                     @nodes = {}
                     @clientNodes = {}
-                    @root = DataContextNode.parseAttrs resp.json, null, @_cacheNode
+                    @root = parseAttrs resp.json, null, @_referenceNode
                 else
-                    DataContextNode.updateAttrs @root, resp.json
+                    updateAttrs @root, resp.json
             return resp
 
-        save: ->
-            mediator.publish channels.DATACONTEXT_SYNCING, @
+        save: =>
+            @set 'json', @root.toJSON()
             super
+            mediator.publish channels.DATACONTEXT_SYNCING, @
+            @pending()
 
         toJSON: ->
             attrs =
@@ -270,28 +301,47 @@ define [
 
             if @root and not @root.isEmpty()
                 attrs.json = @root.toJSON()
+
             return attrs
+
+        # Conditional save when a referenced node in the tree has changed
+        _nodeSave: (node) =>
+            if node.get('id')? and node.get('value')? then @save()
 
         # Each condition or composite node has a reference stored in
         # a array grouped by `id` to enable manipulating nodes in flat
         # means.
-        _cacheNode: (node) =>
-            if node.id
-                if not (cache = @nodes[node.id])
-                    cache = @nodes[node.id] = []
-                # Don't add redundant cache
-                if cache.indexOf(node) is -1
-                    cache.push node
-                # This is to keep track of references for all node objects
-                @clientNodes[node.cid] = node
+        _referenceNode: (node) =>
+            if not node.id? then return
 
+            if not (cache = @nodes[node.id])
+                cache = @nodes[node.id] = []
+
+            # Don't add redundant cache
+            if cache.indexOf(node) is -1 then cache.push node
+
+            # This is to keep track of references for all node objects
+            @clientNodes[node.cid] = node
+
+            # Add change handler on node, only trigger if the value is not
+            # empty
+            node.on 'change', @_nodeSave
+
+        # Deference a node from the tree and unbind the change handler
         _deferenceNode: (node) =>
             if (cache = @nodes[node.id]) and (idx = cache.indexOf(node)) >= 0
                 cache.splice(idx, 1)
+
             delete @clientNodes[node.cid]
+
+            # Remove change handlers from node
+            node.off 'change', @_nodeSave
 
         isSession: ->
             @get 'session'
+
+        isArchived: ->
+            @get 'archived'
 
         # Returns an array of nodes for the provided `id`.
         getNodes: (id) ->
@@ -302,7 +352,8 @@ define [
         # current root changed to a child node
         add: (node) ->
             if not @clientNodes[node.cid]
-                @_cacheNode node
+                @_referenceNode node
+
                 if @root.isEmpty()
                     @root = node
                 # If the root is already a branch and simply a container,
@@ -314,25 +365,39 @@ define [
                         type: 'and'
                         children: [@root, node]
                     @root = branch
-            @save()
+
+                @save()
 
         remove: (node) ->
             if @clientNodes[node.cid]
+                # Replace the root with a placeholder
                 if node is @root
                     @root = new DataContextNode
+
+                # If the root is a branch and only has a single sibling,
+                # the sibling must be demoted
                 else if @root.isBranch()
                     children = @root.get('children')
+
                     if (idx = children.indexOf(node)) >= 0
                         children.splice(idx, 1)[0]
+
                     if children.length is 1
                         @root = children[0]
+
                 @_deferenceNode node
-            @save()
+
+                @save()
 
         # Removes all nodes from this context
         clear: ->
+            # Unbind all change handlers
+            for cid, node of @clientNodes
+                node.off 'change', node
+
             @nodes = {}
             @clientNodes = {}
+
             if @root.id
                 @root = new DataContextNode
             else
@@ -351,7 +416,7 @@ define [
                 @resolve()
                 for model in collection.models
                     model.trigger 'sync'
-            return
+                return
 
         hasSession: ->
             !!(@filter (model) -> model.get 'session')[0]
