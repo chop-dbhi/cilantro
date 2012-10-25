@@ -23,5 +23,7 @@ cilantro/static/cilantro/scripts/javascript/min
 !cilantro/static/cilantro/scripts/javascript/src/modernizr.js
 !cilantro/static/cilantro/scripts/javascript/src/plugins/jquery-ui.js
 !cilantro/static/cilantro/scripts/javascript/src/plugins/jquery-easing.js
+!cilantro/templates/cilantro/_config.js
+!cilantro/templates/cilantro/config.js
 
 cilantro/static/cilantro/stylesheets/css/style.css
