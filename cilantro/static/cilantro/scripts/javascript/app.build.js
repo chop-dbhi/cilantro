@@ -64,11 +64,12 @@
         include: [
             'highcharts',
             'views/queryviews',
-            'views/charts',
             'forms/controls',
             'charts/utils',
             'charts/backbone-charts',
-            'charts/options'
+            'charts/options',
+            'charts/views',
+            'charts/models'
         ],
         exclude: ['environ', 'jquery', 'backbone', 'underscore', 'mediator']
     }, {
