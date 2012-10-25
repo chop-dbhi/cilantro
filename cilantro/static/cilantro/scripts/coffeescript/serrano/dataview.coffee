@@ -27,6 +27,7 @@ define [
             # in this version. This has been changed in Backbone
             # @ commit 1f3f4525
             @on 'sync', ->
+                @resolve()
                 mediator.publish channels.DATAVIEW_SYNCED, @, 'success'
 
             # If the sync fails on the server
