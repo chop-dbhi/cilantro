@@ -63,9 +63,28 @@ Login to the Admin and create a new Site Configuration. This is a simple way to 
 
 ### Templates
 
-Cilantro uses [Django's templates](https://docs.djangoproject.com/en/1.4/topics/templates/) for rendering the base template which ultimately bootstraps the JavaScript code.
+Cilantro uses [Django's templates](https://docs.djangoproject.com/en/1.4/topics/templates/) for rendering the base template which ultimately bootstraps the JavaScript code. Each template has a _private_ version with the name
+prefixed with an underscore and a _public_ version without the underscore. The public templates can be overridden
+to extend the private templates. Every public template looks like this:
 
-There are four structural templates cilantro defines. For easy overriding, the template inheritance tree looks like this:
+```django
+{% extends "cilantro/_header.html" %}
+```
+
+As an example, to override one of the header blocks, simply define `cilantro/header.html`
+and override one of the blocks:
+
+```django
+{% extends "cilantro/_header.html" %}
+
+{% block header_nav %}
+    ...
+{% endblock %}
+```
+
+> Remember that in order for _your_ template to take precedence over Cilantro's list the app where the template lives before `'cilantro'` in the `INSTALLED_APPS` setting.
+
+There are four page templates Cilantro uses. The template inheritance tree looks like this:
 
 ```
 cilantro/_base.html
@@ -77,28 +96,47 @@ cilantro/_base.html
            __ cilantro/index.html
 ```
 
-The `_base.html` template includes the below templates as well to be easily customized. The templates that are included by `_header.html` also shown.
+The `base.html` template includes the below templates as well to be easily customized. The templates that are included by `header.html` also shown.
 
 ```
-cilantro/_header.html
-cilantro/_subnav.html
-cilantro/_content.html
-cilantro/_footer.html
+cilantro/header.html
+cilantro/subnav.html
+cilantro/content.html
+cilantro/footer.html
+```
+
+A _special_ template called `cilantro/_config.js` contains the JavaScript configuration
+for Cilantro. This can be extended by doing the following:
+
+```javascript
+// This file must be named cilantro/config.js in your project.
+// Include the existing private template to provide the base configuration,
+// then simply override it as needed.
+
+{% include "cilantro/_config.js" %}
+
+// Override which routes are used..
+App.routes = [ ... ];
+
+// Define a default dataview for new users..
+App.defaults.dataview = { ... };
+
+...
 ```
 
 The `_header.html` template has it's own set of files that are included and can be overridden.
 
 ```
-cilantro/_brand.html
-cilantro/_nav.html
-cilantro/_nav-auth.html
+cilantro/brand.html
+cilantro/nav.html
+cilantro/nav-auth.html
 ```
 
-_Note: the `_nav.html` template will be included only if authentication is required for the site. This will display a login link. If the user is authenticated, the `_nav-auth.html` template will be used instead._
+_Note: the `nav.html` template will be included only if authentication is required for the site. This will display a login link. If the user is authenticated, the `nav-auth.html` template will be used instead._
 
 #### Template Blocks
 
-**`_base.html`**
+**`base.html`**
 
 - `head_title` - Wraps the contents of the HTML `<title>` tag. Contains the Cilantro [site configuration] title by default.
 - `styles` - Defined in the `<head>` block, this contains all stylesheet links `<link rel=stylesheet href=style.css>` and `<style>` blocks
@@ -112,12 +150,18 @@ _Note: the `_nav.html` template will be included only if authentication is requi
 you're doing, do not override this block. If you need to extend it use Django's `{{ block.super }}` syntax.
 - `scripts` - Contains all the `<script>` tags that will ultimately bootstrap the application.
 
-**`_header.html`**
+**`header.html`**
 
 - `header_content` - The entire contents of the header. By default this contains brand, navigation, and account links.
 - `header_links` - The header navigation links. Of all the `header*` blocks, this is typically the only one that should be extended.
 
-**`_subnav.html`**
+**`brand.html`**
+
+- `brand_url` - The URL the brand title links to. By default, this is a URL with the [name](https://docs.djangoproject.com/en/1.4/topics/http/urls/#naming-url-patterns) of `index`. If this is not overridden, ensure you have some URL defined in that has a name of `index`, otherwise you will see a `NoReverseMatch` exception.
+- `brand_title` - This is configurable via Cilantro's `SiteConfiguration` model, but those who prefer an explicit
+template override, this is the block to do it.
+
+**`subnav.html`**
 
 - `subnav_content` - The contents of the secondary navigation bar.
 
