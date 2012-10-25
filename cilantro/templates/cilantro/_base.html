@@ -69,26 +69,27 @@
 
                     routes: [{
                         name: 'app',
-                        module: 'routes/app'
+                        module: 'routes/app',
+                        route: false
                     }, {
     //                    name: 'workspace',
     //                    module: 'routes/workspace',
-    //                    url: '{% url "cilantro:workspace" %}',
+    //                    route: 'workspace/',
     //                    label: 'Workspace'
                     }, {
                         name: 'discover',
                         module: 'routes/discover',
-                        url: '{% url "cilantro:discover" %}',
+                        route: 'discover/',
                         label: 'Discover'
                     }, {
     //                    name: 'analyze',
     //                    module: 'routes/analyze',
-    //                    url: '{% url "cilantro:analyze" %}',
+    //                    route: 'analyze/',
     //                    label: 'Analyze'
                     }, {
                         name: 'review',
                         module: 'routes/review',
-                        url: '{% url "cilantro:review" %}',
+                        route: 'review/',
                         label: 'Review',
                         options: {
                             perPage: 100

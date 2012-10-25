@@ -397,15 +397,17 @@ define [
                 @$content.append ul
 
             # Append actions
+            # FIXME: this button assumes the data route to be 'review/' which
+            # is a hard-coded assumption
             @$content.append '
                 <div class=actions>
-                    <button data-route=review class="btn btn-small btn-primary">View Results</button>
+                    <button data-route="review/" class="btn btn-small btn-primary">View Results</button>
                     <button data-toggle=clear class="btn btn-small btn-danger pull-right" title="Clear All">
                         <i class="icon-ban-circle icon-white"></i></button>
                 </div>
             '
 
-            @$el
+            return @$el
 
 
         clear: (event) ->
