@@ -15,8 +15,8 @@ define [
     'jquery'
     'underscore'
     'backbone'
-    'serrano/channels'
-], (environ, mediator, $, _, Backbone, channels) ->
+    'serrano'
+], (environ, mediator, $, _, Backbone, Serrano) ->
 
     formActionsTemplate = _.template '
         <div class=form-actions>
@@ -244,7 +244,7 @@ define [
                 if @node
                     @setOperator()
                     @setValue()
-                    mediator.publish channels.DATACONTEXT_REMOVE, @node
+                    mediator.publish Serrano.DATACONTEXT_REMOVE, @node
                     delete @node
                     @$remove.hide()
                 return
@@ -257,8 +257,8 @@ define [
             if @node
                 @node.set data
             else
-                @node = new App.DataContextNode data
-            mediator.publish channels.DATACONTEXT_ADD, @node
+                @node = new Serrano.DataContextNode data
+            mediator.publish Serrano.DATACONTEXT_ADD, @node
             @$remove.show()
 
 

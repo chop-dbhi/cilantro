@@ -1,8 +1,11 @@
 define [
     'environ'
     'mediator'
+    'channels'
+    'underscore'
     'backbone'
-], (environ, mediator, Backbone) ->
+], (environ, mediator, channels, _, Backbone) ->
+
 
     class Distribution extends Backbone.Model
         defaults:
@@ -21,16 +24,20 @@ define [
         comparator: (model) -> model.get 'order'
 
         initialize: ->
+            super
+
             # Subscribe to load events of the distributions
-            mediator.subscribe 'session/load/distributions', (distributions) =>
+            channel = _.template channels.SESSION_LOAD, key: 'distributions'
+            mediator.subscribe channel, (distributions) =>
                 @add distributions, silent: true
+                @resolve()
 
             # Emit saving the distributions data to the session
             @on 'all', _.debounce =>
-                mediator.publish 'session/save', 'distributions', @toJSON()
+                mediator.publish channels.SESSION_SET, 'distributions', @toJSON()
 
         # No-op sync method to prevent sending off requests itself
         sync: (method, model, options) ->
 
 
-    App.Distribution = new Distributions
+    { Distribution, Distributions }

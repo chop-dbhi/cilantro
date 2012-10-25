@@ -4,10 +4,10 @@ define [
     'jquery'
     'underscore'
     'backbone'
-    'serrano/channels'
-    'views/charts'
+    'serrano'
+    'charts'
     'forms/controls'
-], (environ, mediator, $, _, Backbone, channels, Charts, Controls) ->
+], (environ, mediator, $, _, Backbone, Serrano, Charts, Controls) ->
 
     class QueryView extends Backbone.View
         template: _.template '
@@ -102,7 +102,7 @@ define [
                     controlClass = Controls.Control
 
                 if model.get('_links').distribution
-                    chart = new Charts.Distribution
+                    chart = new Charts.DistributionChart
                         editable: false
                         data:
                             context: null
@@ -117,7 +117,7 @@ define [
                 if chart then @$form.append chart.render()
 
             # Subscribe to the session datacontext
-            mediator.subscribe channels.DATACONTEXT_SYNCED, (model) =>
+            mediator.subscribe Serrano.DATACONTEXT_SYNCED, (model) =>
                 if model.isSession()
                     for control in @controls
                         if (conditions = model.getNodes(control.model.id)) and conditions[0]
@@ -363,10 +363,10 @@ define [
             $('body').append @$el
             @$el.panel()
 
-            mediator.subscribe channels.DATACONTEXT_SYNCING, =>
+            mediator.subscribe Serrano.DATACONTEXT_SYNCING, =>
                 @$content.addClass 'loading'
 
-            mediator.subscribe channels.DATACONTEXT_SYNCED, (model) =>
+            mediator.subscribe Serrano.DATACONTEXT_SYNCED, (model) =>
                 if model.isSession() then @render(model)
 
         _parse: (node, html=[]) ->
@@ -412,7 +412,7 @@ define [
 
         clear: (event) ->
             event.preventDefault()
-            mediator.publish channels.DATACONTEXT_CLEAR
+            mediator.publish Serrano.DATACONTEXT_CLEAR
 
     {
         View: QueryView

@@ -1,5 +1,6 @@
 define [
     'underscore'
+    'serrano/channels'
     'serrano/datafield'
     'serrano/dataconcept'
     'serrano/datacontext'

@@ -3,7 +3,7 @@ define [
     'mediator'
     'underscore'
     'backbone'
-    'serrano/channels'
+    './channels'
 ], (environ, mediator, _, Backbone, channels) ->
 
 

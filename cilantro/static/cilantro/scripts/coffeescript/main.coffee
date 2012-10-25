@@ -6,7 +6,6 @@ define [
 
     # App router
     'router'
-    'session'
 
     # Load models/collections
     'models/datafield'
@@ -50,11 +49,9 @@ define [
         root ?= path
         head ?= ''
 
-        # Load preferences after everything is loaded to ensure all the
-        # subscribers are... subscribed.
-        App.preferences.load()
-
+        # Last modules to load due to the heavy number of subscribers
         require [
+            'session'
             'models/datacontext'
             'models/dataview'
         ]

@@ -2,7 +2,7 @@ define [
     'mediator'
     'underscore'
     'backbone'
-    'serrano/channels'
+    './channels'
 ], (mediator, _, Backbone, channels) ->
 
 
@@ -421,7 +421,5 @@ define [
         hasSession: ->
             !!(@filter (model) -> model.get 'session')[0]
 
-
-    App.DataContextNode = DataContextNode
 
     { DataContextNode, DataContext, DataContexts }

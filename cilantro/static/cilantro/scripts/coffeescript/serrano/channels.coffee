@@ -41,6 +41,8 @@ define ->
     DATACONTEXT_REMOVE: 'datacontext/remove'
     DATACONTEXT_CLEAR: 'datacontext/clear'
 
+    DATACONTEXT_HISTORY: 'datacontext/history'
+
     # Published by DataViews
     DATAVIEW_CHANGED: 'dataview/changed'
     DATAVIEW_SYNCING: 'dataview/syncing'
@@ -54,3 +56,5 @@ define ->
     # and sorting options.
     DATAVIEW_COLUMNS: 'dataview/columns'
     DATAVIEW_ORDERING: 'dataview/ordering'
+
+    DATAVIEW_HISTORY: 'dataview/history'

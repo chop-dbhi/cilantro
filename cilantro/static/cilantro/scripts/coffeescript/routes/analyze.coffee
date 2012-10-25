@@ -4,8 +4,9 @@ define [
     'jquery'
     'underscore'
     'backbone'
-    'views/charts'
-], (environ, mediator, $, _, Backbone, Charts) ->
+    'serrano'
+    'charts'
+], (environ, mediator, $, _, Backbone, Serrano, Charts) ->
 
     addChartButton = _.template '<button class=btn title="Add Chart"><i class=icon-signal alt="Add Chart"></i></button>'
 
@@ -20,6 +21,8 @@ define [
             'updateCharts': true
 
         initialize: ->
+            super
+
             @charts = []
 
             @$toolbar = $('<ul>')
@@ -45,32 +48,36 @@ define [
 
             @$toolbar.append $addChart
 
-            @defer => @addChart model for model in App.Distribution.models
-            mediator.subscribe 'datacontext/synced', @updateCharts
+            @distributions = new Charts.Distributions
+
+            @distributions.when =>
+                @addChart model for model in @distibution.models
+
+            mediator.subscribe Serrano.DATACONTEXT_SYNCED, @updateCharts
 
         updateCharts: =>
             (view.updateChart() for view in @charts)
             return
 
         load: ->
-            @$el.fadeIn 100
-            @$toolbar.fadeIn 100
+            @$el.show()
+            @$toolbar.show()
 
         unload: ->
             @$el.hide()
             @$toolbar.hide()
 
         addChart: (attrs) ->
-            if not attrs instanceof App.Distribution.model
+            if not attrs instanceof Charts.Distribution
                 model = attrs
             else
-                model = App.Distribution.create(attrs)
+                model = @distributions.create(attrs)
 
-            view = new Charts.Distribution
+            view = new Charts.DistributionChart
                 model: model
                 collection: App.DataField
 
             @charts.push view
             @$el.append view.$el
 
-            view.updateChart()
+            view.changeChart()

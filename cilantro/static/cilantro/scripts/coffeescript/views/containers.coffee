@@ -1,11 +1,10 @@
-# General views
-
 define [
     'environ'
     'jquery'
     'underscore'
     'backbone'
 ], (environ, $, _, Backbone) ->
+
 
     class Container extends Backbone.View
         template: _.template '
@@ -19,6 +18,8 @@ define [
             @setElement @template()
             @heading = @$el.find '.heading'
             @content = @$el.find '.content'
+
+        render: -> @$el
 
 
     { Container }

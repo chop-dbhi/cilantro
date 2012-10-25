@@ -4,9 +4,9 @@ define [
     'jquery'
     'underscore'
     'backbone'
-    'charts/utils'
-    'charts/backbone-charts'
-], (environ, mediator, $, _, Backbone, ChartUtils) ->
+    './utils'
+    './backbone-charts'
+], (environ, mediator, $, _, Backbone, utils) ->
 
     chartTmpl = _.template '
         <div class="area-container chart-container">
@@ -56,15 +56,14 @@ define [
 
             for model in @collection.models
                 # No good way to represent large string-based yet
-                if (data = model.get('data')).searchable then continue
-                data = model.get('data')
-                if @enumerableOnly and not data.enumerable
+                if model.get 'searchable' then continue
+                if @options.enumerableOnly and not model.get 'enumerable'
                     continue
                 @$el.append "<option value=\"#{ model.id }\">#{ model.get 'name' }</option>"
             return @$el
 
         getSelected: ->
-            return @collection.get parseInt @$el.val()
+            @collection.get parseInt @$el.val()
 
 
     class DistributionChart extends Backbone.Chart
@@ -82,7 +81,7 @@ define [
 
             # Edit form
             'submit': 'changeChart'
-            'change .editable select': 'disableRedundantFields'
+            'change .editable select': 'disableSelected'
 
         initialize: ->
             super
@@ -148,9 +147,9 @@ define [
             @chart = new Highcharts.Chart options
             return @
 
-        # Disable redundant fields since using the same field for multiple
+        # Disable selected fields since using the same field for multiple
         # axes doesn't make sense
-        disableRedundantFields: (event) ->
+        disableSelected: (event) ->
             $target = $ event.target
 
             # Changed to an empty value, unhide other dropdowns
@@ -185,12 +184,16 @@ define [
             if @chart then @chart.setSize chartWidth, null, false
 
         expand: ->
-            @$fullsizeToggle.children('i').removeClass('icon-resize-small').addClass('icon-resize-full')
+            @$fullsizeToggle.children('i')
+                .removeClass('icon-resize-small')
+                .addClass('icon-resize-full')
             @$el.addClass 'expanded'
             @resize()
 
         contract: ->
-            @$fullsizeToggle.children('i').removeClass('icon-resize-full').addClass('icon-resize-small')
+            @$fullsizeToggle.children('i')
+                .removeClass('icon-resize-full')
+                .addClass('icon-resize-small')
             @$el.removeClass 'expanded'
             @resize()
 
@@ -229,7 +232,7 @@ define [
                 data: data
                 success: (resp) =>
                     @$el.removeClass 'loading'
-                    @renderChart ChartUtils.processResponse resp, fields, seriesIdx
+                    @renderChart utils.processResponse resp, fields, seriesIdx
 
         # Ensure rapid successions of this method do not occur
         changeChart: (event) ->
@@ -273,4 +276,4 @@ define [
                 @update url, data, fields, seriesIdx
 
 
-    { Distribution: DistributionChart }
+    { DistributionChart }
