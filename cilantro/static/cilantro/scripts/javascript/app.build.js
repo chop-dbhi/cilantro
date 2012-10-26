@@ -12,8 +12,6 @@
     // explicitly specify the optimization method
     optimize: 'uglify',
 
-    removeCombined: true,
-
     preserveLicenseComments: false,
 
     // no CSS optimization is necessary since we use the sass optimization tool
