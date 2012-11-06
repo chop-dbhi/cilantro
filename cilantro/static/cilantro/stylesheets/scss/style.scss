@@ -35,10 +35,6 @@
 @import "routes/analysis";
 @import "routes/review";
 
-* {
-    @include transition(opacity, 0.4s, ease-in-out);
-}
-
 body {
     background: #f9f9f9 url(../../images/fabric_plaid.png);
     // Padding for navigation bars
