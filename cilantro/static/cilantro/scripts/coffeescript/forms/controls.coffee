@@ -242,10 +242,7 @@ define [
             # If the value is undefined, the condition may be removed
             if data.value is undefined
                 if @node
-                    @setOperator()
-                    @setValue()
                     mediator.publish Serrano.DATACONTEXT_REMOVE, @node
-                    delete @node
                     @$remove.hide()
                 return
 
