@@ -393,7 +393,7 @@ define [
         clear: ->
             # Unbind all change handlers
             for cid, node of @clientNodes
-                node.off 'change', node
+                node.off 'change', @_nodeSave
 
             @nodes = {}
             @clientNodes = {}
