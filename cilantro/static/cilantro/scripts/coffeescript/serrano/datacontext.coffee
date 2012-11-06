@@ -28,7 +28,7 @@ define [
 
             # Check for all undefined values
             for key, value of attrs
-                if not value? then return 'Unknown node type'
+                if value? then return 'Unknown node type'
 
             return
 
