@@ -36,6 +36,7 @@ define [
 
             $(window).on 'resize', =>
                 @resizePinnedThead()
+                @resizeBody()
 
         setBody: (objects, append=false) ->
             html = []
@@ -49,6 +50,7 @@ define [
                 @$tbody.append html.join ''
             else
                 @$tbody.html html.join ''
+            @resizeBody()
             @resizePinnedThead()
 
         setHeader: (header) ->
@@ -86,6 +88,12 @@ define [
                 $elem = $(elem)
                 $copy = $(@$pinnedThead.children()[i])
                 $copy.css 'width', ($elem.width() / theadWidth * 100) + '%'
+
+        resizeBody: ->
+            if (@$table.height() > $('#main-area').height())
+                @$el.removeClass 'short'
+            else
+                @$el.addClass 'short'
 
         # When not at the top, show the pinned header
         togglePinnedThead: (event) ->
