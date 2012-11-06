@@ -295,7 +295,7 @@ define [
                 $group.find('.accordian-body').removeClass('collapse')
 
             return @$el
-        
+
 
     # Represents a search form that will filter down the query options
     class QueryViewsSearchForm extends Backbone.View
@@ -350,21 +350,31 @@ define [
         events:
             'click [data-toggle=clear]': 'clear'
 
+        # FIXME: this button assumes the data route to be 'review/' which
+        # is a hard-coded assumption
         template: _.template '
             <div id=data-filters-list-panel class="panel panel-right scrollable-column closed">
-                <div class="inner panel-content"></div>
+                <div class="inner panel-content">
+                    <div class=actions>
+                        <button data-route="review/" class="btn btn-small btn-primary">View Results</button>
+                        <button data-toggle=clear class="btn btn-small btn-danger pull-right" title="Clear All">
+                            <i class="icon-ban-circle icon-white"></i>
+                        </button>
+                    </div>
+                    <div class=filters></div>
+                </div>
                 <div class=panel-toggle></div>
             </div>
         '
 
         initialize: (options) ->
             @setElement @template()
-            @$content = @$('.panel-content')
+            @$filters = @$('.filters')
             $('body').append @$el
             @$el.panel()
 
             mediator.subscribe Serrano.DATACONTEXT_SYNCING, =>
-                @$content.addClass 'loading'
+                @$filters.addClass 'loading'
 
             mediator.subscribe Serrano.DATACONTEXT_SYNCED, (model) =>
                 if model.isSession() then @render(model)
@@ -385,27 +395,25 @@ define [
             return html
 
         render: (model) =>
-            @$content.removeClass 'loading'
+            @$filters.empty()
+
+            # Append actions
+            @$filters.removeClass 'loading'
             node = model.get('language')
-            @$content.html '<h4>Applied Filters</h4>'
 
             # Not filters
             if not node or _.isEmpty(node)
-                @$content.append '<div class=muted>No filters are applied</div>'
+                @$filters.append '
+                    <div class=muted>
+                        <h4>No filters are applied</h4>
+                        <p>Explore the available filters on the left side
+                            or click "View Results" to immediately see some
+                            data.</p>
+                    </div>
+                '
             else
                 ul = $(@_parse(node).join '').addClass 'unstyled nav-list'
-                @$content.append ul
-
-            # Append actions
-            # FIXME: this button assumes the data route to be 'review/' which
-            # is a hard-coded assumption
-            @$content.append '
-                <div class=actions>
-                    <button data-route="review/" class="btn btn-small btn-primary">View Results</button>
-                    <button data-toggle=clear class="btn btn-small btn-danger pull-right" title="Clear All">
-                        <i class="icon-ban-circle icon-white"></i></button>
-                </div>
-            '
+                @$filters.append ul
 
             return @$el
 
