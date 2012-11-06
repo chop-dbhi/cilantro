@@ -23,8 +23,8 @@ $subnav-bgcolor: #d3e3f2;
         @include box-shadow(inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.2));
         @include linear-gradient($subnav-bgcolor, darken($subnav-bgcolor, 5));
         border-bottom: 1px solid darken($subnav-bgcolor, 20);
-        min-height: 37px;
-        height: 37px;
+        min-height: 40px;
+        height: 40px;
     }
 
     .nav {
