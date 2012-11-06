@@ -198,11 +198,14 @@ define [
 
         className: 'accordian'
 
+        events:
+            'click .accordian-toggle': 'toggleCaret'
+
         groupTemplate: _.template '
             <div class=accordian-group>
                 <div class=accordian-heading>
                     <a class=accordian-toggle data-toggle=collapse href="#category-{{ id }}">{{ name }}</a>
-                    <i class=icon-filter></i>
+                    <b class="caret closed"></b>
                 </div>
                 <div id="category-{{ id }}" class="accordian-body collapse">
                     <ul class="nav nav-list"></ul>
@@ -295,6 +298,10 @@ define [
                 $group.find('.accordian-body').removeClass('collapse')
 
             return @$el
+
+        toggleCaret: (event) ->
+            target = $(event.target)
+            target.siblings('.caret').toggleClass('closed')
 
 
     # Represents a search form that will filter down the query options
