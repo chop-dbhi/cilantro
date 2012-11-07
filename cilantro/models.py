@@ -22,9 +22,9 @@ class SiteConfiguration(models.Model):
     objects = SiteConfigurationManager()
 
     def __unicode__(self):
-        text = u'"{}"'.format(self.title or self.site)
+        text = u'"{0}"'.format(self.title or self.site)
         if self.label:
-            text = '{} ({})'.format(text, self.label)
+            text = '{0} ({1})'.format(text, self.label)
         return text
 
     @property
@@ -46,5 +46,5 @@ class UserPreferences(models.Model):
 
     def __unicode__(self):
         if self.user_id:
-            return u'{}\'s Preferences'.format(self.user)
-        return u'Preferences for Session [{}]'.format(self.session_key)
+            return u'{0}\'s Preferences'.format(self.user)
+        return u'Preferences for Session [{0}]'.format(self.session_key)
