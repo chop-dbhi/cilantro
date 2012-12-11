@@ -7,7 +7,7 @@ kwargs = {
 
     # Dependencies
     'install_requires': [
-        'serrano>=2.0,<2.1',
+        'serrano>=2.0.7,<2.1',
     ],
 
     # Test dependencies

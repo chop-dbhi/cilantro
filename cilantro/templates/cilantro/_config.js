@@ -9,11 +9,12 @@ var App = {
     CSRF_TOKEN: '{{ csrf_token }}',
 
     urls: {
-        exporter: '{% url "serrano:exporter" %}',
-        dataviews: '{% url "serrano:dataviews" %}',
-        dataviewHistory: '{% url "serrano:dataview-history" %}',
-        datacontexts: '{% url "serrano:datacontexts" %}',
-        datacontextHistory: '{% url "serrano:datacontext-history" %}',
+        preview: '{% url "serrano:data:preview" %}',
+        exporter: '{% url "serrano:data:exporter" %}',
+        dataviews: '{% url "serrano:views:active" %}',
+        dataviewHistory: '{% url "serrano:views:history" %}',
+        datacontexts: '{% url "serrano:contexts:active" %}',
+        datacontextHistory: '{% url "serrano:contexts:history" %}',
         dataconcepts: '{% url "serrano:dataconcepts" %}',
         datafields: '{% url "serrano:datafields" %}',
         preferences: '{% url "cilantro:preferences" %}'

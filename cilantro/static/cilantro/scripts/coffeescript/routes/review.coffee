@@ -82,7 +82,7 @@ define [
             # Check if the lastest page is the last page
             if append and @page is @numPages then return
 
-            url = "#{ App.urls.exporter }?per_page=#{ @perPage }"
+            url = "#{ App.urls.preview }?per_page=#{ @perPage }"
 
             if append
                 url = "#{ url }&page=#{ @page + 1 }"
