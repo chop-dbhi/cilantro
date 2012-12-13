@@ -50,8 +50,9 @@ define [
 
             @table = new Table
             @$el.append @table.el
-            @table.$el.scroller
-                relative: 'table'
+            @table.$('#report-table').scroller
+                autofill: true
+                container: @table.$el
                 trigger: =>
                     @loadData true
 
@@ -101,7 +102,7 @@ define [
                     @table.setBody resp.objects, append
                 complete: =>
                     @table.$el.removeClass 'loading'
-                    @table.$el.scroller 'reset'
+                    @table.$('#report-table').scroller 'reset'
 
         sort: (event) ->
             $target = $(event.target)
