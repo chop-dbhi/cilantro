@@ -104,8 +104,11 @@ define [
                     model.trigger 'sync'
                 return
 
+        getSession: ->
+            (@filter (model) -> model.get 'session')[0]
+
         hasSession: ->
-            !!(@filter (model) -> model.get 'session')[0]
+            !!@getSession()
 
 
     { DataView, DataViews }
