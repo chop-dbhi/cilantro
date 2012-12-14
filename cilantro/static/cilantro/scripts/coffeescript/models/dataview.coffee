@@ -22,3 +22,5 @@ define [
 
     views.fetch()
     history.fetch()
+
+    App.DataView = views

@@ -22,3 +22,5 @@ define [
 
     contexts.fetch()
     history.fetch()
+
+    App.DataContext = contexts
