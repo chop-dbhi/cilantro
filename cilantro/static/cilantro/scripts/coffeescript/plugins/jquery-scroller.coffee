@@ -89,10 +89,7 @@ define ['jquery', 'underscore'], ($, _) ->
             $this = $ @
             data = $this.data('scroller')
             if not data
-                data = new Scroller $this, options
-                $this.data 'scroller', data
-                # Reset calculated components
-                data.reset()
+                $this.data 'scroller', (data = new Scroller $this, options)
             data[option]() if typeof option is 'string'
 
     $.fn.scroller.Constructor = Scroller
