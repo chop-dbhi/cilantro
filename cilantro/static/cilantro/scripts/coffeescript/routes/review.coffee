@@ -65,8 +65,6 @@ define [
             @page = 1
             @perPage = @options.perPage
 
-            @loadData()
-
         load: ->
             @$el.fadeIn 100
             @$toolbar.fadeIn 100
