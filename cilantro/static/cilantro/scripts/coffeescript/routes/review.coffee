@@ -5,10 +5,10 @@ define [
     'underscore'
     'backbone'
 
-    'serrano/channels'
+    'serrano'
     'views/columns'
     'views/table'
-], (environ, mediator, $, _, Backbone, channels, Columns, Table) ->
+], (environ, mediator, $, _, Backbone, Serrano, Columns, Table) ->
 
     modifyColumnsButton = _.template '<button class=btn title="Show/Hide Columns"><i class=icon-list alt="Show/Hide Columns"></i></button>'
 
@@ -56,10 +56,10 @@ define [
                 trigger: =>
                     @loadData true
 
-            mediator.subscribe channels.DATAVIEW_SYNCED, =>
+            mediator.subscribe Serrano.DATAVIEW_SYNCED, =>
                 @loadData()
 
-            mediator.subscribe channels.DATACONTEXT_SYNCED, =>
+            mediator.subscribe Serrano.DATACONTEXT_SYNCED, =>
                 @loadData()
 
             @page = 1
@@ -120,4 +120,4 @@ define [
                 ordering = [[$target.data('id'), direction]]
             else
                 ordering = []
-            mediator.publish channels.DATAVIEW_ORDERING, ordering
+            mediator.publish Serrano.DATAVIEW_ORDERING, ordering
