@@ -175,7 +175,7 @@ Cilantro makes use of the [AMD API](http://requirejs.org/docs/whyamd.html) for d
 
 ### Configuration
 
-Cilantro is designed to be modular and extensible via JavaScript. There are a few configuration options that can be set before all the JavaScript loads to customize the which components get loaded.
+Cilantro is designed to be modular and extensible via JavaScript. There are a few configuration options that can be set before all the JavaScript loads to customize which components get loaded.
 
 A few of them are defined ahead such as the Serrano endpoints Cilantro will use to interact with the data. Unless you decide to not use Serrano or you need to override a particular endpoint, you should not changes the `urls` object.
 
