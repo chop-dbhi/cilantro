@@ -124,6 +124,8 @@ App.defaults.dataview = { ... };
 ...
 ```
 
+See the [JavaScript API Configuration](#configuration) section for more details the objects defined in this file. 
+
 The `_header.html` template has its own set of files that are included and can be overridden.
 
 ```
