@@ -96,7 +96,7 @@ cilantro/_base.html
            __ cilantro/index.html
 ```
 
-The `base.html` template includes the below templates as well to be easily customized. The templates that are included by `header.html` also shown.
+The `base.html` template includes the following page section templates that can be easily customized.
 
 ```
 cilantro/header.html
