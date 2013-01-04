@@ -105,6 +105,7 @@ cilantro/content.html
 cilantro/footer.html
 ```
 
+#### JavaScript Configuration Template
 A _special_ template called `cilantro/_config.js` contains the JavaScript configuration
 for Cilantro. This can be extended by doing the following:
 
@@ -179,35 +180,52 @@ Cilantro makes use of the [AMD API](http://requirejs.org/docs/whyamd.html) for d
 
 Cilantro is designed to be modular and extensible via JavaScript. There are a few configuration options that can be set before all the JavaScript loads to customize which components get loaded.
 
-A few of them are defined ahead such as the Serrano endpoints Cilantro will use to interact with the data. Unless you decide to not use Serrano or you need to override a particular endpoint, you should not changes the `urls` object.
+A few of them are defined ahead such as the Serrano endpoints that Cilantro will use to interact with the data. Unless you decide to not use Serrano or you need to override a particular endpoint, you should not changes the `urls` object. These should be overridden by creating a [config.js template](#javascript-configuration-template)as described in the Templates section.  This code will be embedded by Django into the HTML for every page in the application to ensure all client code can access it.
 
 ```javascript
-var cilantro = {
+var App = {
     urls: {
-        datafields: '/api/fields/',
-        dataconcepts: '/api/concepts/',
-        datacontexts: '/api/contexts/',
-        datacontextHistory: '/api/contexts/history/',
+        preview: '/api/data/preview/',
+        exporter: '/api/data/export/',
         dataviews: '/api/views/',
         dataviewHistory: '/api/views/history/',
+        datacontexts: '/api/contexts/',
+        datacontextHistory: '/api/contexts/history/',
+        dataconcepts: '/api/concepts/',
+        datafields: '/api/fields/',
         preferences: '/api/preferences/'
     },
+
+    defaults: {
+        dataview: {},
+        datacontext: {}
+    },
+
     routes: [{
         name: 'app',
         module: 'routes/app',
+        route: false
     }, {
         name: 'discover',
         module: 'routes/discover',
-        url: '/discover/',
+        route: 'discover/',
         label: 'Discover'
     }, {
         name: 'review',
         module: 'routes/review',
-        url: '/review/',
-        label: 'Review'
+        route: 'review/',
+        label: 'Review',
+        options: {
+            perPage: 100
+        }
     }]
-};
+}
 ```
+
+### Overview
+
+A brief architecture overview of the Cilantro client should help overall understanding of the individual modules. Cilantro uses the Backbone.js framework. Most of the Backbone models reflect model objects on the server. The important models you need to understand to edit or extend the UI are DataConcept and DataContextNode. There are others, but these two are crucial to the functionality of the application. DataConcept is responsible for describing the fields that will be presented to the user as a single interface or "concept".
+
 
 
 ### Modules
@@ -236,13 +254,6 @@ The four modules that define the core data structures are mimicked after the mod
 - `DataContexts` - The active list of `DataContext`s
 - `DataContextHistory` - An archived list of `DataContext`s that represents all previous _versions_ of all `DataContext`s
 
-**serrano/dataview**
-
-
-- `DataView` - Represents a single `DataView` which stores the selected columns and sorting options in the output view
-- `DataViews` - The active list of `DataView`s
-- `DataViewHistory` - An archived list of `DataView`s that represents all previous _versions_ of all `DataView`s
-
 **serrano/datafield**
 
 - `DataField` - A single `DataField` object which contains the metadata and links used to drive the interface
@@ -250,8 +261,16 @@ The four modules that define the core data structures are mimicked after the mod
 
 **serrano/dataconcept**
 
-- `DataConcept` - A single `DataConcept` object which contains the metadata and links used to drive the interface
+- `DataConcept` - A single `DataConcept` object which contains the metadata and links used to drive the portion of the  interface the users use to create their conditions.
 - `DataConcepts` - The list of all published `DataConcept`s
+
+**serrano/dataview**
+
+
+- `DataView` - Represents a single `DataView` which stores the selected columns and sorting options in the output view
+- `DataViews` - The active list of `DataView`s
+- `DataViewHistory` - An archived list of `DataView`s that represents all previous _versions_ of all `DataView`s
+
 
 
 ### Module Communication
