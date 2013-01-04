@@ -124,7 +124,7 @@ App.defaults.dataview = { ... };
 ...
 ```
 
-The `_header.html` template has it's own set of files that are included and can be overridden.
+The `_header.html` template has its own set of files that are included and can be overridden.
 
 ```
 cilantro/brand.html
