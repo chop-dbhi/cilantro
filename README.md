@@ -82,7 +82,7 @@ and override one of the blocks:
 {% endblock %}
 ```
 
-> Remember that in order for _your_ template to take precedence over Cilantro's list the app where the template lives before `'cilantro'` in the `INSTALLED_APPS` setting.
+> Remember that in order for _your_ template to take precedence over Cilantro's list the app where the template lives must appear before `'cilantro'` in the `INSTALLED_APPS` setting.
 
 There are four page templates Cilantro uses. The template inheritance tree looks like this:
 
