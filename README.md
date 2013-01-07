@@ -280,9 +280,11 @@ The four modules that define the core data structures are mimicked after the mod
 The DataConceptView is the interface the user uses to create the conditions of the query. Each view appears in the middle of the screen as the user uses the list on the left to open them. There are two types of DataConceptViews- managed and unmanaged. Managed views are the simpler of the two. The on-screen controls (drop-downs, input-boxes, graphs) are constructed by the framework. The framework will also handle the creation of the DataContextNode once the user fills out the view. Unmanaged views leave the construction of the DataContextNode to the developer of the DataConceptView. This can be used to build up more complex query interfaces that do not fit the more traditional single field -> single control mold. For example, a DataConceptView consisting of a single drop-down would be a managed DataConceptView, but one with a complex search that allows the user to select from a many inclusive or exclusive values (perhaps a series of Diagnosis Codes) would be unmanaged. As the developer of a such a DataConceptView, you would be responsible for the construction of the underlying DataContextNode.
 
 **ConceptItemView**
+
 The ConceptItemView represents an item on the left-side of the screen. The user clicks on a ConceptItemView to open its corresponding DataConceptView in the middle of the screen.
 
 **DataContextNodeView**
+
 This represents a DataContextNode (think filter condition) that a user has created. They appear in the right-side of the screen as the user creates them. They are there to both show the user the existing conditions they have already created, and to allow the users to remove and update the same existing conditions.
 
 
