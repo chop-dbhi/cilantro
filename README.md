@@ -180,7 +180,7 @@ Cilantro makes use of the [AMD API](http://requirejs.org/docs/whyamd.html) for d
 
 Cilantro is designed to be modular and extensible via JavaScript. There are a few configuration options that can be set before all the JavaScript loads to customize which components get loaded.
 
-A few of them are defined ahead such as the Serrano endpoints that Cilantro will use to interact with the data. Unless you decide to not use Serrano or you need to override a particular endpoint, you should not changes the `urls` object. These should be overridden by creating a [config.js template](#javascript-configuration-template)as described in the Templates section.  This code will be embedded by Django into the HTML for every page in the application to ensure all client code can access it.
+A few of them are defined ahead such as the Serrano endpoints that Cilantro will use to interact with the data. Unless you decide to not use Serrano or you need to override a particular endpoint, you should not changes the `urls` object. These should be overridden by creating a [config.js template](#javascript-configuration-template) as described in the Templates section. This code will be embedded by Django into the HTML for every page in the application to ensure all client code can access it.
 
 ```javascript
 var App = {
@@ -224,8 +224,9 @@ var App = {
 
 ### Overview
 
-A brief architecture overview of the Cilantro client should help overall understanding of the individual modules. Cilantro uses the Backbone.js framework. Most of the Backbone models reflect model objects on the server. The important models you need to understand to edit or extend the UI are DataConcept and DataContextNode. There are others, but these two are crucial to the functionality of the application. DataConcept is responsible for describing the fields that will be presented to the user as a single interface or "concept".
+A brief architecture overview of the Cilantro client should help overall understanding of the individual modules. Cilantro uses the Backbone.js framework. Most of the Backbone models reflect models on the server. The important models you need to understand to edit or extend the UI are DataConcept and DataContextNode. There are others, but these two are crucial to the functionality of the application. DataConcept is responsible for describing the fields that will be presented to the user as a single interface or "concept". The DataContextNode model represents a portion of the query the user has created using the interface. The "DataContext" portion of the name comes from the fact that this data structure controls the context in which the user will be viewing the data. These nodes are combined together into a larger query as a DataContextNodeTree.
 
+Both DataContextNode and DataConcept have corresponding view objects on the client. DataConceptView is the interface in the middle of the screen that the user will use to create an element of the query. For example, if a DataConcept model contains two fields, the corresponding DataConceptView will present an interface allowing the user to specify the range of values they would like to restrict the search to for those two fields. Depending on the fields and how they relate to one another, this interface may be as simple as two text form inputs, or it may be a more complex graph or tree-based interface. Once the user fills out this view, it will result in the construction of a DataContextNode that will make up all or a portion of their query. A DataContextNodeView then appears on the right hand-side showing a text version of DataContextNode the user just created.
 
 
 ### Modules
@@ -272,10 +273,22 @@ The four modules that define the core data structures are mimicked after the mod
 - `DataViewHistory` - An archived list of `DataView`s that represents all previous _versions_ of all `DataView`s
 
 
+#### Views
+
+**DataConceptView**
+
+The DataConceptView is the interface the user uses to create the conditions of the query. Each view appears in the middle of the screen as the user uses the list on the left to open them. There are two types of DataConceptViews- managed and unmanaged. Managed views are the simpler of the two. The on-screen controls (drop-downs, input-boxes, graphs) are constructed by the framework. The framework will also handle the creation of the DataContextNode once the user fills out the view. Unmanaged views leave the construction of the DataContextNode to the developer of the DataConceptView. This can be used to build up more complex query interfaces that do not fit the more traditional single field -> single control mold. For example, a DataConceptView consisting of a single drop-down would be a managed DataConceptView, but one with a complex search that allows the user to select from a many inclusive or exclusive values (perhaps a series of Diagnosis Codes) would be unmanaged. As the developer of a such a DataConceptView, you would be responsible for the construction of the underlying DataContextNode.
+
+**ConceptItemView**
+The ConceptItemView represents an item on the left-side of the screen. The user clicks on a ConceptItemView to open its corresponding DataConceptView in the middle of the screen.
+
+**DataContextNodeView**
+This represents a DataContextNode (think filter condition) that a user has created. They appear in the right-side of the screen as the user creates them. They are there to both show the user the existing conditions they have already created, and to allow the users to remove and update the same existing conditions.
+
 
 ### Module Communication
 
-Cilantro's JavaScript API uses a [publish/subscribe pattern](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) for communicating between modules. These communication _channels_ can be subscribed to by any module which means integrating additional functionality to the application is relatively simple.
+Cilantro's JavaScript API uses a [publish/subscribe pattern](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) for communicating between modules. These communication _channels_ can be subscribed to by any module. This means integrating additional functionality to the application is relatively simple.
 
 To use, include the `mediator` module in a script:
 
@@ -289,7 +302,7 @@ define(['mediator'], function(mediator) {
 
 #### Common Channels
 
-There are two groups of channels Cilantro utilizes for inter-module communication. A common set of channels _suffixes_ for model-based types have been established.
+A common set of channels _suffixes_ for model-based types have been established.
 
 The publishers of these channels must, at a minimum, pass _itself_ as the first argument for subscribers to consume. The publishers of channels subscribed by these objects must provide the `id` of the model it intends to communicate with.
 
@@ -299,12 +312,10 @@ The publishers of these channels must, at a minimum, pass _itself_ as the first 
 
 - `TYPE/synced` - This channel is published when the object is done syncing with the server, whether it was successful or there was an error. An additional argument is provided which is the status of the sync, either `success` or `error`. Subscribers can make use of this to remove the loading status from `FOO/syncing`, but can also do something with respect to the `status`.
 
-- `TYPE/pause` - This channel is subscribed to by the objects themselves. By default, objects will sync transparently as they are modified, but in certain cases where a lot of changes are occurring (generally at an unknown frequency), syncing should be deferred to prevent too much `chatty` communication with the server. Publishing to this channel will pause syncing until `TYPE/resume` is published to (see belo).
+- `TYPE/pause` - This channel is subscribed to by the objects themselves. By default, objects will sync transparently as they are modified, but in certain cases where a lot of changes are occurring (generally at an unknown frequency), syncing should be deferred to prevent too much `chatty` communication with the server. Publishing to this channel will pause syncing until `TYPE/resume` is published to (see below).
 
 - `TYPE/resume` - This channel is subscribed to by the objects themselves. This is used to resume syncing with the server when it has been paused (see above). If any changes have been made to the object, a resume will cause the object to sync with the server.
 
-
-_A design note aside: channel names are not specific to particular instances of the object which has the advantage of being more flexible from the subscriber perspective to act on the specific instance that publish to the channel or generally for that object type. The disadvantage is the lack of transparency of which objects/modules are actively communicating. It also prevents the mediator from applying permissions at the instance level. At this time, the disadvantages have not been a problem, but may change in a future release._
 
 #### Type-Specific Channels
 
@@ -331,8 +342,6 @@ All channels published and subscribed by `DataView` objects are prefixed with `d
 ### Anyone!
 
 Review [the current issues](https://github.com/cbmi/cilantro/issues) and provide feedback for feature requests or if you think you have found a bug or would like to get feedback on a new feature, [open a ticket](https://github.com/cbmi/cilantro/issues/new).
-
-### If you have skillz..
 
 Fork the repository, clone it locally and create a branch for the issue/feature you are developing.
 
