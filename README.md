@@ -226,7 +226,7 @@ var App = {
 
 A brief architecture overview of the Cilantro client should help overall understanding of the individual modules. Cilantro uses the Backbone.js framework. Most of the Backbone models reflect models on the server. The important models you need to understand to edit or extend the UI are DataConcept and DataContextNode. There are others, but these two are crucial to the functionality of the application. DataConcept is responsible for describing the fields that will be presented to the user as a single interface or "concept". The DataContextNode model represents a portion of the query the user has created using the interface. The "DataContext" portion of the name comes from the fact that this data structure controls the context in which the user will be viewing the data. These nodes are combined together into a larger query as a DataContextNodeTree.
 
-Both DataContextNode and DataConcept have corresponding view objects on the client. DataConceptView is the interface in the middle of the screen that the user will use to create an element of the query. For example, if a DataConcept model contains two fields, the corresponding DataConceptView will present an interface allowing the user to specify the range of values they would like to restrict the search to for those two fields. Depending on the fields and how they relate to one another, this interface may be as simple as two text form inputs, or it may be a more complex graph or tree-based interface. Once the user fills out this view, it will result in the construction of a DataContextNode that will make up all or a portion of their query. A DataContextNodeView then appears on the right hand-side showing a text version of DataContextNode the user just created.
+Both DataContextNode and DataConcept have corresponding view objects on the client. ConceptForm is the interface in the middle of the screen that the user will use to create an element of the query. For example, if a DataConcept model contains two fields, the corresponding ConceptForm will present an interface allowing the user to specify the range of values they would like to restrict the search to for those two fields. Depending on the fields and how they relate to one another, this interface may be as simple as two text form inputs, or it may be a more complex graph or tree-based interface. Once the user fills out this view, it will result in the construction of a FilterModel (on the server this is a DataContextNode) that will make up all or a portion of their query. A Filter view then appears on the right hand-side showing a text version of FilterModel the user just created. We call this right-hand side of the screen the NamedFilter view because all of the FilterModels will add up to one NamedFilterModel that the user can save off and reuse. On the server side the NamedFilterModel is called a DataContextNodeTree.
 
 
 ### Modules
@@ -275,17 +275,21 @@ The four modules that define the core data structures are mimicked after the mod
 
 #### Views
 
-**DataConceptView**
+**ConceptForm**
 
-The DataConceptView is the interface the user uses to create the conditions of the query. Each view appears in the middle of the screen as the user uses the list on the left to open them. There are two types of DataConceptViews- managed and unmanaged. Managed views are the simpler of the two. The on-screen controls (drop-downs, input-boxes, graphs) are constructed by the framework. The framework will also handle the creation of the DataContextNode once the user fills out the view. Unmanaged views leave the construction of the DataContextNode to the developer of the DataConceptView. This can be used to build up more complex query interfaces that do not fit the more traditional single field -> single control mold. For example, a DataConceptView consisting of a single drop-down would be a managed DataConceptView, but one with a complex search that allows the user to select from a many inclusive or exclusive values (perhaps a series of Diagnosis Codes) would be unmanaged. As the developer of a such a DataConceptView, you would be responsible for the construction of the underlying DataContextNode.
+The ConceptForm is the interface the user uses to create the conditions of the query. Each view appears in the middle of the screen as the user uses the list on the left to open them. There are two types of ConceptForms- managed and unmanaged. Managed views are the simpler of the two. The on-screen controls (drop-downs, input-boxes, graphs) are constructed by the framework. The framework will also handle the creation of the DataContextNode once the user fills out the view. Unmanaged views leave the construction of the DataContextNode to the developer of the DataConceptView. This can be used to build up more complex query interfaces that do not fit the more traditional single field -> single control mold. For example, a DataConceptView consisting of a single drop-down would be a managed DataConceptView, but one with a complex search that allows the user to select from a many inclusive or exclusive values (perhaps a series of Diagnosis Codes) would be unmanaged. As the developer of a such a DataConceptView, you would be responsible for the construction of the underlying DataContextNode.
 
-**ConceptItemView**
+**Concept**
 
-The ConceptItemView represents an item on the left-side of the screen. The user clicks on a ConceptItemView to open its corresponding DataConceptView in the middle of the screen.
+The Concept represents an item on the left-side of the screen. The user clicks on a Concept to open its corresponding ConceptForm in the middle of the screen.
 
-**DataContextNodeView**
+**Filter**
 
-This represents a DataContextNode (think filter condition) that a user has created. They appear in the right-side of the screen as the user creates them. They are there to both show the user the existing conditions they have already created, and to allow the users to remove and update the same existing conditions.
+This represents a FilterModel (DataContextNode on the server) that a user has created. They appear in the right-side of the screen as the user creates them. They are there to both show the user the existing conditions they have already created, and to allow the users to remove and update the same existing conditions.
+
+**NamedFilter**
+
+This is the container on the right-side of the screen. It represents the NamedFilterModel (DataContextNodeTree on the server) which is essentially the entire query made up of all the Filters the user has added.
 
 
 ### Module Communication
