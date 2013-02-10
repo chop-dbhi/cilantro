@@ -1,0 +1,61 @@
+.panel {
+    background-color: #fff;
+    z-index: 100;
+
+    &.panel-left {
+        @include box-shadow(2px 0 10px #bbb);
+        border-right: 1px solid #999;
+    }
+
+    &.panel-right {
+        @include box-shadow(-2px 0 10px #bbb);
+        border-left: 1px solid #999;
+    }
+
+    .panel-content {
+        padding: 10px;
+    }
+}
+
+.panel > * {
+    vertical-align: top;
+}
+
+.panel-toggle {
+    @include transition(background-color, 0.3s);
+    height: 100%;
+    width: 10px;
+    position: absolute;
+    top: 0;
+
+    &:hover {
+        background-color: #eee;
+    }
+}
+
+.panel.closed {
+    display: none;
+}
+
+.panel-right {
+    .panel-toggle {
+        left: 0;
+        cursor: e-resize;
+    }
+
+    &.closed .panel-toggle {
+        cursor: w-resize;
+    }
+}
+
+
+.panel-left {
+    .panel-toggle {
+        right: 0;
+        cursor: w-resize;
+    }
+
+    &.closed .panel-toggle {
+        cursor: e-resize;
+    }
+}

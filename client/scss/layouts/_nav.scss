@@ -1,0 +1,18 @@
+.navbar .btn:first-child {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.brand .label {
+    position: relative;
+    bottom: 3px;
+}
+
+.navbar .container-fluid .subtitle {
+    display: block;
+    float: left;
+    padding: 13px 20px 15px;
+    margin-left: -20px;
+    line-height: 1;
+    color: #ddd;
+}
