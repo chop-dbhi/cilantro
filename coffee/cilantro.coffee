@@ -14,4 +14,6 @@ define [
         
     # c.router = new Router
 
+    if c.getOption('autoload') then c.openSession()
+
     return (@cilantro = c)

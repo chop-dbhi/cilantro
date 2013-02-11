@@ -1,7 +1,7 @@
 define [
     '../core'
     'date'
-    'inputio'    
+    'inputio'
     'plugins/backbone-marionette'
     'plugins/backbone-charts'
     'plugins/bootstrap'
@@ -46,7 +46,7 @@ define [
 
     _constructor = c.Marionette.View::constructor
     c.Marionette.View::constructor = (args...) ->
-        _constructor.call(@, args)
+        _constructor.apply(@, args)
         @bindSubscribers()
 
     return c

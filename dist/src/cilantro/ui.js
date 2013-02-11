@@ -25984,7 +25984,7 @@ define('cilantro/ui/core',['../core', 'date', 'inputio', 'plugins/backbone-mario
   c.Marionette.View.prototype.constructor = function() {
     var args;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    _constructor.call(this, args);
+    _constructor.apply(this, args);
     return this.bindSubscribers();
   };
   return c;

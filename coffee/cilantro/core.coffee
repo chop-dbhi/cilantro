@@ -41,6 +41,7 @@ define [
         openSession: (url, credentials) ->
             url ?= @getOption('url')
             credentials ?= @getOption('credentials')
+            if not url? then throw new Error('Session cannot be opened, no URL defined')
             session.openSession url, credentials, (sessionData) ->
                 currentSession = _.clone sessionData
 

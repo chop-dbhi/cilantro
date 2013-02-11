@@ -13582,6 +13582,9 @@ define('cilantro/core',['jquery', 'underscore', 'backbone', 'serrano', 'mediator
       if (credentials == null) {
         credentials = this.getOption('credentials');
       }
+      if (!(url != null)) {
+        throw new Error('Session cannot be opened, no URL defined');
+      }
       return session.openSession(url, credentials, function(sessionData) {
         return currentSession = _.clone(sessionData);
       });
@@ -13926,5 +13929,8 @@ define('cilantro',['./cilantro/core', './cilantro/models', './cilantro/router'],
     contexts: new models.ContextCollection,
     views: new models.ViewCollection
   };
+  if (c.getOption('autoload')) {
+    c.openSession();
+  }
   return (this.cilantro = c);
 });
