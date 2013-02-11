@@ -1,35 +1,29 @@
 COFFEE_DIR = ./coffee
 JAVASCRIPT_DIR = ./js
-TMP_DIR = ./tmp
 BUILD_DIR = ./build
 DIST_DIR = ./dist
+DIST_SRC_DIR = ${DIST_DIR}/src
+DIST_MIN_DIR = ${DIST_DIR}/min
 PID_FILE = .watch-pid
 
-CLIENT_DIR = ./client
-CLIENT_SASS_DIR = ${CLIENT_DIR}/scss
-CLIENT_CSS_DIR = ${CLIENT_DIR}/css
-CLIENT_JS_DIR = ${CLIENT_DIR}/js
+SASS_DIR = ./scss
+CSS_DIR = ./css
 
 COMPILE_SASS = `which sass` --scss --style=compressed \
-			   -r ${CLIENT_SASS_DIR}/lib/bourbon/lib/bourbon.rb \
-			   ${CLIENT_SASS_DIR}:${CLIENT_CSS_DIR}
+			   -r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
+			   ${SASS_DIR}:${CSS_DIR}
 
-COMPILE_COFFEE = `which coffee` -b -o ${TMP_DIR} -c ${COFFEE_DIR}
-WATCH_COFFEE = `which coffee` -w -b -o ${TMP_DIR} -c ${COFFEE_DIR}
+COMPILE_COFFEE = `which coffee` -b -o ${BUILD_DIR} -c ${COFFEE_DIR}
+WATCH_COFFEE = `which coffee` -w -b -o ${BUILD_DIR} -c ${COFFEE_DIR}
 
 BUILD = `which node` bin/r.js -o build.js
 OPTIMIZE = `which node` bin/r.js -o optimize.js
 
-all: build watch
-
-client: optimize sass coffee
-	@echo 'Building client assests...'
-	@rm -rf ${CLIENT_JS_DIR}
-	@cp -r ${DIST_DIR} ${CLIENT_JS_DIR}
+all: combine watch
 
 sass:
 	@echo 'Compiling Sass...'
-	@mkdir -p ${CLIENT_CSS_DIR}
+	@mkdir -p ${CSS_DIR}
 	@${COMPILE_SASS} --update
 
 coffee:
@@ -48,19 +42,16 @@ unwatch:
 		rm ${PID_FILE}; \
 	fi;
 
-build: coffee
-	@echo 'Building javascript...'
-	@rm -rf ${BUILD_DIR}
-	@mkdir -p ${BUILD_DIR}
-	@cp -r ${JAVASCRIPT_DIR}/* ${TMP_DIR}
-	@${BUILD} > /dev/null
+combine: coffee
+	@echo 'Combining JavaScript...'
+	@cp -r ${JAVASCRIPT_DIR}/* ${BUILD_DIR}
 
-optimize: build
-	@echo 'Optimizing javascript...'
+optimize: combine
+	@echo 'Optimizing JavaScript...'
 	@rm -rf ${DIST_DIR}
 	@mkdir -p ${DIST_DIR}
+	@${BUILD} > /dev/null
 	@${OPTIMIZE} > /dev/null
 
 
-
-.PHONY: all client sass coffee watch unwatch build optimize
+.PHONY: all sass coffee watch unwatch combine optimize

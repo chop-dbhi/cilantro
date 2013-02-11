@@ -14,7 +14,7 @@ define [
     # A node property can be represented as a static value via an attribute
     # (e.g. data-id="39") or as a dynamic value via a form element.
 
-    class FieldControl extends Control
+    class FieldControl extends controls.Control
 
         options:
             # A flag denoting whether or not this FieldControl is managed

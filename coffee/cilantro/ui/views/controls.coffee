@@ -1,5 +1,6 @@
 define [
-    '../core'
+    '../../core'
     './controls/core'
 ], (c, mods...) ->
+
     c._.extend {}, mods...

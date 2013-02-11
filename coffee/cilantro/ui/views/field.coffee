@@ -1,4 +1,7 @@
-define ['../core'], (c) ->
+define [
+    '../core'
+    './field/controls'
+], (c) ->
 
     # Contained within the ConceptForm containing views for a single FieldModel
     class FieldContainer extends c.Marionette.ItemView
