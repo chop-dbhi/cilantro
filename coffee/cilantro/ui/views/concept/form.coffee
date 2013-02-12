@@ -1,6 +1,6 @@
 define ['../../core'], (c) ->
 
-    compiled = _.template '
+    compiled = c._.template '
         <div class="area-container conceptform">
             <h3 class=heading>
                 {{ data.name }} <small>{{ data.category }}</small>
