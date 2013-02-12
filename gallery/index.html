@@ -8,23 +8,56 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
         <title>Cilantro Thin Client for Harvest</title>
+
         <meta name="description" content="Cilantro Thin Client for Harvest">
         <meta name="viewport" content="width=device-width">
 
         <link rel=stylesheet href="../css/style.css">
         <style>
             body {
-                background: #f9f9f9 url(images/fabric_plaid.png);
+                background: #f9f9f9 url(images/furley_bg.png);
             }
-            #preview-area .hero-unit {
-                background-color: #f6f6f6;
-                color: #ccc;
-                margin: 0;
+            #preview-area {
+                border: 2px dashed #ccc;
+                padding: 20px;
             }
-            .page-header {
+            #preview-area-default {
+                color: #999;
+            }
+            #gallery-nav .well {
+                box-shadow: inset 0 1px 1px #ddd, 0 1px 2px #fff;
+                border-color: #ccc;
+                background-color: #f9f9f9;
+            }
+
+            #gallery-nav h4 {
+                color: #999;
+            }
+
+            #component-links .nav-list {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            #color-picker li {
+                vertical-align: top;
                 color: #666;
-                text-decoration: 0 1px 2px #fff;
-                border-bottom-color: #ddd;
+            }
+
+            #color-picker ul {
+                margin-bottom: 0;
+            }
+
+            .square {
+                border: 1px solid #999;
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+            }
+            @media screen and (-webkit-min-device-pixel-ratio: 1.5) {
+                body {
+                    background-image: url('images/furley_bg_@2x.png');
+                }
             }
         </style>
         <script src="../build/modernizr.js"></script>
@@ -33,27 +66,46 @@
         <!--[if lt IE 9]><p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p><![endif]-->
 
         <div class=container-fluid>
-            <div class=page-header>
-                <h1>Cilantro Gallery</h1>
-            </div>
+            <h1>Cilantro Gallery</h1>
+
+            <hr>
 
             <div class=row-fluid>
-                <div class=span4>
-                    <div class=well>
-                        <ul id=component-links class="nav nav-list">
+                <div id=gallery-nav class=span4>
+                    <h4>Components</h4>
+
+                    <p class=muted>Click on component to view a representation in the preview area.</p>
+
+                    <div id=component-links class=well>
+                        <ul class="nav nav-list">
                             <li class=nav-header>Views</li>
+                            <li><a data-module="./views/concept.js" href=#views-concept>Concept</a></li>
+                            <li><a data-module="./views/concept-index.js" href=#views-concept-index>ConceptIndex</a></li>
+                            <li class=divider></li>
                             <li class=nav-header>Regions</li>
+                            <li class=divider></li>
                             <li class=nav-header>Layouts</li>
-                        <ul>
+                        </ul>
+                    </div>
+
+                    <h4>Preview Background Color</h4>
+
+                    <p class=muted>Click on a color to change the background of the preview area.</p>
+
+                    <div id=color-picker class=well>
+                        <ul class=unstyled>
+                            <li><span class=square style="background: transparent"></span> None</li>
+                            <li><span class=square style="background: #fff"></span> White</li>
+                            <li><span class=square style="background: #f9f9f9"></span> Soft White</li>
+                            <li><span class=square style="background: #333"></span> Soft Black</li>
+                            <li><span class=square style="background: #000"></span> Black</li>
+                        </ul>
                     </div>
                 </div>
 
                 <div class=span8>
-                    <div id="preview-area" class=well>
-                        <div class=hero-unit>
-                            <h1>Preview Area</h1>
-                            <h3>Click on a component on the left to preview</h3>
-                        </div>
+                    <div id="preview-area">
+                        <h1 id=preview-area-default>Preview Area</h1>
                     </div>
                 </div>
             </div>
@@ -65,8 +117,12 @@
         </script>
         <script src="../build/require.js"></script>
         <script>
-            require(['cilantro/ui'], function(c) {
+            require(['cilantro', 'cilantro/ui'], function(c) {
                 var cache = {}, area = $('#preview-area');
+
+                $('#color-picker').on('click', '.square', function(event) {
+                    area.css('background-color', $(this).css('background-color'));
+                });
 
                 $('#component-links').on('click', 'a', function(event) {
                     event.preventDefault();
@@ -85,6 +141,13 @@
                         area.html(view.el);
                     });
                 });
+
+                // Refresh page state
+                var hash;
+                if ((hash = window.location.hash)) {
+                    $('#component-links a[href='+hash+']').click();
+                }
+
             });
         </script>
 

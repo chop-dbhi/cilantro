@@ -1,10 +1,6 @@
 define ['../../core', './item'], (c, items) ->
 
     class ConceptIndexItem extends items.Concept
-        tagName: 'li'
-
-        template: '<a href=#>{{ name }}</a>'
-
         events:
             'click a': 'click'
 
@@ -29,7 +25,6 @@ define ['../../core', './item'], (c, items) ->
 
 
     class ConceptIndex extends c.Marionette.CollectionView
-        tagName: 'ul'
         className: 'concept-index'
         itemView: ConceptIndexItem
 

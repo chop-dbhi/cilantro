@@ -1,0 +1,17 @@
+.concept {
+    @include box-shadow(1px 1px 4px #ccc);
+    border-radius: 3px;
+    border: 1px solid #f9f9f9;
+    padding: 10px;
+    background-color: #f9f9f9;
+    text-shadow: 0 1px 1px #fff;
+
+    .name {
+        margin-top: 0;
+    }
+
+    .description {
+        color: #999;
+        margin-bottom: 0;
+    }
+}
