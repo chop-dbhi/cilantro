@@ -136,9 +136,12 @@
                         .siblings()
                         .removeClass('active');
 
-                    require([modname], function(view) {
-                        view.render();
-                        area.html(view.el);
+                    // The module is expected to return a callback that takes
+                    // the preview area DOM element. This primarily is useful
+                    // for rendering the view at an arbitary time (e.g. when
+                    // data finally loads).
+                    require([modname], function(handler) {
+                        handler(area);
                     });
                 });
 
