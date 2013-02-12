@@ -5,6 +5,10 @@ define ['backbone', 'underscore'], (Backbone, _) ->
 
     class FieldCollection extends Backbone.Collection
         model: FieldModel
+
+        initialize: ->
+            super
+            @on 'reset', @resolve
 		
         search: (query, process) ->
             Backbone.ajax

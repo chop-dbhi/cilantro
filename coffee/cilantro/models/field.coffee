@@ -7,6 +7,7 @@ define ['../core', 'serrano'], (c, Serrano) ->
             c.getSessionUrl('fields')
 
         initialize: ->
+            super
             c.subscribe c.SESSION_OPENED, => @fetch()
             c.subscribe c.SESSION_CLOSED, => @reset()
 

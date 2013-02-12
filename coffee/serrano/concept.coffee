@@ -6,6 +6,10 @@ define ['backbone', 'underscore'], (Backbone, _) ->
     class ConceptCollection extends Backbone.Collection
         model: ConceptModel
 
+        initialize: ->
+            super
+            @on 'reset', @resolve
+
         search: (query, process) ->
             Backbone.ajax
                 url: _.result @, 'url'
