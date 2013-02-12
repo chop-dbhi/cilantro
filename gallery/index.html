@@ -34,7 +34,7 @@
                 color: #999;
             }
 
-            #component-links .nav-list {
+            #gallery-links .nav-list {
                 padding-left: 0;
                 padding-right: 0;
             }
@@ -68,15 +68,13 @@
         <div class=container-fluid>
             <h1>Cilantro Gallery</h1>
 
-            <hr>
-
             <div class=row-fluid>
                 <div id=gallery-nav class=span4>
                     <h4>Components</h4>
 
                     <p class=muted>Click on component to view a representation in the preview area.</p>
 
-                    <div id=component-links class=well>
+                    <div id=gallery-links class=well>
                         <ul class="nav nav-list">
                             <li class=nav-header>Views</li>
                             <li><a data-module="./views/concept.js" href=#views-concept>Concept</a></li>
@@ -124,9 +122,7 @@
                     area.css('background-color', $(this).css('background-color'));
                 });
 
-                $('#component-links').on('click', 'a', function(event) {
-                    event.preventDefault();
-
+                $('#gallery-links').on('click', 'a', function(event) {
                     var anchor = $(this),
                         modname = anchor.data('module');
 
@@ -148,7 +144,7 @@
                 // Refresh page state
                 var hash;
                 if ((hash = window.location.hash)) {
-                    $('#component-links a[href='+hash+']').click();
+                    $('#gallery-links a[href='+hash+']').click();
                 }
 
             });
