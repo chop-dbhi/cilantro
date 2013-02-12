@@ -9,21 +9,84 @@
 
         <title>Cilantro Thin Client for Harvest</title>
         <meta name="description" content="Cilantro Thin Client for Harvest">
-
-        <!-- Mobile viewport optimized: h5bp.com/viewport -->
         <meta name="viewport" content="width=device-width">
 
-        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-
         <link rel=stylesheet href="../css/style.css">
+        <style>
+            body {
+                background: #f9f9f9 url(images/fabric_plaid.png);
+            }
+            #preview-area .hero-unit {
+                background-color: #f6f6f6;
+                color: #ccc;
+                margin: 0;
+            }
+            .page-header {
+                color: #666;
+                text-decoration: 0 1px 2px #fff;
+                border-bottom-color: #ddd;
+            }
+        </style>
         <script src="../build/modernizr.js"></script>
     </head>
     <body>
         <!--[if lt IE 9]><p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p><![endif]-->
 
-        <script>var require = {baseUrl: '../build'};</script>
+        <div class=container-fluid>
+            <div class=page-header>
+                <h1>Cilantro Gallery</h1>
+            </div>
+
+            <div class=row-fluid>
+                <div class=span4>
+                    <div class=well>
+                        <ul id=component-links class="nav nav-list">
+                            <li class=nav-header>Views</li>
+                            <li class=nav-header>Regions</li>
+                            <li class=nav-header>Layouts</li>
+                        <ul>
+                    </div>
+                </div>
+
+                <div class=span8>
+                    <div id="preview-area" class=well>
+                        <div class=hero-unit>
+                            <h1>Preview Area</h1>
+                            <h3>Click on a component on the left to preview</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var require = {baseUrl: '../build'};
+            var cilantro = {url: 'http://localhost:8000/api/', autoload: true};
+        </script>
         <script src="../build/require.js"></script>
-        <script>require(['cilantro', 'cilantro/ui']);</script>
+        <script>
+            require(['cilantro/ui'], function(c) {
+                var cache = {}, area = $('#preview-area');
+
+                $('#component-links').on('click', 'a', function(event) {
+                    event.preventDefault();
+
+                    var anchor = $(this),
+                        modname = anchor.data('module');
+
+                    // Update to reflect currently active link
+                    anchor.parent()
+                        .addClass('active')
+                        .siblings()
+                        .removeClass('active');
+
+                    require([modname], function(view) {
+                        view.render();
+                        area.html(view.el);
+                    });
+                });
+            });
+        </script>
 
         <!-- Google Analytics: Change UA-XXXXX-X to be your site's ID. -->
         <!--
