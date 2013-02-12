@@ -3,14 +3,10 @@ define [
     './concept/search'
     './concept/item'
     './concept/index'
+    './concept/form'
 ], (c, mods...) ->
 
     class ConceptWorkspace extends c.Marionette.CollectionView
         className: 'concept-workspace'
 
-
-    class ConceptForm extends c.Marionette.ItemView
-        className: 'concept-form'
-
-
-    c._.extend { ConceptWorkspace, ConceptForm }, mods...
+    c._.extend { ConceptWorkspace }, mods...
