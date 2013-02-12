@@ -24,14 +24,28 @@
             #preview-area-default {
                 color: #999;
             }
+            #gallery-nav {
+                border-radius: 3px;
+                background-color: rgba(0, 0, 0, 0.05);
+                border: 1px solid #ccc;
+                padding: 10px;
+            }
+            #gallery-nav :first-child {
+                margin-top: 0;
+            }
             #gallery-nav .well {
-                box-shadow: inset 0 1px 1px #ddd, 0 1px 2px #fff;
-                border-color: #ccc;
+                padding: 10px;
+                box-shadow: none;
+                border: 1px solid #ccc;
                 background-color: #f9f9f9;
             }
 
+            #gallery-nav form {
+                margin-bottom: 0;
+            }
+
             #gallery-nav h4 {
-                color: #999;
+                color: #666;
             }
 
             #gallery-links .nav-list {
@@ -91,16 +105,20 @@
                     <p class=muted>Enter a channel to publish to see how the view behaves.</p>
 
                     <div id=channel-publisher class=well>
-                        <form id=builtin-channel-form class=form-inline>
+                        <form id=builtin-channel-form>
                             <label class=control-label for=builtin-channel>Built-in</label>
-                            <select id=builtin-channel></select>
-                            <input class="btn" type=submit value=Publish>
+                            <div class=input-append>
+                                <select id=builtin-channel></select>
+                                <input class="btn" type=submit value=Publish>
+                            </div>
                         </form>
                         <hr>
-                        <form id=custom-channel-form class=form-inline>
+                        <form id=custom-channel-form>
                             <label class=control-label for=custom-channel>Custom</label>
-                            <input type=text id=custom-channel>
-                            <input class="btn" type=submit value=Publish>
+                            <div class=input-append>
+                                <input type=text id=custom-channel>
+                                <input class="btn" type=submit value=Publish>
+                            </div>
                         </form>
                     </div>
 
