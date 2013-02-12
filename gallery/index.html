@@ -86,7 +86,25 @@
                         </ul>
                     </div>
 
-                    <h4>Preview Background Color</h4>
+                    <h4>Pub/Sub Channel Publisher</h4>
+
+                    <p class=muted>Enter a channel to publish to see how the view behaves.</p>
+
+                    <div id=channel-publisher class=well>
+                        <form id=builtin-channel-form class=form-inline>
+                            <label class=control-label for=builtin-channel>Built-in</label>
+                            <select id=builtin-channel></select>
+                            <input class="btn" type=submit value=Publish>
+                        </form>
+                        <hr>
+                        <form id=custom-channel-form class=form-inline>
+                            <label class=control-label for=custom-channel>Custom</label>
+                            <input type=text id=custom-channel>
+                            <input class="btn" type=submit value=Publish>
+                        </form>
+                    </div>
+
+                    <h4>Background Color</h4>
 
                     <p class=muted>Click on a color to change the background of the preview area.</p>
 
@@ -146,6 +164,28 @@
                 if ((hash = window.location.hash)) {
                     $('#gallery-links a[href='+hash+']').click();
                 }
+
+                var builtinChannel = $('#builtin-channel'),
+                    customChannel = $('#custom-channel');
+
+                // Populate built-in channels
+                var key, value;
+                for (key in c) {
+                    if (key === key.toUpperCase() && typeof (value = c[key]) == 'string') {
+                        var option = $('<option>').val(value).text(value);
+                        builtinChannel.append(option);
+                    }
+                }
+                
+                $('#builtin-channel-form').on('submit', function(event) {
+                    event.preventDefault();
+                    c.publish(builtinChannel.val());
+                });
+
+                $('#custom-channel-form').on('submit', function(event) {
+                    event.preventDefault();
+                    c.publish(customChannel.val());
+                });
 
             });
         </script>
