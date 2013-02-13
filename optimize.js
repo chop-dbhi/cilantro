@@ -8,6 +8,12 @@
     removeCombined: true,
     preserveLicenseComments: false,
 
+    config: {
+        tpl: {
+            variable: 'data'
+        }
+    },
+
     modules: [{
         name: 'cilantro'
     }, {

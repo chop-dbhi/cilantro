@@ -12,7 +12,12 @@
   <script>QUnit.config.autostart = false;</script>
   <script>
       var require = {
-        baseUrl: '../build/'
+        baseUrl: '../build/',
+        config: {
+            tpl: {
+                variable: 'data'
+            }
+        }
       };
   </script>
   <script src="../build/require.js"></script>

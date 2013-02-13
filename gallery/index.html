@@ -17,22 +17,28 @@
             body {
                 background: #f9f9f9 url(images/furley_bg.png);
             }
+
             #preview-area {
-                border: 2px dashed #ccc;
+                border-radius: 3px;
+                border: 1px dashed #ccc;
                 padding: 20px;
             }
+
             #preview-area-default {
                 color: #999;
             }
+
             #gallery-nav {
                 border-radius: 3px;
                 background-color: rgba(0, 0, 0, 0.05);
                 border: 1px solid #ccc;
                 padding: 10px;
             }
+
             #gallery-nav :first-child {
                 margin-top: 0;
             }
+
             #gallery-nav .well {
                 padding: 10px;
                 box-shadow: none;
@@ -52,6 +58,7 @@
                 padding-left: 0;
                 padding-right: 0;
             }
+
             #gallery-links li a {
                 margin-left: -10px;
                 margin-right: -10px;
@@ -153,7 +160,14 @@
         </div>
 
         <script>
-            var require = {baseUrl: '../build'};
+            var require = {
+                baseUrl: '../build',
+                config: {
+                    tpl: {
+                        variable: 'data'
+                    }
+                }
+            };
             var cilantro = {url: 'http://localhost:8000/api/', autoload: true};
         </script>
         <script src="../build/require.js"></script>
