@@ -1,6 +1,6 @@
 define ['../../core'], (c) ->
 
-    compiled = _.template '
+    compiled = c._.template '
         <h4 class=name><%= data.name %>
         <% if (data.category) { %>
             <small><%= data.category.name %></small>
