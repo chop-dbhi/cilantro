@@ -24,25 +24,35 @@
                 padding: 10px;
             }
 
-            #preview-area-default {
-                color: #999;
-            }
-
             #preview-area > .preview-label {
                 color: #999;
                 font-weight: 200;
-                text-decoration: 0 1px 2px #fff;
-            }
-
-            #preview-area :first-child {
-                margin-top: 0;
+                text-shadow: 0 1px 1px #fff;
             }
 
             #gallery-nav {
                 border-radius: 3px;
                 background-color: rgba(0, 0, 0, 0.05);
                 border: 1px solid #ccc;
-                padding: 10px;
+                text-shadow: 0 1px 1px #fff;
+            }
+
+            #gallery-nav [data-toggle] {
+                cursor: pointer;
+            }
+
+            #gallery-nav section {
+                border-bottom: 1px solid #ccc;
+                padding: 10px 10px 0 10px;
+            }
+
+            #gallery-nav section:last-child {
+                margin-bottom: 0;
+                border-bottom: none;
+            }
+
+            #gallery-nav ul {
+                margin-bottom: 0;
             }
 
             #gallery-nav :first-child {
@@ -54,6 +64,7 @@
                 box-shadow: none;
                 border: 1px solid #ccc;
                 background-color: #f9f9f9;
+                margin-bottom: 10px;
             }
 
             #gallery-nav form {
@@ -64,33 +75,31 @@
                 color: #666;
             }
 
-            #gallery-links .nav-list {
+            #components ul {
                 padding-left: 0;
                 padding-right: 0;
             }
 
-            #gallery-links li a {
+            #components li a {
                 margin-left: -10px;
                 margin-right: -10px;
                 padding-left: 10px;
                 padding-right: 10px;
             }
 
-            #color-picker li {
+            #swatches li {
                 vertical-align: top;
                 color: #666;
             }
 
-            #color-picker ul {
-                margin-bottom: 0;
-            }
-
-            .square {
+            .swatch {
                 border: 1px solid #999;
                 display: inline-block;
                 width: 20px;
                 height: 20px;
+                margin-right: 10px;
             }
+
             @media screen and (-webkit-min-device-pixel-ratio: 1.5) {
                 body {
                     background-image: url('images/furley_bg_@2x.png');
@@ -107,68 +116,65 @@
 
             <div class=row-fluid>
                 <div id=gallery-nav class=span4>
-                    <h4>Components</h4>
+                    <section>
+                        <h4 data-toggle=collapse data-target=#components>Components</h4>
 
-                    <p class=muted>Click on component to view a representation in the preview area.</p>
-
-                    <div id=gallery-links class=well>
-                        <ul class="nav nav-list">
-                            <li class=nav-header>Views</li>
-                            <li><a data-module="./views/concept.js" href=#views-concept>Concept</a></li>
-                            <li><a data-module="./views/concept-index.js" href=#views-concept-index>ConceptIndex</a></li>
-                            <li class=divider></li>
-                            <li class=nav-header>Regions</li>
-                            <li class=divider></li>
-                            <li class=nav-header>Layouts</li>
-                        </ul>
-                    </div>
-
-                    <h4>Pub/Sub Channel Publisher</h4>
-
-                    <p class=muted>Enter a channel to publish to see how the view behaves.</p>
-
-                    <div id=channel-publisher class=well>
-                        <form id=builtin-channel-form>
-                            <label class=control-label for=builtin-channel>Built-in</label>
-                            <div class=input-append>
-                                <select id=builtin-channel></select>
-                                <input class="btn" type=submit value=Publish>
+                        <div id=components class="in">
+                            <p class=muted>Click on component to view a representation in the preview area.</p>
+                            <div class=well>
+                                <ul class="nav nav-list"></ul>
                             </div>
-                        </form>
-                        <hr>
-                        <form id=custom-channel-form>
-                            <label class=control-label for=custom-channel>Custom</label>
-                            <div class=input-append>
-                                <input type=text id=custom-channel>
-                                <input class="btn" type=submit value=Publish>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 data-toggle=collapse data-target=#publisher>Channel Publisher</h4>
+
+                        <div id=publisher class="collapse">
+                            <p class=muted>Enter a channel to publish to see how the view behaves.</p>
+
+                            <div class=well>
+                                <form id=builtin-channel-form>
+                                    <label class=control-label for=builtin-channel>Built-in</label>
+                                    <div class=input-append>
+                                        <select id=builtin-channel></select>
+                                        <input class="btn" type=submit value=Publish>
+                                    </div>
+                                </form>
+                                <hr>
+                                <form id=custom-channel-form>
+                                    <label class=control-label for=custom-channel>Custom</label>
+                                    <div class=input-append>
+                                        <input type=text id=custom-channel>
+                                        <input class="btn" type=submit value=Publish>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </section>
 
-                    <h4>Background Color</h4>
+                    <section>
+                        <h4 data-toggle=collapse data-target=#swatches>Background Color</h4>
 
-                    <p class=muted>Click on a color to change the background of the preview area.</p>
-
-                    <div id=color-picker class=well>
-                        <ul class=unstyled>
-                            <li><span class=square style="background: transparent"></span> None</li>
-                            <li><span class=square style="background: #fff"></span> White</li>
-                            <li><span class=square style="background: #f9f9f9"></span> Soft White</li>
-                            <li><span class=square style="background: #333"></span> Soft Black</li>
-                            <li><span class=square style="background: #000"></span> Black</li>
-                        </ul>
-                    </div>
+                        <div id=swatches class="collapse">
+                            <p class=muted>Click on a color to change the background of the preview area.</p>
+                            <div class=well>
+                                <ul class=unstyled></ul>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 <div class=span8>
                     <div id="preview-area">
-                        <h1 id=preview-area-default>Preview Area</h1>
+                        <h1 class=preview-label>Preview Area</h1>
                     </div>
                 </div>
             </div>
         </div>
 
         <script>
+            // RequireJS config
             var require = {
                 baseUrl: '../build',
                 config: {
@@ -177,18 +183,93 @@
                     }
                 }
             };
-            var cilantro = {url: 'http://localhost:8000/api/', autoload: true};
+
+            // Cilantro config
+            var cilantro = {
+                url: 'http://localhost:8000/api/',
+                autoload: true
+            };
+
+            // View-based modules
+            var views = [
+                ['./views/concept.js', 'Concept'],
+                ['./views/concept-index.js', 'ConceptIndex'],
+            ];
+
+            // Region-based modules
+            var regions = [];
+
+            // Layout-based modules
+            var layouts = [];
+
+            // Background color options
+            var colors = [
+                ['transparent', 'None'],
+                ['#ffffff', 'White'],
+                ['#f9f9f9', 'Soft White'],
+                ['#333333', 'Soft Black'],
+                ['#000000', 'Black']
+            ];
+
+
         </script>
+
         <script src="../build/require.js"></script>
+
         <script>
             require(['cilantro', 'cilantro/ui'], function(c) {
+                (function() {
+                    // Build navigation
+                    var i, color, swatch, link, view, region, layout;
+                    
+                    var swatches = $('#swatches ul'),
+                        components = $('#components ul');
+
+                    // Add background color options
+                    for (i = 0; i < colors.length; i++) {
+                        color = colors[i];
+
+                        swatch = $('<span>')
+                            .addClass('swatch')
+                            .css('background', color[0]);
+
+                        swatches.append($('<li>').append(swatch, color[1]));
+                    }
+
+                    function buildModuleLinks(section, modules) {
+                        var i, len, head, link, mod;
+                        if (!(len = modules.length)) return;
+
+
+                        head = $('<li>')
+                            .text(section)
+                            .addClass('nav-header')
+
+                        components.append(head)
+
+                        for (i = 0; i < len ; i++) {
+                            mod = modules[i];
+
+                            link = $('<a>')
+                                .data('module', mod[0])
+                                .attr('href', '#' + mod[1].replace(' ', '-').toLowerCase())
+                                .text(mod[1]);
+                            components.append($('<li>').append(link));
+                        }
+                    }
+
+                    buildModuleLinks('Views', views);
+                    buildModuleLinks('Regions', regions);
+                    buildModuleLinks('Layouts', layouts);            
+                })();
+
                 var cache = {}, area = $('#preview-area');
 
-                $('#color-picker').on('click', '.square', function(event) {
+                $('#swatches').on('click', '.swatch', function(event) {
                     area.css('background-color', $(this).css('background-color'));
                 });
 
-                $('#gallery-links').on('click', 'a', function(event) {
+                $('#components').on('click', 'a', function(event) {
                     var anchor = $(this),
                         modname = anchor.data('module');
 
@@ -210,7 +291,7 @@
                 // Refresh page state
                 var hash;
                 if ((hash = window.location.hash)) {
-                    $('#gallery-links a[href='+hash+']').click();
+                    $('#components a[href='+hash+']').click();
                 }
 
                 var builtinChannel = $('#builtin-channel'),
@@ -237,15 +318,5 @@
 
             });
         </script>
-
-        <!-- Google Analytics: Change UA-XXXXX-X to be your site's ID. -->
-        <!--
-        <script>
-            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-            s.parentNode.insertBefore(g,s)}(document,'script'));
-        </script>
-        -->
     </body>
 </html>
