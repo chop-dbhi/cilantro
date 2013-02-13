@@ -1,13 +1,14 @@
-COFFEE_DIR = ./coffee
-JAVASCRIPT_DIR = ./js
-BUILD_DIR = ./build
-DIST_DIR = ./dist
+COFFEE_DIR = ${PWD}/coffee
+JAVASCRIPT_DIR = ${PWD}/js
+BUILD_DIR = ${PWD}/build
+DIST_DIR = ${PWD}/dist
+TMPL_DIR = ${PWD}/templates
 DIST_SRC_DIR = ${DIST_DIR}/src
 DIST_MIN_DIR = ${DIST_DIR}/min
 PID_FILE = .watch-pid
 
-SASS_DIR = ./scss
-CSS_DIR = ./css
+SASS_DIR = ${PWD}/scss
+CSS_DIR = ${PWD}/css
 
 COMPILE_SASS = `which sass` --scss --style=compressed \
 			   -r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
@@ -45,6 +46,7 @@ unwatch:
 combine: coffee
 	@echo 'Combining JavaScript...'
 	@cp -r ${JAVASCRIPT_DIR}/* ${BUILD_DIR}
+	@ln -sf ${TMPL_DIR} ${BUILD_DIR}
 
 optimize: combine
 	@echo 'Optimizing JavaScript...'
