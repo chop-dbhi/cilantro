@@ -1,0 +1,146 @@
+// Patch mediator prior to loading Cilantro to support the stream
+require(['jquery', 'mediator'], function($, mediator) {
+    var __slice = [].slice,
+         _publish = mediator.publish,
+        stream = $('#stream ul');
+
+    // Wrapper for adding items to the stream. Each argument is JSON.stringified
+    // and rendered in a `pre'
+    mediator.publish = function(channel) {
+        var i, data = [];
+
+        // Call the real publish function
+        _publish.apply(null, __slice.call(arguments, 0));
+
+        // Remaining arguments are the data
+        args = __slice.call(arguments, 1);
+
+        // Add channel name
+        data.push('<strong>' + channel + '</strong>');
+
+        // JSON stringify each argument
+        for (i = 0; i < args.length; i++) {
+            // Anchor toggle
+            data.push('<a href=#>'+ i +'</a>')
+            // Data contents
+            data.push('<pre>' + JSON.stringify(args[i], null, ' ') + '</pre>');
+        }
+
+        // Add to stream
+        stream.prepend($('<li>').html(data.join(' ')));
+    }
+
+    // Toggle view/hide argument contents
+    stream.on('click', 'a', function(event) {
+        event.preventDefault();
+        $(this).next().toggle();
+    });
+
+    // Clear the stream
+    $('#clear-stream').on('click', function(event) {
+        stream.html('');
+    });
+
+    // Build navigation
+    var i, color, swatch, link, view, region, layout;
+    
+    var area = $('#preview-area'),
+        swatches = $('#swatches ul'),
+        components = $('#components ul');
+
+    // Add background color options
+    for (i = 0; i < this.colors.length; i++) {
+        color = this.colors[i];
+
+        swatch = $('<span>')
+            .addClass('swatch')
+            .css('background', color[0]);
+
+        swatches.append($('<li>').append(swatch, color[1]));
+    }
+
+    // Bind click to switch between background colors
+    swatches.on('click', '.swatch', function(event) {
+        area.css('background-color', $(this).css('background-color'));
+    });
+
+    // Constructs the list items and links for loading modules
+    function moduleLinks(section, modules) {
+        var i, len, head, link, mod;
+        if (!(len = modules.length)) return;
+
+        head = $('<li>')
+            .text(section)
+            .addClass('nav-header')
+
+        components.append(head)
+
+        for (i = 0; i < len ; i++) {
+            mod = modules[i];
+
+            link = $('<a>')
+                .data('module', mod[0])
+                .attr('href', '#' + mod[1].replace(' ', '-').toLowerCase())
+                .text(mod[1]);
+            components.append($('<li>').append(link));
+        }
+    }
+
+    moduleLinks('Views', this.views);
+    moduleLinks('Regions', this.regions);
+    moduleLinks('Layouts', this.layouts);            
+
+    // Bind click to load modules
+    components.on('click', 'a', function(event) {
+        var anchor = $(this),
+            modname = anchor.data('module');
+
+        // Update to reflect currently active link
+        anchor.parent()
+            .addClass('active')
+            .siblings()
+            .removeClass('active');
+
+        // The module is expected to return a callback that takes
+        // the preview area DOM element. This primarily is useful
+        // for rendering the view at an arbitary time (e.g. when
+        // data finally loads).
+        require([modname], function(handler) {
+            handler(area);
+        });
+    });
+
+    // Load module based on location hash
+    var hash;
+    if ((hash = window.location.hash)) {
+        components.find('a[href=' + hash + ']').click();
+    }
+
+    // Setup remaining components. This is intentionally loaded *after* the
+    // mediator module was loaded.
+    require(['cilantro'], function(c) {
+        var builtinChannel = $('#builtin-channel'),
+            customChannel = $('#custom-channel');
+
+        // Populate built-in channels
+        var key, value;
+        for (key in c) {
+            if (key === key.toUpperCase() && typeof (value = c[key]) == 'string') {
+                var option = $('<option>').val(value).text(value);
+                builtinChannel.append(option);
+            }
+        }
+        
+        $('#builtin-channel-form').on('submit', function(event) {
+            event.preventDefault();
+            c.publish(builtinChannel.val());
+        });
+
+        $('#custom-channel-form').on('submit', function(event) {
+            event.preventDefault();
+            c.publish(customChannel.val());
+        });
+
+    });
+
+});
