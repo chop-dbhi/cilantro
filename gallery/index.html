@@ -92,6 +92,38 @@
                 color: #666;
             }
 
+            #stream ul {
+                max-height: 200px;
+                overflow: scroll;
+            }
+
+            #stream li {
+                border-bottom: 1px solid #ccc;
+                padding: 5px 0;
+            }
+
+            #stream li:first-child {
+                padding-top: 0;
+            }
+
+            #stream li:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            #stream li strong {
+            }
+
+            #stream li pre {
+                display: block;
+                font-size: 10px;
+                display: none;
+            }
+
+            #stream li a {
+                font-style: italic;
+            }
+
             .swatch {
                 border: 1px solid #999;
                 display: inline-block;
@@ -124,6 +156,19 @@
                             <div class=well>
                                 <ul class="nav nav-list"></ul>
                             </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 data-toggle=collapse data-target=#stream>Channel Stream</h4>
+
+                        <div id=stream class="in">
+                            <p class=muted>The stream of published channels will be echoed here as they occur.</p>
+
+                            <a href=# id=clear-stream><small>Clear</small></a>
+                            <div class=well>
+                                <ul class=unstyled>
+                             </div>
                         </div>
                     </section>
 
@@ -217,6 +262,37 @@
         <script src="../build/require.js"></script>
 
         <script>
+            // Patch mediator prior to loading Cilantro
+            require(['jquery', 'mediator'], function($, mediator) {
+                var __slice = [].slice;
+                var stream = $('#stream ul');
+                $('#clear-stream').on('click', function(event) {
+                    stream.html('');
+                });
+
+                var _publish = mediator.publish;
+
+                mediator.publish = function(channel) {
+                    var i, li, data = [];
+
+                    _publish.apply(null, __slice.call(arguments, 0));
+
+                    args = __slice.call(arguments, 1);
+
+                    for (i = 0; i < args.length; i++) {
+                        data.push('<a href=#>'+i+'</a> <pre>'+JSON.stringify(args[i], null, ' ')+'</pre>');
+                    }
+
+                    stream.prepend($('<li>').append('<strong>'+channel+'</strong> ',
+                        data.join(' ')));
+                }
+
+                stream.on('click', 'a', function(event) {
+                    event.preventDefault();
+                    $(this).next().toggle();
+                });
+            });
+
             require(['cilantro', 'cilantro/ui'], function(c) {
                 (function() {
                     // Build navigation
