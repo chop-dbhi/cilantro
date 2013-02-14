@@ -13,80 +13,7 @@
         <meta name="viewport" content="width=device-width">
 
         <link rel=stylesheet href="../css/style.css">
-        <style>
-            body {
-                background: #f9f9f9 url(images/furley_bg.png);
-            }
-
-            #preview-area {
-                border-radius: 3px;
-                border: 1px dashed #ccc;
-                padding: 20px;
-            }
-
-            #preview-area-default {
-                color: #999;
-            }
-
-            #gallery-nav {
-                border-radius: 3px;
-                background-color: rgba(0, 0, 0, 0.05);
-                border: 1px solid #ccc;
-                padding: 10px;
-            }
-
-            #gallery-nav :first-child {
-                margin-top: 0;
-            }
-
-            #gallery-nav .well {
-                padding: 10px;
-                box-shadow: none;
-                border: 1px solid #ccc;
-                background-color: #f9f9f9;
-            }
-
-            #gallery-nav form {
-                margin-bottom: 0;
-            }
-
-            #gallery-nav h4 {
-                color: #666;
-            }
-
-            #gallery-links .nav-list {
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            #gallery-links li a {
-                margin-left: -10px;
-                margin-right: -10px;
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            #color-picker li {
-                vertical-align: top;
-                color: #666;
-            }
-
-            #color-picker ul {
-                margin-bottom: 0;
-            }
-
-            .square {
-                border: 1px solid #999;
-                display: inline-block;
-                width: 20px;
-                height: 20px;
-            }
-            @media screen and (-webkit-min-device-pixel-ratio: 1.5) {
-                body {
-                    background-image: url('images/furley_bg_@2x.png');
-                }
-            }
-        </style>
+        <link rel=stylesheet href="./gallery.css">
         <script src="../build/modernizr.js"></script>
     </head>
     <body>
@@ -97,69 +24,82 @@
 
             <div class=row-fluid>
                 <div id=gallery-nav class=span4>
-                    <h4>Components</h4>
+                    <section>
+                        <h4 data-toggle=collapse data-target=#components>Components</h4>
 
-                    <p class=muted>Click on component to view a representation in the preview area.</p>
-
-                    <div id=gallery-links class=well>
-                        <ul class="nav nav-list">
-                            <li class=nav-header>Views</li>
-                            <li><a data-module="./views/concept.js" href=#views-concept>Concept</a></li>
-                            <li><a data-module="./views/concept-index.js" href=#views-concept-index>ConceptIndex</a></li>
-                            <li><a data-module="./views/concept-form.js" href=#views-concept-form>ConceptForm</a></li>
-                            <li class=divider></li>
-                            <li class=nav-header>Regions</li>
-                            <li class=divider></li>
-                            <li class=nav-header>Layouts</li>
-                        </ul>
-                    </div>
-
-                    <h4>Pub/Sub Channel Publisher</h4>
-
-                    <p class=muted>Enter a channel to publish to see how the view behaves.</p>
-
-                    <div id=channel-publisher class=well>
-                        <form id=builtin-channel-form>
-                            <label class=control-label for=builtin-channel>Built-in</label>
-                            <div class=input-append>
-                                <select id=builtin-channel></select>
-                                <input class="btn" type=submit value=Publish>
+                        <div id=components class="in">
+                            <p class=muted>Click on component to view a representation in the preview area.</p>
+                            <div class=well>
+                                <ul class="nav nav-list"></ul>
                             </div>
-                        </form>
-                        <hr>
-                        <form id=custom-channel-form>
-                            <label class=control-label for=custom-channel>Custom</label>
-                            <div class=input-append>
-                                <input type=text id=custom-channel>
-                                <input class="btn" type=submit value=Publish>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 data-toggle=collapse data-target=#stream>Channel Stream</h4>
+
+                        <div id=stream class="in">
+                            <p class=muted>The stream of published channels. The output is the
+                                channel name followed argument positions which can be clicked to
+                                view the contents of the argument.</p>
+
+                            <small><a href=# id=clear-stream>Clear</a></small> |
+                            <small><a href=# id=expand-stream>Expand</a></small>
+
+                            <div class=well>
+                                <ul class=unstyled>
+                             </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h4 data-toggle=collapse data-target=#publisher>Channel Publisher</h4>
+
+                        <div id=publisher class="collapse">
+                            <p class=muted>Enter a channel to publish to see how the view behaves.</p>
+
+                            <div class=well>
+                                <form id=builtin-channel-form>
+                                    <label class=control-label for=builtin-channel>Built-in</label>
+                                    <div class=input-append>
+                                        <select id=builtin-channel></select>
+                                        <input class="btn" type=submit value=Publish>
+                                    </div>
+                                </form>
+                                <hr>
+                                <form id=custom-channel-form>
+                                    <label class=control-label for=custom-channel>Custom</label>
+                                    <div class=input-append>
+                                        <input type=text id=custom-channel>
+                                        <input class="btn" type=submit value=Publish>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </section>
 
-                    <h4>Background Color</h4>
+                    <section>
+                        <h4 data-toggle=collapse data-target=#swatches>Background Color</h4>
 
-                    <p class=muted>Click on a color to change the background of the preview area.</p>
-
-                    <div id=color-picker class=well>
-                        <ul class=unstyled>
-                            <li><span class=square style="background: transparent"></span> None</li>
-                            <li><span class=square style="background: #fff"></span> White</li>
-                            <li><span class=square style="background: #f9f9f9"></span> Soft White</li>
-                            <li><span class=square style="background: #333"></span> Soft Black</li>
-                            <li><span class=square style="background: #000"></span> Black</li>
-                        </ul>
-                    </div>
+                        <div id=swatches class="collapse">
+                            <p class=muted>Click on a color to change the background of the preview area.</p>
+                            <div class=well>
+                                <ul class=unstyled></ul>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 <div class=span8>
                     <div id="preview-area">
-                        <h1 id=preview-area-default>Preview Area</h1>
+                        <h1 class=preview-label>Preview Area</h1>
                     </div>
                 </div>
             </div>
         </div>
 
         <script>
+            // RequireJS config
             var require = {
                 baseUrl: '../build',
                 config: {
@@ -168,75 +108,35 @@
                     }
                 }
             };
-            var cilantro = {url: 'http://localhost:8000/api/', autoload: true};
-        </script>
-        <script src="../build/require.js"></script>
-        <script>
-            require(['cilantro', 'cilantro/ui'], function(c) {
-                var cache = {}, area = $('#preview-area');
 
-                $('#color-picker').on('click', '.square', function(event) {
-                    area.css('background-color', $(this).css('background-color'));
-                });
+            // Cilantro config
+            var cilantro = {
+                url: 'http://localhost:8000/api/',
+                autoload: true
+            };
 
-                $('#gallery-links').on('click', 'a', function(event) {
-                    var anchor = $(this),
-                        modname = anchor.data('module');
+            // View-based modules
+            var views = [
+                ['./views/concept.js', 'Concept'],
+                ['./views/concept-index.js', 'ConceptIndex'],
+            ];
 
-                    // Update to reflect currently active link
-                    anchor.parent()
-                        .addClass('active')
-                        .siblings()
-                        .removeClass('active');
+            // Region-based modules
+            var regions = [];
 
-                    // The module is expected to return a callback that takes
-                    // the preview area DOM element. This primarily is useful
-                    // for rendering the view at an arbitary time (e.g. when
-                    // data finally loads).
-                    require([modname], function(handler) {
-                        handler(area);
-                    });
-                });
+            // Layout-based modules
+            var layouts = [];
 
-                // Refresh page state
-                var hash;
-                if ((hash = window.location.hash)) {
-                    $('#gallery-links a[href='+hash+']').click();
-                }
-
-                var builtinChannel = $('#builtin-channel'),
-                    customChannel = $('#custom-channel');
-
-                // Populate built-in channels
-                var key, value;
-                for (key in c) {
-                    if (key === key.toUpperCase() && typeof (value = c[key]) == 'string') {
-                        var option = $('<option>').val(value).text(value);
-                        builtinChannel.append(option);
-                    }
-                }
-                
-                $('#builtin-channel-form').on('submit', function(event) {
-                    event.preventDefault();
-                    c.publish(builtinChannel.val());
-                });
-
-                $('#custom-channel-form').on('submit', function(event) {
-                    event.preventDefault();
-                    c.publish(customChannel.val());
-                });
-
-            });
+            // Background color options
+            var colors = [
+                ['transparent', 'None'],
+                ['#ffffff', 'White'],
+                ['#f9f9f9', 'Soft White'],
+                ['#333333', 'Soft Black'],
+                ['#000000', 'Black']
+            ];
         </script>
 
-        <!-- Google Analytics: Change UA-XXXXX-X to be your site's ID. -->
-        <!--
-        <script>
-            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-            s.parentNode.insertBefore(g,s)}(document,'script'));
-        </script>
-        -->
+        <script data-main="../gallery/main.js" src="../build/require.js"></script>
     </body>
 </html>

@@ -1,0 +1,126 @@
+body {
+    background: #f9f9f9 url(images/furley_bg.png);
+}
+
+#preview-area {
+    border-radius: 3px;
+    border: 1px dashed #ccc;
+    padding: 10px;
+}
+
+#preview-area > .preview-label {
+    color: #999;
+    font-weight: 200;
+    text-shadow: 0 1px 1px #fff;
+}
+
+#gallery-nav {
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid #ccc;
+    text-shadow: 0 1px 1px #fff;
+}
+
+#gallery-nav [data-toggle] {
+    cursor: pointer;
+}
+
+#gallery-nav section {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 10px 0 10px;
+}
+
+#gallery-nav section:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+#gallery-nav ul {
+    margin-bottom: 0;
+}
+
+#gallery-nav :first-child {
+    margin-top: 0;
+}
+
+#gallery-nav .well {
+    padding: 10px;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+}
+
+#gallery-nav form {
+    margin-bottom: 0;
+}
+
+#gallery-nav h4 {
+    color: #666;
+}
+
+#components ul {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#components li a {
+    margin-left: -10px;
+    margin-right: -10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#swatches li {
+    vertical-align: top;
+    color: #666;
+}
+
+#stream ul {
+    max-height: 300px;
+    overflow: scroll;
+}
+
+#stream li {
+    border-bottom: 1px solid #ccc;
+    padding: 5px 0;
+}
+
+#stream li:first-child {
+    padding-top: 0;
+}
+
+#stream li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+#stream li strong {
+}
+
+#stream li pre {
+    text-shadow: 0 1px 1px #fff;
+    display: block;
+    padding: 5px;
+    line-height: 15px;
+    font-size: 10px;
+    display: none;
+}
+
+#stream li a {
+    font-style: italic;
+}
+
+.swatch {
+    border: 1px solid #999;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 1.5) {
+    body {
+        background-image: url('images/furley_bg_@2x.png');
+    }
+}
