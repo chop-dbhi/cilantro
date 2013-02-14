@@ -2,12 +2,13 @@
 require(['jquery', 'mediator'], function($, mediator) {
     var __slice = [].slice,
          _publish = mediator.publish,
+        expanded = false,
         stream = $('#stream ul');
 
     // Wrapper for adding items to the stream. Each argument is JSON.stringified
     // and rendered in a `pre'
     mediator.publish = function(channel) {
-        var i, data = [];
+        var i, li, data = [];
 
         // Call the real publish function
         _publish.apply(null, __slice.call(arguments, 0));
@@ -26,8 +27,11 @@ require(['jquery', 'mediator'], function($, mediator) {
             data.push('<pre>' + JSON.stringify(args[i], null, ' ') + '</pre>');
         }
 
+        li = $('<li>').html(data.join(' '));
+        // Show if in the expanded state
+        if (expanded) li.find('pre').show();
         // Add to stream
-        stream.prepend($('<li>').html(data.join(' ')));
+        stream.prepend(li);
     }
 
     // Toggle view/hide argument contents
@@ -39,6 +43,17 @@ require(['jquery', 'mediator'], function($, mediator) {
     // Clear the stream
     $('#clear-stream').on('click', function(event) {
         stream.html('');
+    });
+
+    $('#expand-stream').on('click', function(event) {
+        expanded = !expanded;
+        if (expanded) {
+            stream.find('pre').show();
+            $(this).text('Collapse');
+        } else {
+            stream.find('pre').hide();
+            $(this).text('Expand');
+        }
     });
 
     // Build navigation
