@@ -8,10 +8,12 @@ define ['../../core'
 
         constructor: (@name) ->
           super name
+          contextTree = c.data.contexts.getSession()
+          context = contextTree.getNodes(@model.id)
 
         onRender: ->
-          fields = for field in @model.attributes.fields
-            f = new controls.FieldControl({model:field})
+          fields = for field in @model.fields
+             new controls.FieldControl({model:field})
 
           console.log(fields)
 
