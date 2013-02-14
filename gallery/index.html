@@ -93,7 +93,7 @@
             }
 
             #stream ul {
-                max-height: 200px;
+                max-height: 300px;
                 overflow: scroll;
             }
 
@@ -115,7 +115,10 @@
             }
 
             #stream li pre {
+                text-shadow: 0 1px 1px #fff;
                 display: block;
+                padding: 5px;
+                line-height: 15px;
                 font-size: 10px;
                 display: none;
             }
@@ -163,7 +166,9 @@
                         <h4 data-toggle=collapse data-target=#stream>Channel Stream</h4>
 
                         <div id=stream class="in">
-                            <p class=muted>The stream of published channels will be echoed here as they occur.</p>
+                            <p class=muted>The stream of published channels. The output is the
+                                channel name followed argument positions which can be clicked to
+                                view the contents of the argument.</p>
 
                             <a href=# id=clear-stream><small>Clear</small></a>
                             <div class=well>
