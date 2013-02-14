@@ -1,10 +1,9 @@
 define(['cilantro', 'cilantro/ui'], function(c) {
-    var view = new c.ui.views.ConceptForm;
     return function(dom) {
         c.data.concepts.when(function() {
-            view.model = c.data.concepts.get(1);
+            var view = new c.ui.views.ConceptForm({model:c.data.concepts.get(1)});
             view.render();
+            dom.html(view.el);
         });
-        dom.html(view.el);
     }
 });

@@ -14,8 +14,10 @@ COMPILE_SASS = `which sass` --scss --style=compressed \
 			   -r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
 			   ${SASS_DIR}:${CSS_DIR}
 
+COFFEE_JITTER = `which jitter` ${COFFEE_DIR} ${BUILD_DIR}
 COMPILE_COFFEE = `which coffee` -b -o ${BUILD_DIR} -c ${COFFEE_DIR}
 WATCH_COFFEE = `which coffee` -w -b -o ${BUILD_DIR} -c ${COFFEE_DIR}
+
 
 BUILD = `which node` bin/r.js -o build.js
 OPTIMIZE = `which node` bin/r.js -o optimize.js
@@ -33,8 +35,11 @@ coffee:
 
 watch: unwatch
 	@echo 'Watching...'
-	@${WATCH_COFFEE} &> /dev/null & echo $$! > ${PID_FILE}
 	@${COMPILE_SASS} --watch &> /dev/null & echo $$! >> ${PID_FILE}
+	@if which jitter &> /dev/null; then \
+		 ${COFFEE_JITTER}; else \
+	   ${WATCH_COFFEE} &> /dev/null & echo $$! > ${PID_FILE}; \
+		 fi;
 
 unwatch:
 	@if [ -f ${PID_FILE} ]; then \
