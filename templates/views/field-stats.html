@@ -1,0 +1,7 @@
+<!--
+Renders an unstyled list of stats for a given field such
+as Avg, Min, Max, etc.
+-->
+<% for (var key in data) { %>
+<li><span class=stat-label><%= key %></span> <%= data[key] %></li>
+<% } %>

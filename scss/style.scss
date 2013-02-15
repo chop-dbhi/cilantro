@@ -10,6 +10,13 @@
 @import "base/accordian";
 
 @import "views/concept";
+@import "views/field-stats";
+@import "views/field-form";
+
+
+body {
+    text-shadow: 0 1px 1px #fff;
+}
 
 .chromeframe {
     margin: 0.2em 0;

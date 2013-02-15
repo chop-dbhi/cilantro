@@ -4,12 +4,12 @@ define [
 ], (c, templates...) ->
 
     # Create an object of templates by name..
-    templates = c._.object ['concept'], templates
+    templates = c._.object ['item'], templates
 
     class Concept extends c.Marionette.ItemView
         className: 'concept'
 
-        template: templates.concept
+        template: templates.item
 
         serializeData: ->
             data = @model.toJSON()
