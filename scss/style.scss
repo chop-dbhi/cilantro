@@ -6,8 +6,10 @@
 
 @import "plugins/panels";
 
+@import "base/empty";
+@import "base/accordian";
+
 @import "views/concept";
-@import "views/concept-index";
 
 .chromeframe {
     margin: 0.2em 0;

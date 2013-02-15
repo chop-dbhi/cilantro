@@ -2,8 +2,17 @@ define(['cilantro', 'cilantro/ui'], function(c) {
     var view = new c.ui.views.ConceptIndex({
         collection: c.data.concepts
     });
+
+    var emptyView = new c.ui.views.ConceptIndex;
+
     return function(dom) {
         view.render();
-        dom.html(view.el);
+        emptyView.render();
+
+        dom.html('<h3 class=preview-label>Populated</h3>')
+        dom.append(view.el);
+
+        dom.append('<h3 class=preview-label>Empty</h3>')
+        dom.append(emptyView.el);
     }
 });
