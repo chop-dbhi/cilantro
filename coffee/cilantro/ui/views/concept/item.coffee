@@ -1,23 +1,29 @@
-define ['../../core'], (c) ->
+define [
+    '../../core'
+    'tpl!templates/views/concept.html'
+], (c, templates...) ->
 
-    compiled = _.template '
-        <h4 class=name><%= data.name %>
-        <% if (data.category) { %>
-            <small><%= data.category.name %></small>
-        <% } %>
-        </h4>
-        <% if (data.description) { %>
-            <p class=description><%= data.description %></p>
-        <% } %>
-    ', null, variable: 'data'
+    # Create an object of templates by name..
+    templates = c._.object ['concept'], templates
+
 
     class Concept extends c.Marionette.ItemView
         className: 'concept'
 
-        template: (data) ->
+        template: templates.concept
+
+        serializeData: ->
+            data = @model.toJSON()
             if not data.description
                 data.description = data.fields[0].description
-            compiled data
+            return data
 
+        toggleFocus: (id) =>
+            @$el.toggleClass('active', (id is @model.id))
+
+
+    # Down here since constants don't play nice with object keys..
+    Concept::subscribers = {}
+    Concept::subscribers[c.CONCEPT_FOCUS] = 'toggleFocus'
 
     { Concept }

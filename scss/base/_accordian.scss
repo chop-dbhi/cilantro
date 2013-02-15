@@ -1,0 +1,39 @@
+.accordian {
+    @include box-shadow(0 1px 2px #ccc);
+    @include border-radius(3px);
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+
+    .empty {
+        padding: 5px;
+    }
+
+    .accordian-group {
+        padding: 5px;
+        border-bottom: 1px solid #ccc;
+        background-color: #f9f9f9;
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .accordian-heading {
+        font-weight: 500;
+        font-size: 16px;
+        position: relative;
+        cursor: pointer;
+        padding: 0 5px;
+
+        > i {
+            position: absolute;
+            top: 4px;
+            right: 5px;
+        }
+    }
+
+    .accordian-items {
+        margin: 5px 0 0 0;
+        background-color: #fff;
+        border: 1px solid #ccc;
+    }
+}

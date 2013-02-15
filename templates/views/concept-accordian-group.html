@@ -1,0 +1,17 @@
+<!--
+This is used to render concepts grouped by category. Each group represents
+a top-level category. Second-level categories are rendered with the .accordian-items
+list directly.
+
+view: ConceptAccordianGroup
+type: composite
+container: .accordian-items
+-->
+
+<div class=accordian-heading data-toggle="collapse" data-target="#category-<%= data.id %>">
+    <%= data.name %>
+    <i class="pull-right icon-plus"></i>
+</div>
+<div id="category-<%= data.id %>" class="collapse">
+    <ul class="accordian-items nav nav-list"></ul>
+</div>
