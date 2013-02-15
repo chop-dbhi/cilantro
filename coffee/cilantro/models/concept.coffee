@@ -1,6 +1,8 @@
-define ['../core', 'serrano'], (c, Serrano) ->
+define ['../core', 'serrano', './field'], (c, Serrano, fields) ->
     
     class ConceptModel extends Serrano.ConceptModel
+        fieldModel: fields.FieldModel
+
 
     class ConceptCollection extends Serrano.ConceptCollection
         model: ConceptModel

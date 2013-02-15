@@ -10,12 +10,11 @@ define ['backbone', 'underscore'], (Backbone, _) ->
             super
             @on 'reset', @resolve
 		
-        search: (query, process) ->
+        search: (query, handler) ->
             Backbone.ajax
                 url: _.result @, 'url'
                 data: q: query
-                success: (resp) ->
-                    process(resp)
+                success: (resp) -> handler(resp)
 
 
     { FieldModel, FieldCollection }
