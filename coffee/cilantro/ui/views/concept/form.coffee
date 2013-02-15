@@ -1,23 +1,37 @@
 define ['../../core'
-        '../controls'
-        'tpl!templates/views/conceptform.html'
-], (c, controls, compiledTemplate) ->
+        '../field'
+        '../charts'
+        'tpl!templates/views/concept-form.html'
+], (c, field, charts, compiledTemplate) ->
 
-    class ConceptForm extends c.Marionette.ItemView
+    class ConceptForm extends c.Marionette.Layout
         className: 'concept-form'
 
-        constructor: (@name) ->
-          super name
-          contextTree = c.data.contexts.getSession()
-          context = contextTree.getNodes(@model.id)
+        constructor: (model) ->
+          super model
+          #contextTree = c.data.contexts.getSession()
+          #context = contextTree.getNodes(@model.id)
+
+        regions:
+          main:"#main"
+          fields:"#fields"
 
         onRender: ->
-          fields = for field in @model.fields
-             new controls.FieldControl({model:field})
+          mainChart = new charts.FieldDistributionChart(
+            editable: false
+            model: @model.fields[0]
+            data:
+              context: null
+          )
 
-          console.log(fields)
+          debugger
+          mainChart.render()
+          @main.show(mainChart)
 
         template: compiledTemplate
 
+        fieldForms: ->
+          for item in @model.fields
+            new field.FieldForm({model:item})
 
     { ConceptForm }
