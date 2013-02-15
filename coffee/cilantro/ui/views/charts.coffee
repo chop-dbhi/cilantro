@@ -1,37 +1,4 @@
-define ['../core', './charts/utils'], (c, utils) ->
-
-    chartTmpl = _.template '
-        <div class="area-container chart-container">
-            <div class=btn-toolbar>
-                <div class=btn-group>
-                    <button class="btn btn-mini fullsize" title="Toggle Fullsize"><i class=icon-resize-full alt="Toggle Fullsize"></i></button>
-                    <!--<button class="btn btn-mini outliers" title="Show Outliers" disabled><i class=icon-eye-open alt="Show Outliers"></i></button>-->
-                </div>
-                <div class=btn-group>
-                    <button class="btn btn-mini edit" title="Edit"><i class=icon-wrench alt="Edit"></i></button>
-                </div>
-                <div class=btn-group>
-                    <button class="btn btn-danger btn-mini remove" title="Remove"><i class=icon-remove alt="Remove"></i></button>
-                </div>
-            </div>
-            <div class=heading>
-                <span class="label label-info"></span>
-            </div>
-            <div class=editable>
-                <form class=form>
-                    <fieldset>
-                        <label>X-Axis <select name=x-axis></select></label>
-                        <label>Y-Axis <select name=y-axis></select></label>
-                        <label>Series <select name=series></select></label>
-                        <button class="btn btn-primary">Update</button>
-                    </fieldset>
-                </form>
-            </div>
-            <div class=chart>
-            </div>
-        </div>
-    '
-
+define ['../core', './charts/utils', 'tpl!templates/views/chart.html'], (c, utils, chartTmpl) ->
 
     # Represents a list of possible fields for use with a distribution chart
     class FieldAxis extends c.Marionette.ItemView
@@ -131,7 +98,8 @@ define ['../core', './charts/utils'], (c, utils) ->
 
         getOperator: -> 'in'
 
-        render: -> @$el
+        render: ->
+            super
 
         renderChart: (options) ->
             if @chart then @chart.destroy?()
