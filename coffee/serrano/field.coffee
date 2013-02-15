@@ -16,6 +16,7 @@ define ['backbone', 'underscore'], (Backbone, _) ->
             else
                 Backbone.ajax
                     url: @urls.distribution
+                    dataType: 'json'
                     success: (resp) =>
                         @_cache.distribution = if cache then resp else null
                         handler(resp)
@@ -28,6 +29,7 @@ define ['backbone', 'underscore'], (Backbone, _) ->
             else
                 Backbone.ajax
                     url: @urls.stats
+                    dataType: 'json'
                     success: (resp) =>
                         @_cache.stats = if cache then resp else null
                         handler(resp)
@@ -40,6 +42,7 @@ define ['backbone', 'underscore'], (Backbone, _) ->
             else
                 Backbone.ajax
                     url: @urls.values
+                    dataType: 'json'
                     success: (resp) =>
                         @_cache.values = if cache then resp else null
                         handler(resp)
@@ -57,6 +60,7 @@ define ['backbone', 'underscore'], (Backbone, _) ->
             Backbone.ajax
                 url: _.result @, 'url'
                 data: q: query
+                dataType: 'json'
                 success: (resp) -> handler(resp)
 
 
