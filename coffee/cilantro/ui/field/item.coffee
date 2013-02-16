@@ -1,5 +1,5 @@
 define [
-    '../../core'
+    '../core'
     'tpl!templates/views/field.html'
 ], (c, templates...) ->
 

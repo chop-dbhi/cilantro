@@ -1,19 +1,17 @@
 define [
     './cilantro/core'
     './cilantro/models'
-    './cilantro/router'
-], (c, models, Router) ->
+], (c, models) ->
 
     c.models = models
-    
+
+    # TODO move this logic into a workflow..
     c.data =
         concepts: new models.ConceptCollection
         fields: new models.FieldCollection
         contexts: new models.ContextCollection
         views: new models.ViewCollection
         
-    # c.router = new Router
-
     if c.getOption('autoload') then c.openSession()
 
     return (@cilantro = c)

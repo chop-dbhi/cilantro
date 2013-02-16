@@ -1,9 +1,9 @@
 define(['cilantro', 'cilantro/ui'], function(c) {
-    var view = new c.ui.views.ConceptIndex({
+    var view = new c.ui.ConceptIndex({
         collection: c.data.concepts
     });
 
-    var emptyView = new c.ui.views.ConceptIndex;
+    var emptyView = new c.ui.ConceptIndex;
 
     return function(dom) {
         view.render();

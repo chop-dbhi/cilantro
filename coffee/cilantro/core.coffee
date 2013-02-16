@@ -2,8 +2,8 @@ define [
     'jquery'
     'underscore'
     'backbone'
-    'serrano'
     'mediator'
+    './channels'
     './utils'
     './session'
 
@@ -12,7 +12,7 @@ define [
     'plugins/js'
     'plugins/jquery-ajax-queue'
     'plugins/backbone-deferrable'
-], ($, _, Backbone, Serrano, mediator, utils, session) ->
+], ($, _, Backbone, mediator, channels, utils, session) ->
 
     # Relies on the jquery-ajax-queue plugin to supply this method.
     # This ensures data is not silently lost
@@ -55,8 +55,8 @@ define [
         getSessionUrl: (name) ->
             session.getSessionUrl(currentSession, name)
 
-    channels = _.extend {}, session.channels, Serrano.channels
+    channels = _.extend {}, channels, session.channels
 
     # Construct the base object which is composed core libraries, the
     # mediator methods, and the app-level config
-    return _.extend c, mediator, channels, props, aliases, methods
+    _.extend c, mediator, channels, props, aliases, methods

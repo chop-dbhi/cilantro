@@ -1,5 +1,5 @@
 define [
-    '../../core'
+    '../core'
     './item'
     'tpl!templates/views/concept-accordian-group.html'
     'tpl!templates/views/concept-accordian-item.html'
