@@ -1,5 +1,5 @@
 define [
-    '../core'
+    './core'
     './concept/search'
     './concept/item'
     './concept/index'

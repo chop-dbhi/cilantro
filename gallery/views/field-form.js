@@ -1,6 +1,6 @@
 define(['cilantro', 'cilantro/ui'], function(c) {
-    var view1 = new c.ui.views.FieldForm,
-        view2 = new c.ui.views.FieldForm;
+    var view1 = new c.ui.FieldForm,
+        view2 = new c.ui.FieldForm;
 
     return function(dom) {
         c.data.fields.when(function() {

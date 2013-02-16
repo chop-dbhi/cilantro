@@ -1,4 +1,6 @@
-define ['../core'], (c) ->
+define [
+    './core'
+], (c) ->
 
     class Filter extends c.Marionette.ItemView
         className: 'filter'

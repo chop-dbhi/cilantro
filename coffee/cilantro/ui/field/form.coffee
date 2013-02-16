@@ -1,5 +1,5 @@
 define [
-    '../../core'
+    '../core'
     './item'
     './stats'
     'tpl!templates/views/field-form.html'

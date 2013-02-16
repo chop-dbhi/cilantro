@@ -1,5 +1,5 @@
 define [
-    '../core'
+    './core'
     './field/item'
     './field/form'
     './field/controls'

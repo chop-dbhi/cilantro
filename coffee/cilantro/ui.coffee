@@ -1,10 +1,12 @@
 # This extends cilantro and attached libraries with UI-related components
 define [
-	'./core'
-	'./ui/views'
-	'./ui/regions'
-	'./ui/layouts'
-], (c, views, regions, layouts) ->
+	'cilantro'
+    './ui/concept'
+    './ui/field'
+    './ui/charts'
+    './ui/filter'
+    './ui/controls'
+], (c, mods...) ->
 
-    c.ui = { views, regions, layouts }
+    c.ui = c._.extend {}, mods...
     return c

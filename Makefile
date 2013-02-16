@@ -53,7 +53,9 @@ optimize: combine
 	@rm -rf ${DIST_DIR}
 	@mkdir -p ${DIST_DIR}
 	@${BUILD} > /dev/null
+	@rm -rf ${DIST_SRC_DIR}/templates
 	@${OPTIMIZE} > /dev/null
+	@rm -rf ${DIST_MIN_DIR}/templates
 
 
 .PHONY: all sass coffee watch unwatch combine optimize

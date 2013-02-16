@@ -1,4 +1,7 @@
-define ['../core', './charts/utils'], (c, utils) ->
+define [
+    './core'
+    './charts/utils'
+], (c, utils) ->
 
     chartTmpl = _.template '
         <div class="area-container chart-container">
