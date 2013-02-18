@@ -13,8 +13,9 @@ define ['../../core'
           #context = contextTree.getNodes(@model.id)
 
         regions:
-          main:"#main"
-          fields:"#fields"
+          main:".main"
+          chart:".chart"
+          fields:".fields"
 
         onRender: ->
           mainChart = new charts.FieldDistributionChart(
@@ -24,12 +25,16 @@ define ['../../core'
               context: null
           )
 
-          @main.show(mainChart)
+          main = new field.FieldForm(model:@model.fields[0])
+          fields = new c.Marionette.CollectionView(
+              itemView: field.FieldForm
+              collection: new c.Backbone.Collection(@model.fields[1..])
+          )
+
+          @main.show(main)
+          @chart.show(mainChart)
+          @fields.show(fields)
 
         template: compiledTemplate
-
-        fieldForms: ->
-          for item in @model.fields
-            new field.FieldForm({model:item})
 
     { ConceptForm }
