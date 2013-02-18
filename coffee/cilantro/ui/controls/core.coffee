@@ -1,4 +1,6 @@
-define ['../../core'], (c) ->
+define [
+    '../core'
+], (c) ->
 
     # Control interface, this should not be used directly
     class Control extends c.Marionette.ItemView

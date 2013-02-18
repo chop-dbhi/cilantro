@@ -18,6 +18,6 @@
         name: 'cilantro'
     }, {
         name: 'cilantro/ui',
-        exclude: ['cilantro/core']
+        exclude: ['cilantro']
     }]
 })

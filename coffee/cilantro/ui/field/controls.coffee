@@ -1,6 +1,6 @@
 define [
-    '../../core'
-    '../controls/core'
+    '../core'
+    '../controls'
     'inputio'
 ], (c, controls, InputIO) ->
 

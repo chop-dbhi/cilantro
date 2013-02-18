@@ -1,9 +1,6 @@
 define [
-    '../core'
-    './field/item'
-    './field/form'
+    './core'
+    './controls/core'
     './field/controls'
-    './field/stats'
 ], (c, mods...) ->
-
     c._.extend {}, mods...

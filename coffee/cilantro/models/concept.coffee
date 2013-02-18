@@ -1,10 +1,15 @@
-define ['../core', 'serrano', './field'], (c, Serrano, fields) ->
-    
-    class ConceptModel extends Serrano.ConceptModel
-        fieldModel: fields.FieldModel
+define ['../core', './field'], (c, field) ->
+
+    class ConceptModel extends Backbone.Model
+        parse: (resp) ->
+            @fields = []
+            # Parse and attach field model instances to concept
+            for attrs in resp.fields
+                @fields.push(new field.FieldModel attrs, parse: true)
+            return resp
 
 
-    class ConceptCollection extends Serrano.ConceptCollection
+    class ConceptCollection extends Backbone.Collection
         model: ConceptModel
 
         url: ->
@@ -14,6 +19,15 @@ define ['../core', 'serrano', './field'], (c, Serrano, fields) ->
             super
             c.subscribe c.SESSION_OPENED, => @fetch()
             c.subscribe c.SESSION_CLOSED, => @reset()
+            @on 'reset', @resolve
 
 
-    { ConceptCollection, ConceptModel }
+        search: (query, handler) ->
+            c.Backbone.ajax
+                url: c._.result @, 'url'
+                data: q: query
+                dataType: 'json'
+                success: (resp) -> handler(resp)
+
+
+    { ConceptModel, ConceptCollection }
