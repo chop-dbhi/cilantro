@@ -24,8 +24,6 @@ define ['../../core'
               context: null
           )
 
-          debugger
-          mainChart.render()
           @main.show(mainChart)
 
         template: compiledTemplate

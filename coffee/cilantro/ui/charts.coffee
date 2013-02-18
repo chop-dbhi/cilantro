@@ -4,37 +4,6 @@ define [
     'tpl!templates/views/chart.html'
 ], (c, utils, chartTmpl) ->
 
-    chartTmpl = _.template '
-        <div class="area-container chart-container">
-            <div class=btn-toolbar>
-                <div class=btn-group>
-                    <button class="btn btn-mini fullsize" title="Toggle Fullsize"><i class=icon-resize-full alt="Toggle Fullsize"></i></button>
-                    <!--<button class="btn btn-mini outliers" title="Show Outliers" disabled><i class=icon-eye-open alt="Show Outliers"></i></button>-->
-                </div>
-                <div class=btn-group>
-                    <button class="btn btn-mini edit" title="Edit"><i class=icon-wrench alt="Edit"></i></button>
-                </div>
-                <div class=btn-group>
-                    <button class="btn btn-danger btn-mini remove" title="Remove"><i class=icon-remove alt="Remove"></i></button>
-                </div>
-            </div>
-            <div class=heading>
-                <span class="label label-info"></span>
-            </div>
-            <div class=editable>
-                <form class=form>
-                    <fieldset>
-                        <label>X-Axis <select name=x-axis></select></label>
-                        <label>Y-Axis <select name=y-axis></select></label>
-                        <label>Series <select name=series></select></label>
-                        <button class="btn btn-primary">Update</button>
-                    </fieldset>
-                </form>
-            </div>
-            <div class=chart>
-            </div>
-        </div>
-    '
     # Represents a list of possible fields for use with a distribution chart
     class FieldAxis extends c.Marionette.ItemView
         tagName: 'select'
@@ -80,7 +49,7 @@ define [
         initialize: ->
             super
 
-            @setElement chartTmpl()
+            @setElement(@template(@model))
 
             @$heading = @$ '.heading'
             @$label = @$heading.find '.label'
@@ -135,6 +104,8 @@ define [
 
         render: ->
             super
+            @update()
+            return @
 
         renderChart: (options) ->
             if @chart then @chart.destroy?()
@@ -239,23 +210,18 @@ define [
             @$el.remove()
             if @model then @model.destroy()
 
-        update: (url, data, fields, seriesIdx) ->
-            if @options.data
-                for key, value of @options.data
-                    if not data
-                        data = "#{key}=#{value}"
-                    else
-                        data = data + "&#{key}=#{value}"
-
+        update: () ->
+            #if @options.data
+            #    for key, value of @options.data
+            #        if not data
+            #            data = "#{key}=#{value}"
+            #        else
+            #            data = data + "&#{key}=#{value}"
+            #
             @$el.addClass 'loading'
-            Backbone.ajax
-                url: url
-                data: data
-                success: (resp) =>
+            @model.distribution (resp) =>
                     @$el.removeClass 'loading'
-                    #TODO Remove this. FormModel will have a distribution function, use that in
-                    # render chart
-                    @renderChart utils.processResponse resp, fields, seriesIdx
+                    @renderChart utils.processResponse resp, [@model]
 
         # Ensure rapid successions of this method do not occur
         changeChart: (event) ->
@@ -297,6 +263,7 @@ define [
                         series: if series then series.id
 
                 @update url, data, fields, seriesIdx
+        template: chartTmpl
 
 
     { FieldDistributionChart }
