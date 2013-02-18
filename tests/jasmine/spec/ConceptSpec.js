@@ -5,7 +5,7 @@ define(['cilantro', 'cilantro/ui','text!../../../mock/concepts.json'], function 
 
         beforeEach(function () {
             model = new c.models.ConceptModel(concepts[0], { parse:true });
-            form = new c.ui.views.ConceptForm({ model:model });
+            form = new c.ui.ConceptForm({ model:model });
         });
 
         it("should have a model", function () {
@@ -16,8 +16,5 @@ define(['cilantro', 'cilantro/ui','text!../../../mock/concepts.json'], function 
             expect(form.model.fields).toEqual(jasmine.any(Array));
         });
 
-        it("should return an array of FieldForms", function(){
-            expect(form.fieldForms()).toEqual(jasmine.any(Array));
-        })
     });
 });
