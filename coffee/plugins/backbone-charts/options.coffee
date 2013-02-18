@@ -4,6 +4,7 @@ define ->
         chart:
             style:
                 fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
+
         title:
             text: ''
             align: 'right'
