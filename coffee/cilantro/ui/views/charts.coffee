@@ -218,6 +218,8 @@ define ['../core', './charts/utils', 'tpl!templates/views/chart.html'], (c, util
                 data: data
                 success: (resp) =>
                     @$el.removeClass 'loading'
+                    #TODO Remove this. FormModel will have a distribution function, use that in
+                    # render chart
                     @renderChart utils.processResponse resp, fields, seriesIdx
 
         # Ensure rapid successions of this method do not occur
