@@ -5,7 +5,6 @@ define ['../../core'
 ], (c, field, charts, compiledTemplate) ->
 
     class ManagedContextMapper
-
         constructor: (@context, @fields) ->
 
         # For a given field id, return the ContextNode
@@ -24,19 +23,19 @@ define ['../../core'
 
         regions:
             main:".main"
-            chart:".chart"
+            chart:".primary-chart"
             fields:".fields"
 
         onRender: ->
             ungraphedFieldsStart = 0
             if @model.fields[0].get('_links').distribution?
-              ungraphedFieldsStart = 1
-              mainChart = new charts.FieldDistributionChart(
-                editable: false
-                model: @model.fields[0]
-                data:
-                  context: null
-              )
+                ungraphedFieldsStart = 1
+                mainChart = new charts.FieldDistributionChart(
+                  editable: false
+                  model: @model.fields[0]
+                  data:
+                    context: null
+                )
 
             mainFields = new field.FieldForm(model:@model.fields[0])
 
