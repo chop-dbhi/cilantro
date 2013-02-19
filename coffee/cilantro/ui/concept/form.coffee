@@ -38,3 +38,23 @@ define ['../../core'
         template: compiledTemplate
 
     { ConceptForm }
+
+
+    class ManagedContextMapper
+
+      constructor: (@contextTree, @fields) ->
+
+      # For a given field id, return the ContextNode
+      # in the ContextTree if it exists
+      getContextNodeFor: (id) ->
+        for node in @contextTree
+
+
+
+
+
+
+
+
+
+
