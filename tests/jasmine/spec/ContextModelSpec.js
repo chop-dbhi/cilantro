@@ -7,7 +7,7 @@ define(['cilantro', 'cilantro/ui','text!../../../mock/contexts.json'], function 
             model = new c.models.ContextModel(contexts[0], { parse:true });
         });
 
-        it("should a single node under id 30", function () {
+        it("should contain a single node under id 30", function () {
             expect(model.nodes[30].length).toEqual(1);
         });
 

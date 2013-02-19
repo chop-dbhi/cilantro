@@ -9,8 +9,9 @@ define ['../../core'
 
         constructor: (model) ->
           super model
-          #contextTree = c.data.contexts.getSession()
-          #context = contextTree.getNodes(@model.id)
+          @context = c.data.contexts.getSession()
+          @manager = new ManagedContextMapper(@context, @model.fields)
+
 
         regions:
           main:".main"
@@ -25,13 +26,16 @@ define ['../../core'
               context: null
           )
 
-          main = new field.FieldForm(model:@model.fields[0])
+          mainFields = new field.FieldForm(model:@model.fields[0])
+
           fields = new c.Marionette.CollectionView(
               itemView: field.FieldForm
+              itemViewOptions: (model) =>
+                  context: @manager.getNodes(model.id)
               collection: new c.Backbone.Collection(@model.fields[1..])
           )
 
-          @main.show(main)
+          @main.show(mainFields)
           @chart.show(mainChart)
           @fields.show(fields)
 
@@ -41,12 +45,12 @@ define ['../../core'
 
     class ManagedContextMapper
 
-      constructor: (@contextTree, @fields) ->
+      constructor: (@context, @fields) ->
 
       # For a given field id, return the ContextNode
       # in the ContextTree if it exists
-      getContextNodeFor: (id) ->
-      #for node in @contextTree
+      getNodes: (fieldId) ->
+          @context.getNodes(fieldId)
 
 
     { ConceptForm }
