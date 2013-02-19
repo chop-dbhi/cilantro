@@ -37,7 +37,6 @@ define ['../../core'
 
         template: compiledTemplate
 
-    { ConceptForm }
 
 
     class ManagedContextMapper
@@ -47,9 +46,10 @@ define ['../../core'
       # For a given field id, return the ContextNode
       # in the ContextTree if it exists
       getContextNodeFor: (id) ->
-        for node in @contextTree
+      #for node in @contextTree
 
 
+    { ConceptForm }
 
 
 
