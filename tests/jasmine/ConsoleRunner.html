@@ -2,18 +2,17 @@
   "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <title>Jasmine Spec Runner</title>
-
-  <link rel="shortcut icon" type="image/png" href="lib/jasmine-1.3.1/jasmine_favicon.png">
+  <title>Jasmine Test Runner</title>
   <link rel="stylesheet" type="text/css" href="lib/jasmine-1.3.1/jasmine.css">
   <script type="text/javascript" src="lib/jasmine-1.3.1/jasmine.js"></script>
   <script type="text/javascript" src="lib/jasmine-1.3.1/jasmine-html.js"></script>
   <script type="text/javascript" src="lib/jasmine-jquery.js"></script>
   <script type="text/javascript" src="lib/mock-ajax.js"></script>
-  
-  <!-- include source files here... -->
-  <script src="../../build/jquery.js"></script>
+  <script type="text/javascript" src="phantom-jasmine/lib/console-runner.js"></script>
 
+  <!-- SOURCE FILES -->
+
+  <!-- TEST FILES -->
   <script>
         var require = {
             baseUrl: '../../build/',
@@ -25,32 +24,22 @@
         };
   </script>
   <script src="../../build/require.js"></script>
-  <script type="text/javascript">
-      require([
+</head>
+<body>
+
+<script type="text/javascript">
+  require([
         './spec/ConceptSpec.js',
         './spec/ContextModelSpec.js'
-      ], function() {
-          var jasmineEnv = jasmine.getEnv();
-          jasmineEnv.updateInterval = 1000;
+  ], function() {
+  var console_reporter = new jasmine.ConsoleReporter()
+  window.console_reporter = console_reporter;
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+  jasmine.getEnv().addReporter(console_reporter);
+  jasmine.getEnv().execute();
+  });
+</script>
 
-          var htmlReporter = new jasmine.HtmlReporter();
-
-          jasmineEnv.addReporter(htmlReporter);
-
-          jasmineEnv.specFilter = function(spec) {
-            return htmlReporter.specFilter(spec);
-          };
-
-          function execJasmine() {
-            jasmineEnv.execute();
-          }
-
-        $(execJasmine);
-      });
-  </script>
-
-</head>
-
-<body>
 </body>
 </html>
+

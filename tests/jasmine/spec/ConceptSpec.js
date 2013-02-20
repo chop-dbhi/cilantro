@@ -1,4 +1,4 @@
-define(['cilantro', 'cilantro/ui','text!../../../mock/concepts.json'], function (c, ui, mocks) {
+define(['cilantro', 'cilantro/ui','text!../../mock/concepts.json'], function (c, ui, mocks) {
     describe("ConceptForm", function () {
         var concepts = JSON.parse(mocks);
         var form, model;
@@ -15,6 +15,8 @@ define(['cilantro', 'cilantro/ui','text!../../../mock/concepts.json'], function 
         it("should have a fields array on its model", function(){
             expect(form.model.fields).toEqual(jasmine.any(Array));
         });
+
+
 
     });
 });

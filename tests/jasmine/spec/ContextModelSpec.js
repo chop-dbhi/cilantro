@@ -1,4 +1,4 @@
-define(['cilantro', 'cilantro/ui','text!../../../mock/contexts.json'], function (c, ui, mocks) {
+define(['cilantro', 'cilantro/ui','text!../../mock/contexts.json'], function (c, ui, mocks) {
     describe("ContextModel", function () {
         var contexts = JSON.parse(mocks);
         var model;
