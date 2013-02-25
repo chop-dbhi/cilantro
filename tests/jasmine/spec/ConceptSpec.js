@@ -16,7 +16,6 @@ define(['cilantro', 'cilantro/ui','text!../../mock/concepts.json'], function (c,
             expect(form.model.fields).toEqual(jasmine.any(Array));
         });
 
-
         describe('Chart', function() {
            var async = new AsyncSpec(this);
            
@@ -26,18 +25,19 @@ define(['cilantro', 'cilantro/ui','text!../../mock/concepts.json'], function (c,
                done();
            });
            
-           async.it(" maintains size across renderings when removed from dom", function(done){
+           async.it("maintains size across renderings when removed from dom", function(done){
               form.render();
-              var el = form.chart.currentView.$el;
               $('#arena').html(form.el);
               setTimeout(function(){
-                  var width1 = $(".highcharts-container",el).css("width");
+                  var width1 = $("#arena .highcharts-container").css("width");
+                  expect(width1).toBeDefined();
                   form.close();
                   form.render();
                   $('#arena').html(form.el);
                   el = form.chart.currentView.$el;
                   setTimeout(function(){
-                      var width2 = $(".highcharts-container",el).css("width");
+                      var width2 = $(".highcharts-container", el).css("width");
+                      expect(width2).toBeDefined();
                       expect(width1).toEqual(width2);
                       form.close()
                       done();
