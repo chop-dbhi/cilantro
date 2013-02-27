@@ -48,12 +48,12 @@ define [
 
         initialize: ->
             super
-
             @setElement(@template(@model))
 
             @$heading = @$ '.heading'
             @$label = @$heading.find '.label'
             @$renderArea = @$ '.chart'
+            @$renderArea.width(@options.parentView.$el.width()) if @options.parentView?
             @$toolbar = @$ '.btn-toolbar'
             @$fullsizeToggle = @$ '.fullsize'
             @$form = @$ '.editable'

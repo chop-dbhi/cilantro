@@ -20,7 +20,6 @@ define ['../../core'
             @context = c.data.contexts.getSession()
             @manager = new ManagedContextMapper(@context, @model.fields)
 
-
         regions:
             main:".main"
             chart:".primary-chart"
@@ -31,6 +30,7 @@ define ['../../core'
             if @model.fields[0].get('_links').distribution?
                 ungraphedFieldsStart = 1
                 mainChart = new charts.FieldDistributionChart(
+                  parentView: @
                   editable: false
                   model: @model.fields[0]
                   data:
