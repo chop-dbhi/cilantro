@@ -27,24 +27,24 @@ define ['../../core'
 
         onRender: ->
             ungraphedFieldsStart = 0
-            if @model.fields[0].get('_links').distribution?
+            if @model.fields[0].urls.distribution?
                 ungraphedFieldsStart = 1
-                mainChart = new charts.FieldDistributionChart(
+                mainChart = new charts.FieldDistributionChart
                   parentView: @
                   editable: false
                   model: @model.fields[0]
                   data:
                     context: null
-                )
+                
 
             mainFields = new field.FieldForm(model:@model.fields[0])
 
-            fields = new c.Marionette.CollectionView(
+            fields = new c.Marionette.CollectionView
                 itemView: field.FieldForm
                 itemViewOptions: (model) =>
                    context: @manager.getNodes(model.id)
                 collection: new c.Backbone.Collection(@model.fields[ungraphedFieldsStart..])
-            )
+            
 
             @main.show(mainFields)
             @chart.show(mainChart) if mainChart?
