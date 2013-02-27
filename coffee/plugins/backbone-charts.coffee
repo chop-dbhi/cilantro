@@ -1,10 +1,10 @@
 define [
-    'cilantro/core'
     'highcharts'
     'underscore'
     'backbone'
     './backbone-charts/options'
-], (c, Highcharts, _, Backbone, chartOptions) ->
+    'plugins/backbone-marionette'
+], (Highcharts, _, Backbone, chartOptions) ->
 
     OPTIONS_MAP =
         el: 'chart.renderTo'
@@ -25,7 +25,7 @@ define [
         prefix: 'tooltip.valuePrefix'
         series: 'series'
 
-    class Chart extends c.Backbone.Marionette.ItemView
+    class Chart extends Backbone.Marionette.ItemView
         className: 'chart'
         chartOptions: chartOptions.defaults
 
