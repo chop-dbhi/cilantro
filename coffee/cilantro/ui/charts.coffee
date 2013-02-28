@@ -103,12 +103,11 @@ define [
         getOperator: -> 'in'
 
         render: ->
-            super
-            @update()
-            return @
-
-        renderChart: (options) ->
             if @chart then @chart.destroy?()
+            @update()
+            return @$el
+
+        customizeOptions: (options) ->
             @$label.detach()
 
             @$heading.text options.title.text
@@ -136,8 +135,7 @@ define [
             $.extend true, options, @chartOptions
             options.chart.renderTo = @$renderArea[0]
 
-            @chart = new Highcharts.Chart options
-            return @
+            return options
 
         # Disable selected fields since using the same field for multiple
         # axes doesn't make sense
@@ -210,18 +208,11 @@ define [
             @$el.remove()
             if @model then @model.destroy()
 
-        update: () ->
-            #if @options.data
-            #    for key, value of @options.data
-            #        if not data
-            #            data = "#{key}=#{value}"
-            #        else
-            #            data = data + "&#{key}=#{value}"
-            #
+        update: (callback) ->
             @$el.addClass 'loading'
             @model.distribution (resp) =>
                     @$el.removeClass 'loading'
-                    @renderChart utils.processResponse resp, [@model]
+                    @chart = new Highcharts.Chart(@customizeOptions utils.processResponse resp, [@model])
 
         # Ensure rapid successions of this method do not occur
         changeChart: (event) ->
