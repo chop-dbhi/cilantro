@@ -45,39 +45,48 @@ define [
             # Edit form
             'submit': 'changeChart'
             'change .editable select': 'disableSelected'
+        ui: 
+            'heading': '.heading'
+            'label' : '.heading .label'
+            'renderArea': '.chart'
+            'toolbar': '.btn-toolbar'
+            'fullsizeToggle': '.fullsize'
+            'form': '.editable'
+            'xAxis': '[name=x-Axis]'
+            'yAxis': '[name=y-Axis]'
+            'series': '[name=series]'
+
 
         initialize: ->
             super
             @setElement(@template(@model))
 
-            @$heading = @$ '.heading'
-            @$label = @$heading.find '.label'
-            @$renderArea = @$ '.chart'
-            @$renderArea.width(@options.parentView.$el.width()) if @options.parentView?
-            @$toolbar = @$ '.btn-toolbar'
-            @$fullsizeToggle = @$ '.fullsize'
-            @$form = @$ '.editable'
+            # Explicitly set our width to a specified parentView in case the DOM 
+            # hiearchy is not yet in place
+            @ui.renderArea.width(@options.parentView.$el.width()) /
+                if @options.parentView?
+
 
             if @options.editable is false
-                @$form.detach()
-                @$toolbar.detach()
+                @ui.form.detach()
+                @ui.toolbar.detach()
             else
                 # Form-related components
                 @xAxis = new FieldAxis
-                    el: @$el.find '[name=x-axis]'
+                    el: @ui.xAxis
                     collection: @collection
 
                 @yAxis = new FieldAxis
-                    el: @$el.find '[name=y-axis]'
+                    el: @ui.yAxis
                     collection: @collection
 
                 @series = new FieldAxis
-                    el: @$el.find '[name=series]'
+                    el: @ui.series
                     enumerableOnly: true
                     collection: @collection
 
                 if @model
-                    if @model.get 'xAxis' then @$form.hide()
+                    if @model.get 'xAxis' then @ui.form.hide()
                     if (expanded = @model.get 'expanded') then @expand() else @contract()
 
         enableChartEvents: ->
@@ -108,32 +117,32 @@ define [
             return @$el
 
         customizeOptions: (options) ->
-            @$label.detach()
+            @ui.label.detach()
 
-            @$heading.text options.title.text
+            @ui.heading.text options.title.text
             options.title.text = ''
 
             # Check if any data is present
             if not options.series[0]
-                @$renderArea.html '<p class=no-data>Unfortunately, there is
+                @ui.renderArea.html '<p class=no-data>Unfortunately, there is
                     no data to graph here.</p>'
                 return
 
-            @$form.hide()
+            @ui.form.hide()
 
             labelText = []
             if options.clustered
                 labelText.push 'Clustered'
 
             if labelText[0]
-                @$label.text(labelText.join(', ')).show()
-                @$heading.append @$label
+                @ui.label.text(labelText.join(', ')).show()
+                @ui.heading.append @$label
 
             if @interactive(options)
                 @enableChartEvents()
 
             $.extend true, options, @chartOptions
-            options.chart.renderTo = @$renderArea[0]
+            options.chart.renderTo = @ui.renderArea[0]
 
             return options
 
@@ -170,7 +179,7 @@ define [
             @model.save expanded: not expanded
 
         resize: ->
-            chartWidth = @$renderArea.width()
+            chartWidth = @ui.renderArea.width()
             if @chart then @chart.setSize chartWidth, null, false
 
         expand: ->
@@ -188,10 +197,10 @@ define [
             @resize()
 
         hideToolbar: ->
-            @$toolbar.fadeOut 200
+            @ui.toolbar.fadeOut 200
 
         showToolbar: ->
-            @$toolbar.fadeIn 200
+            @ui.toolbar.fadeIn 200
 
         # Toggles between showing the outliers and hiding the outliers
         # on the chart if any are present. The button will be greayed out
@@ -201,14 +210,14 @@ define [
                 continue
 
         toggleEdit: (event) ->
-            if @$form.is(':visible') then @$form.fadeOut 300 else @$form.fadeIn 300
+            if @ui.form.is(':visible') then @ui.form.fadeOut 300 else @ui.form.fadeIn 300
 
         removeChart: (event) ->
             if @chart then @chart.destroy?()
             @$el.remove()
             if @model then @model.destroy()
 
-        update: (callback) ->
+        update:  ->
             @$el.addClass 'loading'
             @model.distribution (resp) =>
                     @$el.removeClass 'loading'
