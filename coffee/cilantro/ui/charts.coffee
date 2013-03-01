@@ -45,6 +45,7 @@ define [
             # Edit form
             'submit': 'changeChart'
             'change .editable select': 'disableSelected'
+
         ui: 
             'heading': '.heading'
             'label' : '.heading .label'
