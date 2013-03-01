@@ -53,7 +53,7 @@ define [
 
         render: ->
             # Destroy previous chart
-            if @chart then @chart.destroy?()
+            if @chart then @chart.destroy()
 
             # Check for model or collection
             if @model
