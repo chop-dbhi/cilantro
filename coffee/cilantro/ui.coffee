@@ -6,6 +6,7 @@ define [
     './ui/charts'
     './ui/filter'
     './ui/controls'
+    './ui/workflows'
 ], (c, mods...) ->
 
     c.ui = c._.extend {}, mods...

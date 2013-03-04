@@ -104,6 +104,7 @@ require(['jquery', 'mediator'], function($, mediator) {
     moduleLinks('Views', this.views);
     moduleLinks('Regions', this.regions);
     moduleLinks('Layouts', this.layouts);            
+    moduleLinks('Workflows', this.workflows);
 
     // Bind click to load modules
     components.on('click', 'a', function(event) {
