@@ -6,7 +6,6 @@ define [
     # Create an object of templates by name..
     templates = c._.object ['item'], templates
 
-
     class Concept extends c.Marionette.ItemView
         className: 'concept'
 

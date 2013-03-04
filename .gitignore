@@ -3,4 +3,6 @@
 .sass-cache
 .watch-pid
 build
+.idea
 css/style.css
+phantom-jasmine

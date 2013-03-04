@@ -3,6 +3,7 @@ define [
     'underscore'
     'backbone'
     './backbone-charts/options'
+    'plugins/backbone-marionette'
 ], (Highcharts, _, Backbone, chartOptions) ->
 
     OPTIONS_MAP =
@@ -24,12 +25,12 @@ define [
         prefix: 'tooltip.valuePrefix'
         series: 'series'
 
-
-    class Chart extends Backbone.View
+    class Chart extends Backbone.Marionette.ItemView
         className: 'chart'
         chartOptions: chartOptions.defaults
 
         initialize: (options) ->
+            super(options)
             if not options.el? then options.el = @el
             @chartOptions = $.extend true, {}, @chartOptions, options.options
             # Map convenience options to the real ones
@@ -53,7 +54,7 @@ define [
 
         render: ->
             # Destroy previous chart
-            if @chart then @chart.destroy()
+            if @chart then @chart.destroy?()
 
             # Check for model or collection
             if @model

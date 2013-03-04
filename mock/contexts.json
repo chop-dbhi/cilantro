@@ -1,1 +1,33 @@
-[]
+[{
+    "count": 3,
+    "archived": false,
+    "object_name_plural": "patients",
+    "description": "",
+    "language": {
+        "operator": "exact",
+        "language": "Hemoglobin (HGB) is equal to 17",
+        "id": 30,
+        "value": 17
+    },
+    "created": "2013-02-14 16:05:35",
+    "composite": false,
+    "object_name": "patient",
+    "modified": "2013-02-19 13:19:39",
+    "json": {
+        "operator": "exact",
+        "id": 30,
+        "value": 17,
+        "concept_id": 28
+    },
+    "session": true,
+    "_links": {
+        "self": {
+            "href": "/mock/contexts/900/",
+            "rel": "self"
+        }
+    },
+    "published": false,
+    "keywords": "",
+    "id": 900,
+    "name": ""
+}]

@@ -1,39 +1,9 @@
 define [
     './core'
     './charts/utils'
-], (c, utils) ->
-
-    chartTmpl = _.template '
-        <div class="area-container chart-container">
-            <div class=btn-toolbar>
-                <div class=btn-group>
-                    <button class="btn btn-mini fullsize" title="Toggle Fullsize"><i class=icon-resize-full alt="Toggle Fullsize"></i></button>
-                    <!--<button class="btn btn-mini outliers" title="Show Outliers" disabled><i class=icon-eye-open alt="Show Outliers"></i></button>-->
-                </div>
-                <div class=btn-group>
-                    <button class="btn btn-mini edit" title="Edit"><i class=icon-wrench alt="Edit"></i></button>
-                </div>
-                <div class=btn-group>
-                    <button class="btn btn-danger btn-mini remove" title="Remove"><i class=icon-remove alt="Remove"></i></button>
-                </div>
-            </div>
-            <div class=heading>
-                <span class="label label-info"></span>
-            </div>
-            <div class=editable>
-                <form class=form>
-                    <fieldset>
-                        <label>X-Axis <select name=x-axis></select></label>
-                        <label>Y-Axis <select name=y-axis></select></label>
-                        <label>Series <select name=series></select></label>
-                        <button class="btn btn-primary">Update</button>
-                    </fieldset>
-                </form>
-            </div>
-            <div class=chart>
-            </div>
-        </div>
-    '
+    './controls',
+    'tpl!templates/views/chart.html'
+], (c, utils, controls, chartTmpl) ->
 
 
     # Represents a list of possible fields for use with a distribution chart
@@ -60,7 +30,6 @@ define [
         getSelected: ->
             @collection.get parseInt @$el.val()
 
-
     class FieldDistributionChart extends c.Backbone.Chart
         options:
             editable: true
@@ -78,39 +47,22 @@ define [
             'submit': 'changeChart'
             'change .editable select': 'disableSelected'
 
+        ui: 
+            'heading': '.heading'
+            'label' : '.heading .label'
+            'renderArea': '.chart'
+            'toolbar': '.btn-toolbar'
+            'fullsizeToggle': '.fullsize'
+            'form': '.editable'
+            'xAxis': '[name=x-Axis]'
+            'yAxis': '[name=y-Axis]'
+            'series': '[name=series]'
+
+
         initialize: ->
-            super
+            super(@options)
+            @setElement(@template(@model))
 
-            @setElement chartTmpl()
-
-            @$heading = @$ '.heading'
-            @$label = @$heading.find '.label'
-            @$renderArea = @$ '.chart'
-            @$toolbar = @$ '.btn-toolbar'
-            @$fullsizeToggle = @$ '.fullsize'
-            @$form = @$ '.editable'
-
-            if @options.editable is false
-                @$form.detach()
-                @$toolbar.detach()
-            else
-                # Form-related components
-                @xAxis = new FieldAxis
-                    el: @$el.find '[name=x-axis]'
-                    collection: @collection
-
-                @yAxis = new FieldAxis
-                    el: @$el.find '[name=y-axis]'
-                    collection: @collection
-
-                @series = new FieldAxis
-                    el: @$el.find '[name=series]'
-                    enumerableOnly: true
-                    collection: @collection
-
-                if @model
-                    if @model.get 'xAxis' then @$form.hide()
-                    if (expanded = @model.get 'expanded') then @expand() else @contract()
 
         enableChartEvents: ->
             @setOption('plotOptions.series.events.click', @chartClick)
@@ -134,39 +86,67 @@ define [
 
         getOperator: -> 'in'
 
-        render: -> @$el
-
-        renderChart: (options) ->
+        render: ->
+            @bindUIElements()
+            @ui.renderArea.width(@options.parentView.$el.width()) \
+                if @options.parentView?
             if @chart then @chart.destroy?()
-            @$label.detach()
+            @update()
+            return @$el
 
-            @$heading.text options.title.text
+        onRender: ->
+            if @options.editable is false
+                @ui.form.detach()
+                @ui.toolbar.detach()
+            else
+                # Form-related components
+                @xAxis = new FieldAxis
+                    el: @ui.xAxis
+                    collection: @collection
+
+                @yAxis = new FieldAxis
+                    el: @ui.yAxis
+                    collection: @collection
+
+                @series = new FieldAxis
+                    el: @ui.series
+                    enumerableOnly: true
+                    collection: @collection
+
+                if @model
+                    if @model.get 'xAxis' then @ui.form.hide()
+                    if (expanded = @model.get 'expanded') then @expand() else @contract()
+
+
+        customizeOptions: (options) ->
+            @ui.label.detach()
+
+            @ui.heading.text options.title.text
             options.title.text = ''
 
             # Check if any data is present
             if not options.series[0]
-                @$renderArea.html '<p class=no-data>Unfortunately, there is
+                @ui.renderArea.html '<p class=no-data>Unfortunately, there is
                     no data to graph here.</p>'
                 return
 
-            @$form.hide()
+            @ui.form.hide()
 
             labelText = []
             if options.clustered
                 labelText.push 'Clustered'
 
             if labelText[0]
-                @$label.text(labelText.join(', ')).show()
-                @$heading.append @$label
+                @ui.label.text(labelText.join(', ')).show()
+                @ui.heading.append @$label
 
             if @interactive(options)
                 @enableChartEvents()
 
             $.extend true, options, @chartOptions
-            options.chart.renderTo = @$renderArea[0]
+            options.chart.renderTo = @ui.renderArea[0]
 
-            @chart = new Highcharts.Chart options
-            return @
+            return options
 
         # Disable selected fields since using the same field for multiple
         # axes doesn't make sense
@@ -201,7 +181,7 @@ define [
             @model.save expanded: not expanded
 
         resize: ->
-            chartWidth = @$renderArea.width()
+            chartWidth = @ui.renderArea.width()
             if @chart then @chart.setSize chartWidth, null, false
 
         expand: ->
@@ -219,10 +199,10 @@ define [
             @resize()
 
         hideToolbar: ->
-            @$toolbar.fadeOut 200
+            @ui.toolbar.fadeOut 200
 
         showToolbar: ->
-            @$toolbar.fadeIn 200
+            @ui.toolbar.fadeIn 200
 
         # Toggles between showing the outliers and hiding the outliers
         # on the chart if any are present. The button will be greayed out
@@ -232,33 +212,23 @@ define [
                 continue
 
         toggleEdit: (event) ->
-            if @$form.is(':visible') then @$form.fadeOut 300 else @$form.fadeIn 300
+            if @ui.form.is(':visible') then @ui.form.fadeOut 300 else @ui.form.fadeIn 300
 
         removeChart: (event) ->
             if @chart then @chart.destroy?()
             @$el.remove()
             if @model then @model.destroy()
 
-        update: (url, data, fields, seriesIdx) ->
-            if @options.data
-                for key, value of @options.data
-                    if not data
-                        data = "#{key}=#{value}"
-                    else
-                        data = data + "&#{key}=#{value}"
-
+        update:  ->
             @$el.addClass 'loading'
-            Backbone.ajax
-                url: url
-                data: data
-                success: (resp) =>
+            @model.distribution (resp) =>
                     @$el.removeClass 'loading'
-                    @renderChart utils.processResponse resp, fields, seriesIdx
+                    @chart = new Highcharts.Chart(@customizeOptions utils.processResponse resp, [@model])
 
         # Ensure rapid successions of this method do not occur
         changeChart: (event) ->
             if event then event.preventDefault()
-            
+
             @collection.when =>
                 # TODO fix this nonsense
                 if not event?
@@ -295,6 +265,8 @@ define [
                         series: if series then series.id
 
                 @update url, data, fields, seriesIdx
+        template: chartTmpl
 
+        c._.extend(FieldDistributionChart::, controls.Control)
 
     { FieldDistributionChart }
