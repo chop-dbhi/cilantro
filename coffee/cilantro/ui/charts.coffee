@@ -6,13 +6,6 @@ define [
 ], (c, utils, controls, chartTmpl) ->
 
 
-    extend = (obj, mixin) ->
-        obj[name] = method for name, method of mixin
-        obj
-
-    include = (klass, mixin) ->
-        extend klass.prototype, mixin
-
     # Represents a list of possible fields for use with a distribution chart
     class FieldAxis extends c.Marionette.ItemView
         tagName: 'select'
@@ -274,6 +267,6 @@ define [
                 @update url, data, fields, seriesIdx
         template: chartTmpl
 
-        include(FieldDistributionChart, controls.Control)
+        c._.extend(FieldDistributionChart::, controls.Control)
 
     { FieldDistributionChart }
