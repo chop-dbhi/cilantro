@@ -35,7 +35,6 @@ define ['../../core'
                   model: @model.fields[0]
                   data:
                     context: null
-                
 
             mainFields = new field.FieldForm(model:@model.fields[0])
 
@@ -44,7 +43,7 @@ define ['../../core'
                 itemViewOptions: (model) =>
                    context: @manager.getNodes(model.id)
                 collection: new c.Backbone.Collection(@model.fields[ungraphedFieldsStart..])
-            
+
 
             @main.show(mainFields)
             @chart.show(mainChart) if mainChart?
@@ -53,16 +52,3 @@ define ['../../core'
         template: compiledTemplate
 
     { ConceptForm }
-
-
-
-
-
-
-
-
-
-
-
-
-

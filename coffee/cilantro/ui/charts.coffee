@@ -1,8 +1,17 @@
 define [
     './core'
     './charts/utils'
+    './controls',
     'tpl!templates/views/chart.html'
-], (c, utils, chartTmpl) ->
+], (c, utils, controls, chartTmpl) ->
+
+
+    extend = (obj, mixin) ->
+        obj[name] = method for name, method of mixin
+        obj
+
+    include = (klass, mixin) ->
+        extend klass.prototype, mixin
 
     # Represents a list of possible fields for use with a distribution chart
     class FieldAxis extends c.Marionette.ItemView
@@ -27,7 +36,6 @@ define [
 
         getSelected: ->
             @collection.get parseInt @$el.val()
-
 
     class FieldDistributionChart extends c.Backbone.Chart
         options:
@@ -59,36 +67,9 @@ define [
 
 
         initialize: ->
-            super
+            super(@options)
             @setElement(@template(@model))
 
-            # Explicitly set our width to a specified parentView in case the DOM 
-            # hiearchy is not yet in place
-            @ui.renderArea.width(@options.parentView.$el.width()) /
-                if @options.parentView?
-
-
-            if @options.editable is false
-                @ui.form.detach()
-                @ui.toolbar.detach()
-            else
-                # Form-related components
-                @xAxis = new FieldAxis
-                    el: @ui.xAxis
-                    collection: @collection
-
-                @yAxis = new FieldAxis
-                    el: @ui.yAxis
-                    collection: @collection
-
-                @series = new FieldAxis
-                    el: @ui.series
-                    enumerableOnly: true
-                    collection: @collection
-
-                if @model
-                    if @model.get 'xAxis' then @ui.form.hide()
-                    if (expanded = @model.get 'expanded') then @expand() else @contract()
 
         enableChartEvents: ->
             @setOption('plotOptions.series.events.click', @chartClick)
@@ -113,9 +94,36 @@ define [
         getOperator: -> 'in'
 
         render: ->
+            @bindUIElements()
+            @ui.renderArea.width(@options.parentView.$el.width()) \
+                if @options.parentView?
             if @chart then @chart.destroy?()
             @update()
             return @$el
+
+        onRender: ->
+            if @options.editable is false
+                @ui.form.detach()
+                @ui.toolbar.detach()
+            else
+                # Form-related components
+                @xAxis = new FieldAxis
+                    el: @ui.xAxis
+                    collection: @collection
+
+                @yAxis = new FieldAxis
+                    el: @ui.yAxis
+                    collection: @collection
+
+                @series = new FieldAxis
+                    el: @ui.series
+                    enumerableOnly: true
+                    collection: @collection
+
+                if @model
+                    if @model.get 'xAxis' then @ui.form.hide()
+                    if (expanded = @model.get 'expanded') then @expand() else @contract()
+
 
         customizeOptions: (options) ->
             @ui.label.detach()
@@ -227,7 +235,7 @@ define [
         # Ensure rapid successions of this method do not occur
         changeChart: (event) ->
             if event then event.preventDefault()
-            
+
             @collection.when =>
                 # TODO fix this nonsense
                 if not event?
@@ -266,5 +274,6 @@ define [
                 @update url, data, fields, seriesIdx
         template: chartTmpl
 
+        include(FieldDistributionChart, controls.Control)
 
     { FieldDistributionChart }
