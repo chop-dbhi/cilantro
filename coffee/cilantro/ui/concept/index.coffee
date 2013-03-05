@@ -24,9 +24,15 @@ define [
 
         template: templates.item
 
+        initialize: ->
+            @subscribe c.CONCEPT_FOCUS, @toggleFocus
+
         click: (event) ->
             event.preventDefault()
             c.publish c.CONCEPT_FOCUS, @model.id
+
+        toggleFocus: (id) =>
+            @$el.toggleClass('active', (id is @model.id))
 
 
     class ConceptAccordianGroup extends c.Marionette.ItemView

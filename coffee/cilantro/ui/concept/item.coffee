@@ -18,12 +18,5 @@ define [
                 data.description = data.fields[0].description
             return data
 
-        toggleFocus: (id) =>
-            @$el.toggleClass('active', (id is @model.id))
-
-
-    # Down here since constants don't play nice with object keys..
-    Concept::subscribers = {}
-    Concept::subscribers[c.CONCEPT_FOCUS] = 'toggleFocus'
 
     { Concept }
