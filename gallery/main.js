@@ -135,7 +135,9 @@ require(['jquery', 'mediator'], function($, mediator) {
     // mediator module was loaded.
     require(['cilantro'], function(c) {
         var builtinChannel = $('#builtin-channel'),
-            customChannel = $('#custom-channel');
+            builtinChannelData = $('#builtin-channel-data'),
+            customChannel = $('#custom-channel'),
+            customChannelData = $('#custom-channel-data');
 
         // Populate built-in channels
         var key, value;
@@ -148,12 +150,20 @@ require(['jquery', 'mediator'], function($, mediator) {
         
         $('#builtin-channel-form').on('submit', function(event) {
             event.preventDefault();
-            c.publish(builtinChannel.val());
+            var data, args = [builtinChannel.val()];
+            if (data = $.trim(builtinChannelData.val())) {
+                args.push(JSON.parse(data));
+            }
+            c.publish.apply(null, args);
         });
 
         $('#custom-channel-form').on('submit', function(event) {
             event.preventDefault();
-            c.publish(customChannel.val());
+            var data, args = [customChannel.val()];
+            if (data = $.trim(customChannelData.val())) {
+                args.push(JSON.parse(data));
+            }
+            c.publish.apply(null, args);
         });
 
     });
