@@ -3,8 +3,8 @@ require(['jquery', 'mediator'], function($, mediator) {
     var __slice = [].slice,
          _publish = mediator.publish,
         expanded = false,
-        stream = $('#stream ul');
-
+        stream = $('#stream ul'),
+        navigator = $("#nav-container");
     // Wrapper for adding items to the stream. Each argument is JSON.stringified
     // and rendered in a `pre'
     mediator.publish = function(channel) {
@@ -118,11 +118,12 @@ require(['jquery', 'mediator'], function($, mediator) {
             .removeClass('active');
 
         // The module is expected to return a callback that takes
-        // the preview area DOM element. This primarily is useful
-        // for rendering the view at an arbitary time (e.g. when
-        // data finally loads).
+        // the preview area DOM element and the navigator portion
+        // of the screen. This primarily is useful for rendering
+        // the view at an arbitary time (e.g. when data finally 
+        // loads) and hiding the navigator if necessary.
         require([modname], function(handler) {
-            handler(area);
+            handler(area, navigator);
         });
     });
 
