@@ -1,0 +1,24 @@
+<div class=row-fluid>
+    <div class="span4">
+        <span class=control-label>
+            <%= data.name %>
+            <span class=control-units><%= data.units %></span>
+        </span>
+    </div>
+
+    <select class=span4 name=operator></select>
+
+    <input class=span4 type=text name=value>
+</div>
+<% if (data.description) { %>
+    <div class=row-fluid>
+        <div class="control-description span12"><%= data.description %></div>
+    </div>
+<% } %>
+<div class=row-fluid>
+    <div class="control-buttons span12">
+        <button data-toggle=add class="btn btn-success btn-mini">Add</button>
+        <button data-toggle=update class="btn btn-primary btn-mini">Update</button>
+        <button data-toggle=remove class="btn btn-danger btn-mini">Remove</button>
+    </div>
+</div>

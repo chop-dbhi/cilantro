@@ -2,7 +2,10 @@ define [
     '../core'
     '../controls'
     'inputio'
-], (c, controls, InputIO) ->
+    'tpl!templates/views/field-control.html'
+], (c, controls, InputIO, templates...) ->
+
+    templates = c._.object ['control'], templates
 
     FORM_ELEMENTS = 'input,select,textarea'
 
@@ -15,6 +18,8 @@ define [
     # (e.g. data-id="39") or as a dynamic value via a form element.
 
     class FieldControl extends controls.Control
+
+        template: templates.control
 
         options:
             # A flag denoting whether or not this FieldControl is managed
