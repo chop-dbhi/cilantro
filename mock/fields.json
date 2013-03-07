@@ -70,12 +70,12 @@
                 "is between"
             ]
         ],
-        "plural_name": "Hemoglobin (HGB)s",
-        "plural_unit": "",
+        "plural_name": "Hemoglobin (HGB)",
+        "plural_unit": "mg/dL",
         "published": true,
         "searchable": false,
         "simple_type": "number",
-        "unit": ""
+        "unit": "mg/dL"
     },
     {
         "_links": {
