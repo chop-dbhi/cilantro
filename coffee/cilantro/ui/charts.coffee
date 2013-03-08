@@ -59,8 +59,8 @@ define [
             'series': '[name=series]'
 
 
-        initialize: ->
-            super(@options)
+        initialize:(options) ->
+            super(c._.extend(@options, options))
             @setElement(@template(@model))
 
 

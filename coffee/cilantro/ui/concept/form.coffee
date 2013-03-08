@@ -13,8 +13,11 @@ define ['../../core'
         # For a given field id, return the ContextNode
         # in the ContextTree if it exists
         getNodes: (fieldId) ->
-            @context.getNodes(fieldId)
-
+            nodes = @context.getNodes(fieldId)
+            if nodes.length == 0
+                nodes = new c.models.ContextNodeModel(id:fieldId)
+                @context.add(nodes)
+            nodes
 
     class ConceptForm extends c.Marionette.Layout
         className: 'concept-form'
@@ -40,9 +43,12 @@ define ['../../core'
                   editable: false
                   model: @model.fields[0]
                   data:
-                    context: null
+                    context: @manager.getNodes(@model.fields[0].id)
 
-            mainFields = new field.FieldForm(model:@model.fields[0])
+            mainFields = new field.FieldForm(
+                model:@model.fields[0]
+                context:@manager.getNodes(@model.fields[0].id)
+            )
 
             fields = new c.Marionette.CollectionView
                 itemView: field.FieldForm
