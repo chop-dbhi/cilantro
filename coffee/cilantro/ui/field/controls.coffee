@@ -9,13 +9,6 @@ define [
 
     FORM_ELEMENTS = 'input,select,textarea'
 
-    # Encapsulates a group of control elements that represents a
-    # ContextNode, i.e. a single condition or branch of nodes. When
-    # the data is ready to be saved, the view will utilize various
-    # methods to extract and populate the ContextNode model instance.
-    # ---
-    # A node property can be represented as a static value via an attribute
-    # (e.g. data-id="39") or as a dynamic value via a form element.
 
     class FieldControl extends controls.Control
         className: 'field-control'
@@ -33,8 +26,17 @@ define [
             'change select': 'change'
             'click input[type=radio],input[type=checkbox]': 'change'
 
+        ui:
+            add: '.actions .add'
+            remove: '.actions .remove'
+            update: '.actions .update'
+
         constructor: ->
             super
+
+            # Cache context nodes by cid
+            @_nodeCache = {}
+
             # Various ways to define the UI elements
             @ui = _.extend {}, @constructor.defaultUI, @ui, @options.ui
             @attrs = _.extend {}, @constructor.defaultAttrs, @attrs, @options.attrs
@@ -73,16 +75,19 @@ define [
         setValue: (value) -> @_setProp('value', value)
         setNulls: (value) -> @_setProp('nulls', Boolean(value))
 
+        reset: -> @set()
+
         # Triggered any time the control contents have changed
-        change: (event) -> @trigger 'change', @, @get()
+        change: (event) ->
+            @trigger 'change', @, @get()
 
         # Creates a new node with the control contents
         add: ->
             @node = node = new c.models.ContextNode @get()
             @_nodeCache[node.cid] = node
-            if not @managed
-                @$add.hide()
-                @$update.show()
+            if @options.managed
+                @ui.add.hide()
+                @ui.update.show()
             @trigger 'add', @, node
 
         # Updates the current node with the control contents
@@ -93,12 +98,10 @@ define [
         # Removes a node, but leaves the control contents alone.
         remove: (cid) ->
             node = @_deferenceNode cid
-            if not @managed and not @node
-                @$update.hide()
-                @$add.show()
             @trigger 'remove', @, node
-
-        reset: -> @set()
+            if @managed and not @node
+                @ui.update.hide()
+                @ui.add.show()
 
 
     # Selectors of elements that pertain to the data attribute

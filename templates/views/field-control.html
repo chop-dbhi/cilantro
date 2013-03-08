@@ -1,19 +1,8 @@
-<div class=name>
-    <%= data.name %>
-    <% if (data.unit) { %>
-        <span class=unit><%= data.unit %></span>
-    <% } %>
-</div>
-
-<% if (data.description) { %>
-    <p class="description"><%= data.description %></p>
-<% } %>
-
 <select name=operator></select>
 
 <input type=text name=value>
 
-<div class="actions">
+<div class=field-actions>
     <button data-toggle=add class="btn btn-success btn-mini">Add</button>
     <button data-toggle=update class="btn btn-primary btn-mini">Update</button>
     <button data-toggle=remove class="btn btn-danger btn-mini">Remove</button>

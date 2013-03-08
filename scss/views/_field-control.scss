@@ -1,9 +1,4 @@
 .field-control {
-    @include box-shadow(0 2px 2px #ccc);
-    @include border-radius(3px);
-    background-color: #fff;
-    padding: 20px;
-
     > input, select {
         @include box-sizing(border-box);
         display: block;
@@ -11,24 +6,7 @@
         height: 30px;
     }
 
-    .name {
-        display: block;
-        font-weight: 500;
-        font-size: 1.2em;
-        padding: 5px 0;
-    }
-
-    .unit {
-        font-size: 0.9em;
-        color: #999;
-    }
-
-    .description {
-        color: #999;
-
-    }
-
-    .actions {
+    .field-actions {
         @include clearfix;
 
         [data-toggle=add], [data-toggle=update] {
