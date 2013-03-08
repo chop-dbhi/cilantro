@@ -1,8 +1,24 @@
 body {
     background: #f9f9f9 url(images/furley_bg.png);
+    padding-top: 60px;
 }
 
-#preview-area {
+.gallery-ui {
+    text-shadow: 0 1px 1px #fff;
+    box-shadow: inset 1px 2px 2px #ddd;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+#gallery-toolbar {
+    margin-bottom: 10px;
+    padding: 5px 10px;
+}
+
+#preview-area {}
+
+.preview-ui {
     border-radius: 3px;
     border: 1px dashed #ccc;
     padding: 10px;
@@ -15,10 +31,6 @@ body {
 }
 
 #gallery-nav {
-    border-radius: 3px;
-    background-color: rgba(0, 0, 0, 0.05);
-    border: 1px solid #ccc;
-    text-shadow: 0 1px 1px #fff;
 }
 
 #gallery-nav [data-toggle] {
