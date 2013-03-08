@@ -1,17 +1,26 @@
-define ['../../core'
-        'tpl!templates/workflows/query.html'
-], (c, compiledTemplate) ->
-    class QueryWorkflow extends c.Marionette.Layout
+define [
+    '../../core'
+    '../concept'
+    'tpl!templates/workflows/query.html'
+], (c, concept, templates...) ->
 
+    templates = c._.object ['query'], templates
+
+    class QueryWorkflow extends c.Marionette.Layout
         className: 'query-workflow'
 
-        template: compiledTemplate
+        template: templates.query
 
         regions:
-            conceptIndex: '.concept-index-container'
-            conceptForms: '.concept-form-container'
+            index: '.concept-index-container'
+            workspace: '.concept-workspace-container'
             filters: '.named-filter-container'
 
         onRender: ->
+            @index.show new concept.ConceptIndex
+                collection: c.data.concepts
+
+            @workspace.show new concept.ConceptWorkspace
+
 
     { QueryWorkflow }

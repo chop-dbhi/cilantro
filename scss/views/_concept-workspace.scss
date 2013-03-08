@@ -1,0 +1,21 @@
+.concept-workspace .concept-workspace-log {
+    list-style: none;
+    margin-left: 0;
+
+    .concept {
+        @include box-shadow(none);
+        background-color: inherit;
+        border: none;
+        border-top: 1px solid #ccc;
+        padding: 5px 0;
+
+        &:first-child {
+            border-top: none;
+        }
+
+        > * {
+            font-size: 14px;
+            display: inline;
+        }
+    }
+}
