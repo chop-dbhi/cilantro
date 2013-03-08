@@ -19,6 +19,7 @@ define ['../../core'
                 @context.add(nodes)
             nodes
 
+
     class ConceptForm extends c.Marionette.Layout
         className: 'concept-form'
 
@@ -30,34 +31,38 @@ define ['../../core'
             @manager = new ManagedContextMapper(@context, @model.fields)
 
         regions:
-            main:".main"
-            chart:".primary-chart"
-            fields:".fields"
+            main: '.concept-main'
+            chart: '.concept-chart'
+            fields: '.concept-fields'
 
         onRender: ->
             ungraphedFieldsStart = 0
-            if @model.fields[0].urls.distribution?
+            mainField = @model.fields[0]
+
+            if mainField.urls.distribution?
                 ungraphedFieldsStart = 1
-                mainChart = new charts.FieldDistributionChart
+                mainChart = new charts.FieldChart
                   parentView: @
-                  editable: false
-                  model: @model.fields[0]
+                  model: mainField
                   data:
                     context: @manager.getNodes(@model.fields[0].id)
 
-            mainFields = new field.FieldForm(
-                model:@model.fields[0]
-                context:@manager.getNodes(@model.fields[0].id)
-            )
+            mainForm = new field.FieldForm
+                model: mainField
+                context: @manager.getNodes(mainField.id)
+                showChart: false
 
             fields = new c.Marionette.CollectionView
                 itemView: field.FieldForm
+
                 itemViewOptions: (model) =>
+                   showChart: false
                    context: @manager.getNodes(model.id)
+
                 collection: new c.Backbone.Collection(@model.fields[ungraphedFieldsStart..])
 
 
-            @main.show(mainFields)
+            @main.show(mainForm)
             @chart.show(mainChart) if mainChart?
             @fields.show(fields)
 

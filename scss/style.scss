@@ -6,25 +6,24 @@
 
 @import "plugins/panels";
 
+@import "mixins/backdrop";
+
 @import "base/empty";
 @import "base/accordian";
 @import "base/control";
+@import "base/charts";
 
 @import "views/concept";
-@import "views/field-stats";
-@import "views/field-form";
-@import "views/field-control";
 @import "views/concept-form";
 @import "views/concept-workspace";
+
+@import "views/field";
+@import "views/field-stats";
+@import "views/field-chart";
+@import "views/field-form";
+@import "views/field-control";
 
 
 body {
     text-shadow: 0 1px 1px #fff;
-}
-
-.chromeframe {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
 }

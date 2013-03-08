@@ -1,0 +1,19 @@
+@mixin field {
+    @include backdrop;
+
+    .field-name {
+        display: block;
+        font-weight: 500;
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    .field-unit {
+        font-size: 0.9em;
+        color: #999;
+    }
+
+    .field-description {
+        color: #999;
+    }
+}

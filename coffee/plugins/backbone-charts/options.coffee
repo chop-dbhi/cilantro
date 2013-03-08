@@ -102,6 +102,7 @@ define ->
         chart:
             defaultSeriesType: 'areaspline'
             margin: [0, 0, 0, 0]
+            height: 40
 
         title:
             text: ''

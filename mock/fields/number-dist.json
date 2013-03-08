@@ -702,6 +702,14 @@
             "values": [
                 26.0
             ]
+        }
+    ],
+    "outliers": [
+        {
+            "count": 1,
+            "values": [
+                6400.0
+            ]
         },
         {
             "count": 1,
@@ -743,14 +751,6 @@
             "count": 1,
             "values": [
                 141.0
-            ]
-        }
-    ],
-    "outliers": [
-        {
-            "count": 1,
-            "values": [
-                6400.0
             ]
         }
     ],

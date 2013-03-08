@@ -1,6 +1,4 @@
 .field-form {
-    .description {
-        color: #999;
-        margin-bottom: 0;
-    }
+    @include field;
+    margin-bottom: 20px;
 }
