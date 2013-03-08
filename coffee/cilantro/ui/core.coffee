@@ -2,6 +2,7 @@ define [
     '../core'
     'date'
     'inputio'
+    'highcharts'
     'plugins/backbone-marionette'
     'plugins/backbone-charts'
     'plugins/bootstrap'
@@ -13,7 +14,11 @@ define [
     'plugins/jquery-scroller'
 ], (c) ->
 
+    c.Highcharts = Highcharts
     c.Marionette = Backbone.Marionette
+
+    # Shortcut to Marionette template renderer
+    c.renderTemplate = c.Marionette.Renderer.render
 
     # Extend base Marionette with mediator methods
     c.Marionette.View::publish = c.publish

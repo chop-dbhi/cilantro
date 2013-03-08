@@ -6,6 +6,9 @@ define [
     'plugins/backbone-marionette'
 ], (Highcharts, _, Backbone, chartOptions) ->
 
+
+    # Highcharts options are very nested.. this makes the common ones more
+    # accessible. Use the `setOption` method to parse the options
     OPTIONS_MAP =
         el: 'chart.renderTo'
         type: 'chart.type'
@@ -25,8 +28,10 @@ define [
         prefix: 'tooltip.valuePrefix'
         series: 'series'
 
+
     class Chart extends Backbone.Marionette.ItemView
-        className: 'chart'
+        template: ->
+
         chartOptions: chartOptions.defaults
 
         initialize: (options) ->
@@ -52,29 +57,12 @@ define [
                 options = options[tok]
             options[last] = value
 
-        render: ->
-            # Destroy previous chart
+        getChartOptions: ->
+            @chartOptions
+
+        renderChart: (options) ->
             if @chart then @chart.destroy?()
-
-            # Check for model or collection
-            if @model
-                @chartOptions.series = [$.extend true, {}, @model.toJSON()]
-                if @model.categories
-                    @setOption 'xAxis.categories', @model.categories
-            # There are two potential usages of a collection. If the collection
-            # is a Series instance (as defined above), treat it as a single
-            # series. Otherwise assume it is a collection of multiple series
-            else if @collection
-                if @collection instanceof Series
-                    @chartOptions.series = [$.extend true, {}, @collection.toJSON()]
-                else
-                    @chartOptions.series = $.extend true, [], @collection.toJSON()
-
-                if @collection.categories
-                    @setOption 'xAxis.categories', @collection.categories
-
-            @chart = new Highcharts.Chart @chartOptions
-            return @$el
+            @chart = new Highcharts.Chart(options)
 
 
     # Set a default option for the class
@@ -121,7 +109,6 @@ define [
     SplineChart.setDefaultOption('chart.type', 'spline')
 
     class Sparkline extends Chart
-        className: 'sparkline'
         chartOptions: chartOptions.sparkline
 
 
@@ -134,7 +121,6 @@ define [
     Backbone.PieChart = PieChart
     Backbone.ScatterChart = ScatterChart
     Backbone.SplineChart = SplineChart
-
     Backbone.Sparkline = Sparkline
 
     return

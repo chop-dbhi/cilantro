@@ -1,9 +1,12 @@
 define [
     '../core'
+    '../charts'
+    '../charts/utils'
     'tpl!templates/views/field-stats.html'
-], (c, templates...) ->
+    'tpl!templates/views/field-stats-values.html'
+], (c, charts, utils, templates...) ->
 
-    templates = c._.object ['stats'], templates
+    templates = c._.object ['layout', 'values'], templates
 
     
     # Prettifies a key for display
@@ -17,35 +20,52 @@ define [
         if c._.isNumber(value) then c.utils.prettyNumber(value) else value
 
 
-    class FieldStats extends c.Marionette.ItemView
+    # Takes an object of key/value pairs representing stats and prettifies
+    # the key and number for display
+    prettyStats = (data, rawValue=false) ->
+        stats = {}
+        for key, value of data
+            if key.slice(0, 1) is '_' then continue
+            stats[prettyKey(key)] = prettyValue(value)
+        return stats
+
+
+    class FieldStatsValues extends c.Marionette.ItemView
         tagName: 'ul'
         className: 'field-stats'
-        template: templates.stats
 
-        parseData: (data) ->
-            stats = {}
-            for key, value of data
-                if key.slice(0, 1) is '_' then continue
-                stats[prettyKey(key)] = prettyValue(value)
-            return stats
+        template: ->
 
-        render: ->
-            @isClosed = false
-
-            @triggerMethod 'before:render', @
-            @triggerMethod 'item:before:render', @
-
+        onRender: ->
             @model.stats (data) =>
-                template = @getTemplate()
-                data = @parseData(data)
-                html = c.Marionette.Renderer.render(template, data)
+                data = prettyStats(data)
+                html = c.renderTemplate(templates.values, data)
                 @$el.html(html)
-                @bindUIElements()
 
-                @triggerMethod 'render', @
-                @triggerMethod 'item:rendered', @
 
-            return @
+    class FieldStatsChart extends charts.FieldChart
+        className: 'sparkline'
+
+        chartOptions: c.Backbone.Sparkline::chartOptions
+
+        getChartOptions: (resp) ->
+            options =
+                series: [utils.getSeries(resp.data)]
+
+            c.$.extend true, options, @chartOptions
+            options.chart.renderTo = @ui.chart[0]
+            return options
+
+
+    class FieldStats extends c.Marionette.Layout
+        template: templates.layout
+
+        regions:
+            values: '.stats-values'
+
+        onRender: ->
+            @values.show new FieldStatsValues
+                model: @model
 
 
     { FieldStats }

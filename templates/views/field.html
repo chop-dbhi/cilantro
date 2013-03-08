@@ -1,8 +1,10 @@
-<!--
-Renders a generic representation of a field.
--->
+<div class=field-name>
+    <%= data.name %>
+    <% if (data.unit) { %>
+        <span class=field-unit><%= data.unit %></span>
+    <% } %>
+</div>
 
-<h4 class=name><%= data.name %></h4>
 <% if (data.description) { %>
-    <p class=description><%= data.description %></p>
+    <p class=field-description><%= data.description %></p>
 <% } %>

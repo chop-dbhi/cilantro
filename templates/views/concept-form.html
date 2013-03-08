@@ -1,17 +1,14 @@
-<div class="area-container conceptform">
-    <h3 class=heading>
-        <%= data.name %> <small> <%= data.category.name %> </small>
-    </h3>
-    <div class=btn-toolbar>
-        <button data-toggle=detail class="btn btn-small"><i class=icon-info-sign></i> Info</button>
-        <button data-toggle=hide class="btn btn-small"><i class=icon-minus></i> Hide</button>
-    </div>
-    <div class=details>
-        <div class=description><%= data.description %></div>
-    </div>
-    <form class=form-inline>
-        <div class=main></div>
-        <div class=primary-chart></div>
-        <div class=fields></div>
-    </form>
+<div class=concept-name>
+    <%= data.name %>
+    <% if (data.category) { %>
+        <span class=concept-category><%= data.category.name %></span>
+    <% } %>
 </div>
+
+<% if (data.description) { %>
+    <p class=concept-description><%= data.description %></p>
+<% } %>
+
+<div class=concept-chart></div>
+<div class=concept-main></div>
+<div class=concept-fields></div>
