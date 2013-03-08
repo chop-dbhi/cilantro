@@ -15,9 +15,9 @@ define ['../../core'
         getNodes: (fieldId) ->
             nodes = @context.getNodes(fieldId)
             if nodes.length == 0
-                nodes = new c.models.ContextNodeModel(id:fieldId)
-                @context.add(nodes)
-            nodes
+                nodes = [new c.models.ContextNodeModel(id:fieldId)]
+                @context.add(nodes[0])
+            nodes[0]
 
 
     class ConceptForm extends c.Marionette.Layout

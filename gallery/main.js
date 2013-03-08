@@ -158,10 +158,10 @@ require(['jquery', 'mediator'], function($, mediator) {
             .removeClass('active');
 
         // The module is expected to return a callback that takes
-        // the preview area DOM element and the navigator portion
-        // of the screen. This primarily is useful for rendering
-        // the view at an arbitary time (e.g. when data finally 
-        // loads) and hiding the navigator if necessary.
+        // the preview area DOM element. This primarily is 
+        // useful for rendering the view at an arbitary 
+        // time (e.g. when data finally loads)
+
         require([modname], function(handler) {
             handler(previewArea, navigator);
         });

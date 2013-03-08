@@ -1,7 +1,7 @@
-define(['cilantro/ui/charts', 'cilantro/models', 'text!../../mock/concepts.json'], 
-    function (charts, models,  mocks) {
+define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!../../mock/concepts.json'], 
+    function (_, charts, models, mocks) {
 
-    describe("FieldDistributionChart", function(){
+    describe("Spy FieldDistributionChart", function(){
        var async = new AsyncSpec(this);
        var concepts = JSON.parse(mocks);
        var model;
@@ -9,6 +9,7 @@ define(['cilantro/ui/charts', 'cilantro/models', 'text!../../mock/concepts.json'
 
        async.beforeEach(function(done) {
             window.Highcharts.Chart = jasmine.createSpy();
+            window.Highcharts.Chart.prototype.series = [{points:[]}];
             model = new models.ConceptModel(concepts[0], { parse:true });
             done();
        });
@@ -34,5 +35,39 @@ define(['cilantro/ui/charts', 'cilantro/models', 'text!../../mock/concepts.json'
                done();
            }, 1000);
        });
+    });
+    
+    describe("FieldDistributionChart", function(){
+        var async = new AsyncSpec(this);
+        var concept = JSON.parse(mocks)[2];
+        var model;
+        var context;
+
+        async.beforeEach(function(done){
+            model = new models.ConceptModel(concept, {parse: true});
+            context = new models.ContextNodeModel({id:model.fields[0].id});
+            done();
+        });
+
+        async.it("should update when it's context changes", function(done){
+
+           var testChart = new charts.FieldDistributionChart({
+                 editable: true,
+                 model: model.fields[0],
+                 data: {
+                   context: context
+                 }
+           });
+
+           var el = testChart.render();
+
+           setTimeout(function(){
+               points = testChart.chart.series[0].points;
+               expect(_.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeUndefined();
+               context.set({value:["ABNORMAL"]})
+               expect(_.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeTruthy();
+               done();
+           }, 1000);
+        });
     });
 });
