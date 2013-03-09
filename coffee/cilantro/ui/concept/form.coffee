@@ -1,7 +1,8 @@
-define ['../../core'
-        '../field'
-        '../charts'
-        'tpl!templates/views/concept-form.html'
+define [
+    '../../core'
+    '../field'
+    '../charts'
+    'tpl!templates/views/concept-form.html'
 ], (c, field, charts, templates...) ->
 
     templates = c._.object ['form'], templates
