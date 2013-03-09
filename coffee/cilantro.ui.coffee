@@ -4,7 +4,7 @@ define [
     './cilantro/ui/concept'
     './cilantro/ui/field'
     './cilantro/ui/charts'
-    './cilantro/ui/filter'
+    './cilantro/ui/context'
     './cilantro/ui/controls'
     './cilantro/ui/workflows'
 ], (c, mods...) ->

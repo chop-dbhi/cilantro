@@ -1,0 +1,34 @@
+.context-node {
+    @include backdrop;
+    @extend .clearfix;
+
+    padding: 5px;
+
+    &.disabled {
+        @include transition(color, 0.2s);
+        color: #ccc;
+
+        &:hover {
+            color: inherit;
+        }
+    }
+
+    .language {
+        padding: 12px 0;
+    }
+
+    .actions {
+        float: right;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 5px;
+
+        .destroy {
+            color: rgb(180, 0, 0);
+        }
+
+        .state {
+            color: #999;
+        }
+    }
+}
