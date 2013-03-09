@@ -1,7 +1,7 @@
 define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!../../mock/concepts.json'], 
     function (_, charts, models, mocks) {
 
-    describe("Spy FieldDistributionChart", function(){
+    describe("Spy FieldChart", function(){
        var async = new AsyncSpec(this);
        var concepts = JSON.parse(mocks);
        var model;
@@ -20,7 +20,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!../../mock/
        });
 
        async.it("should only create one Highcharts.Chart object on calls to render", function(done){
-            var testChart = new charts.FieldDistributionChart({
+            var testChart = new charts.FieldChart({
                  editable: false,
                  model: model.fields[0],
                  data: {
@@ -37,7 +37,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!../../mock/
        });
     });
     
-    describe("FieldDistributionChart", function(){
+    describe("FieldChart", function(){
         var async = new AsyncSpec(this);
         var concept = JSON.parse(mocks)[2];
         var model;
@@ -51,7 +51,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!../../mock/
 
         async.it("should update when it's context changes", function(done){
 
-           var testChart = new charts.FieldDistributionChart({
+           var testChart = new charts.FieldChart({
                  editable: true,
                  model: model.fields[0],
                  data: {

@@ -43,10 +43,10 @@ define [
             if mainField.urls.distribution?
                 ungraphedFieldsStart = 1
                 mainChart = new charts.FieldChart
-                  parentView: @
-                  model: mainField
-                  data:
-                    context: @manager.getNodes(@model.fields[0].id)
+                    parentView: @
+                    model: mainField
+                    data:
+                        context: @manager.getNodes(mainField.id)
 
             mainForm = new field.FieldForm
                 model: mainField
