@@ -1,5 +1,7 @@
 # Cilantro Style Guide
 
+Largely inspired by [Airbnb's JavaScript style guide](https://github.com/airbnb/javascript#readme)
+
 ## CoffeeScript
 
 ### Indentation & Spaces
