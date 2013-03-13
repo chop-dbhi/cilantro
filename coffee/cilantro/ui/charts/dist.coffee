@@ -57,7 +57,7 @@ define [
             if @node then @node.destroy()
 
         onRender: ->
-            @stopListening @context
+            @stopListening @context if @context?
             @$el.addClass 'loading'
 
             # Explicitly set the width of the chart so Highcharts knows
@@ -70,7 +70,7 @@ define [
             @model.distribution (resp) =>
                 options = @getChartOptions(resp)
                 @renderChart(options)
-                @listenTo @context, 'change', @contextUpdated
+                @listenTo @context, 'change', @contextUpdated if @context?
                 @contextUpdated()
 
 
