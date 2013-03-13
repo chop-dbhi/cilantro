@@ -1,5 +1,5 @@
 define [
-    './core'
+    '../core'
 ], (c) ->
 
     # Represents a list of possible fields for use with a distribution chart
