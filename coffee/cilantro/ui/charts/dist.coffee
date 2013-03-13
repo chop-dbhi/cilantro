@@ -1,14 +1,13 @@
 define [
     '../core'
-    '../controls'
+    './core'
     './utils'
     'tpl!templates/views/chart.html'
-], (c, controls, utils, templates...) ->
+], (c, charts, utils, templates...) ->
 
     templates = c._.object ['chart'], templates
 
-
-    class FieldChart extends c.Backbone.Chart
+    class FieldChart extends charts.Chart
         template: templates.chart
 
         ui:
@@ -18,7 +17,7 @@ define [
 
         initialize: ->
             super
-            @context = options.data.context
+            @context = @options.data.context
 
         chartClick: (event) =>
             category = event.point.category ? event.point.name
@@ -79,9 +78,6 @@ define [
             points = @chart.series[0].points
             point.select(point.name ? point.category in @context.get('value'), true) \
                 for point in points if @context?.get('value')
-
-
-    c._.extend FieldChart::, controls.Control::
 
 
     { FieldChart }

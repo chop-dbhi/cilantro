@@ -1,10 +1,8 @@
 define [
-    'highcharts'
-    'underscore'
-    'backbone'
-    './backbone-charts/options'
-    'plugins/backbone-marionette'
-], (Highcharts, _, Backbone, chartOptions) ->
+    '../core'
+    '../controls'
+    './options'
+], (c, controls, chartOptions) ->
 
 
     # Highcharts options are very nested.. this makes the common ones more
@@ -29,7 +27,7 @@ define [
         series: 'series'
 
 
-    class Chart extends Backbone.Marionette.ItemView
+    class Chart extends controls.Control
         template: ->
 
         chartOptions: chartOptions.defaults
@@ -111,16 +109,9 @@ define [
     class Sparkline extends Chart
         chartOptions: chartOptions.sparkline
 
+    charts = { Chart, AreaChart, AreaSplineChart, BarChart, ColumnChart,
+        LineChart, PieChart, ScatterChart, SplineChart, Sparkline }
 
-    Backbone.Chart = Chart
-    Backbone.AreaChart = AreaChart
-    Backbone.AreaSplineChart = AreaSplineChart
-    Backbone.BarChart = BarChart
-    Backbone.ColumnChart = ColumnChart
-    Backbone.LineChart = LineChart
-    Backbone.PieChart = PieChart
-    Backbone.ScatterChart = ScatterChart
-    Backbone.SplineChart = SplineChart
-    Backbone.Sparkline = Sparkline
+    c._.extend Backbone, charts
 
-    return
+    return charts

@@ -4,7 +4,6 @@ define [
     'inputio'
     'highcharts'
     'plugins/backbone-marionette'
-    'plugins/backbone-charts'
     'plugins/bootstrap'
     'plugins/bootstrap-typeselect'
     'plugins/bootstrap-datepicker'
