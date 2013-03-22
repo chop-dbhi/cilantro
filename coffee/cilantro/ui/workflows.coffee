@@ -1,8 +1,5 @@
 define [
     './core'
-    './charts/dist'
-    './charts/axis'
-    './charts/editable'
+    './workflows/query'
 ], (c, mods...) ->
-
     c._.extend {}, mods...

@@ -3,7 +3,48 @@ require(['jquery', 'mediator'], function($, mediator) {
     var __slice = [].slice,
          _publish = mediator.publish,
         expanded = false,
-        stream = $('#stream ul');
+        stream = $('#stream ul'),
+
+        navigator = $('#gallery-nav'),
+        navToggle = $('#gallery-nav-toggle'),
+
+        previewArea = $('#preview-area'),
+        // For adjusting the span class..
+        previewParent = previewArea.parent(),
+
+        // For re-attaching the navigator..
+        mainRow = navigator.parent();
+
+
+    navToggle.click(function() {
+        navigator.toggleState();
+    });
+
+    navigator.toggleState = function() {
+        if (navigator.is(':visible')) {
+            navigator.collapse();
+        } else {
+            navigator.expand();
+        }
+    }
+
+    navigator.collapse = function() {
+        if (navigator.is(':visible')) {
+            navigator.detach();
+            previewArea.removeClass('preview-ui');
+            previewParent.toggleClass('span8 span12');
+            navToggle.text('Show Nav');
+        }
+    }
+
+    navigator.expand = function() {
+        if (!navigator.is(':visible')) {
+            navigator.prependTo(mainRow);
+            previewArea.addClass('preview-ui');
+            previewParent.toggleClass('span8 span12');
+            navToggle.text('Hide Nav');
+        }
+    }
 
     // Wrapper for adding items to the stream. Each argument is JSON.stringified
     // and rendered in a `pre'
@@ -59,8 +100,7 @@ require(['jquery', 'mediator'], function($, mediator) {
     // Build navigation
     var i, color, swatch, link, view, region, layout;
     
-    var area = $('#preview-area'),
-        swatches = $('#swatches ul'),
+    var swatches = $('#swatches ul'),
         components = $('#components ul');
 
     // Add background color options
@@ -76,7 +116,7 @@ require(['jquery', 'mediator'], function($, mediator) {
 
     // Bind click to switch between background colors
     swatches.on('click', '.swatch', function(event) {
-        area.css('background-color', $(this).css('background-color'));
+        previewArea.css('background-color', $(this).css('background-color'));
     });
 
     // Constructs the list items and links for loading modules
@@ -104,6 +144,7 @@ require(['jquery', 'mediator'], function($, mediator) {
     moduleLinks('Views', this.views);
     moduleLinks('Regions', this.regions);
     moduleLinks('Layouts', this.layouts);            
+    moduleLinks('Workflows', this.workflows);
 
     // Bind click to load modules
     components.on('click', 'a', function(event) {
@@ -117,11 +158,12 @@ require(['jquery', 'mediator'], function($, mediator) {
             .removeClass('active');
 
         // The module is expected to return a callback that takes
-        // the preview area DOM element. This primarily is useful
-        // for rendering the view at an arbitary time (e.g. when
-        // data finally loads).
+        // the preview area DOM element. This primarily is 
+        // useful for rendering the view at an arbitary 
+        // time (e.g. when data finally loads)
+
         require([modname], function(handler) {
-            handler(area);
+            handler(previewArea, navigator);
         });
     });
 

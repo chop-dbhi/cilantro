@@ -26,10 +26,19 @@ define ->
 
         plotOptions:
             series:
+                cursor: 'pointer'
                 shadow: false
+                borderWidth: 1
+                borderColor: 'black'
                 animation:
                     duration: 400
-
+                color: '#cbcbcb'
+                states: 
+                    select:
+                        color: '#91e7f7'
+                        borderWidth: 3
+                    hover:
+                        enabled: false
             area:
                 lineWidth: 1
                 shadow: false

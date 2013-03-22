@@ -78,6 +78,7 @@ define [
         isRejected: ->
             @state() is 'rejected'
 
+    Deferrable.ready = Deferrable.when
     Deferrable.resolveWith = Deferrable.resolve
     Deferrable.rejectWith = Deferrable.reject
 
