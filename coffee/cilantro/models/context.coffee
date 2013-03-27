@@ -92,6 +92,7 @@ define [
             if destroy
                 node.destroy() for node in (@get('children') or [])
             @set('children', [])
+            return @
 
 
     class ConditionNodeModel extends ContextNodeModel
@@ -132,11 +133,12 @@ define [
             if @isNew() then return super
             return @get('_links').self.href
 
-        constructor: ->
+        constructor: (attrs, options={}) ->
+            options.parse = true
             @root = new BranchNodeModel
                 type: 'and'
                 children: []
-            super
+            super attrs, options
 
             @on 'sync', ->
                 @resolve()
@@ -226,6 +228,7 @@ define [
 
         clear: (args...) ->
             @root.clear args...
+            return @
 
 
     class ContextCollection extends c.Backbone.Collection
