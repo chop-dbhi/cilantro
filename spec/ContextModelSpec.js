@@ -25,6 +25,16 @@ define(['cilantro', 'text!../../mock/contexts.json'], function (c, mocks) {
             });
             expect(model.isValid()).toBe(true);
         });
+
+        it('should fetch itself', function() {
+            var model = new c.models.ContextNodeModel({
+                field: 3,
+                operator: 'exact',
+                value: 30
+            });
+
+            expect(model.fetch({field: 3})).toBe(model);
+        });
     });
 
     describe('ConditionNodeModel', function() {
@@ -92,6 +102,16 @@ define(['cilantro', 'text!../../mock/contexts.json'], function (c, mocks) {
             model.add(node);
             model.clear();
             expect(model.get('children').length).toBe(0);
+        });
+
+        it('should fetch child node (by field)', function() {
+            model.add(node);
+            expect(model.fetch({field: 1})).toBe(node);
+        });
+
+        it('should fetch child node (by concept)', function() {
+            model.add(node);
+            expect(model.fetch({concept: 1})).toBe(node);
         });
 
         it('should not deep validate', function() {

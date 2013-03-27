@@ -5,6 +5,14 @@ define [
     class ContextNodeError extends Error
 
 
+    queryAttrs = (attrs, query) ->
+        if attrs instanceof ContextNodeModel
+            attrs = attrs.attributes
+        if query.concept? and attrs.concept is query.concept
+            return true
+        if query.field? and attrs.field is query.field
+            return true
+        return false
 
 
     # Represents a single node within a ContextModel tree. Non-branch nodes
@@ -26,6 +34,9 @@ define [
         isTyped: ->
             @attributes.field? or @attributes.concept?
 
+        fetch: (query) ->
+            if queryAttrs(@, query)
+                return @
 
     # Branch-type node that acts as a container for other nodes. The `type`
     # determines the conditional relationship between the child nodes.
@@ -47,6 +58,18 @@ define [
                             return message
             return
 
+        fetch: (query) ->
+            if (node = super) then return node
+
+            children = @get('children')
+            for child, i in children
+                if queryAttrs(child, query)
+                    # If this a match, convert the child into an instance
+                    # for downstream use.
+                    if not (child instanceof ContextNodeModel)
+                        child = children[i] = getContextNodeModel(child)
+                    return child
+            return
 
         toJSON: ->
             json = super
@@ -217,6 +240,9 @@ define [
 
         isArchived: ->
             @get 'archived'
+
+        fetch: (args...) ->
+            @root.fetch args...
 
         add: (args...) ->
             @root.add args...
