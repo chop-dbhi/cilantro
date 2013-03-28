@@ -1,4 +1,4 @@
-define(['cilantro', 'text!../../mock/contexts.json'], function (c, mocks) {
+define(['cilantro'], function (c) {
 
     describe('ContextNodeModel (base class)', function() {
         it('should validate as condition', function() {
@@ -34,6 +34,32 @@ define(['cilantro', 'text!../../mock/contexts.json'], function (c, mocks) {
             });
 
             expect(model.fetch({field: 3})).toBe(model);
+        });
+
+        describe('Local vs. public attributes', function() {
+            var model;
+            beforeEach(function() {
+                model = new c.models.ContextNodeModel({
+                    field: 3,
+                    operator: 'exact',
+                    value: 30
+                });
+            });
+
+            it('should create a copy of the internal attributes', function() {
+                expect(model.publicAttributes).toEqual(model.attributes);
+            });
+
+            it('toJSON should not reflect local attributes on set...', function() {
+                model.set('value', 50);
+                expect(model.toJSON()).not.toEqual(model.attributes);
+            });
+
+            it('...until save is called', function() {
+                model.set('value', 50);
+                model.save();
+                expect(model.toJSON()).toEqual(model.attributes);
+            });
         });
     });
 
@@ -131,6 +157,31 @@ define(['cilantro', 'text!../../mock/contexts.json'], function (c, mocks) {
             expect(function() {
                 model.add(model.attributes);
             }).toThrow();
+        });
+
+        describe('Local vs. Public attributes', function() {
+
+            it('toJSON should recurse on public attributes', function() {
+                model.add(node);
+
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
+                });
+
+                model.save();
+
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        field: 1,
+                        concept: 1,
+                        value: 30,
+                        operator: 'exact'
+                    }]
+                });
+            });
+
         });
     });
 

@@ -19,8 +19,18 @@ define [
     # must be carefully handled and not removed from the tree unless explicitly
     # removed
     class ContextNodeModel extends c.Backbone.Model
-        # Individual nodes cannot be synced with the server..
-        sync: ->
+        initialize: ->
+            # Save the initial state of the internal attributes
+            @save()
+
+        toJSON: ->
+            @publicAttributes
+
+        # Override to create a deep copy of the internal attributes
+        # into the savedAttributes. This will must be called to make
+        # the attributes visible (via toJSON) for upstream callers
+        save: ->
+            @publicAttributes = c.dom.extend true, {}, @attributes
 
         validate: (attrs, options) ->
             try
@@ -37,6 +47,7 @@ define [
         fetch: (query) ->
             if queryAttrs(@, query)
                 return @
+
 
     # Branch-type node that acts as a container for other nodes. The `type`
     # determines the conditional relationship between the child nodes.
