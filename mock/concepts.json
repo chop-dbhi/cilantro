@@ -387,5 +387,99 @@
         "keywords": "",
         "id": 8,
         "name": "Review of Systems"
+    },
+    {
+        "_links": {
+            "self": {
+                "href": "/mock/concepts/number.json",
+                "rel": "self"
+            }
+        },
+        "archived": false,
+        "category": {
+            "id": 4,
+            "name": "CBC",
+            "order": 3.1,
+            "parent": {
+                "id": 2,
+                "name": "Medical",
+                "order": 3.0
+            }
+        },
+        "description": "Patient Diagnosis",
+        "fields": [
+            {
+                "_links": {
+                    "distribution": {
+                        "href": "/mock/fields/number-dist.json",
+                        "rel": "data"
+                    },
+                    "self": {
+                        "href": "/mock/fields/number.json",
+                        "rel": "self"
+                    },
+                    "stats": {
+                        "href": "/mock/fields/number-stats.json",
+                        "rel": "data"
+                    },
+                    "values": {
+                        "href": "/gallery/extensions/vocab/mock/diagnoses.json",
+                        "rel": "data"
+                    }
+                },
+                "app_name": "openmrs",
+                "archived": false,
+                "category": null,
+                "data_modified": null,
+                "description": "Patient Diagnosis",
+                "enumerable": false,
+                "field_name": "diagnosis",
+                "id": 30,
+                "internal_type": "float",
+                "keywords": "",
+                "model_name": "diagnosis",
+                "modified": "2012-10-03 21:02:38",
+                "name": "Diagnosis",
+                "nullable": true,
+                "operators": [
+                    [
+                        "in",
+                        "in"
+                    ],
+                    [
+                        "-in",
+                        "not in"
+                    ],
+                    [
+                        "only",
+                        "only be"
+                    ],
+                    [
+                        "all",
+                        "require all"
+                    ],
+                    [
+                        "-all",
+                        "can not have"
+                    ]
+                ],
+                "plural_name": "Hemoglobin (HGB)s",
+                "plural_unit": "",
+                "published": true,
+                "searchable": false,
+                "simple_type": "number",
+                "unit": ""
+            }
+        ],
+        "formatter_name": "Formatter",
+        "id": 28,
+        "keywords": "",
+        "modified": "2012-10-11 09:56:23",
+        "name": "Diagnosis",
+        "order": null,
+        "plural_name": "Diagnoses",
+        "published": true,
+        "queryview": "QueryView",
+        "sortable": true
     }
 ]

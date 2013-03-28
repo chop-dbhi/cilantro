@@ -76,13 +76,29 @@ define ['../../core'
 
             # Initialize a ConceptForm view if not already present.
             # And the corresponding history item
-            if not (view = @itemsViews[model.id])?
-                view = new form.ConceptForm
-                    model: model
+            if (view = @itemsViews[model.id])?
+                @setCurrentView(view)
+                return
 
-                @itemsViews[model.id] = view
-                @log.currentView.add(model)
+            # Determine if this is registered as a custom concept
+            customForm = c.getOption('concepts.forms.#{@model.id}')
+            if customForm?
+                require [customForm.module], (CustomForm) =>
+                    options = customForm.options or {}
+                    options.model = model
+                    @createView(CustomForm, options)
+            else
+                    @createView(form.ConceptForm, model: model)
 
+        createView: (ConceptForm, options) =>
+            view = new ConceptForm(options)
+
+            @ItemView[options.model.id] = view
+            @log.currentView.add(options.model)
+
+            @setCurrentView(view)
+
+        setCurrentView: (view) ->
             @currentView = view
             @main.show(view)
 
