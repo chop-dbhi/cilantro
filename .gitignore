@@ -6,3 +6,4 @@ build
 css/style.css
 .idea
 node_modules
+gallery/extensions
