@@ -5,4 +5,4 @@
 build
 css/style.css
 .idea
-phantom-jasmine
+node_modules

@@ -1,4 +1,4 @@
-define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!../../mock/concepts.json'], 
+define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/concepts.json'], 
     function (_, charts, models, mocks) {
 
     describe("Spy FieldChart", function(){
