@@ -93,7 +93,7 @@ define ['../../core'
         createView: (ConceptForm, options) =>
             view = new ConceptForm(options)
 
-            @ItemView[options.model.id] = view
+            @itemView[options.model.id] = view
             @log.currentView.add(options.model)
 
             @setCurrentView(view)
