@@ -9,6 +9,7 @@ PID_FILE = .watch-pid
 
 SASS_DIR = ${PWD}/scss
 CSS_DIR = ${PWD}/css
+IMG_DIR = ${PWD}/img
 
 COMPILE_SASS = `which sass` --scss --style=compressed \
 			   -r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
@@ -29,12 +30,17 @@ sass:
 	@echo 'Compiling Sass...'
 	@mkdir -p ${CSS_DIR}
 	@${COMPILE_SASS} --update
-	# Compile extension sass
+	@echo 'Compiling extensions Sass...'
 	@for dir in ${PWD}/extensions/*/; do \
 	    ext=`basename $${dir%*/}`; mkdir -p ${CSS_DIR}/$$ext; \
         `which sass` --scss --style=compressed \
 		-r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
 		${PWD}/extensions/$$ext/scss:${CSS_DIR}/$$ext --update; done;
+	@echo 'Putting extension images in place...'
+	@for dir in ${PWD}/extensions/*/; do \
+	    ext=`basename $${dir%*/}`; mkdir -p ${IMG_DIR}/$$ext; \
+	   	cp ${PWD}/extensions/$$ext/images/*.* ${IMG_DIR}/$$ext; done;
+
 
 coffee:
 	@echo 'Compiling CoffeeScript...'
@@ -59,9 +65,10 @@ combine: coffee
 	@echo 'Combining JavaScript...'
 	@cp -r ${JAVASCRIPT_DIR}/* ${BUILD_DIR}
 	@ln -sf ${TMPL_DIR} ${BUILD_DIR}
+	@echo 'Putting extension JavaScript templates in place...'
 	@for dir in ${PWD}/extensions/*/; do \
-	    dir=`basename $${dir%*/}`; mkdir -p ${TMPL_DIR}/$$dir; \
-	   	cp ${PWD}/extensions/$$dir/templates/*.html ${TMPL_DIR}/$$dir; done;
+	    ext=`basename $${dir%*/}`; mkdir -p ${TMPL_DIR}/$$ext; \
+	   	cp ${PWD}/extensions/$$ext/templates/*.html ${TMPL_DIR}/$$ext; done;
 
 optimize: combine
 	@echo 'Optimizing JavaScript...'
