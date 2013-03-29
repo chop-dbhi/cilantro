@@ -52,6 +52,9 @@ combine: coffee
 	@echo 'Combining JavaScript...'
 	@cp -r ${JAVASCRIPT_DIR}/* ${BUILD_DIR}
 	@ln -sf ${TMPL_DIR} ${BUILD_DIR}
+	@for dir in ${PWD}/extensions/*/; do \
+	    dir=`basename $${dir%*/}`; mkdir -p ${TMPL_DIR}/$$dir; \
+	   	cp ${PWD}/extensions/$$dir/templates/*.html ${TMPL_DIR}/$$dir; done;
 
 optimize: combine
 	@echo 'Optimizing JavaScript...'
