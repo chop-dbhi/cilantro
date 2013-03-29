@@ -7,3 +7,6 @@ css/style.css
 .idea
 node_modules
 gallery/extensions
+extensions/
+templates/vocab/
+harvest-vocab/
