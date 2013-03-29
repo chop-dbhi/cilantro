@@ -4,9 +4,10 @@
 .watch-pid
 build
 css/style.css
+css/vocab/
 .idea
 node_modules
 gallery/extensions
 extensions/
 templates/vocab/
-harvest-vocab/
+harvest-vocab
