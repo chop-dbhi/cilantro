@@ -14,6 +14,7 @@ COMPILE_SASS = `which sass` --scss --style=compressed \
 			   -r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
 			   ${SASS_DIR}:${CSS_DIR}
 
+
 COFFEE_JITTER = `which jitter` ${COFFEE_DIR} ${BUILD_DIR}
 COMPILE_COFFEE = `which coffee` -b -o ${BUILD_DIR} -c ${COFFEE_DIR}
 WATCH_COFFEE = `which coffee` -w -b -o ${BUILD_DIR} -c ${COFFEE_DIR}
@@ -28,6 +29,12 @@ sass:
 	@echo 'Compiling Sass...'
 	@mkdir -p ${CSS_DIR}
 	@${COMPILE_SASS} --update
+	# Compile extension sass
+	@for dir in ${PWD}/extensions/*/; do \
+	    ext=`basename $${dir%*/}`; mkdir -p ${CSS_DIR}/$$ext; \
+        `which sass` --scss --style=compressed \
+		-r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
+		${PWD}/extensions/$$ext/scss:${CSS_DIR}/$$ext --update; done;
 
 coffee:
 	@echo 'Compiling CoffeeScript...'
