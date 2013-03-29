@@ -39,7 +39,7 @@ sass:
 	@echo 'Putting extension images in place...'
 	@for dir in ${PWD}/extensions/*/; do \
 	    ext=`basename $${dir%*/}`; mkdir -p ${IMG_DIR}/$$ext; \
-	   	cp ${PWD}/extensions/$$ext/images/*.* ${IMG_DIR}/$$ext; done;
+	   	cp ${PWD}/extensions/$$ext/img/*.* ${IMG_DIR}/$$ext; done;
 
 
 coffee:
