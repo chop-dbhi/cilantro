@@ -81,7 +81,7 @@ define ['../../core'
                 return
 
             # Determine if this is registered as a custom concept
-            customForm = c.getOption('concepts.forms.#{@model.id}')
+            customForm = c.getOption("concepts.forms.#{ model.id }")
             if customForm?
                 require [customForm.module], (CustomForm) =>
                     options = customForm.options or {}
