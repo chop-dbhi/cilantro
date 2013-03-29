@@ -397,14 +397,10 @@
         },
         "archived": false,
         "category": {
-            "id": 4,
-            "name": "CBC",
-            "order": 3.1,
-            "parent": {
-                "id": 2,
-                "name": "Medical",
-                "order": 3.0
-            }
+            "id": 9,
+            "name": "Custom",
+            "order": 5,
+            "parent": null
         },
         "description": "Patient Diagnosis",
         "fields": [
@@ -472,7 +468,7 @@
             }
         ],
         "formatter_name": "Formatter",
-        "id": 28,
+        "id": 31,
         "keywords": "",
         "modified": "2012-10-11 09:56:23",
         "name": "Diagnosis",
