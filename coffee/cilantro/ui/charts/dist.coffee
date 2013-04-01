@@ -17,7 +17,7 @@ define [
 
         initialize: ->
             super
-            @context = @options.data.context
+            @context = @options.context
 
         chartClick: (event) =>
             category = event.point.category ? event.point.name
