@@ -15,21 +15,10 @@ define [
 
         template: templates.control
 
-        options:
-            # A flag denoting whether or not this FieldControl is managed
-            # by a ConceptControlView. Managed views have their validation errors
-            # caught by the parent view. Default to false
-            managed: true
-
         events:
             'keyup input': 'change'
             'change select': 'change'
             'click input[type=radio],input[type=checkbox]': 'change'
-
-        ui:
-            add: '.actions .add'
-            remove: '.actions .remove'
-            update: '.actions .update'
 
         constructor: ->
             super
@@ -80,28 +69,6 @@ define [
         # Triggered any time the control contents have changed
         change: (event) ->
             @trigger 'change', @, @get()
-
-        # Creates a new node with the control contents
-        add: ->
-            @node = node = new c.models.ContextNode @get()
-            @_nodeCache[node.cid] = node
-            if @options.managed
-                @ui.add.hide()
-                @ui.update.show()
-            @trigger 'add', @, node
-
-        # Updates the current node with the control contents
-        update: ->
-            @node.set @get()
-            @trigger 'update', @, @node
-
-        # Removes a node, but leaves the control contents alone.
-        remove: (cid) ->
-            node = @_deferenceNode cid
-            @trigger 'remove', @, node
-            if @managed and not @node
-                @ui.update.hide()
-                @ui.add.show()
 
 
     # Selectors of elements that pertain to the data attribute

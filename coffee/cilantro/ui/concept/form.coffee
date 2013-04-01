@@ -55,6 +55,17 @@ define [
             # Base the context off the current session
             @manager.setContext(c.data.contexts.getSession())
 
+        events:
+            'click .concept-actions [data-toggle=add]': 'save'
+            'click .concept-actions [data-toggle=update]': 'save'
+            'click .concept-actions [data-toggle=remove]': 'clear'
+
+        ui:
+            actions: '.concept-actions'
+            add: '.concept-actions [data-toggle=add]'
+            remove: '.concept-actions [data-toggle=remove]'
+            update: '.concept-actions [data-toggle=update]'
+
         regions:
             main: '.concept-main'
             chart: '.concept-chart'
@@ -92,6 +103,22 @@ define [
             @main.show(mainForm)
             @chart.show(mainChart) if mainChart?
             @fields.show(fields)
+
+        # Saves the current state of the context which enables it to be
+        # synced with the server.
+        save: ->
+            @manager.context.save()
+            @ui.add.hide()
+            @ui.update.show()
+            @ui.remove.show()
+
+        # Clears the local context of conditions
+        clear: ->
+            @manager.context.clear()
+            @manager.context.save()
+            @ui.add.show()
+            @ui.update.hide()
+            @ui.remove.hide()
 
 
     { ConceptForm }
