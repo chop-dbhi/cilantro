@@ -38,7 +38,7 @@ define [
         regions:
             main: '.field-main'
             stats: '.field-stats'
-            controls: '.field-controls'
+            control: '.field-control'
             chart: '.field-chart'
 
         # Map corresponding view class to region. This makes it
@@ -47,7 +47,7 @@ define [
         regionViews:
             main: item.Field
             stats: stats.FieldStats
-            controls: controls.FieldControl
+            control: controls.FieldControl
 
         onRender: ->
             for key, klass of c._.result @, 'regionViews'
