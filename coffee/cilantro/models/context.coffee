@@ -30,7 +30,8 @@ define [
         # into the savedAttributes. This will must be called to make
         # the attributes visible (via toJSON) for upstream callers
         save: ->
-            @publicAttributes = c.dom.extend true, {}, @attributes
+            @publicAttributes = c._.clone @attributes
+            return
 
         validate: (attrs, options) ->
             try
@@ -80,6 +81,18 @@ define [
                     if not (child instanceof ContextNodeModel)
                         child = children[i] = getContextNodeModel(child)
                     return child
+            return
+
+        save: ->
+            super
+            attrs = @publicAttributes
+            children = []
+            # Recurse on children to ensure no node instances are present
+            for child, i in attrs.children
+                if child instanceof ContextNodeModel
+                    child = child.publicAttributes
+                children.push(child)
+            attrs.children = children
             return
 
         toJSON: ->
