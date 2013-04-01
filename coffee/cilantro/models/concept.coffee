@@ -17,7 +17,7 @@ define ['../core', './field'], (c, field) ->
 
         initialize: ->
             super
-            c.subscribe c.SESSION_OPENED, => @fetch()
+            c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
             @on 'reset', @resolve
 
