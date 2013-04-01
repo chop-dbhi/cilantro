@@ -6,7 +6,8 @@
     "language": {
         "operator": "exact",
         "language": "Hemoglobin (HGB) is equal to 17",
-        "id": 30,
+        "field": 30,
+        "concept": 28,
         "value": 17
     },
     "created": "2013-02-14 16:05:35",
@@ -15,9 +16,9 @@
     "modified": "2013-02-19 13:19:39",
     "json": {
         "operator": "exact",
-        "id": 30,
+        "field": 30,
         "value": 17,
-        "concept_id": 28
+        "concept": 28
     },
     "session": true,
     "_links": {

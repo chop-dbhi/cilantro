@@ -59,7 +59,7 @@ define ['../core'], (c) ->
         initialize: ->
             super
             # TODO change this to use Marionette's app initializer
-            c.subscribe c.SESSION_OPENED, => @fetch()
+            c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
             @on 'reset', @resolve
 		
