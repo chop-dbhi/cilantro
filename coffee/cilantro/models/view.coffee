@@ -96,7 +96,7 @@ define [
         initialize: ->
             super
             c.subscribe c.SESSION_OPENED, =>
-                @fetch().done => @ensureSession()
+                @fetch(reset: true).done => @ensureSession()
             c.subscribe c.SESSION_CLOSED, => @reset()
 
             # Mimic the initial sync for each model

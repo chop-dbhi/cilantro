@@ -422,7 +422,7 @@ define [
         initialize: ->
             super
             c.subscribe c.SESSION_OPENED, =>
-                @fetch().done =>
+                @fetch(reset: true).done =>
                     @ensureSession()
                     @resolve()
             c.subscribe c.SESSION_CLOSED, => @reset()
