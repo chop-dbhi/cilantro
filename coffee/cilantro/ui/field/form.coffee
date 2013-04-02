@@ -63,23 +63,36 @@ define [
                     context: @context
                 @chart.show chart
 
-            if @options.managed then @ui.actions.hide() else @ui.actions.show()
+            @setDefaultState()
+
+        setDefaultState: ->
+            if @options.managed then @ui.actions.hide()
+            if @context.isValid()
+                @setUpdateState()
+            else
+                @setNewState()
+
+        setUpdateState: ->
+            @ui.add.hide()
+            @ui.update.show()
+            @ui.remove.show()
+
+        setNewState: ->
+            @ui.add.show()
+            @ui.update.hide()
+            @ui.remove.hide()
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
         save: ->
             @context.save()
-            @ui.add.hide()
-            @ui.update.show()
-            @ui.remove.show()
+            if @options.managed then @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
             @context.clear()
             @context.save()
-            @ui.add.show()
-            @ui.update.hide()
-            @ui.remove.hide()
+            if @options.managed then @setNewState()
 
 
     { FieldForm }

@@ -119,33 +119,47 @@ define [
             fieldForms = new c.Marionette.CollectionView
                 itemView: field.FieldForm
 
-                itemViewOptions: (model) =>
-                   showChart: false
-                   context: @manager.getFieldContext(model.id)
-
                 # New collection for locally managing the fields..
                 collection: new c.Backbone.Collection(conceptFields)
 
+                itemViewOptions: (model) =>
+                    showChart: false
+                    context: @manager.getFieldContext(model.id)
+
             @fields.show(fieldForms)
 
+        setDefaultState: ->
+            # If this is valid field-level context update the state
+            # of the concept form. Only one of the fields need to be
+            # valid to update the context
+            if @context.isValid()
+                @setUpdateState()
+            else
+                @setNewState()
+
+        setUpdateState: ->
+            @ui.add.hide()
+            @ui.update.show()
+            @ui.remove.show()
+
+        setNewState: ->
+            @ui.add.show()
+            @ui.update.hide()
+            @ui.remove.hide()
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
         save: (options) ->
             options = c._.extend(deep: @options.managed, options)
             @context.save(options)
-            @ui.add.hide()
-            @ui.update.show()
-            @ui.remove.show()
+            @setUpdateState()
 
         # Clears the local context of conditions
         clear: (options) ->
             options = c._.extend(deep: @options.managed, options)
             @context.clear(options)
             @context.save(options)
-            @ui.add.show()
-            @ui.update.hide()
-            @ui.remove.hide()
+            @setNewState()
 
 
     { ConceptForm }
