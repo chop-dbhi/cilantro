@@ -97,7 +97,7 @@ define(['cilantro'], function (c) {
         });
 
         it('should validate', function() {
-            expect(model.isValid()).toBe(true);
+            expect(model.isValid({deep: false})).toBe(true);
         });
 
         it('should deep validate', function() {
@@ -169,7 +169,7 @@ define(['cilantro'], function (c) {
                     children: []
                 });
 
-                model.save();
+                model.save({deep: false});
 
                 expect(model.toJSON()).toEqual({
                     type: 'and',
@@ -186,7 +186,7 @@ define(['cilantro'], function (c) {
                 model.add(node);
                 node.set('value', 50);
 
-                model.save();
+                model.save({deep: false});
 
                 expect(model.toJSON()).toEqual({
                     type: 'and',

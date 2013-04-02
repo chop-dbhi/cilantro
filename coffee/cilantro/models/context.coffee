@@ -55,9 +55,11 @@ define [
     class BranchNodeModel extends ContextNodeModel
         nodeType: 'branch'
 
-        validate: (attrs, options={}) ->
+        validate: (attrs, options) ->
             if not (attrs.type is 'and' or attrs.type is 'or')
                 return 'Not a valid branch node'
+
+            options = c._.extend deep: true, options
 
             # Recurse children and validate
             if options.deep
@@ -85,7 +87,8 @@ define [
 
         # If this is a deep save, recursively save children prior to
         # creating a copy to publicAttributes.
-        save: (options={}) ->
+        save: (options) ->
+            options = c._.extend deep: true, options
             super
             attrs = @publicAttributes
             children = []
