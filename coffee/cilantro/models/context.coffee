@@ -29,9 +29,10 @@ define [
         # Override to create a copy of the internal attributes for exposing
         # as `public` attributes. This will must be called to make
         # the attributes visible (via toJSON) for upstream callers
-        save: ->
-            @publicAttributes = c._.clone @attributes
-            return
+        save: (options) ->
+            if (isValid = @isValid(options))
+                @publicAttributes = c._.clone @attributes
+            return isValid
 
         validate: (attrs, options) ->
             try
@@ -67,9 +68,8 @@ define [
                     if child instanceof ContextNodeModel
                         if not child.isValid(options)
                             return child.validationError
-                    else
-                        if (message = ContextNodeModel::validate.call(null, child, options))
-                            return message
+                    else if (message = ContextNodeModel::validate.call(null, child, options))
+                        return message
             return
 
         fetch: (query) ->
@@ -88,18 +88,39 @@ define [
         # If this is a deep save, recursively save children prior to
         # creating a copy to publicAttributes.
         save: (options) ->
-            options = c._.extend deep: true, options
-            super
+            options = c._.extend
+                deep: true
+                ignore: true
+                strict: false
+            , options
+
+            if not super(deep: false) then return false
+
             attrs = @publicAttributes
             children = []
+
             # Recurse on children to ensure no node instances are present
             for child in attrs.children
                 if child instanceof ContextNodeModel
-                    if options.deep then child.save(options)
-                    child = child.publicAttributes
-                children.push(child)
+                    # Save child node if the deep option is passed. If strict
+                    # if true, any validation error will cause the save to fail
+                    if options.deep
+                        if child.save(options)
+                            child = child.publicAttributes
+                        else
+                            if options.strict
+                                return false
+                            # Invalid children can be ignored (excluded from the array)
+                            # otherwise the previous state is maintained
+                            child = if options.ignore then null else child.publicAttributes
+                    else
+                        child = child.publicAttributes
+
+                # Only if the child is not empty, append to the output
+                if child? then children.push(child)
+
             attrs.children = children
-            return
+            return true
 
         toJSON: ->
             attrs = super

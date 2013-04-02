@@ -50,15 +50,22 @@ define(['cilantro'], function (c) {
                 expect(model.publicAttributes).toEqual(model.attributes);
             });
 
-            it('toJSON should not reflect local attributes on set...', function() {
+            it('toJSON should not reflect local attributes on set', function() {
                 model.set('value', 50);
                 expect(model.toJSON()).not.toEqual(model.attributes);
             });
 
-            it('...until save is called', function() {
+            it('toJSON should reflect local attributes after save', function() {
                 model.set('value', 50);
                 model.save();
                 expect(model.toJSON()).toEqual(model.attributes);
+            });
+
+            it('toJSON should not change on an invalid state', function() {
+                model.set('value', null);
+                model.save();
+                expect(model.toJSON()).not.toEqual(model.attributes);
+                expect(model.toJSON().value).toEqual(30);
             });
         });
     });
@@ -217,6 +224,61 @@ define(['cilantro'], function (c) {
                 });
             });
 
+            it('toJSON should not include invalid children by default', function() {
+                model.add(node);
+
+                expect(model.save()).toBe(true);
+
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        field: 1,
+                        concept: 1,
+                        value: 30,
+                        operator: 'exact'
+                    }]
+                });
+
+                // Make the node invalid
+                node.set('value', null);
+
+                // Still considered valid since the branch itself is valid
+                expect(model.save({ignore: false})).toBe(true);
+
+                // Invalid node not saved
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        field: 1,
+                        concept: 1,
+                        value: 30,
+                        operator: 'exact'
+                    }]
+                });
+
+                // Still considered valid since the branch itself is valid
+                expect(model.save()).toBe(true);
+
+                // Invalid node not saved
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
+                });
+
+                expect(model.save({strict: true})).toBe(false);
+
+                // Invalid node not saved
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        field: 1,
+                        concept: 1,
+                        value: 30,
+                        operator: 'exact'
+                    }]
+                });
+
+            });
         });
     });
 
