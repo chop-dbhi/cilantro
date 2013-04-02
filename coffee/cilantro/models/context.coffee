@@ -141,10 +141,25 @@ define [
             @set('children', children)
             return @
 
-        clear: (destroy) ->
-            if destroy
-                node.destroy() for node in (@get('children') or [])
-            @set('children', [])
+        clear: (options) ->
+            options = c._.extend
+                deep: true
+                destroy: false
+            , options
+
+            if options.deep or options.destroy
+                children = []
+
+                # Recurse on children to ensure no node instances are present
+                for child in @get('children') or []
+                    if child instanceof ContextNodeModel
+                        if options.destroy
+                            child.destroy()
+                        else
+                            child.clear(options)
+                            children.push(child)
+
+                @set('children', children)
             return @
 
 

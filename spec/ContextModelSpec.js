@@ -124,9 +124,15 @@ define(['cilantro'], function (c) {
             model.remove(node);
         });
 
-        it('should clear', function() {
+        it('should clear (but not destroy)', function() {
             model.add(node);
             model.clear();
+            expect(model.get('children')[0].attributes).toEqual({});
+        });
+
+        it('should clear and destroy', function() {
+            model.add(node);
+            model.clear({destroy: true});
             expect(model.get('children').length).toBe(0);
         });
 
