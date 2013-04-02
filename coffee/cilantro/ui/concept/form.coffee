@@ -49,6 +49,10 @@ define [
 
         template: templates.form
 
+        options:
+            showChart: true
+            chartField: null
+
         constructor: (model) ->
             super model
             @manager = new ConceptContextManager(@model)
@@ -72,37 +76,57 @@ define [
             fields: '.concept-fields'
 
         onRender: ->
-            ungraphedFieldsStart = 0
-            mainField = @model.fields[0]
+            conceptFields = @model.fields[..]
 
-            # Ensure the contexts being set here are the same between mainField
-            # and mainForm
-            if mainField.urls.distribution?
-                ungraphedFieldsStart = 1
-                mainChart = new charts.FieldChart
-                    parentView: @
-                    model: mainField
-                    data:
-                        context: @manager.getFieldContext(mainField.id)
+            # Optionally render the chart if a distribution is available
+            if @options.showChart
+                idx = 0
 
-            mainForm = new field.FieldForm
-                model: mainField
-                context: @manager.getFieldContext(mainField.id)
-                showChart: false
+                if (chartField = @options.chartField)?
+                    # Get the index of the field and ensure it exists for this
+                    # concept
+                    if (idx = conceptFields.indexOf(chartField)) is -1
+                        throw new Error('Field not associated with concept')
 
-            fields = new c.Marionette.CollectionView
+                    # Throw an error for an explicitly defined field if it
+                    # does not support distributions
+                    if not chartField.urls.distribution?
+                        throw new Error('Field does not support distributions')
+
+                if chartField or (chartField = @model.fields[idx]).urls.distribution?
+                    # Remove from remaining concept fields
+                    conceptFields = conceptFields.pop(idx)
+
+                    context = @manager.getFieldContext(chartField.id)
+
+                    # TODO this could display it's own chart.. so there would
+                    # be no need to construct a separate chart here.
+                    mainFieldForm = new field.FieldForm
+                        showChart: false
+                        model: chartField
+                        context: context
+
+                    fieldChart = new charts.FieldChart
+                        parentView: @
+                        model: chartField
+                        context: context
+
+                    @main.show(mainFieldForm)
+                    @chart.show(fieldChart)
+
+
+            fieldForms = new c.Marionette.CollectionView
                 itemView: field.FieldForm
 
                 itemViewOptions: (model) =>
                    showChart: false
                    context: @manager.getFieldContext(model.id)
 
-                collection: new c.Backbone.Collection(@model.fields[ungraphedFieldsStart..])
+                # New collection for locally managing the fields..
+                collection: new c.Backbone.Collection(conceptFields)
 
+            @fields.show(fieldForms)
 
-            @main.show(mainForm)
-            @chart.show(mainChart) if mainChart?
-            @fields.show(fields)
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
