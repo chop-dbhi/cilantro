@@ -14,8 +14,7 @@ define [
             @options = options
 
         setContext: (context) ->
-            # Attempt to fetch the concept-level node (should be a branch unless
-            # this is an unmanaged view)
+            # Fetch the branch relative to the concept.id
             if not (@context = context.fetch(concept: @model.id))
                 # Create a branch-style node to put all field-level nodes inside,
                 # mark it with the concept_id so it can be found later
@@ -26,6 +25,7 @@ define [
 
                 # Add to parent context
                 context.add @context
+            @model.context = @context
             return
 
         getFieldContext: (id) ->
@@ -50,6 +50,7 @@ define [
         template: templates.form
 
         options:
+            managed: true
             showChart: true
             chartField: null
 
@@ -130,16 +131,18 @@ define [
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
-        save: ->
-            @manager.context.save()
+        save: (options) ->
+            options = c._.extend(deep: @options.managed, options)
+            @context.save(options)
             @ui.add.hide()
             @ui.update.show()
             @ui.remove.show()
 
         # Clears the local context of conditions
-        clear: ->
-            @manager.context.clear()
-            @manager.context.save()
+        clear: (options) ->
+            options = c._.extend(deep: @options.managed, options)
+            @context.clear(options)
+            @context.save(options)
             @ui.add.show()
             @ui.update.hide()
             @ui.remove.hide()

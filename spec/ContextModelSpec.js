@@ -182,6 +182,35 @@ define(['cilantro'], function (c) {
                 });
             });
 
+            it('should not recurse unless the deep=true option is passed', function() {
+                model.add(node);
+                node.set('value', 50);
+
+                model.save();
+
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        field: 1,
+                        concept: 1,
+                        value: 30,
+                        operator: 'exact'
+                    }]
+                });
+
+                model.save({deep: true});
+
+                expect(model.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        field: 1,
+                        concept: 1,
+                        value: 50,
+                        operator: 'exact'
+                    }]
+                });
+            });
+
         });
     });
 

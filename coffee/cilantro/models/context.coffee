@@ -19,15 +19,15 @@ define [
     # must be carefully handled and not removed from the tree unless explicitly
     # removed
     class ContextNodeModel extends c.Backbone.Model
-        initialize: ->
+        initialize: (options={}) ->
             # Save the initial state of the internal attributes
-            @save()
+            @save(options)
 
         toJSON: ->
             @publicAttributes
 
-        # Override to create a deep copy of the internal attributes
-        # into the savedAttributes. This will must be called to make
+        # Override to create a copy of the internal attributes for exposing
+        # as `public` attributes. This will must be called to make
         # the attributes visible (via toJSON) for upstream callers
         save: ->
             @publicAttributes = c._.clone @attributes
@@ -83,28 +83,31 @@ define [
                     return child
             return
 
-        save: ->
+        # If this is a deep save, recursively save children prior to
+        # creating a copy to publicAttributes.
+        save: (options={}) ->
             super
             attrs = @publicAttributes
             children = []
             # Recurse on children to ensure no node instances are present
-            for child, i in attrs.children
+            for child in attrs.children
                 if child instanceof ContextNodeModel
+                    if options.deep then child.save(options)
                     child = child.publicAttributes
                 children.push(child)
             attrs.children = children
             return
 
         toJSON: ->
-            json = super
+            attrs = super
             children = []
             # Recurse on children to ensure no node instances are present
-            for child, i in json.children
+            for child in attrs.children
                 if child instanceof ContextNodeModel
                     child = child.toJSON()
                 children.push(child)
-            json.children = children
-            return json
+            attrs.children = children
+            return attrs
 
         # Adds variable number of nodes to branch ensuring the same node
         # is not added twice
