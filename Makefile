@@ -1,5 +1,6 @@
 COFFEE_DIR = ${PWD}/coffee
 JAVASCRIPT_DIR = ${PWD}/js
+EXT_DIR = ${PWD}/extensions
 BUILD_DIR = ${PWD}/build
 DIST_DIR = ${PWD}/dist
 TMPL_DIR = ${PWD}/templates
@@ -30,16 +31,6 @@ sass:
 	@echo 'Compiling Sass...'
 	@mkdir -p ${CSS_DIR}
 	@${COMPILE_SASS} --update
-	@echo 'Compiling extensions Sass...'
-	@for dir in ${PWD}/extensions/*/; do \
-	    ext=`basename $${dir%*/}`; mkdir -p ${CSS_DIR}/$$ext; \
-        `which sass` --scss --style=compressed \
-		-r ${SASS_DIR}/lib/bourbon/lib/bourbon.rb \
-		${PWD}/extensions/$$ext/scss:${CSS_DIR}/$$ext --update; done;
-	@echo 'Putting extension images in place...'
-	@for dir in ${PWD}/extensions/*/; do \
-	    ext=`basename $${dir%*/}`; mkdir -p ${IMG_DIR}/$$ext; \
-	   	cp ${PWD}/extensions/$$ext/img/*.* ${IMG_DIR}/$$ext; done;
 
 
 coffee:
@@ -65,10 +56,9 @@ combine: coffee
 	@echo 'Combining JavaScript...'
 	@cp -r ${JAVASCRIPT_DIR}/* ${BUILD_DIR}
 	@ln -sf ${TMPL_DIR} ${BUILD_DIR}
-	@echo 'Putting extension JavaScript templates in place...'
-	@for dir in ${PWD}/extensions/*/; do \
-	    ext=`basename $${dir%*/}`; mkdir -p ${TMPL_DIR}/$$ext; \
-	   	cp ${PWD}/extensions/$$ext/templates/*.html ${TMPL_DIR}/$$ext; done;
+	@echo 'Putting extensions in place...'
+	@rm -f ${BUILD_DIR}/ext
+	@ln -sf ${EXT_DIR} ${BUILD_DIR}/ext
 
 optimize: combine
 	@echo 'Optimizing JavaScript...'
