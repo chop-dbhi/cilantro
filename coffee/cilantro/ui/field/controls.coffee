@@ -23,50 +23,39 @@ define [
         constructor: ->
             super
 
-            # Cache context nodes by cid
-            @_nodeCache = {}
-
             # Various ways to define the UI elements
             @ui = _.extend {}, @constructor.defaultUI, @ui, @options.ui
             @attrs = _.extend {}, @constructor.defaultAttrs, @attrs, @options.attrs
 
-        # Given a client id, deference the node
-        _deferenceNode: (cid) ->
-            if (node = @_nodeCache[cid])?
-                delete @_nodeCache[cid]
-                # Delete reference here
-                if @node.cid is id then delete @node
-                return node
-
-        # Gets the value corresonding to the property.
-        _getProp: (prop) ->
+        # Gets the value corresonding to the attribute key
+        _getAttr: (prop, type) ->
             if not ($el = @ui[prop])? then return
             if $el.is(FORM_ELEMENTS)
-                InputIO.get($el)
+                InputIO.get($el, type)
             else
-                $el.attr(@options.attrs[prop])
+                $el.attr(@attrs[prop])
 
-        _setProp: (prop, value) ->
+        _setAttr: (prop, value) ->
             if not ($el = @ui[prop])? then return
             if $el.is(FORM_ELEMENTS)
                 InputIO.set($el, value)
             else
-                $el.attr(@options.attrs[prop], value)
+                $el.attr(@attrs[prop], value)
             return
 
-        getId: -> @model.id or @_getProp('id')
-        getOperator: -> @_getProp('operator')
-        getValue: -> @_getProp('value')
-        getNulls: -> @_getProp('nulls')
+        getId: -> @model?.id or @_getAttr('id')
+        getOperator: -> @_getAttr('operator', 'string')
+        getValue: -> @_getAttr('value', @model?.get('simple_type'))
+        getNulls: -> @_getAttr('nulls', 'boolean')
 
-        setId: (value) -> not @model.id and @_setProp('id', value)
-        setOperator: (value) -> @_setProp('operator', value)
-        setValue: (value) -> @_setProp('value', value)
-        setNulls: (value) -> @_setProp('nulls', Boolean(value))
+        setId: (value) -> not @model?.id and @_setAttr('id', value)
+        setOperator: (value) -> @_setAttr('operator', value)
+        setValue: (value) -> @_setAttr('value', value)
+        setNulls: (value) -> @_setAttr('nulls', Boolean(value))
 
-        reset: -> @set()
-
-        # Triggered any time the control contents have changed
+        # Triggered any time the control contents have changed. Upstream, the
+        # context can be bound to this event and update itself as changes
+        # occur.
         change: (event) ->
             @trigger 'change', @, @get()
 

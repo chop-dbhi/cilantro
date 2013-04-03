@@ -20,7 +20,7 @@
 
     getType = ($el) -> $el.attr('data-type') or $el.attr('type')
 
-    get = (selector) ->
+    get = (selector, type) ->
         multi = false
 
         # Remove disabled fields from the set
@@ -38,7 +38,7 @@
         # Multi-selects are handled by jQuery
         if $el.is 'select[multiple]'
             multi = true
-            value = coerce($el.val(), getType($el))
+            value = coerce($el.val(), type or getType($el))
         # Get values with multiple elements in the set. It is assumed
         # the selector is targeted to a group of elements representing
         # one or more values such as range query.
@@ -48,9 +48,9 @@
             value = []
             for e in $el
                 $e = $(e)
-                value.push(coerce($e.val(), getType($e)))
+                value.push(coerce($e.val(), type or getType($e)))
         else
-            value = coerce($el.val(), getType($el))
+            value = coerce($el.val(), type or getType($el))
 
         # Handle empty values
         if not value? or value is ''
