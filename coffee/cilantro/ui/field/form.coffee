@@ -67,7 +67,7 @@ define [
 
         setDefaultState: ->
             if @options.managed then @ui.actions.hide()
-            if @context.isValid()
+            if @context?.isValid()
                 @setUpdateState()
             else
                 @setNewState()
@@ -85,13 +85,13 @@ define [
         # Saves the current state of the context which enables it to be
         # synced with the server.
         save: ->
-            @context.save()
+            @context?.save()
             if @options.managed then @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
-            @context.clear()
-            @context.save()
+            @context?.clear()
+            @context?.save()
             if @options.managed then @setNewState()
 
 

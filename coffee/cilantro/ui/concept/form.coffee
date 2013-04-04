@@ -96,7 +96,7 @@ define [
 
                 if chartField or (chartField = @model.fields[idx]).urls.distribution?
                     # Remove from remaining concept fields
-                    conceptFields = conceptFields.pop(idx)
+                    conceptFields.pop(idx)
 
                     context = @manager.getFieldContext(chartField.id)
 
@@ -128,11 +128,13 @@ define [
 
             @fields.show(fieldForms)
 
+            @setDefaultState()
+
         setDefaultState: ->
             # If this is valid field-level context update the state
             # of the concept form. Only one of the fields need to be
             # valid to update the context
-            if @context.isValid()
+            if @context?.isValid()
                 @setUpdateState()
             else
                 @setNewState()
@@ -151,14 +153,14 @@ define [
         # synced with the server.
         save: (options) ->
             options = c._.extend(deep: @options.managed, options)
-            @context.save(options)
+            @context?.save(options)
             @setUpdateState()
 
         # Clears the local context of conditions
         clear: (options) ->
             options = c._.extend(deep: @options.managed, options)
-            @context.clear(options)
-            @context.save(options)
+            @context?.clear(options)
+            @context?.save(options)
             @setNewState()
 
 
