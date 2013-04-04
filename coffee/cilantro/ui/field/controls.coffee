@@ -27,6 +27,10 @@ define [
                 operator:
                     allowEmpty: true
 
+        regionViews:
+            operator: controls.OperatorInput
+            value: controls.TextInput
+            nulls: controls.BooleanInput
 
         # Gets the value corresonding to the attribute key
         _getAttr: (attr, type) ->
