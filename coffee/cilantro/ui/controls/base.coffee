@@ -2,27 +2,88 @@ define [
     '../core'
 ], (c) ->
 
+
+    class ControlError extends Error
+
+
+    controlOptions = ['attrNames', 'dataAttrs', 'dataSelectors', 'regions',
+        'regionViews', 'attrGetters', 'attrSetters']
+
+
     # Control interface, this should not be used directly
     class Control extends c.Marionette.Layout
+        className: 'control'
+
         attrNames: ['id', 'operator', 'value', 'nulls']
 
-        getId: (options) ->
-        getOperator: (options) ->
-        getValue: (options) ->
-        getNulls: (options) ->
+        regions:
+            id: '.control-id'
+            operator: '.control-operator'
+            value: '.control-value'
+            nulls: '.control-nulls'
 
-        setId: (value, options) ->
-        setOperator: (value) ->
-        setValue: (value) ->
-        setNulls: (value) ->
+        regionViews: {}
+
+        regionOptions: {}
+
+        dataAttrs:
+            id: 'data-id'
+            operator: 'data-operator'
+            value: 'data-value'
+            nulls: 'data-nulls'
+
+        dataSelectors:
+            id: '[data-id]'
+            operator: '[data-operator]'
+            value: '[data-value]'
+            nulls: '[data-nulls]'
+
+        attrGetters:
+            id: 'getId'
+            operator: 'getOperator'
+            value: 'getValue'
+            nulls: 'getNulls'
+
+        attrSetters:
+            id: 'setId'
+            operator: 'setOperator'
+            value: 'setValue'
+            nulls: 'setNulls'
+
+        constructor: ->
+            super
+            for optionKey in controlOptions
+                if (option = @options[optionKey])?
+                    if c._.isArray(option)
+                        @[optionKey] = option
+                    else if c._.isObject(option)
+                        @[optionKey] = c._.extend {}, @[optionKey], option
+                    else
+                        @[optionKey] = option
+            return
+
+        onRender: ->
+            for key, klass of c._.result @, 'regionViews'
+                inputAttrs = {}
+                inputAttrs[@dataAttrs[key]] = ''
+
+                options = c._.extend {}, c._.result(@regionOptions, key),
+                    inputAttrs: inputAttrs
+                    model: @model
+
+                @[key].show new klass(options)
 
         _get: (key, options) ->
-            method = "get#{ key.charAt(0).toUpperCase() }#{ key.slice(1) }"
-            @[method]?(options)
+            if not (method = @attrGetters[key]) then return
+            if (func = @[method])?
+                return func.call(@, options)
+            throw new ControlError 'Getter declared, but not defined'
 
         _set: (key, value, options) ->
-            method = "set#{ key.charAt(0).toUpperCase() }#{ key.slice(1) }"
-            @[method]?(value, options)
+            if not (method = @attrSetters[key]) then return
+            if (func = @[method])?
+                return func.call(@, value, options)
+            throw new ControlError 'Setter declared, but not defined'
 
         get: (key, options) ->
             if typeof key is 'object'
@@ -60,6 +121,13 @@ define [
                 for key in @attrNames
                     @_set key, null, options
             return
+
+        # Triggered any time the control contents have changed. Upstream, the
+        # context can be bound to this event and update itself as changes
+        # occur. The small timer is prevent chatty typing
+        change: (event) ->
+            @trigger 'change', @, @get()
+
 
 
     { Control }
