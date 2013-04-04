@@ -71,8 +71,30 @@ define [
 
 
 
+    class StringControl extends FieldControl
 
 
 
+    class NumberControl extends FieldControl
+        options:
+            regionViews:
+                value: controls.RangeInput
 
-    { FieldControl }
+        events: ->
+            events = {}
+            events["change #{@dataSelectors.operator}"] = 'toggleRange'
+            c._.extend events, controlEvents
+
+        toggleRange: ->
+            input2 = @value.currentView.input2.ui.input
+            if /range/i.test(@getOperator())
+                input2.prop('disabled', false).show()
+            else
+                input2.prop('disabled', true).hide()
+
+        onRender: ->
+            super
+            @toggleRange()
+
+
+    { FieldControl, StringControl, NumberControl }
