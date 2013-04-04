@@ -9,38 +9,50 @@ define [
 
     FORM_ELEMENTS = 'input,select,textarea'
 
+    controlEvents =
+        'keyup input': 'change'
+        'change select': 'change'
+        'click input[type=radio],input[type=checkbox]': 'change'
+
 
     class FieldControl extends controls.Control
         className: 'field-control'
 
         template: templates.control
 
-        events:
-            'keyup input': 'change'
-            'change select': 'change'
-            'click input[type=radio],input[type=checkbox]': 'change'
+        events: controlEvents
 
-        constructor: ->
-            super
+        options:
+            inputOptions:
+                operator:
+                    allowEmpty: true
 
-            # Various ways to define the UI elements
-            @ui = _.extend {}, @constructor.defaultUI, @ui, @options.ui
-            @attrs = _.extend {}, @constructor.defaultAttrs, @attrs, @options.attrs
 
         # Gets the value corresonding to the attribute key
-        _getAttr: (prop, type) ->
-            if not ($el = @ui[prop])? then return
+        _getAttr: (attr, type) ->
+            dataSelector = @dataSelectors[attr]
+
+            # Check if the region and el exist
+            if not (region = @[attr])? then return
+            if not ($el = region.currentView.$(dataSelector))? then return
+
+            # If this a form element, extract the value otherwise get the attrerty
             if $el.is(FORM_ELEMENTS)
                 InputIO.get($el, type)
             else
-                $el.attr(@attrs[prop])
+                $el.attr(@dataAttrs[attr])
 
-        _setAttr: (prop, value) ->
-            if not ($el = @ui[prop])? then return
+        _setAttr: (attr, value) ->
+            dataSelector = @dataSelectors[attr]
+
+            # Check if the region and el exist
+            if not (region = @[attr])? then return
+            if not ($el = region.currentView.$(dataSelector))? then return
+
             if $el.is(FORM_ELEMENTS)
                 InputIO.set($el, value)
             else
-                $el.attr(@attrs[prop], value)
+                $el.attr(@dataAttrs[attr], value)
             return
 
         getId: -> @model?.id or @_getAttr('id')
@@ -53,29 +65,10 @@ define [
         setValue: (value) -> @_setAttr('value', value)
         setNulls: (value) -> @_setAttr('nulls', Boolean(value))
 
-        # Triggered any time the control contents have changed. Upstream, the
-        # context can be bound to this event and update itself as changes
-        # occur.
-        change: (event) ->
-            @trigger 'change', @, @get()
 
 
-    # Selectors of elements that pertain to the data attribute
-    # for the node. The `nulls` selector is used to flag whether
-    # or not to include empty and/or NULL values.
-    FieldControl.defaultUI =
-        id: '[name=id],[data-id]'
-        value: '[name=value],[data-value]'
-        operator: '[name=operator],[data-operator]'
-        nulls: '[name=nulls],[data-nulls]'
 
 
-    # Attribute-based properties representing a constant value
-    FieldControl.defaultAttrs =
-        id: 'data-id'
-        value: 'data-value'
-        operator: 'data-operator'
-        nulls: 'data-nulls'
 
 
     { FieldControl }
