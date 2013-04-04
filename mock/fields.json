@@ -33,42 +33,15 @@
         "name": "Hemoglobin (HGB)",
         "nullable": true,
         "operators": [
-            [
-                "exact",
-                "is"
-            ],
-            [
-                "-exact",
-                "is not"
-            ],
-            [
-                "in",
-                "includes"
-            ],
-            [
-                "-in",
-                "excludes"
-            ],
-            [
-                "lt",
-                "is less than"
-            ],
-            [
-                "lte",
-                "is less than or equal to"
-            ],
-            [
-                "gt",
-                "is greater than"
-            ],
-            [
-                "gte",
-                "is greater than or equal to"
-            ],
-            [
-                "range",
-                "is between"
-            ]
+            ["exact", "is equal to"],
+            ["-exact", "is not equal to"],
+            ["in", "includes"],
+            ["-in", "excludes"],
+            ["lt", "is less than"],
+            ["lte", "is less than or equal to"],
+            ["gt", "is greater than"],
+            ["gte", "is greater than or equal to"],
+            ["range", "is between"]
         ],
         "plural_name": "Hemoglobin (HGB)",
         "plural_unit": "mg/dL",
@@ -109,38 +82,12 @@
         "name": "Drug Name",
         "nullable": false,
         "operators": [
-            [
-                "exact",
-                "is"
-            ],
-            [
-                "-exact",
-                "is not"
-            ],
-            [
-                "iexact",
-                "is"
-            ],
-            [
-                "-iexact",
-                "is not"
-            ],
-            [
-                "in",
-                "includes"
-            ],
-            [
-                "-in",
-                "excludes"
-            ],
-            [
-                "icontains",
-                "contains"
-            ],
-            [
-                "-icontains",
-                "does not contain"
-            ]
+            ["iexact", "is equal to"],
+            ["-iexact", "is not equal to"],
+            ["in", "includes"],
+            ["-in", "excludes"],
+            ["icontains", "contains"],
+            ["-icontains", "does not contain"]
         ],
         "plural_name": "Drug Names",
         "plural_unit": "",
@@ -183,8 +130,6 @@
         "description": "Findings noted on examination of the head, ears, eyes, nose and throat.",
         "plural_unit": "",
         "operators": [
-            ["exact", "is equal to"],
-            ["-exact", "is not equal to"],
             ["iexact", "is equal to"],
             ["-iexact", "is not equal to"],
             ["in", "includes"],
@@ -235,8 +180,6 @@
         "description": "Findings noted on examination of the chest.",
         "plural_unit": "",
         "operators": [
-            ["exact", "is equal to"],
-            ["-exact", "is not equal to"],
             ["iexact", "is equal to"],
             ["-iexact", "is not equal to"],
             ["in", "includes"],
@@ -287,8 +230,6 @@
         "description": "Findings noted on examination of the abdomen.",
         "plural_unit": "",
         "operators": [
-            ["exact", "is equal to"],
-            ["-exact", "is not equal to"],
             ["iexact", "is equal to"],
             ["-iexact", "is not equal to"],
             ["in", "includes"],
