@@ -32,11 +32,9 @@ define [
             if not (node = @context.fetch(field: id))
                 # Create a branch-style node to put all field-level nodes inside,
                 # mark it with the concept_id so it can be found later
-                node = new c.models.BranchNodeModel
+                node = new c.models.ConditionNodeModel
                     field: id
                     concept: @model.id
-                    type: 'and'
-                    children: []
 
                 # Add to parent context
                 @context.add node
@@ -96,7 +94,7 @@ define [
 
                 if chartField or (chartField = @model.fields[idx]).urls.distribution?
                     # Remove from remaining concept fields
-                    conceptFields.pop(idx)
+                    conceptFields.splice(idx, 1)
 
                     context = @manager.getFieldContext(chartField.id)
 
