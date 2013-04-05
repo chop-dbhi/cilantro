@@ -129,5 +129,15 @@ define [
             @trigger 'change', @, @get()
 
 
+        getId: ->
+        getOperator: ->
+        getValue: ->
+        getNulls: ->
+
+        setId: ->
+        setOperator: ->
+        setValue: ->
+        setNulls: ->
+
 
     { Control }
