@@ -52,6 +52,8 @@ define [
 
         constructor: ->
             super
+            @bindContext(@options.context)
+
             for optionKey in controlOptions
                 if (option = @options[optionKey])?
                     if c._.isArray(option)
@@ -61,6 +63,21 @@ define [
                     else
                         @[optionKey] = option
             return
+
+        bindContext: (context) ->
+            @unbindContext()
+            if context?
+                @context = context
+
+                @context.listenTo @, 'change', (view, attrs) =>
+                    @context.set(attrs)
+
+                @listenTo context, 'change', (model, options) =>
+                    @set(model.changedAttributes())
+
+        unbindContext: ->
+            @context?.stopListening(@)
+            @stopListening(@context)
 
         onRender: ->
             for key, klass of c._.result @, 'regionViews'
@@ -125,7 +142,7 @@ define [
         # Triggered any time the control contents have changed. Upstream, the
         # context can be bound to this event and update itself as changes
         # occur. The small timer is prevent chatty typing
-        change: (event) ->
+        change: (event) =>
             @trigger 'change', @, @get()
 
 

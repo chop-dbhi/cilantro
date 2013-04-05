@@ -15,14 +15,10 @@ define [
             heading: '.heading'
             status : '.heading .status'
 
-        initialize: ->
-            super
-            @context = @options.context
-
         chartClick: (event) =>
             category = event.point.category ? event.point.name
             event.point.select(not event.point.selected, true)
-            @context?.set @get()
+            @change()
 
         interactive: (options) ->
             if (type = options.chart?.type) is 'pie'
@@ -46,6 +42,8 @@ define [
             options.chart.renderTo = @ui.chart[0]
             return options
 
+        getId: -> @model.id
+
         getValue: (options) ->
             points = @chart.getSelectedPoints()
             return (point.category for point in points)
@@ -57,7 +55,6 @@ define [
             if @node then @node.destroy()
 
         onRender: ->
-            @stopListening @context if @context?
             @$el.addClass 'loading'
 
             # Explicitly set the width of the chart so Highcharts knows
@@ -70,14 +67,12 @@ define [
             @model.distribution (resp) =>
                 options = @getChartOptions(resp)
                 @renderChart(options)
-                @listenTo @context, 'change', @contextUpdated if @context?
-                @contextUpdated()
 
 
-        contextUpdated: =>
+        setValue: (value) =>
+            if not c._.isArray(value) then value = []
             points = @chart.series[0].points
-            point.select(point.name ? point.category in @context.get('value'), true) \
-                for point in points if @context?.get('value')
+            point.select(point.name ? point.category in value, true) for point in points
 
 
     { FieldChart }
