@@ -17,16 +17,28 @@ define [
         template: templates.form
 
         options:
+            managed: true
             showChart: true
 
         constructor: ->
             super
             @context = @options.context
 
+        events:
+            'click .concept-actions [data-toggle=add]': 'save'
+            'click .concept-actions [data-toggle=update]': 'save'
+            'click .concept-actions [data-toggle=remove]': 'clear'
+
+        ui:
+            actions: '.field-actions'
+            add: '.field-actions [data-toggle=add]'
+            remove: '.field-actions [data-toggle=remove]'
+            update: '.field-actions [data-toggle=update]'
+
         regions:
             main: '.field-main'
             stats: '.field-stats'
-            controls: '.field-controls'
+            control: '.field-control'
             chart: '.field-chart'
 
         # Map corresponding view class to region. This makes it
@@ -35,7 +47,7 @@ define [
         regionViews:
             main: item.Field
             stats: stats.FieldStats
-            controls: controls.FieldControl
+            control: controls.FieldControl
 
         onRender: ->
             for key, klass of c._.result @, 'regionViews'
@@ -50,6 +62,37 @@ define [
                     model: @model
                     context: @context
                 @chart.show chart
+
+            @setDefaultState()
+
+        setDefaultState: ->
+            if @options.managed then @ui.actions.hide()
+            if @context?.isValid()
+                @setUpdateState()
+            else
+                @setNewState()
+
+        setUpdateState: ->
+            @ui.add.hide()
+            @ui.update.show()
+            @ui.remove.show()
+
+        setNewState: ->
+            @ui.add.show()
+            @ui.update.hide()
+            @ui.remove.hide()
+
+        # Saves the current state of the context which enables it to be
+        # synced with the server.
+        save: ->
+            @context?.save()
+            if @options.managed then @setUpdateState()
+
+        # Clears the local context of conditions
+        clear: ->
+            @context?.clear()
+            @context?.save()
+            if @options.managed then @setNewState()
 
 
     { FieldForm }

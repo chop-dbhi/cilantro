@@ -23,9 +23,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
             var testChart = new charts.FieldChart({
                  editable: false,
                  model: model.fields[0],
-                 data: {
-                   context: null
-                 }
+                 context: null
             });
 
            var el = testChart.render();
@@ -54,9 +52,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
            var testChart = new charts.FieldChart({
                  editable: true,
                  model: model.fields[0],
-                 data: {
-                   context: context
-                 }
+                 context: context
            });
 
            var el = testChart.render();
