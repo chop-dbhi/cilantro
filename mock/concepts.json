@@ -419,7 +419,7 @@
                         "rel": "data"
                     },
                     "values": {
-                        "href": "/gallery/extensions/vocab/mock/diagnoses.json",
+                        "href": "/extensions/vocab/mock/root.json",
                         "rel": "data"
                     }
                 },
