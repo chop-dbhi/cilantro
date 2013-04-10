@@ -4,21 +4,38 @@
     "object_name_plural": "patients",
     "description": "",
     "language": {
-        "operator": "exact",
-        "language": "Hemoglobin (HGB) is equal to 17",
-        "field": 30,
-        "concept": 28,
-        "value": 17
-    },
+		"type": "and",
+		"children": [{
+			"operator": "exact",
+			"language": "hemoglobin (hgb) is equal to 17",
+			"field": 30,
+			"value": 17,
+            "concept": 28
+		}, {
+			"operator": "in",
+			"language": "Diagnosis is equal to Ischemic Heart Disease 1 or Ischemic Heart Disease 2",
+			"id": 35,
+			"value": [5, 9],
+            "concept": 31
+		}]
+	},
     "created": "2013-02-14 16:05:35",
     "composite": false,
     "object_name": "patient",
     "modified": "2013-02-19 13:19:39",
     "json": {
-        "operator": "exact",
-        "field": 30,
-        "value": 17,
-        "concept": 28
+        "type": "and",
+        "children": [{
+            "operator": "exact",
+            "field": 30,
+            "concept": 28,
+            "value": 17
+        },{
+            "operator": "in",
+            "field": 35,
+            "concept": 31,
+            "value": [5, 9]
+        }]
     },
     "session": true,
     "_links": {
