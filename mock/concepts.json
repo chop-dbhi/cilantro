@@ -430,7 +430,7 @@
                 "description": "Patient Diagnosis",
                 "enumerable": false,
                 "field_name": "diagnosis",
-                "id": 30,
+                "id": 35,
                 "internal_type": "float",
                 "keywords": "",
                 "model_name": "diagnosis",
