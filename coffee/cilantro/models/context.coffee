@@ -5,7 +5,7 @@ define [
     class ContextNodeError extends Error
 
 
-    queryAttrs = (attrs, query) ->
+    queryAttrs = (attrs, query, options) ->
         if attrs instanceof ContextNodeModel
             attrs = attrs.attributes
         if query.concept? and attrs.concept is query.concept
@@ -19,7 +19,7 @@ define [
     # must be carefully handled and not removed from the tree unless explicitly
     # removed
     class ContextNodeModel extends c.Backbone.Model
-        initialize: (options={}) ->
+        initialize: (attrs, options={}) ->
             # Save the initial state of the internal attributes
             @save(options)
 
@@ -46,15 +46,27 @@ define [
         isTyped: ->
             @attributes.field? or @attributes.concept?
 
-        fetch: (query) ->
-            if queryAttrs(@, query)
+        fetch: (query, options) ->
+            if queryAttrs(@, query, options)
                 return @
 
 
     # Branch-type node that acts as a container for other nodes. The `type`
     # determines the conditional relationship between the child nodes.
     class BranchNodeModel extends ContextNodeModel
+        defaults:
+            type: 'and'
+            children: []
+
         nodeType: 'branch'
+
+        initialize: (attrs, options={}) ->
+            if options.deep
+                children = @get('children')
+                for child, i in children
+                    if not (child instanceof ContextNodeModel)
+                        children[i] = getContextNodeModel(child, options)
+            super(attrs, options)
 
         validate: (attrs, options) ->
             if not (attrs.type is 'and' or attrs.type is 'or')
@@ -72,16 +84,16 @@ define [
                         return message
             return
 
-        fetch: (query) ->
+        fetch: (query, options) ->
             if (node = super) then return node
 
             children = @get('children')
             for child, i in children
-                if queryAttrs(child, query)
+                if queryAttrs(child, query, options)
                     # If this a match, convert the child into an instance
                     # for downstream use.
                     if not (child instanceof ContextNodeModel)
-                        child = children[i] = getContextNodeModel(child)
+                        child = children[i] = getContextNodeModel(child, options)
                     return child
             return
 
@@ -209,7 +221,7 @@ define [
     # Returns the node model class appropriate for attrs
     getContextNodeModel = (attrs, options) ->
         for model in contextNodeModels
-            if not model::validate.call(null, attrs)
+            if not model::validate.call(null, attrs, options)
                 return new model(attrs, options)
         throw new ContextNodeError 'Unknown context node type'
 
