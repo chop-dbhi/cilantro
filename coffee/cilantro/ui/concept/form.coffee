@@ -15,7 +15,7 @@ define [
 
         setContext: (context) ->
             # Fetch the branch relative to the concept.id
-            if not (@context = context.fetch(concept: @model.id))
+            if not (@context = context.fetch({concept: @model.id}, {deep: true}))
                 # Create a branch-style node to put all field-level nodes inside,
                 # mark it with the concept_id so it can be found later
                 @context = new c.models.BranchNodeModel

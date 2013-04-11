@@ -36,7 +36,6 @@
           "concept": 31,
           "children": [{
                "operator": "in",
-               "concept": 31,
                "field": 35,
                "value": [5, 9]
           }] 
