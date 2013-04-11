@@ -172,6 +172,38 @@ define(['cilantro'], function (c) {
             }).toThrow();
         });
 
+        describe('Deep initialization', function() {
+            it('should convert descendants into nodes', function() {
+                var model = new c.models.BranchNodeModel({
+                    type: 'and',
+                    children: [{
+                        field: 1,
+                        concept: 1,
+                        value: 30,
+                        operator: 'exact'
+                    }, {
+                        concept: 2,
+                        type: 'and',
+                        children: [{
+                            field: 2,
+                            concept: 2,
+                            value: [0.5, 1],
+                            operator: 'range'
+                        }]
+                    }]
+                }, {
+                    deep: true
+                });
+
+                c0 = model.get('children')[0]
+                c1 = model.get('children')[1]
+                c1_0 = c1.get('children')[0]
+                expect(c0 instanceof c.models.ConditionNodeModel).toBe(true);
+                expect(c1 instanceof c.models.BranchNodeModel).toBe(true);
+                expect(c1_0 instanceof c.models.ConditionNodeModel).toBe(true);
+            });
+        });
+
         describe('Local vs. Public attributes', function() {
 
             it('toJSON should recurse on public attributes', function() {
