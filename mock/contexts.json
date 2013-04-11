@@ -30,11 +30,16 @@
             "field": 30,
             "concept": 28,
             "value": 17
-        },{
-            "operator": "in",
-            "field": 35,
-            "concept": 31,
-            "value": [5, 9]
+        },
+        { 
+          "type": "and",
+          "concept": 31,
+          "children": [{
+               "operator": "in",
+               "concept": 31,
+               "field": 35,
+               "value": [5, 9]
+          }] 
         }]
     },
     "session": true,
