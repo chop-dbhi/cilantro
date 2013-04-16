@@ -1,8 +1,12 @@
-define ['../../core'
-        '../field'
-        '../charts'
-        'tpl!templates/views/concept-form.html'
-], (c, field, charts, compiledTemplate) ->
+define [
+    '../../core'
+    '../field'
+    '../charts'
+    'tpl!templates/views/concept-form.html'
+], (c, field, charts, templates...) ->
+
+    templates = c._.object ['form'], templates
+
 
     class ManagedContextMapper
         constructor: (@context, @fields) ->
@@ -10,10 +14,17 @@ define ['../../core'
         # For a given field id, return the ContextNode
         # in the ContextTree if it exists
         getNodes: (fieldId) ->
-            @context.getNodes(fieldId)
+            nodes = @context.getNodes(fieldId)
+            if nodes.length == 0
+                nodes = [new c.models.ContextNodeModel(id:fieldId)]
+                @context.add(nodes[0])
+            nodes[0]
+
 
     class ConceptForm extends c.Marionette.Layout
         className: 'concept-form'
+
+        template: templates.form
 
         constructor: (model) ->
             super model
@@ -21,34 +32,40 @@ define ['../../core'
             @manager = new ManagedContextMapper(@context, @model.fields)
 
         regions:
-            main:".main"
-            chart:".primary-chart"
-            fields:".fields"
+            main: '.concept-main'
+            chart: '.concept-chart'
+            fields: '.concept-fields'
 
         onRender: ->
             ungraphedFieldsStart = 0
-            if @model.fields[0].urls.distribution?
-                ungraphedFieldsStart = 1
-                mainChart = new charts.FieldDistributionChart
-                  parentView: @
-                  editable: false
-                  model: @model.fields[0]
-                  data:
-                    context: null
+            mainField = @model.fields[0]
 
-            mainFields = new field.FieldForm(model:@model.fields[0])
+            if mainField.urls.distribution?
+                ungraphedFieldsStart = 1
+                mainChart = new charts.FieldChart
+                    parentView: @
+                    model: mainField
+                    data:
+                        context: @manager.getNodes(mainField.id)
+
+            mainForm = new field.FieldForm
+                model: mainField
+                context: @manager.getNodes(mainField.id)
+                showChart: false
 
             fields = new c.Marionette.CollectionView
                 itemView: field.FieldForm
+
                 itemViewOptions: (model) =>
+                   showChart: false
                    context: @manager.getNodes(model.id)
+
                 collection: new c.Backbone.Collection(@model.fields[ungraphedFieldsStart..])
 
 
-            @main.show(mainFields)
+            @main.show(mainForm)
             @chart.show(mainChart) if mainChart?
             @fields.show(fields)
 
-        template: compiledTemplate
 
     { ConceptForm }

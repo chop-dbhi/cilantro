@@ -2,6 +2,7 @@ define [
     '../core'
 ], (c) ->
 
+    class ContextNodeError extends Error
 
     isBranch = (attrs) ->
         (attrs.type is 'and' or attrs.type is 'or') and attrs.children?.length >= 2
@@ -17,6 +18,9 @@ define [
     # must be carefully handled and not removed from the tree unless explicitly
     # removed
     class ContextNodeModel extends c.Backbone.Model
+
+        # Individual nodes cannot be synced with the server..
+        sync: ->
 
         validate: (attrs) ->
             # Some kind of node
@@ -73,7 +77,7 @@ define [
         # nodes to the branch
         promote: (nodes...) ->
             if nodes.length is 0
-                throw new Error 'At least one node must be supplied'
+                throw new ContextNodeError 'At least one node must be supplied'
 
             if @isRoot()
                 type = 'and'
@@ -119,7 +123,7 @@ define [
         # Add one or more nodes to this branch.
         add: (nodes...) ->
             if not @isBranch()
-                throw new Error 'Node is not a branch. Use "promote" to convert it into one'
+                throw new ContextNodeError 'Node is not a branch. Use "promote" to convert it into one'
             @get('children').push nodes...
             return @
 
@@ -165,7 +169,7 @@ define [
             node = new nodeModel attrs
 
         else
-            throw new Error 'Unknown node type'
+            throw new ContextNodeError 'Unknown node type'
 
         if parent
             node.parent = parent
@@ -185,6 +189,9 @@ define [
 
     class ContextModel extends c.Backbone.Model
         nodeModel: ContextNodeModel
+
+        options:
+            autosave: false
 
         deferred:
             # Defer and only execute once
@@ -328,7 +335,7 @@ define [
 
             # Add change handler on node, only trigger if the value is not
             # empty
-            node.on 'change', @_nodeSave
+            if @options.autosave then node.on 'change', @_nodeSave
 
         # Deference a node from the tree and unbind the change handler
         _deferenceNode: (node) =>
@@ -368,8 +375,7 @@ define [
                         type: 'and'
                         children: [@root, node]
                     @root = branch
-
-                @save()
+                if @options.autosave then @save()
 
         remove: (node) ->
             if @clientNodes[node.cid]
@@ -389,14 +395,13 @@ define [
                         @root = children[0]
 
                 @_deferenceNode node
-
-                @save()
+                if @options.autosave then @save()
 
         # Removes all nodes from this context
         clear: ->
             # Unbind all change handlers
             for cid, node of @clientNodes
-                node.off 'change', @_nodeSave
+                if @options.autosave then node.off 'change', @_nodeSave
 
             @nodes = {}
             @clientNodes = {}
@@ -405,7 +410,7 @@ define [
                 @root = new @nodeModel
             else
                 @root.clear()
-            @save()
+            if @options.autosave then @save()
 
 
     class ContextCollection extends c.Backbone.Collection
@@ -417,15 +422,10 @@ define [
         initialize: ->
             super
             c.subscribe c.SESSION_OPENED, =>
-                @fetch().done => @ensureSession()
+                @fetch(reset: true).done =>
+                    @ensureSession()
+                    @resolve()
             c.subscribe c.SESSION_CLOSED, => @reset()
-
-            # Mimic the initial sync for each model
-            @on 'reset', (collection) ->
-                @resolve()
-                for model in collection.models
-                    model.trigger 'sync'
-                return
 
         getSession: ->
             (@filter (model) -> model.get 'session')[0]

@@ -373,6 +373,19 @@
             "alt_plural_name": "Abdominal Exams",
             "published": true,
             "model_name": "systemsreview"
-        }]
+        }],
+        "modified": "2012-10-11 09:56:23",
+        "formatter_name": "SystemsReview",
+        "order": null,
+        "_links": {
+            "self": {
+                "href": "/demo/api/concepts/8/",
+                "rel": "self"
+            }
+        },
+        "published": true,
+        "keywords": "",
+        "id": 8,
+        "name": "Review of Systems"
     }
 ]

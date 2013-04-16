@@ -1,0 +1,17 @@
+.field-control {
+    > input, select {
+        @include box-sizing(border-box);
+        display: block;
+        width: 100%;
+        height: 30px;
+    }
+
+    .field-actions {
+        @include clearfix;
+
+        [data-toggle=add], [data-toggle=update] {
+            float: right;
+            margin-left: 5px;
+        }
+    }
+}

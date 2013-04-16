@@ -1,0 +1,13 @@
+@mixin backdrop {
+    @include box-shadow(0 2px 2px #ccc);
+    @include border-radius(3px);
+    background-color: #fff;
+    padding: 20px;
+}
+
+@mixin nobackdrop {
+    @include box-shadow(none);
+    @include border-radius(0);
+    background-color: inherit;
+    padding: 0;
+}

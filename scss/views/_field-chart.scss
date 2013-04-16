@@ -1,0 +1,8 @@
+.field-chart {
+    @include backdrop;
+    padding: 0;
+
+    .chart {
+        @include nobackdrop;
+    }
+}

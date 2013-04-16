@@ -1,15 +1,18 @@
-.concept {
-    @include box-shadow(1px 1px 4px #ccc);
-    border-radius: 3px;
-    border: 1px solid #f9f9f9;
-    background-color: #f9f9f9;
-    padding: 10px;
+@mixin concept {
+    @include backdrop;
 
-    .name {
+    .concept-name {
         margin-top: 0;
     }
 
-    .description {
+    .concept-name {
+        display: block;
+        font-weight: 500;
+        font-size: 1.4em;
+        margin-bottom: 10px;
+    }
+
+    .concept-description {
         color: #999;
         margin-bottom: 0;
     }

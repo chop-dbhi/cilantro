@@ -1,6 +1,6 @@
 define ['../core', './field'], (c, field) ->
 
-    class ConceptModel extends Backbone.Model
+    class ConceptModel extends c.Backbone.Model
         parse: (resp) ->
             @fields = []
             # Parse and attach field model instances to concept
@@ -9,7 +9,7 @@ define ['../core', './field'], (c, field) ->
             return resp
 
 
-    class ConceptCollection extends Backbone.Collection
+    class ConceptCollection extends c.Backbone.Collection
         model: ConceptModel
 
         url: ->
@@ -17,7 +17,7 @@ define ['../core', './field'], (c, field) ->
 
         initialize: ->
             super
-            c.subscribe c.SESSION_OPENED, => @fetch()
+            c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
             @on 'reset', @resolve
 

@@ -1,13 +1,17 @@
-define ['highcharts'], (Highcharts) ->
+define [
+    '../core'
+], (c) ->
 
     # MAX_RADIUS = 10
     # MIN_RADIUS = 3
 
     getColor = (idx) ->
-        colors = Highcharts.getOptions().colors
+        colors = c.Highcharts.getOptions().colors
         return colors[idx % colors.length]
 
+
     dateRegexp = /\d{4}-\d{2]-\d{2]/
+
 
     parseDate = (str) ->
         year = parseInt(str.substr(0, 4))
@@ -135,7 +139,7 @@ define ['highcharts'], (Highcharts) ->
                     if p.sentinel then continue
                     norm = Math.min(Math.max(parseInt(parseFloat(p.count, 10) / avg * 5) / 10, 0.05), 1)
 #                    radius = Math.min(Math.max(MIN_RADIUS, parseFloat(p.count, 10) / avg * 5), MAX_RADIUS)
-                    color = Highcharts.Color(getColor seriesNo).setOpacity(norm)
+                    color = c.Highcharts.Color(getColor seriesNo).setOpacity(norm)
                     p.marker = fillColor: color.get()
                     if xEnum
                         p.marker.radius = 7
@@ -153,10 +157,10 @@ define ['highcharts'], (Highcharts) ->
             # Multiple series
             if seriesList[1]
                 formatterFunc = ->
-                    return "<b>#{ @series.name }</b><br>#{ @point.count } for (#{ Highcharts.numberFormat parseFloat @x }, #{ Highcharts.numberFormat parseFloat @y })"
+                    return "<b>#{ @series.name }</b><br>#{ @point.count } for (#{ c.Highcharts.numberFormat parseFloat @x }, #{ c.Highcharts.numberFormat parseFloat @y })"
             else
                 formatterFunc = ->
-                    return "#{ @point.count } for (#{ Highcharts.numberFormat parseFloat @x }, #{ Highcharts.numberFormat parseFloat @y })"
+                    return "#{ @point.count } for (#{ c.Highcharts.numberFormat parseFloat @x }, #{ c.Highcharts.numberFormat parseFloat @y })"
 
         options = {
             clustered: clustered
@@ -194,5 +198,20 @@ define ['highcharts'], (Highcharts) ->
 
         return options
 
+    # Simple parser to format for use by Highcharts
+    getSeries = (data) ->
+        points = []
 
-    { processResponse }
+        for datum in data
+            point = c._.clone datum
+            point.x = datum.values[0]
+            if datum.values[1]?
+                point.y = datum.values[1]
+            else
+                point.y = datum.count
+            points.push point
+
+        return data: c._.sortBy points, 'x'
+
+
+    { processResponse, getSeries }
