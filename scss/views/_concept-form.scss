@@ -9,4 +9,13 @@
     .concept-fields .field-form:last-child {
         margin-bottom: 0;
     }
+
+    .concept-actions {
+        @include clearfix;
+
+        [data-toggle=add], [data-toggle=update] {
+            float: right;
+            margin-left: 5px;
+        }
+    }
 }
