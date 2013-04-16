@@ -18,6 +18,5 @@
         name: 'cilantro'
     }, {
         name: 'cilantro/ui',
-        exclude: ['cilantro']
     }]
 })
