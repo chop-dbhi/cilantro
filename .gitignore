@@ -6,6 +6,8 @@ build
 css/style.css
 css/vocab/
 .idea
+.grunt
+_SpecRunner.html
 node_modules
 gallery/extensions
 extensions/
