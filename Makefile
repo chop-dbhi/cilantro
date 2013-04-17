@@ -63,7 +63,7 @@ combine: coffee
 optimize: combine
 	@echo 'Optimizing JavaScript...'
 	@rm -rf ${DIST_DIR}
-	@mkdir -p ${DIST_DIR}
+	@mkdir -p ${DIST_DIR} ${EXT_DIR}
 	@${BUILD} > /dev/null
 	@rm -rf ${DIST_SRC_DIR}/templates
 	@${OPTIMIZE} > /dev/null
