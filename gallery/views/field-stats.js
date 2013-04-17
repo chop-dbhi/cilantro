@@ -1,4 +1,4 @@
-define(['cilantro', 'cilantro/ui'], function(c) {
+define(['cilantro.ui'], function(c) {
     var view1 = new c.ui.FieldStats,
         view2 = new c.ui.FieldStats;
 

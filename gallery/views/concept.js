@@ -1,4 +1,4 @@
-define(['cilantro', 'cilantro/ui'], function(c) {
+define(['cilantro.ui'], function(c) {
     var view = new c.ui.Concept;
     return function(dom) {
         c.data.concepts.when(function() {

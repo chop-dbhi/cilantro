@@ -1,4 +1,4 @@
-define(['cilantro', 'cilantro/ui','text!/mock/concepts.json'], function (c, ui, mocks) {
+define(['cilantro.ui','text!/mock/concepts.json'], function (c, mocks) {
     
     describe("ConceptForm", function () {
         var concepts = JSON.parse(mocks);

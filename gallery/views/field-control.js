@@ -1,4 +1,4 @@
-define(['cilantro', 'cilantro/ui'], function(c) {
+define(['cilantro.ui'], function(c) {
     var base = new c.ui.FieldControl,
         number = new c.ui.NumberControl,
         string = new c.ui.StringControl;

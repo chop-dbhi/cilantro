@@ -17,6 +17,6 @@
     modules: [{
         name: 'cilantro'
     }, {
-        name: 'cilantro/ui',
+        name: 'cilantro.ui'
     }]
 })

@@ -68,10 +68,6 @@ optimize: combine
 	@rm -rf ${DIST_SRC_DIR}/templates
 	@${OPTIMIZE} > /dev/null
 	@rm -rf ${DIST_MIN_DIR}/templates
-	@mv ${DIST_SRC_DIR}/cilantro/ui.js ${DIST_SRC_DIR}/cilantro.ui.js
-	@rm -rf ${DIST_SRC_DIR}/cilantro
-	@mv ${DIST_MIN_DIR}/cilantro/ui.js ${DIST_MIN_DIR}/cilantro.ui.js
-	@rm -rf ${DIST_MIN_DIR}/cilantro
 
 
 .PHONY: all sass coffee watch unwatch combine optimize

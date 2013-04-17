@@ -1,4 +1,4 @@
-define(['cilantro', 'cilantro/ui'], function(c) {
+define(['cilantro.ui'], function(c) {
     return function(dom) {
         c.data.concepts.when(function() {
             var model = c.data.concepts.get(28)
