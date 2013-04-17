@@ -56,7 +56,11 @@ define(['../jquery'], function(jQuery) {
         return promise;
     };
 
-    jQuery.ajax = function(options) {
+    jQuery.ajax = function(options, optional) {
+        if (typeof(options) === "string"){
+              optional.url = options;
+              options = optional;
+        }
         return queueRequest(options);
     };
 
