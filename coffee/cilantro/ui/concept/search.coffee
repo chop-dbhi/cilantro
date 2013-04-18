@@ -1,8 +1,7 @@
 define [
-    'jquery' 
     '../core'
     'tpl!templates/views/concept-search.html'
-], ($, c, template) ->
+], (c, template) ->
 
     class ConceptSearch extends c.Marionette.ItemView
         className: 'concept-search'
@@ -14,7 +13,7 @@ define [
 
         onRender: ->
             url = c.data.concepts.url()
-            search = $(@ui.input).typeahead
+            search = c.$(@ui.input).typeahead
                 name: 'Concepts'
                 remote: "#{ url }?q=%QUERY"
                 valueKey: 'label'
