@@ -3,8 +3,7 @@
  * https://github.com/twitter/typeahead
  * Copyright 2013 Twitter, Inc. and other contributors; Licensed MIT
  */
-
-(function($) {
+define(['jquery'], function($) {
     var VERSION = "0.9.2";
     var utils = {
         isMsie: function() {
@@ -1123,4 +1122,4 @@
             }
         };
     })();
-})(window.jQuery);
+});
