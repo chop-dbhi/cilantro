@@ -11,6 +11,7 @@ define [
     'plugins/jquery-easing'
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
+    'plugins/typeahead'
 ], (c) ->
 
     c.Highcharts = Highcharts
