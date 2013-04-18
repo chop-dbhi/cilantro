@@ -6,13 +6,14 @@ define [
     './channels'
     './utils'
     './session'
+    './router'
 
     # Core plugins that extend various libraries such as Backbone and jQuery.
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
     'plugins/backbone-deferrable'
-], ($, _, Backbone, mediator, channels, utils, session) ->
+], ($, _, Backbone, mediator, channels, utils, session, router) ->
 
     # Relies on the jquery-ajax-queue plugin to supply this method.
     # This ensures data is not silently lost
@@ -23,9 +24,10 @@ define [
 
     currentSession = null
 
-    c = config: @cilantro or {}
+    defaultConfig =
+        autoroute: true
 
-    props = { $, _, Backbone, utils }
+    c = config: $.extend true, defaultConfig, @cilantro
 
     aliases =
         dom: $
@@ -56,6 +58,11 @@ define [
             session.getSessionUrl(currentSession, name)
 
     channels = _.extend {}, channels, session.channels
+
+    router = new router.Router
+        el: methods.getOption('ui.main')
+
+    props = { $, _, Backbone, utils, router }
 
     # Construct the base object which is composed core libraries, the
     # mediator methods, and the app-level config
