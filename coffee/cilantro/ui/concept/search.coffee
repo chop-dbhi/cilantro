@@ -2,7 +2,6 @@ define [
     'jquery' 
     '../core'
     'tpl!templates/views/concept-search.html'
-    'plugins/typeahead'
 ], ($, c, template) ->
 
     class ConceptSearch extends c.Marionette.ItemView
