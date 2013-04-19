@@ -12,3 +12,5 @@ extensions/
 templates/vocab/
 harvest-vocab
 img/vocab/
+.grunt
+_SpecRunner.html
