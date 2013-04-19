@@ -6,13 +6,13 @@ define(['jquery'], function($) {
 
         var Typeselect = function(element, datasets, options) {
             if (typeof options === "undefined")
-                options = {}
+                options = {};
 
             this.options = $.extend({}, $.fn.typeselect.defaults, options);
 
             this.selectedDatums = {};
             this.selectedItems = {};
-            this.datasetsByName = {}
+            this.datasetsByName = {};
 
             var createFetch = function(name, valueKey, fetch) {
                 return $.proxy(function(parsedResponse){
@@ -76,8 +76,15 @@ define(['jquery'], function($) {
             constructor: Typeselect,
 
             listen: function() {
-                this.$target
-                    .on('click', '.close', $.proxy(this.click, this))
+                var targets = [];
+                $.each(this.$targetsMap, $.proxy(function(name, $target){
+                    if ($.inArray(targets, $target)) return true;
+                    $target.on('click', '.close', $.proxy(this.click, this));
+                    targets.append($target);
+                }, this));
+
+                if (this.$defaultTarget && !$.inArray(targets, this.$defaultTarget))
+                    $defautlTarget.on('click', '.close', $.proxy(this.click, this));
             },
 
             add: function(value, dataset_name) {
@@ -106,7 +113,7 @@ define(['jquery'], function($) {
                     // default list item with remove icon
                     item = $(this.options.selectedItem)
                         .text(value[valueKey])
-                        .attr('data-value', value[valueKey]
+                        .attr('data-value', value[valueKey])
                         .attr('data-dataset', dataset_name)
                         .append('<span class="close">&times;</span>');
                 }
@@ -145,7 +152,7 @@ define(['jquery'], function($) {
             click: function(event) {
                 event.preventDefault();
                 var $parent = $(event.target).parent();
-                this.remove($parent.attr('data-value'), $parent.attr('data-dataset');
+                this.remove($parent.attr('data-value'), $parent.attr('data-dataset'));
             },
 
             selected: function(groupByDataset){
@@ -159,7 +166,7 @@ define(['jquery'], function($) {
                 });
             }
 
-        }
+        };
 
         $.fn.typeselect = function(option, defaults) {
             return this.each(function() {
