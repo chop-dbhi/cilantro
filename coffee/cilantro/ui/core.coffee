@@ -5,13 +5,13 @@ define [
     'highcharts'
     'plugins/backbone-marionette'
     'plugins/bootstrap'
-    'plugins/bootstrap-typeselect'
     'plugins/bootstrap-datepicker'
     'plugins/jquery-ui'
     'plugins/jquery-easing'
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
     'plugins/typeahead'
+    'plugins/typeselect'
 ], (c) ->
 
     c.Highcharts = Highcharts
