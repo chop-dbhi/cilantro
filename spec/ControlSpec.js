@@ -1,5 +1,4 @@
-define(['cilantro.ui', 'text!../mock/fields.json'], function (c, fieldsJSON) {
-
+define(['cilantro/ui', 'text!/mock/fields.json'], function (c, fieldsJSON) {
     var fields = new c.Backbone.Collection(JSON.parse(fieldsJSON));
 
     describe('FieldControl', function() {

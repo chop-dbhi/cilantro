@@ -1,5 +1,6 @@
 *.DS_Store
 *.sw?
+*.py?
 .sass-cache
 .watch-pid
 build
@@ -14,7 +15,3 @@ extensions/
 templates/vocab/
 harvest-vocab
 img/vocab/
-*.sw[po]
-*.py[co]
-.sass-cache
-*.swn
