@@ -1,9 +1,16 @@
 define(['cilantro.ui'], function(c) {
-    var view = new c.ui.ResultsWorkflow;
+
+    var frame = new c.structs.Frame(null, {
+          url: '/mock/data/preview.json'
+      }),
+      view = new c.ui.ResultsWorkflow({
+          model: frame
+      });
 
     return function(dom, navigator) {
         navigator.collapse();
-        view.render();
         dom.html(view.el);
-    }
+        view.render();
+        frame.fetch();
+    };
 });

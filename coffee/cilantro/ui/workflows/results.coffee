@@ -1,7 +1,9 @@
 define [
     '../../core'
+    '../../structs'
+    '../tables'
     'tpl!templates/workflows/results.html'
-], (c, templates...) ->
+], (c, structs, tables, templates...) ->
 
     templates = c._.object ['results'], templates
 
@@ -10,9 +12,16 @@ define [
 
         template: templates.results
 
-        regions: {}
+        initialize: ->
+            if not @model?
+                @model = new structs.Frame
+
+        regions:
+            table: '.table-region'
 
         onRender: ->
+            @table.show new tables.Table
+                model: @model
 
 
     { ResultsWorkflow }
