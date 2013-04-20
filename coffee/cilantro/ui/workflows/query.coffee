@@ -12,9 +12,9 @@ define [
         template: templates.query
 
         regions:
-            index: '.concept-index-container'
-            workspace: '.concept-workspace-container'
-            filters: '.named-filter-container'
+            index: '.concept-index-region'
+            workspace: '.concept-workspace-region'
+            filters: '.named-filter-region'
 
         onRender: ->
             @index.show new concept.ConceptIndex
