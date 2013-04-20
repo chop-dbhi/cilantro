@@ -1,9 +1,11 @@
 define [
     './cilantro/core'
     './cilantro/models'
-], (c, models) ->
+    './cilantro/structs'
+], (c, models, structs) ->
 
     c.models = models
+    c.structs = structs
 
     # TODO move this logic into a workflow..
     c.data =

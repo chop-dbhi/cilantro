@@ -6,6 +6,7 @@ define [
     './cilantro/ui/charts'
     './cilantro/ui/filter'
     './cilantro/ui/controls'
+    './cilantro/ui/tables'
     './cilantro/ui/workflows'
 ], (c, mods...) ->
 
