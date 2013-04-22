@@ -13,13 +13,13 @@ define [
 
         render: ->
             @header = new header.Header
-                model: @model.indexes
+                collection: @model.indexes
             
             @body = new body.Body
                 collection: @model.series
 
             @footer = new footer.Footer
-                model: @model.indexes
+                collection: @model.indexes
                     
             @$el.append(@header.el, @body.el, @footer.el)
 
