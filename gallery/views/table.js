@@ -1,6 +1,6 @@
 define(['cilantro.ui'], function(c) {
 
-    var frame = new c.structs.Frame(null, {
+    var frame = new c.structs.Frame(null, null, {
           url: '/mock/data/preview.json'
       }),
       table = new c.ui.Table({

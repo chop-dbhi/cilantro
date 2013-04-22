@@ -13,7 +13,7 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
             });
 
             it('should populate remote data on fetch', function() {
-                var frame = new c.structs.Frame(null, {
+                var frame = new c.structs.Frame(null, null, {
                     url: '/mock/data/preview.json'
                 });
 

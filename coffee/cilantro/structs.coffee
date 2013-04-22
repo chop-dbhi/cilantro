@@ -11,40 +11,45 @@ define [
 
 
     class Datum extends c.Backbone.Model
-        constructor: (attrs, options={}) ->
-            if not (index = options.index)?
-                index = new Index
+        constructor: (attrs, index, options) ->
+            if not (index instanceof Index)
+                index = new Index index
             @index = index
-
-            options.parse = true
             super(attrs, options)
 
 
-    class DatumArray extends c.Backbone.Collection
-        constructor: (attrs, options={}) ->
-            if not (indexes = options.indexes)?
-                indexes = new Indexes
+
+    # Internal container for the Series. It is a collection of Datum objects.
+    class _DatumArray extends c.Backbone.Collection
+        constructor: (attrs, indexes, options) ->
             @indexes = indexes
             super(attrs, options)
 
         model: (value, options) =>
-            index = @indexes.models[@length]
+            # Collections length are not updated immediately, so this uses
+            # the internal hash to determine the next index
+            index = @indexes.at(c._.keys(@_byId).length)
+
             new Datum
                 value: value
             ,
-                index: index
+                index
 
 
     class Series extends c.Backbone.Model
-        constructor: (attrs, options={}) ->
-            if not (indexes = options.indexes)?
-                indexes = new Indexes
-
+        constructor: (attrs, indexes, options={}) ->
+            if not (indexes instanceof Indexes)
+                indexes = new Indexes indexes
             @indexes = indexes
-            @data = new DatumArray null,
-                indexes: indexes
 
-            options.parse = true
+            if c._.isArray(attrs)
+                data = attrs
+                attrs = null
+            else
+                options.parse = true
+
+            @data = new _DatumArray data, indexes
+
             super(attrs, options)
 
         parse: (resp, options) ->
@@ -52,15 +57,14 @@ define [
             return
 
 
-    class SeriesArray extends c.Backbone.Collection
-        constructor: (attrs, options={}) ->
-            if not (indexes = options.indexes)?
-                indexes = new Indexes
+    # Internal container for the Frame. It is a collection of Series objects.
+    class _SeriesArray extends c.Backbone.Collection
+        constructor: (attrs, indexes, options) ->
             @indexes = indexes
             super(attrs, options)
 
         model: (attrs, options) =>
-            new Series attrs, indexes: @indexes
+            new Series attrs, @indexes, options
 
 
     class Frame extends c.Backbone.Model
@@ -68,16 +72,18 @@ define [
             paginate: true
             paginateBy: 50
 
-        constructor: (attrs, options={}) ->
-            @indexes = new Indexes
-            @series = new SeriesArray null,
-                indexes: @indexes
+        constructor: (attrs, indexes, options={}) ->
+            if not (indexes instanceof Indexes)
+                indexes = new Indexes indexes
+            @indexes = indexes
 
-            options.parse = true
+            if c._.isArray(attrs)
+                data = attrs
+                attrs = null
+            else
+                options.parse = true
 
-            # Set the url for easily creating a data frame for remote data
-            if options.url?
-                @url = => options.url
+            @series = new _SeriesArray data, indexes
 
             super(attrs, options)
 
