@@ -14,3 +14,4 @@ harvest-vocab
 img/vocab/
 .grunt
 _SpecRunner.html
+spec-runner.html

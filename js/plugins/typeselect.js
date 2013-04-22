@@ -81,7 +81,7 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 $.each(this.$targetsMap, $.proxy(function(name, $target){
                     if (~$.inArray($target, targets)) return true;
                     $target.on('click', '.close', $.proxy(this.click, this));
-                    targets.append($target);
+                    targets.push($target);
                 }, this));
 
                 if (this.$defaultTarget && !$.inArray(targets, this.$defaultTarget))
