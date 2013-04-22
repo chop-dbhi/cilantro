@@ -5,17 +5,16 @@ define(['jquery','plugins/typeselect'], function($){
     var $arena = $('#arena');
 
     function select($element, value){
-        var ttView = $element.data().ttView, e;
-        ttView.inputView.$input.blur().focus();
-        ttView.inputView.$input.val(value);
+        var e;
+        $element.val(value);
         // Tell the input something changed
-        e = $.Event('input', {keyCode:65});
+        e = $.Event('input', { keyCode:65 });
         $element.trigger(e);
         // Down arrow 
-        e = $.Event('keydown', {keyCode:40});
+        e = $.Event('keydown', { keyCode:40 });
         $element.trigger(e);
         // Enter
-        e = $.Event('keydown', {keyCode:13});
+        e = $.Event('keydown', { keyCode:13 });
         $element.trigger(e);
     }
 
