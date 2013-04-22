@@ -56,6 +56,7 @@ define(['jquery', 'plugins/typeahead'], function($) {
             this.$element.on('typeahead:selected', $.proxy(function(event, datum, dataset_name){
                  this.add(datum, dataset_name);
                  // Clear out the textbox
+                 this.$element.blur();
                  this.$element.val('');
             }, this));
 
@@ -78,13 +79,13 @@ define(['jquery', 'plugins/typeahead'], function($) {
             listen: function() {
                 var targets = [];
                 $.each(this.$targetsMap, $.proxy(function(name, $target){
-                    if ($.inArray(targets, $target)) return true;
+                    if (~$.inArray($target, targets)) return true;
                     $target.on('click', '.close', $.proxy(this.click, this));
                     targets.append($target);
                 }, this));
 
                 if (this.$defaultTarget && !$.inArray(targets, this.$defaultTarget))
-                    $defautlTarget.on('click', '.close', $.proxy(this.click, this));
+                    $defaultTarget.on('click', '.close', $.proxy(this.click, this));
             },
 
             add: function(value, dataset_name) {
@@ -95,10 +96,10 @@ define(['jquery', 'plugins/typeahead'], function($) {
 
                 var template, item, $target;
                 var dataset = this.datasetsByName[dataset_name];
-                var valueKey = data.valueKey;
+                var valueKey = dataset.valueKey || "value";
                 // Do not add redundant values
-                if (this.selectedDatums[dataset_name][valueKey]) return;
-                this.selectedDatums[dataset_name][valueKey] = value;
+                if (this.selectedDatums[dataset_name][value[valueKey]]) return;
+                this.selectedDatums[dataset_name][value[valueKey]] = value;
 
                 // Render
                 if (dataset.selectedTemplate){
@@ -118,7 +119,7 @@ define(['jquery', 'plugins/typeahead'], function($) {
                         .append('<span class="close">&times;</span>');
                 }
 
-                this.selectedItems[dataset_name][valueKey] = item;
+                this.selectedItems[dataset_name][value[valueKey]] = item;
 
                 // Add to the target container
                 if ($target = this.$targetsMap[dataset_name]){
@@ -135,16 +136,16 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 if (typeof dataset_name === "undefined")
                     dataset_name = this.options.dataset || this.datasets[0].name;
 
-                var valueKey = this.datasetsByName[dataset_name],
+                var valueKey = this.datasetsByName[dataset_name].valueKey || 'value',
                     item;
 
                 // Remove from the selected cache
-                if (this.selectedDatums[dataset-name][valueKey])
-                    delete this.selectedDatums[dataset-name][valueKey];
+                if (this.selectedDatums[dataset_name][value])
+                    delete this.selectedDatums[dataset_name][value];
 
                 // Remove element from DOM element cache
-                if (item = this.selectedItems[dataset-name][valueKey]){
-                   delete this.selectedItem[dataset-name][valueKey];
+                if (item = this.selectedItems[dataset_name][value]){
+                   delete this.selectedItems[dataset_name][value];
                    item.remove();
                 }
             },
