@@ -26,8 +26,8 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
                 });
 
                 runs(function() {
-                    expect(frame.indexes.length).toEqual(6);
-                    expect(frame.series.length).toEqual(30);
+                    expect(frame.width()).toEqual(6);
+                    expect(frame.size()).toEqual(30);
                 });
             });
 
@@ -46,7 +46,12 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
             });
 
             it('should should have data', function() {
-                expect(series.data.length).toEqual(6);
+                expect(series.width()).toEqual(6);
+                expect(series.size()).toEqual(1);
+            });
+
+            it('should be classified as a row', function() {
+                expect(series.isRow()).toBe(true);
             });
 
         });

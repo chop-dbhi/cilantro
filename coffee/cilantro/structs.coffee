@@ -17,6 +17,9 @@ define [
             @index = index
             super(attrs, options)
 
+        size: -> 1
+
+        width: -> 1
 
 
     # Internal container for the Series. It is a collection of Datum objects.
@@ -56,6 +59,17 @@ define [
             @data.reset(resp.values, options)
             return
 
+        isColumn: ->
+            @width() is 1
+
+        isRow: ->
+            not @isColumn()
+
+        size: ->
+            if @isColumn() then @data.length else 1
+
+        width: ->
+            @indexes.length
 
     # Internal container for the Frame. It is a collection of Series objects.
     class _SeriesArray extends c.Backbone.Collection
@@ -92,6 +106,11 @@ define [
             @series.reset(resp.objects, options)
             return
 
+        size: ->
+            @series.length
+
+        width: ->
+            @indexes.length
 
 
     { Frame, Series, Datum, Index, Indexes }
