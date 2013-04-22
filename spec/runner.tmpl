@@ -27,7 +27,7 @@
             autoload: true
         };
   </script>
-  <script src="build/require.js"></script>
+  <script src="/build/require.js"></script>
   <script>
       require(['<%= [].concat(scripts.specs,scripts.reporters).join("','") %>'], function(){
         require(['<%= scripts.start.join("','") %>'], function(){

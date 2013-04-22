@@ -9,6 +9,7 @@ css/vocab/
 .idea
 .grunt
 _SpecRunner.html
+spec-runner.html
 node_modules
 gallery/extensions
 extensions/
