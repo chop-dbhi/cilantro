@@ -11,9 +11,6 @@ define [
 
         itemView: cell.Cell
 
-        #itemViewOptions: (model, index) ->
-        #    model: model.data.at(index)
-
 
     class EmptyRow extends c.Backbone.View
         className: 'empty'
