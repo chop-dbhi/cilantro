@@ -11,6 +11,10 @@ define [
 
         itemView: cell.Cell
 
+        itemViewOptions: (model, index) =>
+            c._.extend {}, @options,
+                model: model
+
 
     class EmptyRow extends c.Backbone.View
         className: 'empty'

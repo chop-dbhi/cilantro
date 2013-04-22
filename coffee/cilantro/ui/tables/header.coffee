@@ -26,7 +26,7 @@ define [
         tagName: 'thead'
 
         render: ->
-            row = new HeaderRow
+            row = new HeaderRow c._.extend {}, @options,
                 collection: @collection
             @$el.html(row.el)
             row.render()

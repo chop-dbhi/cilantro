@@ -13,8 +13,9 @@ define [
 
         emptyItemView: row.EmptyRow
 
-        itemViewOptions: (model, index) ->
-            collection: model.data
+        itemViewOptions: (model, index) =>
+            c._.extend {}, @options,
+                collection: model.data
 
 
     { Body }
