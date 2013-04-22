@@ -112,5 +112,10 @@ define [
         width: ->
             @indexes.length
 
+        column: (index) ->
+            data = @series.map (series) ->
+                series.data.at(index)
+            new Series data, @indexes.at(index)
+
 
     { Frame, Series, Datum, Index, Indexes }

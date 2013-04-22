@@ -31,6 +31,13 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
                 });
             });
 
+            it('should be able to extract columns', function() {
+                var frame = new c.structs.Frame(data);
+                var column = frame.column(2);
+                expect(column.width()).toEqual(1);
+                expect(column.size()).toEqual(30);
+                expect(column.isColumn()).toBe(true);
+            });
         });
 
         describe('Series', function() {
