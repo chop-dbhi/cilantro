@@ -4,6 +4,15 @@ define [
 
 
     class Index extends c.Backbone.Model
+        defaults:
+            visible: true
+
+        show: ->
+            @set visible: true
+
+        hide: ->
+            @set visible: false
+
 
 
     class Indexes extends c.Backbone.Collection
