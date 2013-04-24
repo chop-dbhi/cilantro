@@ -58,5 +58,17 @@ define(['jquery','plugins/typeselect'], function($){
 
              expect($('#target li')).toExist();
          });
+
+         it('Adds preselected choices to the target', function(){
+             var t = $('#source').typeselect({
+                 name: 'test',
+                 local: ['apple', 'orange', 'banana'],
+                 target: '#target',
+                 selected: {value: 'orange'}
+             });
+             expect($('#target li')).toExist();
+             // Last char is X we insert, so remove it before comparison
+             expect($('#target li').text().replace(/\W/g, '')).toEqual('orange');
+         });
     });
 }); 

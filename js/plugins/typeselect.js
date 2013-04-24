@@ -43,11 +43,15 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 if (dataset.target) this.$targetsMap[dataset.name] = $(dataset.target);
                 if (typeof dataset.remote === 'string' || dataset.remote instanceof String)
                     dataset.remote = {url: dataset.remote};
+
                 if (dataset.remote)
                     dateset.remote.fetch = createFetch(dataset.name, valueKey, dataset.remote.fetch);
                 this.selectedDatums[dataset.name] = {};
                 this.selectedItems[dataset.name] = {};
                 this.datasetsByName[dataset.name] = dataset;
+
+                if (dataset.selected)
+                    this.prePopulate(dataset.selected, dataset.name);
             }, this));
 
             // Initialize with twitter (not bootstrap) typeahead
@@ -59,15 +63,6 @@ define(['jquery', 'plugins/typeahead'], function($) {
                  this.$element.blur();
                  this.$element.val('');
             }, this));
-
-            // Populate pre-selected values
-            var preselected = this.options.selected;
-            for (var i = 0; i < preselected.length; i++) {
-                if ($.isArray(preselected[i]))
-                    this.add.apply(preselected[i]);
-                else
-                    this.add(preselected[i]);
-            }
 
             this.listen();
         };
@@ -165,6 +160,14 @@ define(['jquery', 'plugins/typeahead'], function($) {
                         return datum;
                     });
                 });
+            },
+
+            prePopulate: function(selectedDatums, dataset_name){
+                var index;
+                if (!$.isArray(selectedDatums))
+                    selectedDatums = [selectedDatums];
+                for (index = 0; index < selectedDatums.length; index++)
+                    this.add(selectedDatums[index], dataset_name);
             }
 
         };
@@ -173,9 +176,9 @@ define(['jquery', 'plugins/typeahead'], function($) {
             return this.each(function() {
                 var $this = $(this),
                    data = $this.data('typeselect'),
-                   datasets = typeof option == 'object' && option;
+                   datasets = option;
                 if (!data) $this.data('typeselect', (data = new Typeselect(this, datasets, defaults)));
-                if (typeof option == 'string') data[option]();
+                if (typeof option === 'string') data[option]();
             });
         };
 
@@ -197,7 +200,5 @@ define(['jquery', 'plugins/typeahead'], function($) {
             e.preventDefault();
             $this.typeselect($this.data());
         });
-
     }($);
-
 });
