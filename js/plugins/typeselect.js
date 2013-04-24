@@ -14,14 +14,15 @@ define(['jquery', 'plugins/typeahead'], function($) {
             this.selectedItems = {};
             this.datasetsByName = {};
 
-            var createFetch = function(name, valueKey, fetch) {
-                return $.proxy(function(parsedResponse){
-                    var datums = fetch ? fetch(parsedResponse) : JSON.parse(parsedResponse);
-                    var filtered = $.map(datums, function(index, datum){
-                         if (this.selectedDatums[datum[valueKey]]) return null;
+            var createFilter = function(name, valueKey, filter, selectedDatums) {
+                return function(parsedResponse){
+                    var datums = filter ? filter(parsedResponse) : parsedResponse;
+                    var filtered = $.map(datums, function(datum, index){
+                         if (selectedDatums[datum[valueKey]]) return null;
                          else return datum;
                     });
-                }, this);
+                    return filtered;
+                };
             };
 
             // Support multiple targets based on dataset 
@@ -45,7 +46,8 @@ define(['jquery', 'plugins/typeahead'], function($) {
                     dataset.remote = {url: dataset.remote};
 
                 if (dataset.remote)
-                    dateset.remote.fetch = createFetch(dataset.name, valueKey, dataset.remote.fetch);
+                    dataset.remote.filter = createFilter(dataset.name, valueKey, 
+                        dataset.remote.filter, this.selectedDatums);
                 this.selectedDatums[dataset.name] = {};
                 this.selectedItems[dataset.name] = {};
                 this.datasetsByName[dataset.name] = dataset;
@@ -70,6 +72,10 @@ define(['jquery', 'plugins/typeahead'], function($) {
         Typeselect.prototype = {
 
             constructor: Typeselect,
+
+            destroy: function(){
+                this.$element.typeahead('destroy');
+            },
 
             listen: function() {
                 var targets = [];
