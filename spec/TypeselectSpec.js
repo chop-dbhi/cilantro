@@ -133,10 +133,38 @@ define(['jquery','plugins/typeselect'], function($){
 
              typeIn(t, 'Hem');
              setTimeout(function(){
+                 expect($('#source').parent().find('div.tt-suggestion').length).toEqual(4);
                  downAndEnter(t);
                  expect($('#target li').text().replace(/\W/g, '')).toEqual('HemoglobinHGBs');
                  done();
              }, 1500);
+         });
+
+
+         async.it("Filters out selected items from remote datasets", function(done){
+             t = $('#source').typeselect({
+                 // Note, there seems to be an issue where if you reuse a dataset name, even on a 
+                 // totally new input, if the old dataset was local, and the new one is remote,
+                 // typeahead will not try to retrieve remote results
+                 name: 'test_remote',
+                 remote: '/mock/search.json?q=%QUERY',
+                 target: '#target',
+                 valueKey: 'label',
+                 cache: false,
+                 selected: { id:50, label:'Medication'}
+             });
+
+             expect($('#target li')).toExist();
+             // Last char is X we insert, so remove it before comparison
+             expect($('#target li').text().replace(/\W/g, '')).toEqual('Medication');
+             typeIn(t, 'Med');
+
+             setTimeout(function(){
+                 // Medecine is selected so it should not be shown.
+                 expect($('#source').parent().find('div.tt-suggestion').length).toEqual(3);
+                 done();
+             }, 1500);
+
          });
         
     });

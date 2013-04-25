@@ -45,10 +45,11 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 if (typeof dataset.remote === 'string' || dataset.remote instanceof String)
                     dataset.remote = {url: dataset.remote};
 
+                this.selectedDatums[dataset.name] = {};
+
                 if (dataset.remote)
                     dataset.remote.filter = createFilter(dataset.name, valueKey, 
-                        dataset.remote.filter, this.selectedDatums);
-                this.selectedDatums[dataset.name] = {};
+                        dataset.remote.filter, this.selectedDatums[dataset.name]);
                 this.selectedItems[dataset.name] = {};
                 this.datasetsByName[dataset.name] = dataset;
 
