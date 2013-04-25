@@ -13,6 +13,9 @@ define(['jquery', 'plugins/typeahead'], function($) {
             this.selectedDatums = {};
             this.selectedItems = {};
             this.datasetsByName = {};
+            // Begin hack to fix caching issue
+            this.urlToDatasetMap = {};
+            // End hack to fix caching issue
 
             var createFilter = function(name, valueKey, filter, selectedDatums) {
                 return function(parsedResponse){
@@ -40,21 +43,27 @@ define(['jquery', 'plugins/typeahead'], function($) {
             // modify filter attributes so we can remove 
             // selected items from future suggestions
             $.each(datasets, $.proxy(function(index, dataset) {
-                var valueKey = dataset.valueKey || 'value';
+                var valueKey = dataset.valueKey || 'value', dataset_name = dataset.name;
                 if (dataset.target) this.$targetsMap[dataset.name] = $(dataset.target);
                 if (typeof dataset.remote === 'string' || dataset.remote instanceof String)
                     dataset.remote = {url: dataset.remote};
+                this.selectedDatums[dataset_name] = {};
 
-                this.selectedDatums[dataset.name] = {};
-
-                if (dataset.remote)
-                    dataset.remote.filter = createFilter(dataset.name, valueKey, 
-                        dataset.remote.filter, this.selectedDatums[dataset.name]);
-                this.selectedItems[dataset.name] = {};
-                this.datasetsByName[dataset.name] = dataset;
+                if (dataset.remote){
+                    // Begin hack to fix caching issue
+                    this.urlToDatasetMap[dataset.remote.url.replace(/\W/g,'_')] = dataset_name;
+                    dataset.name = dataset.remote.url.replace(/\W/g,'_');
+                    // End hack to fix caching issue
+                    dataset.remote.filter = createFilter(dataset_name, valueKey, 
+                        dataset.remote.filter, this.selectedDatums[dataset_name]);
+                }
+                // TODO this cache will containt
+                // be the swapped out dataset.name if we did that above
+                this.selectedItems[dataset_name] = {};
+                this.datasetsByName[dataset_name] = dataset;
 
                 if (dataset.selected)
-                    this.prePopulate(dataset.selected, dataset.name);
+                    this.prePopulate(dataset.selected, dataset_name);
             }, this));
 
             // Initialize with twitter (not bootstrap) typeahead
@@ -95,7 +104,10 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 // Use first supplied dataset by default
                 if (typeof dataset_name === "undefined")
                     dataset_name = this.options.dataset || this.datasets[0].name;
-
+                // Begin hack to fix caching issue
+                if (this.urlToDatasetMap.hasOwnProperty(dataset_name))
+                    dataset_name = this.urlToDatasetMap[dataset_name]
+                // End hack to fix caching issue
                 var template, item, $target;
                 var dataset = this.datasetsByName[dataset_name];
                 var valueKey = dataset.valueKey || "value";
@@ -137,6 +149,11 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 // Use first supplied dataset by default
                 if (typeof dataset_name === "undefined")
                     dataset_name = this.options.dataset || this.datasets[0].name;
+
+                // Begin hack to fix caching issue
+                if (this.urlToDatasetMap.hasOwnProperty(dataset_name))
+                    dataset_name = this.urlToDatasetMap[dataset_name]
+                // End hack to fix caching issue
 
                 var valueKey = this.datasetsByName[dataset_name].valueKey || 'value',
                     item;

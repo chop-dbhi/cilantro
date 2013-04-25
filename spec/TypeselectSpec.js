@@ -125,7 +125,7 @@ define(['jquery','plugins/typeselect'], function($){
                  // totally new input, if the old dataset was local, and the new one is remote,
                  // typeahead will not try to retrieve remote results
                  name: 'test_remote',
-                 remote: '/mock/search.json?q=%QUERY',
+                 remote: '/mock/search.json?b=%QUERY',
                  target: '#target',
                  valueKey: 'label',
                  cache: false
@@ -147,11 +147,11 @@ define(['jquery','plugins/typeselect'], function($){
                  // totally new input, if the old dataset was local, and the new one is remote,
                  // typeahead will not try to retrieve remote results
                  name: 'test_remote',
-                 remote: '/mock/search.json?q=%QUERY',
+                 remote: '/mock/search.json?d=%QUERY',
                  target: '#target',
                  valueKey: 'label',
                  cache: false,
-                 selected: { id:50, label:'Medication'}
+                 selected: {id: 50, label:'Medication'}
              });
 
              expect($('#target li')).toExist();
@@ -160,12 +160,35 @@ define(['jquery','plugins/typeselect'], function($){
              typeIn(t, 'Med');
 
              setTimeout(function(){
-                 // Medecine is selected so it should not be shown.
+                 // Medication is selected so it should not be shown.
                  expect($('#source').parent().find('div.tt-suggestion').length).toEqual(3);
                  done();
              }, 1500);
 
          });
         
+         async.it("Items are no longer filtered out once unselected", function(done){
+             t = $('#source').typeselect({
+                 // Note, there seems to be an issue where if you reuse a dataset name, even on a 
+                 // totally new input, if the old dataset was local, and the new one is remote,
+                 // typeahead will not try to retrieve remote results
+                 name: 'test_remote',
+                 remote: '/mock/search.json?q=%QUERY',
+                 target: '#target',
+                 valueKey: 'label',
+                 cache: false,
+                 selected: {id: 50, label: 'Medication'}
+             });
+
+             // Remove selected item
+             $('#target li span.close').click();
+             typeIn(t, 'Med');
+             setTimeout(function(){
+                 // Medication was removed so it should be shown in results
+                 expect($('#source').parent().find('div.tt-suggestion').length).toEqual(4);
+                 done();
+             }, 1500);
+
+         });
     });
 }); 
