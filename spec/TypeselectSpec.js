@@ -100,8 +100,8 @@ define(['jquery','plugins/typeselect'], function($){
     });
 
     describe('Type select remote source', function(){
-         var async = new AsyncSpec(this);
          var t;
+         var async = new AsyncSpec(this);
 
          async.beforeEach(function(done){
              $arena.append($(inputTemplate));
@@ -110,17 +110,25 @@ define(['jquery','plugins/typeselect'], function($){
          });
 
          async.afterEach(function(done){
-             t.typeselect('destroy');
+            // There is a bug in the actual typeahead code if we use
+            // destroy. Destroy does not prevent ajax callbacks from executing
+            // and the callback contains code references that no longer exist
+            // after destroy is called
+            // t.typeselect('destroy');
              $arena.empty();
              done();
          });
 
          async.it("Retrieves remove datasets", function(done){
              t = $('#source').typeselect({
-                 name: 'test',
-                 remote: '/mock/search.json',
+                 // Note, there seems to be an issue where if you reuse a dataset name, even on a 
+                 // totally new input, if the old dataset was local, and the new one is remote,
+                 // typeahead will not try to retrieve remote results
+                 name: 'test_remote',
+                 remote: '/mock/search.json?q=%QUERY',
                  target: '#target',
-                 valueKey: 'label'
+                 valueKey: 'label',
+                 cache: false
              });
 
              typeIn(t, 'Hem');
@@ -130,7 +138,6 @@ define(['jquery','plugins/typeselect'], function($){
                  done();
              }, 1500);
          });
-         // test removal of selected items
         
     });
 }); 
