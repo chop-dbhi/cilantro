@@ -117,7 +117,7 @@ define(['jquery', 'plugins/typeahead'], function($) {
                     dataset_name = this.options.dataset || this.datasets[0].name;
                 // Begin hack to fix caching issue
                 if (this.urlToDatasetMap.hasOwnProperty(dataset_name))
-                    dataset_name = this.urlToDatasetMap[dataset_name]
+                    dataset_name = this.urlToDatasetMap[dataset_name];
                 // End hack to fix caching issue
                 var template, item, $target;
                 var dataset = this.datasetsByName[dataset_name];
@@ -163,7 +163,7 @@ define(['jquery', 'plugins/typeahead'], function($) {
 
                 // Begin hack to fix caching issue
                 if (this.urlToDatasetMap.hasOwnProperty(dataset_name))
-                    dataset_name = this.urlToDatasetMap[dataset_name]
+                    dataset_name = this.urlToDatasetMap[dataset_name];
                 // End hack to fix caching issue
 
                 var valueKey = this.datasetsByName[dataset_name].valueKey || 'value',
