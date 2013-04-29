@@ -51,13 +51,24 @@ define(['jquery', 'plugins/typeahead'], function($) {
 
                 if (dataset.remote){
                     // Begin hack to fix caching issue
-                    this.urlToDatasetMap[dataset.remote.url.replace(/\W/g,'_')] = dataset_name;
-                    dataset.name = dataset.remote.url.replace(/\W/g,'_');
+                    dataset.name = dataset.remote.url.replace(/[?%&=./:]/g, function(c){
+                        var r = {
+                            '?':'q',
+                            '%':'p',
+                            '&':'a',
+                            '=':'e',
+                            '.':'d',
+                            '/':'s',
+                            ':':'c'
+                        };
+                        return r[c];
+                    });
+                    this.urlToDatasetMap[dataset.name] = dataset_name;
                     // End hack to fix caching issue
                     dataset.remote.filter = createFilter(dataset_name, valueKey, 
                         dataset.remote.filter, this.selectedDatums[dataset_name]);
                 }
-                // TODO this cache will containt
+                // TODO this cache will will need to be
                 // be the swapped out dataset.name if we did that above
                 this.selectedItems[dataset_name] = {};
                 this.datasetsByName[dataset_name] = dataset;
