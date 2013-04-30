@@ -111,6 +111,7 @@ define(['jquery', 'plugins/typeahead'], function($) {
             },
 
             add: function(value, dataset_name) {
+                var engine, template, item, $target;
                 // dataset_name parameter is optional
                 // Use first supplied dataset by default
                 if (typeof dataset_name === "undefined")
@@ -119,7 +120,6 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 if (this.urlToDatasetMap.hasOwnProperty(dataset_name))
                     dataset_name = this.urlToDatasetMap[dataset_name];
                 // End hack to fix caching issue
-                var template, item, $target;
                 var dataset = this.datasetsByName[dataset_name];
                 var valueKey = dataset.valueKey || "value";
                 // Do not add redundant values
@@ -127,22 +127,14 @@ define(['jquery', 'plugins/typeahead'], function($) {
                 this.selectedDatums[dataset_name][value[valueKey]] = value;
 
                 // Render
-                if (dataset.selectedTemplate){
-                    if (!$.isFunction(dataset.selectedTemplate))
-                        template = dataset.engine.compile(dataset.selectedTemplate);
-                    else 
-                        template = dataset.selectedTemplate;
-                    item = $(template.render(value))
-                        .attr('data-value', value[valueKey])
-                        .attr('data-dataset', dataset_name);
-                } else {
-                    // default list item with remove icon
-                    item = $(this.options.selectedItem)
-                        .text(value[valueKey])
-                        .attr('data-value', value[valueKey])
-                        .attr('data-dataset', dataset_name)
-                        .append('<span class="close">&times;</span>');
-                }
+                template = dataset.selectedTemplate || this.options.selectedTemplate;
+                engine = dataset.engine || this.options.engine;
+
+                if (typeof template === 'string' || template instanceof String)
+                     template = engine.compile(template);
+                item = $(template.render(value, valueKey))
+                     .attr('data-value', value[valueKey])
+                     .attr('data-dataset', dataset_name);
 
                 this.selectedItems[dataset_name][value[valueKey]] = item;
 
@@ -219,8 +211,12 @@ define(['jquery', 'plugins/typeahead'], function($) {
 
 
         $.fn.typeselect.defaults = {
-            selected: [],
-            selectedItem: '<li class=typeselect-selected></li>'
+            selectedTemplate: {  render: function(value, valueKey){
+                return $('<li class=typeselect-selected></li>')
+                        .text(value[valueKey])
+                        .append('<span class="close">&times;</span>');
+               }
+            }
         };
 
 
