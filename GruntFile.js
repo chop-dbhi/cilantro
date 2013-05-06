@@ -17,6 +17,7 @@ module.exports = function(grunt) {
         host: 'http://127.0.0.1:8125/',
         template:'spec/runner.tmpl',
         outfile: 'spec-runner.html',
+        keepRunner: true,
         templateOptions:{
           requireConfig: {
              baseUrl: 'build/',
