@@ -58,8 +58,8 @@ combine: coffee
 	@ln -sf ${TMPL_DIR} ${BUILD_DIR}
 	@echo 'Putting extensions in place...'
 	@rm -f ${BUILD_DIR}/ext
-	if [-d ${BUILD_DIR}/ext ]; then \
-	    @ln -sf ${EXT_DIR} ${BUILD_DIR}/ext\
+	@if [ -d ${BUILD_DIR}/ext ]; then \
+	    @ln -sf ${EXT_DIR} ${BUILD_DIR}/ext; \
 	fi;
 
 optimize: combine
