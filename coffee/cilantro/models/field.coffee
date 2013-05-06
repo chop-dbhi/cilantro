@@ -55,13 +55,6 @@ define [
         url: ->
             c.getSessionUrl('fields')
 
-        initialize: ->
-            super
-            # TODO change this to use Marionette's app initializer
-            c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
-            c.subscribe c.SESSION_CLOSED, => @reset()
-            @on 'reset', @resolve
-		
         search: (query, handler) ->
             c.Backbone.ajax
                 url: c._.result @, 'url'
