@@ -10,6 +10,10 @@ Cilantro provides various modules and utilies which act as sane defaults for int
 
 Since this is a client for supporting data discovery applications, the UI must be flexible in order to support different workflows that are employed by the kind of data the application is representing.
 
+## Compatibility
+
+Cilantro relies on a Serrano-compatible API with version 2.0.15+
+
 ## Install
 
 ## Contribute
