@@ -5,14 +5,19 @@ define [
     class ContextNodeError extends Error
 
 
-    queryAttrs = (attrs, query, options) ->
+    queryAttrs = (attrs={}, query={}, options) ->
         if attrs instanceof ContextNodeModel
             attrs = attrs.attributes
-        if query.concept? and attrs.concept is query.concept
-            return true
-        if query.field? and attrs.field is query.field
-            return true
-        return false
+
+        # No empty queries
+        if c._.isEmpty(query) then return false
+
+        # Check against each key in the query for a match on attrs
+        for key, value of query
+            if attrs[key] isnt value
+                return false
+
+        return true
 
 
     # Represents a single node within a ContextModel tree. Non-branch nodes
