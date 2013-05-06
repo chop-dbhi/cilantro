@@ -1,14 +1,13 @@
-define ['../core'], (c) ->
+define [
+  '../core'
+  './base'
+], (c, base) ->
 
 
-    class FieldModel extends c.Backbone.Model
-        parse: (resp) ->
-            @urls = {}
+    class FieldModel extends base.Model
+        parse: ->
+            super
             @_cache = {}
-            # Simpler representation of urls
-            for key, value of resp._links
-                @urls[key] = value.href
-            return resp
 
         distribution: (handler, cache=true) ->
             if not @urls.distribution? then handler()
@@ -50,7 +49,7 @@ define ['../core'], (c) ->
             return
 
 
-    class FieldCollection extends c.Backbone.Collection
+    class FieldCollection extends base.Collection
         model: FieldModel
 
         url: ->

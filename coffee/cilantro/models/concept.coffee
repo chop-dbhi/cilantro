@@ -1,15 +1,38 @@
-define ['../core', './field'], (c, field) ->
+define [
+  '../core'
+  './base'
+  './field'
+], (c, base, field) ->
 
-    class ConceptModel extends c.Backbone.Model
-        parse: (resp) ->
-            @fields = []
-            # Parse and attach field model instances to concept
-            for attrs in resp.fields
-                @fields.push(new field.FieldModel attrs, parse: true)
+
+    class ConceptModel extends base.Model
+        constructor: (attrs, options={}) ->
+            @fields = new field.FieldCollection
+            options.parse = true
+            super(attrs, options)
+
+        initialize: ->
+            super
+
+            # Fetch the field data the first time a concept receives focus
+            c.subscribe c.CONCEPT_FOCUS, (id) =>
+                if @id isnt id then return
+                if not @fields.length then @fields.fetch()
+
+        parse: (resp, options) ->
+            super
+
+            if resp?
+                # Set the endpoint for related fields
+                @fields.url = => @urls.fields
+
+                if resp.fields?
+                    @fields.set(resp.fields, options)
+                    delete resp.fields
             return resp
 
 
-    class ConceptCollection extends c.Backbone.Collection
+    class ConceptCollection extends base.Collection
         model: ConceptModel
 
         url: ->
