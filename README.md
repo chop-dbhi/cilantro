@@ -16,9 +16,19 @@ Cilantro relies on a Serrano-compatible API with version 2.0.15+
 
 ## Install
 
-## Contribute
+**NPM**
 
-### Anyone!
+```bash
+npm install cilantro
+```
+
+**Bower**
+
+```bash
+bower install cilantro
+```
+
+## Contribute
 
 Review [the current issues](https://github.com/cbmi/cilantro/issues) and provide feedback for feature requests or if you think you have found a bug or would like to get feedback on a new feature, [open a ticket](https://github.com/cbmi/cilantro/issues/new).
 
