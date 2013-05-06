@@ -15,12 +15,22 @@ define ['../core', './field'], (c, field) ->
         url: ->
             c.getSessionUrl('concepts')
 
+        constructor: ->
+            @queryable = new c.Backbone.Collection
+            @viewable = new c.Backbone.Collection
+            super
+
         initialize: ->
             super
             c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
+
             @on 'reset', @resolve
 
+            # Update the sub-collections with the specific sets of models
+            @on 'reset', ->
+                @queryable.set @filter (m) -> m.get('queryview')?
+                @viewable.set @filter (m) -> m.get('formatter_name')?
 
         search: (query, handler) ->
             c.Backbone.ajax
