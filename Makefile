@@ -62,14 +62,20 @@ combine: coffee
 	    @ln -sf ${EXT_DIR} ${BUILD_DIR}/ext; \
 	fi;
 
-optimize: combine
-	@echo 'Optimizing JavaScript...'
+src-dist: combine
+	@echo 'Creating source distribution...'
 	@rm -rf ${DIST_DIR}
 	@mkdir -p ${DIST_DIR} ${EXT_DIR}
 	@${BUILD} > /dev/null
 	@rm -rf ${DIST_SRC_DIR}/templates
+
+dist: src-dist
+	@echo 'Creating distribution...'
 	@${OPTIMIZE} > /dev/null
 	@rm -rf ${DIST_MIN_DIR}/templates
 
+# Legacy alias
+optimize: dist
 
-.PHONY: all sass coffee watch unwatch combine optimize
+
+.PHONY: all sass coffee watch unwatch combine src-dist dist optimize

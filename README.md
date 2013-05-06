@@ -10,11 +10,25 @@ Cilantro provides various modules and utilies which act as sane defaults for int
 
 Since this is a client for supporting data discovery applications, the UI must be flexible in order to support different workflows that are employed by the kind of data the application is representing.
 
+## Compatibility
+
+Cilantro relies on a Serrano-compatible API with version 2.0.15+
+
 ## Install
 
-## Contribute
+**NPM**
 
-### Anyone!
+```bash
+npm install cilantro
+```
+
+**Bower**
+
+```bash
+bower install cilantro
+```
+
+## Contribute
 
 Review [the current issues](https://github.com/cbmi/cilantro/issues) and provide feedback for feature requests or if you think you have found a bug or would like to get feedback on a new feature, [open a ticket](https://github.com/cbmi/cilantro/issues/new).
 

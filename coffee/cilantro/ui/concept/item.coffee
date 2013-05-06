@@ -14,8 +14,8 @@ define [
 
         serializeData: ->
             data = @model.toJSON()
-            if not data.description
-                data.description = data.fields[0].description
+            if not data.description and @model.fields.length
+                data.description = @model.fields.models[0].description
             return data
 
 

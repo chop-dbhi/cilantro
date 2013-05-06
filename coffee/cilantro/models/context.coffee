@@ -5,14 +5,19 @@ define [
     class ContextNodeError extends Error
 
 
-    queryAttrs = (attrs, query, options) ->
+    queryAttrs = (attrs={}, query={}, options) ->
         if attrs instanceof ContextNodeModel
             attrs = attrs.attributes
-        if query.concept? and attrs.concept is query.concept
-            return true
-        if query.field? and attrs.field is query.field
-            return true
-        return false
+
+        # No empty queries
+        if c._.isEmpty(query) then return false
+
+        # Check against each key in the query for a match on attrs
+        for key, value of query
+            if attrs[key] isnt value
+                return false
+
+        return true
 
 
     # Represents a single node within a ContextModel tree. Non-branch nodes
@@ -46,9 +51,11 @@ define [
         isTyped: ->
             @attributes.field? or @attributes.concept?
 
-        fetch: (query, options) ->
+        fetch: (query, options={}) ->
             if queryAttrs(@, query, options)
                 return @
+            if options.create isnt false
+                return new @constructor query
 
 
     # Branch-type node that acts as a container for other nodes. The `type`
@@ -84,18 +91,27 @@ define [
                         return message
             return
 
-        fetch: (query, options) ->
-            if (node = super) then return node
+        fetch: (query, options={}) ->
+            # Set false to prevent shadowing the children below
+            create = options.create
+            options.create = false
+
+            if (node = super(query, options))
+                return node
 
             children = @get('children')
+
+            # Recurse on each child node for a match, converting raw
+            # attributes into nodes as needed
             for child, i in children
-                if queryAttrs(child, query, options)
-                    # If this a match, convert the child into an instance
-                    # for downstream use.
-                    if not (child instanceof ContextNodeModel)
-                        child = children[i] = getContextNodeModel(child, options)
-                    return child
-            return
+                if not (child instanceof ContextNodeModel)
+                    child = children[i] = getContextNodeModel(child, options)
+                if (node = child.fetch(query, options))
+                    return node
+
+            if create isnt false
+                @add(node = new @constructor query)
+                return node
 
         # If this is a deep save, recursively save children prior to
         # creating a copy to publicAttributes.
