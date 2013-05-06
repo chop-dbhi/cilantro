@@ -66,7 +66,7 @@ define ['../core'], (c) ->
         search: (query, handler) ->
             c.Backbone.ajax
                 url: c._.result @, 'url'
-                data: q: query
+                data: query: query
                 dataType: 'json'
                 success: (resp) -> handler(resp)
 
