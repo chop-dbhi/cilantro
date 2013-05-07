@@ -17,7 +17,7 @@ define [
             # Fetch the field data the first time a concept receives focus
             c.subscribe c.CONCEPT_FOCUS, (id) =>
                 if @id isnt id then return
-                if not @fields.length then @fields.fetch()
+                if not @fields.length then @fields.fetch(reset:true)
 
         parse: (resp, options) ->
             super

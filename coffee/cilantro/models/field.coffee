@@ -6,8 +6,8 @@ define [
 
     class FieldModel extends base.Model
         parse: ->
-            super
             @_cache = {}
+            super
 
         distribution: (handler, cache=true) ->
             if not @links.distribution? then handler()
