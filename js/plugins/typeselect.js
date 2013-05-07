@@ -1,4 +1,4 @@
-define(['jquery', 'lib/typeahead'], function($) {
+define(['jquery', 'plugins/typeahead'], function($) {
 
     !function($) {
 
