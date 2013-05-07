@@ -5,15 +5,11 @@
                 "href": "/mock/fields/number-dist.json",
                 "rel": "data"
             },
-            "self": {
-                "href": "/mock/fields/number.json",
-                "rel": "self"
-            },
             "stats": {
                 "href": "/mock/fields/number-stats.json",
                 "rel": "data"
             },
-            "values": {
+            "self": {
                 "href": "/extensions/vocab/mock/root.json",
                 "rel": "data"
             }
