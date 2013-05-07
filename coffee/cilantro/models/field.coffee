@@ -10,12 +10,12 @@ define [
             @_cache = {}
 
         distribution: (handler, cache=true) ->
-            if not @urls.distribution? then handler()
+            if not @links.distribution? then handler()
             if cache and @_cache.distribution?
                 handler(@_cache.distribution)
             else
                 c.Backbone.ajax
-                    url: @urls.distribution
+                    url: @links.distribution
                     dataType: 'json'
                     success: (resp) =>
                         @_cache.distribution = if cache then resp else null
@@ -23,12 +23,12 @@ define [
             return
 
         stats: (handler, cache=true) ->
-            if not @urls.stats? then handler()
+            if not @links.stats? then handler()
             if cache and @_cache.stats?
                 handler(@_cache.stats)
             else
                 c.Backbone.ajax
-                    url: @urls.stats
+                    url: @links.stats
                     dataType: 'json'
                     success: (resp) =>
                         @_cache.stats = if cache then resp else null
@@ -36,12 +36,12 @@ define [
             return
 
         values: (handler, cache=true) ->
-            if not @urls.values? then handler()
+            if not @links.values? then handler()
             if cache and @_cache.values?
                 handler(@_cache.values)
             else
                 c.Backbone.ajax
-                    url: @urls.values
+                    url: @links.values
                     dataType: 'json'
                     success: (resp) =>
                         @_cache.values = if cache then resp else null

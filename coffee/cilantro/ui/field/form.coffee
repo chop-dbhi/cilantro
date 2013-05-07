@@ -57,7 +57,7 @@ define [
                 @[key].show view
 
             # Only represent for fields that support distributions
-            if @options.showChart and @model.urls.distribution?
+            if @options.showChart and @model.links.distribution?
                 chart = new charts.FieldChart
                     model: @model
                     context: @context
@@ -107,7 +107,7 @@ define [
                     field: model.id
                     concept: context.get 'concept'
 
-            if not @fieldChartIndex? and model.urls.distribution?
+            if not @fieldChartIndex? and model.links.distribution?
                 @fieldChartIndex = index
                 options.showChart = true
 

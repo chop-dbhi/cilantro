@@ -24,7 +24,7 @@ define [
 
             if resp?
                 # Set the endpoint for related fields
-                @fields.url = => @urls.fields
+                @fields.url = => @links.fields
 
                 if resp.fields?
                     @fields.set(resp.fields, options)

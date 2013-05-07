@@ -4,16 +4,17 @@ define [
 
     class Model extends c.Backbone.Model
         url: ->
-            if @isNew() then super else @urls.self
+            if @isNew() then super else @links.self
 
         constructor: (attrs, options) ->
-            @urls = {}
+            @links = {}
             super(attrs, options)
 
         parse: (attrs, options) ->
             if attrs? and attrs._links?
+                @links = {}
                 for name, link of attrs._links
-                    @urls[name] = link.href
+                    @links[name] = link.href
                 delete attrs._links
             return attrs
 
@@ -22,16 +23,17 @@ define [
         model: Model
 
         url: ->
-            if @isNew() then super else @urls.self
+            if @isNew() then super else @links.self
 
         constructor: (attrs, options) ->
-            @urls = {}
+            @links = {}
             super(attrs, options)
 
         parse: (attrs, options) ->
             if attrs? and attrs._links?
+                @links = {}
                 for name, link of attrs._links
-                    @urls[name] = link.href
+                    @links[name] = link.href
                 delete attrs._links
             return attrs
 
