@@ -1,5 +1,4 @@
-[
-    {
+[ {
         "_links": {
             "self": {
                 "href": "/mock/concepts/number.json",
@@ -111,7 +110,6 @@
             "parent": null
         },
         "description": "Patient Diagnosis",
-        "fields": ,
         "formatter_name": "Formatter",
         "id": 31,
         "keywords": "",
