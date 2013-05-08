@@ -2,7 +2,7 @@ define [
     './core'
 ], (c) ->
 
-    loader = -> '<div class="loader"><i class="icon-spinner icon-spin"></i></div>'
+    loader = '<div class="loader"><i class="icon-spinner icon-spin"></i></div>'
 
     class EmptyView extends c.Marionette.ItemView
         options:
@@ -13,10 +13,17 @@ define [
             super
 
             if not @template?
-                if @options.loader
-                    @template = loader
-                else if @options.message
-                    @template = -> @options.message
+                if @options.template
+                    @template = @options.template
+                else
+                    html = []
+
+                    if @options.loader
+                        html.push loader
+                    if @options.message
+                        html.push @options.message
+
+                    @template = -> html.join ' '
 
             @$el.addClass('empty-view')
 
