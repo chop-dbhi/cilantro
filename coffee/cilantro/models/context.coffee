@@ -68,6 +68,10 @@ define [
         nodeType: 'branch'
 
         initialize: (attrs, options={}) ->
+            options = c._.extend
+                deep: true
+            , options
+
             if options.deep
                 children = @get('children')
                 for child, i in children
