@@ -5,29 +5,48 @@ define [
 
     templates = c._.object ['item'], templates
 
+    flattenLanguage = (attrs, items=[]) ->
+        if attrs.children?
+            for child in attrs.children
+                flattenLanguage(child, items)
+        else if attrs.language?
+            items.push(attrs.language)
+        return items
+
+
     class ContextNode extends c.Marionette.ItemView
         className: 'context-node'
 
         template: templates.item
 
         events:
-            'click .actions .destroy': 'destroyNode'
-            'click .actions .state': 'toggleState'
+            'click .actions .destroy': 'clickDestroy'
+            'click .actions .state': 'clickState'
 
         ui:
             state: '.actions .state'
 
+        initialize: ->
+            @listenTo(@model, 'destroy', @destroyNode, @)
+            @listenTo(@model, 'change:enabled', @toggleState, @)
+
         serializeData: ->
-            language: @model.get('language')
+            language: flattenLanguage(@model.toJSON()).join(', ')
+
+        clickDestroy: (event) ->
+            @model.destroy()
+
+        clickState: (event) ->
+            enabled = @model.get('enabled') isnt false
+            @model.set('enabled', !enabled)
 
         destroyNode: (event) ->
-            if @model? then @model.destroy()
             @$el.fadeOut
                 duration: 400
                 easing: 'easeOutExpo'
                 complete: => @close()
 
-        disable: (trigger=true) ->
+        disable: ->
             @$el.addClass('disabled')
             @ui.state
                 .attr('title', 'Enable')
@@ -35,9 +54,7 @@ define [
                     .addClass('icon-circle-blank')
                     .removeClass('icon-circle')
 
-            if trigger then @model.set enabled: false
-
-        enable: (trigger=true) ->
+        enable: ->
             @$el.removeClass('disabled')
             @ui.state
                 .attr('title', 'Disable')
@@ -45,16 +62,12 @@ define [
                     .addClass('icon-circle')
                     .removeClass('icon-circle-blank')
 
-            if trigger then @model.set enabled: true
-
         toggleState: (event) ->
-            disabled = @model.get('enabled') is false
-            if disabled then @enable(event) else @disable(event)
+            enabled = @model.get('enabled') isnt false
+            if enabled then @enable() else @disable()
 
         onRender: ->
-            disabled = @model.get('enabled') is false
-            # Initial state corresponds to the flag
-            if disabled then @disable(false) else @enable(false)
+            @toggleState()
 
 
     { ContextNode }

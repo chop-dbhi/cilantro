@@ -1,20 +1,12 @@
 .context-node {
+    @include transition(color, 0.2s);
     @include backdrop;
     @extend .clearfix;
 
-    padding: 5px;
+    padding: 10px;
 
     &.disabled {
-        @include transition(color, 0.2s);
         color: #ccc;
-
-        &:hover {
-            color: inherit;
-        }
-    }
-
-    .language {
-        padding: 12px 0;
     }
 
     .actions {
