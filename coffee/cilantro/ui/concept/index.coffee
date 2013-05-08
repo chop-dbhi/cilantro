@@ -1,17 +1,13 @@
 define [
     '../core'
     './item'
+    '../empty'
     'tpl!templates/views/concept-accordian-group.html'
     'tpl!templates/views/concept-accordian-item.html'
-], (c, items, templates...) ->
+], (c, items, empty, templates...) ->
 
     # Create an object of templates by name..
     templates = c._.object ['group', 'item'], templates
-
-
-    class ConceptNoItems extends c.Marionette.ItemView
-        className: 'empty'
-        template: -> 'No concepts have been setup'
 
 
     class ConceptAccordianItem extends items.Concept
@@ -73,7 +69,7 @@ define [
     class ConceptIndex extends c.Marionette.CollectionView
         className: 'accordian'
         itemView: ConceptAccordianGroup
-        emptyView: ConceptNoItems
+        emptyView: empty.EmptyView
 
         # Temporarily override
         showCollection: ->
