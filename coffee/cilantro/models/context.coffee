@@ -67,7 +67,7 @@ define [
 
         nodeType: 'branch'
 
-        initialize: (attrs, options={}) ->
+        initialize: (attrs, options) ->
             options = c._.extend
                 deep: true
             , options
