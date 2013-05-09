@@ -3,22 +3,6 @@
     "archived": false,
     "object_name_plural": "patients",
     "description": "",
-    "language": {
-		"type": "and",
-		"children": [{
-			"operator": "exact",
-			"language": "hemoglobin (hgb) is equal to 17",
-			"field": 30,
-			"value": 17,
-            "concept": 28
-		}, {
-			"operator": "in",
-			"language": "Diagnosis is equal to Ischemic Heart Disease 1 or Ischemic Heart Disease 2",
-			"id": 35,
-			"value": [5, 9],
-            "concept": 31
-		}]
-	},
     "created": "2013-02-14 16:05:35",
     "composite": false,
     "object_name": "patient",
@@ -26,16 +10,19 @@
     "json": {
         "type": "and",
         "children": [{
-            "operator": "exact",
+            "language": "Hemoglobin (HGB) is between 20 and 45 mg/dL",
+            "operator": "range",
             "field": 30,
-            "concept": 28,
-            "value": 17
+            "value": [20, 45],
+            "concept": 28
         },
         { 
           "type": "and",
           "concept": 31,
           "children": [{
+              "language": "Diagnosis is either Ischemic Heart Disease 1 or Ischemic Heart Disease 2",
                "operator": "in",
+               "concept": 31,
                "field": 35,
                "value": [5, 9]
           }] 

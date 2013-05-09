@@ -96,15 +96,10 @@ define [
         initialize: ->
             super
             c.subscribe c.SESSION_OPENED, =>
-                @fetch(reset: true).done => @ensureSession()
+                @fetch(reset: true).done =>
+                    @ensureSession()
+                    @resolve()
             c.subscribe c.SESSION_CLOSED, => @reset()
-
-            # Mimic the initial sync for each model
-            @on 'reset', (collection) ->
-                @resolve()
-                for model in collection.models
-                    model.trigger 'sync'
-                return
 
         getSession: ->
             (@filter (model) -> model.get 'session')[0]

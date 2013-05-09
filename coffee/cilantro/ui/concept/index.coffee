@@ -1,17 +1,13 @@
 define [
     '../core'
     './item'
+    '../empty'
     'tpl!templates/views/concept-accordian-group.html'
     'tpl!templates/views/concept-accordian-item.html'
-], (c, items, templates...) ->
+], (c, items, empty, templates...) ->
 
     # Create an object of templates by name..
     templates = c._.object ['group', 'item'], templates
-
-
-    class ConceptNoItems extends c.Marionette.ItemView
-        className: 'empty'
-        template: -> 'No concepts have been setup'
 
 
     class ConceptAccordianItem extends items.Concept
@@ -72,13 +68,15 @@ define [
 
     class ConceptIndex extends c.Marionette.CollectionView
         className: 'accordian'
+
         itemView: ConceptAccordianGroup
-        emptyView: ConceptNoItems
+
+        emptyView: empty.EmptyView
 
         # Temporarily override
         showCollection: ->
             collection = @collection
-            @collection = new c.Backbone.Collection @groupModels()
+            @collection = new c.Backbone.Collection @groupModels(collection)
             super
             @collection = collection
             return
@@ -96,13 +94,11 @@ define [
                 return attrs.category
             return id: null, name: 'Other'
 
-        groupModels: ->
+        groupModels: (collection) ->
             groups = {}
 
             # Group by category and sub-category
-            for model in @collection.models
-                if not model.get 'queryview' then continue
-
+            for model in collection.models
                 attrs = model.attributes
                 groupAttrs = null
                 sectionAttrs = null

@@ -1,9 +1,12 @@
-[
-    {
+[ {
         "_links": {
             "self": {
                 "href": "/mock/concepts/number.json",
                 "rel": "self"
+            },
+            "fields": {
+                "href": "/mock/concepts-28-fields.json",
+                "rel": "fields"
             }
         },
         "archived": false,
@@ -18,86 +21,6 @@
             }
         },
         "description": "The iron-containing respiratory pigment in red blood cells of vertebrates, consisting of about 6 percent heme and 94 percent globin.",
-        "fields": [
-            {
-                "_links": {
-                    "distribution": {
-                        "href": "/mock/fields/number-dist.json",
-                        "rel": "data"
-                    },
-                    "self": {
-                        "href": "/mock/fields/number.json",
-                        "rel": "self"
-                    },
-                    "stats": {
-                        "href": "/mock/fields/number-stats.json",
-                        "rel": "data"
-                    },
-                    "values": {
-                        "href": "/mock/fields/number-values.json",
-                        "rel": "data"
-                    }
-                },
-                "app_name": "openmrs",
-                "archived": false,
-                "category": null,
-                "data_modified": null,
-                "description": "The iron-containing respiratory pigment in red blood cells of vertebrates, consisting of about 6 percent heme and 94 percent globin.",
-                "enumerable": false,
-                "field_name": "hgb",
-                "id": 30,
-                "internal_type": "float",
-                "keywords": "",
-                "model_name": "labresult",
-                "modified": "2012-10-03 21:02:38",
-                "name": "Hemoglobin (HGB)",
-                "nullable": true,
-                "operators": [
-                    [
-                        "exact",
-                        "is"
-                    ],
-                    [
-                        "-exact",
-                        "is not"
-                    ],
-                    [
-                        "in",
-                        "includes"
-                    ],
-                    [
-                        "-in",
-                        "excludes"
-                    ],
-                    [
-                        "lt",
-                        "is less than"
-                    ],
-                    [
-                        "lte",
-                        "is less than or equal to"
-                    ],
-                    [
-                        "gt",
-                        "is greater than"
-                    ],
-                    [
-                        "gte",
-                        "is greater than or equal to"
-                    ],
-                    [
-                        "range",
-                        "is between"
-                    ]
-                ],
-                "plural_name": "Hemoglobin (HGB)s",
-                "plural_unit": "",
-                "published": true,
-                "searchable": false,
-                "simple_type": "number",
-                "unit": ""
-            }
-        ],
         "formatter_name": "Formatter",
         "id": 28,
         "keywords": "",
@@ -114,6 +37,10 @@
             "self": {
                 "href": "/mock/concepts/string.json",
                 "rel": "self"
+            },
+            "fields": {
+                "href": "/mock/concepts-50-fields.json",
+                "rel": "fields"
             }
         },
         "archived": false,
@@ -124,80 +51,6 @@
             "parent": null
         },
         "description": "Name of medication given to a patient.",
-        "fields": [
-            {
-                "_links": {
-                    "self": {
-                        "href": "/mock/fields/string.json",
-                        "rel": "self"
-                    },
-                    "values": {
-                        "href": "/mock/fields/string-values.json",
-                        "rel": "data"
-                    },
-                    "stats": {
-                        "href": "/mock/fields/string-stats.json",
-                        "rel": "data"
-                    }
-                },
-                "alt_name": "Medication",
-                "alt_plural_name": "Drug Names",
-                "app_name": "drugs",
-                "archived": false,
-                "category": null,
-                "data_modified": null,
-                "description": "Name of drug given to a patient.",
-                "enumerable": false,
-                "field_name": "name",
-                "id": 59,
-                "internal_type": "char",
-                "keywords": "",
-                "model_name": "drug",
-                "modified": "2012-10-11 14:29:43",
-                "name": "Drug Name",
-                "nullable": false,
-                "operators": [
-                    [
-                        "exact",
-                        "is"
-                    ],
-                    [
-                        "-exact",
-                        "is not"
-                    ],
-                    [
-                        "iexact",
-                        "is"
-                    ],
-                    [
-                        "-iexact",
-                        "is not"
-                    ],
-                    [
-                        "in",
-                        "includes"
-                    ],
-                    [
-                        "-in",
-                        "excludes"
-                    ],
-                    [
-                        "icontains",
-                        "contains"
-                    ],
-                    [
-                        "-icontains",
-                        "does not contain"
-                    ]
-                ],
-                "plural_name": "Drug Names",
-                "plural_unit": "",
-                "published": true,
-                "searchable": true,
-                "simple_type": "string",
-                "unit": ""
-            }
-        ],
         "formatter_name": "Formatter",
         "id": 50,
         "keywords": "",
@@ -220,160 +73,6 @@
         "plural_name": "Review of Systems",
         "description": "Review of Systems",
         "queryview": "QueryView",
-        "fields": [{
-            "internal_type": "char",
-            "app_name": "openmrs",
-            "searchable": false,
-            "alt_name": null,
-            "keywords": "",
-            "data_modified": null,
-            "id": 51,
-            "unit": "",
-            "category": null,
-            "archived": false,
-            "simple_type": "string",
-            "enumerable": true,
-            "_links": {
-                "distribution": {
-                    "href": "/mock/fields/string-dist.json",
-                    "rel": "data"
-                },
-                "self": {
-                    "href": "/mock/fields/string.json",
-                    "rel": "self"
-                },
-                "stats": {
-                    "href": "/mock/fields/string-stats.json",
-                    "rel": "data"
-                },
-                "values": {
-                    "href": "/mock/fields/string-values.json",
-                    "rel": "data"
-                }
-            },
-            "description": "Findings noted on examination of the head, ears, eyes, nose and throat.",
-            "plural_unit": "",
-            "operators": [
-                ["exact", "is equal to"],
-                ["-exact", "is not equal to"],
-                ["iexact", "is equal to"],
-                ["-iexact", "is not equal to"],
-                ["in", "includes"],
-                ["-in", "excludes"],
-                ["icontains", "contains the text"],
-                ["-icontains", "does not contain"]
-            ],
-            "field_name": "heent",
-            "plural_name": "HEENT Exams",
-            "name": "HEENT Exam",
-            "nullable": true,
-            "modified": "2012-10-04 13:55:38",
-            "alt_plural_name": "HEENT Exams",
-            "published": true,
-            "model_name": "systemsreview"
-        }, {
-            "internal_type": "char",
-            "app_name": "openmrs",
-            "searchable": false,
-            "alt_name": null,
-            "keywords": "",
-            "data_modified": null,
-            "id": 52,
-            "unit": "",
-            "category": null,
-            "archived": false,
-            "simple_type": "string",
-            "enumerable": true,
-            "_links": {
-                "distribution": {
-                    "href": "/mock/fields/string-dist.json",
-                    "rel": "data"
-                },
-                "self": {
-                    "href": "/mock/fields/string.json",
-                    "rel": "self"
-                },
-                "stats": {
-                    "href": "/mock/fields/string-stats.json",
-                    "rel": "data"
-                },
-                "values": {
-                    "href": "/mock/fields/string-values.json",
-                    "rel": "data"
-                }
-            },
-            "description": "Findings noted on examination of the chest.",
-            "plural_unit": "",
-            "operators": [
-                ["exact", "is equal to"],
-                ["-exact", "is not equal to"],
-                ["iexact", "is equal to"],
-                ["-iexact", "is not equal to"],
-                ["in", "includes"],
-                ["-in", "excludes"],
-                ["icontains", "contains the text"],
-                ["-icontains", "does not contain"]
-            ],
-            "field_name": "chest",
-            "plural_name": "Chest Exams",
-            "name": "Chest Exam",
-            "nullable": true,
-            "modified": "2012-10-04 13:54:48",
-            "alt_plural_name": "Chest Exams",
-            "published": true,
-            "model_name": "systemsreview"
-        }, {
-            "internal_type": "char",
-            "app_name": "openmrs",
-            "searchable": false,
-            "alt_name": null,
-            "keywords": "",
-            "data_modified": null,
-            "id": 53,
-            "unit": "",
-            "category": null,
-            "archived": false,
-            "simple_type": "string",
-            "enumerable": true,
-            "_links": {
-                "distribution": {
-                    "href": "/mock/fields/string-dist.json",
-                    "rel": "data"
-                },
-                "self": {
-                    "href": "/mock/fields/string.json",
-                    "rel": "self"
-                },
-                "stats": {
-                    "href": "/mock/fields/string-stats.json",
-                    "rel": "data"
-                },
-                "values": {
-                    "href": "/mock/fields/string-values.json",
-                    "rel": "data"
-                }
-            },
-            "description": "Findings noted on examination of the abdomen.",
-            "plural_unit": "",
-            "operators": [
-                ["exact", "is equal to"],
-                ["-exact", "is not equal to"],
-                ["iexact", "is equal to"],
-                ["-iexact", "is not equal to"],
-                ["in", "includes"],
-                ["-in", "excludes"],
-                ["icontains", "contains the text"],
-                ["-icontains", "does not contain"]
-            ],
-            "field_name": "abdominal",
-            "plural_name": "Abdominal Exams",
-            "name": "Abdominal Exam",
-            "nullable": true,
-            "modified": "2012-10-04 13:53:15",
-            "alt_plural_name": "Abdominal Exams",
-            "published": true,
-            "model_name": "systemsreview"
-        }],
         "modified": "2012-10-11 09:56:23",
         "formatter_name": "SystemsReview",
         "order": null,
@@ -381,6 +80,10 @@
             "self": {
                 "href": "/demo/api/concepts/8/",
                 "rel": "self"
+            },
+            "fields": {
+                "href": "/mock/concepts-8-fields.json",
+                "rel": "fields"
             }
         },
         "published": true,
@@ -393,6 +96,10 @@
             "self": {
                 "href": "/mock/concepts/number.json",
                 "rel": "self"
+            },
+            "fields": {
+                "href": "/mock/concepts-31-fields.json",
+                "rel": "fields"
             }
         },
         "archived": false,
@@ -403,70 +110,6 @@
             "parent": null
         },
         "description": "Patient Diagnosis",
-        "fields": [
-            {
-                "_links": {
-                    "distribution": {
-                        "href": "/mock/fields/number-dist.json",
-                        "rel": "data"
-                    },
-                    "self": {
-                        "href": "/mock/fields/number.json",
-                        "rel": "self"
-                    },
-                    "stats": {
-                        "href": "/mock/fields/number-stats.json",
-                        "rel": "data"
-                    },
-                    "values": {
-                        "href": "/extensions/vocab/mock/root.json",
-                        "rel": "data"
-                    }
-                },
-                "app_name": "openmrs",
-                "archived": false,
-                "category": null,
-                "data_modified": null,
-                "description": "Patient Diagnosis",
-                "enumerable": false,
-                "field_name": "diagnosis",
-                "id": 35,
-                "internal_type": "float",
-                "keywords": "",
-                "model_name": "diagnosis",
-                "modified": "2012-10-03 21:02:38",
-                "name": "Diagnosis",
-                "nullable": true,
-                "operators": [
-                    [
-                        "in",
-                        "in"
-                    ],
-                    [
-                        "-in",
-                        "not in"
-                    ],
-                    [
-                        "only",
-                        "only be"
-                    ],
-                    [
-                        "all",
-                        "require all"
-                    ],
-                    [
-                        "-all",
-                        "can not have"
-                    ]
-                ],
-                "plural_name": "Hemoglobin (HGB)s",
-                "plural_unit": "",
-                "published": true,
-                "searchable": false,
-                "simple_type": "number",
-                "unit": ""
-            }
-        ],
         "formatter_name": "Formatter",
         "id": 31,
         "keywords": "",

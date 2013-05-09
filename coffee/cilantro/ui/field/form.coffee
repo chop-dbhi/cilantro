@@ -55,12 +55,14 @@ define [
                     model: @model
                     context: @context
                 @[key].show view
-            
+
             # Only represent for fields that support distributions
-            if @options.showChart and @model.urls.distribution?
+            if @options.showChart and @model.links.distribution?
                 chart = new charts.FieldChart
                     model: @model
                     context: @context
+                    chart:
+                        height: 200
                 @chart.show chart
 
             @setDefaultState()
@@ -95,4 +97,23 @@ define [
             if @options.managed then @setNewState()
 
 
-    { FieldForm }
+    class FieldFormCollection extends c.Marionette.CollectionView
+        itemView: FieldForm
+
+        itemViewOptions: (model, index) ->
+            context = @options.context
+
+            options =
+                model: model
+                context: context.fetch
+                    field: model.id
+                    concept: context.get 'concept'
+
+            if not @fieldChartIndex? and model.links.distribution?
+                @fieldChartIndex = index
+                options.showChart = true
+
+            return options
+
+
+    { FieldForm, FieldFormCollection }

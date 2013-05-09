@@ -1,0 +1,26 @@
+.context-node {
+    @include transition(color, 0.2s);
+    @include backdrop;
+    @extend .clearfix;
+
+    padding: 10px;
+
+    &.disabled {
+        color: #ccc;
+    }
+
+    .actions {
+        float: right;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 5px;
+
+        .destroy {
+            color: rgb(180, 0, 0);
+        }
+
+        .state {
+            color: #999;
+        }
+    }
+}
