@@ -52,8 +52,8 @@ define [
 
             # Update the sub-collections with the specific sets of models
             @on 'reset', ->
-                @queryable.set @filter (m) -> m.get('queryview')?
-                @viewable.set @filter (m) -> m.get('formatter_name')?
+                @queryable.reset @filter (m) -> !!m.get('queryview')
+                @viewable.reset @filter (m) -> !!m.get('formatter_name')
 
         search: (query, handler) ->
             c.Backbone.ajax

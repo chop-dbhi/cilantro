@@ -68,13 +68,15 @@ define [
 
     class ConceptIndex extends c.Marionette.CollectionView
         className: 'accordian'
+
         itemView: ConceptAccordianGroup
+
         emptyView: empty.EmptyView
 
         # Temporarily override
         showCollection: ->
             collection = @collection
-            @collection = new c.Backbone.Collection @groupModels()
+            @collection = new c.Backbone.Collection @groupModels(collection)
             super
             @collection = collection
             return
@@ -92,13 +94,11 @@ define [
                 return attrs.category
             return id: null, name: 'Other'
 
-        groupModels: ->
+        groupModels: (collection) ->
             groups = {}
 
             # Group by category and sub-category
-            for model in @collection.models
-                if not model.get 'queryview' then continue
-
+            for model in collection.models
                 attrs = model.attributes
                 groupAttrs = null
                 sectionAttrs = null
