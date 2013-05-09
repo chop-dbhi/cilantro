@@ -11,7 +11,16 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
             window.Highcharts.Chart = jasmine.createSpy();
             window.Highcharts.Chart.prototype.series = [{points:[]}];
             model = new models.ConceptModel(concepts[0], { parse:true });
-            done();
+            if (model.fields.length){
+               context = new models.ContextNodeModel({id:model.fields.at(0).id});
+               done();
+            }else{
+               model.fields.once('reset', function() {
+                  context = new models.ContextNodeModel({id:model.fields.at(0).id});
+                  done();
+               });
+            }
+            model.fields.fetch({reset:true});
        });
 
        async.afterEach(function(done){
@@ -22,10 +31,9 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
        async.it("should only create one Highcharts.Chart object on calls to render", function(done){
             var testChart = new charts.FieldChart({
                  editable: false,
-                 model: model.fields[0],
+                 model: model.fields.at(0),
                  context: null
             });
-
            var el = testChart.render();
 
            setTimeout(function(){
@@ -59,7 +67,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
 
            var testChart = new charts.FieldChart({
                  editable: true,
-                 model: model.fields[0],
+                 model: model.fields.at(0),
                  context: context
            });
 
