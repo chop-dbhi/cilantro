@@ -38,8 +38,6 @@ define [
             update: '.concept-actions [data-toggle=update]'
 
         regions:
-            main: '.concept-main'
-            chart: '.concept-chart'
             fields: '.concept-fields'
 
         onRender: ->
