@@ -11,7 +11,16 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
             window.Highcharts.Chart = jasmine.createSpy();
             window.Highcharts.Chart.prototype.series = [{points:[]}];
             model = new models.ConceptModel(concepts[0], { parse:true });
-            done();
+            if (model.fields.length){
+               context = new models.ContextNodeModel({id:model.fields.at(0).id});
+               done();
+            }else{
+               model.fields.once('reset', function() {
+                  context = new models.ContextNodeModel({id:model.fields.at(0).id});
+                  done();
+               });
+            }
+            model.fields.fetch({reset:true});
        });
 
        async.afterEach(function(done){
@@ -22,10 +31,9 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
        async.it("should only create one Highcharts.Chart object on calls to render", function(done){
             var testChart = new charts.FieldChart({
                  editable: false,
-                 model: model.fields[0],
+                 model: model.fields.at(0),
                  context: null
             });
-
            var el = testChart.render();
 
            setTimeout(function(){
@@ -43,15 +51,23 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
 
         async.beforeEach(function(done){
             model = new models.ConceptModel(concept, {parse: true});
-            context = new models.ContextNodeModel({id:model.fields[0].id});
-            done();
+            if (model.fields.length){
+               context = new models.ContextNodeModel({id:model.fields.at(0).id});
+               done();
+            }else{
+               model.fields.once('reset', function() {
+                  context = new models.ContextNodeModel({id:model.fields.at(0).id});
+                  done();
+               });
+            }
+            model.fields.fetch({reset:true});
         });
 
         async.it("should update when it's context changes", function(done){
 
            var testChart = new charts.FieldChart({
                  editable: true,
-                 model: model.fields[0],
+                 model: model.fields.at(0),
                  context: context
            });
 
@@ -60,7 +76,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
            setTimeout(function(){
                points = testChart.chart.series[0].points;
                expect(_.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeUndefined();
-               context.set({value:["ABNORMAL"]})
+               context.set({value:["ABNORMAL"]});
                expect(_.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeTruthy();
                done();
            }, 1000);
