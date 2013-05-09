@@ -14,3 +14,7 @@ extensions/
 templates/vocab/
 harvest-vocab
 img/vocab/
+*.sw[po]
+*.py[co]
+.sass-cache
+*.swn

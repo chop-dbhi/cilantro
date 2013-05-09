@@ -1,0 +1,55 @@
+@import "lib/bourbon/bourbon";
+@import "lib/bootstrap";
+@import "lib/chosen";
+@import "lib/select2";
+//@import "lib/bootstrap-responsive";
+
+@import "base/app";
+@import "base/modal";
+
+@import "layouts/subnav";
+@import "layouts/scrollable-column";
+@import "layouts/panels";
+@import "layouts/main-area";
+@import "layouts/analysis-area";
+
+@import "state/sync";
+@import "state/loading";
+
+@import "modules/chosen";
+@import "modules/icons";
+@import "modules/container";
+@import "modules/charts";
+@import "modules/accordian";
+@import "modules/conditions";
+@import "modules/grouped-tables";
+@import "modules/data-conditions";
+@import "modules/queryviews";
+@import "modules/data-filters";
+@import "modules/columns";
+@import "modules/table";
+
+@import "routes/workspace";
+@import "routes/discover";
+@import "routes/analysis";
+@import "routes/review";
+
+* {
+    @include user-select(none);
+    @include transition(opacity, 0.4s, ease-in-out);
+}
+
+select, input, p, table {
+    @include user-select(auto);
+}
+
+body {
+    background: #f9f9f9 url(../../images/fabric_plaid.png);
+    // Padding for navigation bars
+    padding-top: 77px;
+    font-size: 16px;
+}
+
+h1 {
+    margin: 10px 0 20px 0;
+}

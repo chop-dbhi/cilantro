@@ -1,0 +1,36 @@
+@mixin raised {
+    @include box-shadow(1px 1px 3px #ccc);
+    @include border-radius(3px);
+    background-color: #fff;
+    border: 1px solid #bbb;
+}
+
+.raised {
+    @include raised;
+}
+
+
+#main-area {
+    position: fixed;
+    top: 77px;
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+
+    .inner {
+        height: 100%;
+        padding: 10px;
+    }
+
+    // For a simple layout
+    &.centered {
+        margin: 0 auto;
+        position: static;
+        max-width: 960px;
+
+        .inner {
+            @include raised;
+            padding: 10px;
+        }
+    }
+}

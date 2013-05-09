@@ -1,0 +1,49 @@
+.chart-container {
+    @include inline-block;
+    vertical-align: top;
+    margin-bottom: 2%;
+
+    > .btn-toolbar {
+        position: absolute;
+        right: 10px;
+        top: -1px;
+        z-index: 10;
+    }
+
+    .heading {
+        cursor: move;
+    }
+
+    .heading .label {
+        bottom: 2px;
+        margin-left: 10px;
+        position: relative;
+        display: none;
+    }
+
+    .editable {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 39px;
+        bottom: 0;
+        z-index: 10;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+        
+        form, label {
+            margin-bottom: 0;
+        }
+    }
+
+    .chart {
+        height: 220px;
+
+        .no-data {
+            padding: 10px;
+            color: #999;
+            text-align: center;
+        }
+    }
+}

@@ -1,0 +1,127 @@
+#report-container {
+    @include raised;
+    position: absolute;
+    min-height: 65px;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 0;
+    overflow: auto;
+
+    &.short {
+        bottom: auto;
+    }
+
+    .pinned-thead {
+        @include box-shadow(0 2px 5px #ccc);
+        @include border-radius(3px 3px 0 0);
+        display: none;
+        background-color: white;
+        position: fixed;
+        z-index: 20;
+        // A bit of a shortcut.. this assumes the table is in a fixed
+        // position in the UI
+        left: 21px;
+        right: 21px;
+
+        div {
+            @include inline-block;
+            cursor: pointer;
+            position: relative;
+            font-weight: bold;
+            padding: 8px;
+            line-height: 18px;
+            text-align: left;
+
+            i {
+                position: absolute;
+                right: 8px;
+                top: 9px;
+            }
+
+        }
+    }
+
+    thead th {
+        &:first-child {
+            @include border-radius(3px 0 0 0);
+        }
+
+        &:last-child {
+            @include border-radius(0 3px 0 0);
+        }
+
+        position: relative;
+        cursor: pointer;
+
+        &:hover, &.selected {
+            background-color: #eee;
+        }
+
+        i {
+            position: absolute;
+            right: 8px;
+            top: 9px;
+        }
+    }
+}
+
+#report-alert {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 5;
+    display: none;
+    margin-bottom: 0;
+    background-color: transparentize(#fff, 0.15);
+    color: #333;
+    border: none;
+    text-align: center;
+
+    h4 {
+        color: #333;
+    }
+}
+
+#report-table {
+    @include border-radius(3px);
+    @include user-select(auto);
+    margin-bottom: 0;
+
+    tr.highlight td {
+        background-color: transparentize(yellow, 0.5);
+    }
+
+    tbody {
+        position: relative;
+    }
+
+    thead tr {
+        @include transition(all, 0.3s);
+    }
+
+    td .highlight, th .highlight {
+        @include box-shadow(0 2px 1px #ddd);
+        @include border-radius(3px);
+        background-color: yellow;
+    }
+
+    tr:last-child {
+        @include border-radius(0 0 3px 3px);
+    }
+
+    small {
+        font-size: 11px;
+    }
+
+    .help {
+        color: #aaa;
+    }
+
+    .no-data {
+        color: #aaa;
+        font-size: 12px;
+    }
+}

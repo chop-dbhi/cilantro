@@ -1,0 +1,8 @@
+include LICENSE
+exclude cilantro/static/cilantro/scripts/javascript/app.build.js
+exclude cilantro/static/cilantro/scripts/javascript/min/build.txt
+
+global-exclude .DS_Store
+
+prune cilantro/static/cilantro/scripts/coffeescript
+prune cilantro/static/cilantro/stylesheets/scss

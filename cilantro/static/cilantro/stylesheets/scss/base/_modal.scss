@@ -1,0 +1,9 @@
+// Modals should be hidden until they are needed
+.modal {
+    display: none;
+}
+
+// Lighter backdrop
+.modal-backdrop, .modal-backdrop.fade.in {
+    opacity: 0.3;
+}

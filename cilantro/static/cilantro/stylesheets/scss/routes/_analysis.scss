@@ -1,0 +1,37 @@
+#analysis-area {
+    .chart-container {
+        width: 49%;
+
+        // Give the odd containers the margin by default
+        &:nth-child(odd) {
+            margin-right: 2%;
+        }
+
+        // When a chart is expanded, reset the margin-right for all
+        // siblings that follow.. this is epic.
+        &.expanded {
+            width: 100%;
+            margin-right: 0;
+
+            &:nth-child(odd) {
+                & ~ .chart-container:nth-child(odd) {
+                    margin-right: 0;
+                }
+
+                & ~ .chart-container:nth-child(even) {
+                    margin-right: 2%;
+                }
+            }
+
+            &:nth-child(even) {
+                & ~ .chart-container:nth-child(even) {
+                    margin-right: 0;
+                }
+
+                & ~ .chart-container:nth-child(odd) {
+                    margin-right: 2%;
+                }
+            }
+        }
+    }
+}

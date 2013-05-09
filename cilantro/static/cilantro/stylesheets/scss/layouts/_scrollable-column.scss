@@ -1,0 +1,9 @@
+.scrollable-column {
+    position: fixed;
+    overflow: hidden;
+
+    .inner {
+        height: 100%;
+        overflow: auto;
+    }
+}

@@ -1,0 +1,106 @@
+{% extends "cilantro/base.html" %}
+
+{% block styles %}
+    <link rel=stylesheet href={{ CILANTRO_CSS_URL }}style.css>
+{% endblock styles %}
+
+{% block scripts %}
+    <script>
+        var
+
+            // Used by `environ.js` to correctly prefix URL paths
+            SCRIPT_NAME = '{{ request.META.SCRIPT_NAME }}',
+
+            // Used for non-safe requests, also defined in `environ.js`
+            CSRF_TOKEN = '{{ csrf_token }}',
+
+            // Namespace for shared App components
+            App = {preferences: JSON.parse('{{ user_preferences|safe }}')};
+
+        // Pre-configuration, everything is relative to Cilantro's path. For
+        // integration of external scripts, create a contexted `require`
+        // function. See http://requirejs.org/docs/api.html#multiversion.
+        // Note that all existing scripts defined here can be used
+        var require = {
+            baseUrl: '{{ CILANTRO_JAVASCRIPT_URL }}',
+            shim: {
+                'underscore': {
+                    exports: '_'
+                },
+                'backbone': {
+                    deps: ['underscore', 'jquery'],
+                    exports: 'Backbone'
+                },
+                'highcharts': {
+                    exports: 'Highcharts'
+                },
+                'bootstrap': ['jquery'],
+                'jquery.chosen': ['jquery'],
+                'jquery.ui': ['jquery']
+            }
+        };
+    </script>
+
+    <script data-main=main src={{ CILANTRO_JAVASCRIPT_URL }}require.js></script>
+{% endblock scripts %}
+
+{% block header_content %}
+    <ul class=nav>
+        <li><a href=/ data-route=workspace>Workspace</a>
+        <li><a href=/discover/ data-route=discover>Discover</a>
+        <li><a href=/analyze/ data-route=analyze>Analyze</a>
+        <li><a href=/review/ data-route=review>Review</a>
+    </ul>
+{% endblock %}
+
+{% block subnav_content %}
+    <ul class="nav pull-left">
+        <li><button class=btn data-toggle=panel data-target=#data-filters-panel title=Filters>
+                <i class=icon-filter alt=Filters></i> Filters
+            </button>
+    </ul>
+    <ul class="nav pull-right">
+        <li><button class=btn data-toggle=panel data-target=#data-conditions-panel><i class=icon-tasks></i></button>
+    </ul>
+{% endblock subnav_content %}
+
+
+{% block content %}
+    <div id=main-area class=scrollable-column>
+        <div class=inner></div>
+    </div> <!-- end #main-area -->
+
+    <div id=data-conditions-panel class="panel panel-right closed">
+        <div class=panel-toggle data-toggle=panel></div>
+
+        <div class="inner panel-content">
+            <ul id=data-conditions class="condition-list"></ul>
+            <div class=btn-toolbar>
+                <button class="btn btn-danger btn-small">Clear</button>
+            </div>
+        </div>
+    </div> <!-- end #data-conditions-panel -->
+{% endblock content %}
+
+{% block extra_content %}
+    <!-- Modal for introducting the application -->
+    <div id=intro-modal class="modal fade">
+        <div class=modal-header>
+            <button class=close data-dismiss=modal>x</button>
+            <h1>Hey there!</h1>
+        </div>
+        <div class=modal-body>
+            <p>It looks like you never used this fancy application before. <strong>PROJECT NAME HERE</strong>
+            is a data discovery, querying and reporting tool for <strong>TYPE OF DATA HERE</strong>.</p>
+
+            <p>The typical workflow for getting started is to simply browse or search for what data is available
+            using the left-hand side. Simply click on one of these <strong>Data Concepts</strong> to view various
+            statistics about the data in the center area of the page.</p>
+
+            <p class="alert alert-info"><strong>Hint</strong> The Data Concept search is quite
+            powerful and actually looks <em>into</em> the data itself. Even if you don't know the name
+            of the <em>kind</em> of data your looking for, this will enable you to find the relevant
+            Data Concepts it applies to.</p>
+        </div>
+    </div>
+{% endblock extra_content %}
