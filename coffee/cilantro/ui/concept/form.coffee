@@ -46,6 +46,7 @@ define [
             fields = new field.FieldFormCollection
                 collection: @model.fields
                 context: @context
+                hideSingleFieldInfo: true
 
             @fields.show(fields)
             @setDefaultState()
