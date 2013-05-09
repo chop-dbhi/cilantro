@@ -61,6 +61,8 @@ define [
                 chart = new charts.FieldChart
                     model: @model
                     context: @context
+                    chart:
+                        height: 200
                 @chart.show chart
 
             @setDefaultState()
