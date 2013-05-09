@@ -21,7 +21,10 @@ define [
         constructor: ->
             super
             session = c.data.contexts.getSession()
-            @context = session.fetch(concept: @model.id)
+            @context = session.fetch
+                concept: @model.id
+            ,
+                create: 'branch'
 
         events:
             'click .concept-actions [data-toggle=add]': 'save'
@@ -35,14 +38,13 @@ define [
             update: '.concept-actions [data-toggle=update]'
 
         regions:
-            main: '.concept-main'
-            chart: '.concept-chart'
             fields: '.concept-fields'
 
         onRender: ->
             fields = new field.FieldFormCollection
                 collection: @model.fields
                 context: @context
+                hideSingleFieldInfo: true
 
             @fields.show(fields)
             @setDefaultState()
@@ -51,7 +53,7 @@ define [
             # If this is valid field-level context update the state
             # of the concept form. Only one of the fields need to be
             # valid to update the context
-            if @context?.isValid()
+            if @context?.isValid(strict: true)
                 @setUpdateState()
             else
                 @setNewState()
@@ -68,16 +70,19 @@ define [
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
-        save: (options) ->
-            options = c._.extend(deep: @options.managed, options)
-            @context?.save(options)
+        save: ->
+            options = deep: @options.managed
+            if @context?
+                @context.save(options)
+                c.publish c.CONTEXT_SAVE
             @setUpdateState()
 
         # Clears the local context of conditions
-        clear: (options) ->
-            options = c._.extend(deep: @options.managed, options)
-            @context?.clear(options)
-            @context?.save(options)
+        clear: ->
+            options = deep: @options.managed
+            if @context?
+                @context.clear(options)
+                @context.save(options)
             @setNewState()
 
 

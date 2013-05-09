@@ -5,29 +5,16 @@ define [
     class ContextNodeError extends Error
 
 
-    queryAttrs = (attrs={}, query={}, options) ->
-        if attrs instanceof ContextNodeModel
-            attrs = attrs.attributes
-
-        # No empty queries
-        if c._.isEmpty(query) then return false
-
-        # Check against each key in the query for a match on attrs
-        for key, value of query
-            if attrs[key] isnt value
-                return false
-
-        return true
-
-
     # Represents a single node within a ContextModel tree. Non-branch nodes
     # must be carefully handled and not removed from the tree unless explicitly
     # removed
     class ContextNodeModel extends c.Backbone.Model
-        initialize: (attrs, options={}) ->
-            # Save the initial state of the internal attributes
+
+        # Save of the default public attributes on initialization
+        initialize: (attrs, options) ->
             @save(options)
 
+        # Returns the public attributes
         toJSON: ->
             @publicAttributes
 
@@ -39,6 +26,16 @@ define [
                 @publicAttributes = c._.clone @attributes
             return isValid
 
+        # Clears all attributes except for the field and concept identifers
+        clear: (options) ->
+            attrs =
+                field: @get 'field'
+                concept: @get 'concept'
+            super(silent: true)
+            @set attrs, validate: false
+            return
+
+        # Validates the attributes are valid for the node type
         validate: (attrs, options) ->
             try
                 model = getContextNodeModel(attrs)
@@ -48,26 +45,47 @@ define [
                 return error.message
             return
 
+        # Determines if the node is 'typed', that is, whether it is associated
+        # with a specific field or concept. If not, the node is considered a
+        # container for the attributes.
         isTyped: ->
             @attributes.field? or @attributes.concept?
 
+        # Attempts to fetch a node relative to this one. The `query` is a set
+        # of attributes the the target node must match in order to be
+        # returned. The current node is checked first and recurses (for branch
+        # nodes).
         fetch: (query, options={}) ->
-            if queryAttrs(@, query, options)
+            if c._.isEmpty(query) then return false
+
+            match = true
+
+            # Check against each key in the query for a match on attrs
+            for key, value of query
+                if @attributes[key] isnt value
+                    match = false
+                    break
+
+            if match
                 return @
-            if options.create isnt false
-                return new @constructor query
+            else if options.create
+                klass = contextNodeModels[options.create]
+                return new klass(query)
 
 
     # Branch-type node that acts as a container for other nodes. The `type`
     # determines the conditional relationship between the child nodes.
     class BranchNodeModel extends ContextNodeModel
+        nodeType: 'branch'
+
         defaults: ->
             type: 'and'
             children: []
 
-        nodeType: 'branch'
-
-        initialize: (attrs, options={}) ->
+        # If `deep` is true, children are immediately converted into their
+        # respective context node instances. This is normally performed during
+        # a fetch.
+        initialize: (attrs, options) ->
             options = c._.extend
                 deep: true
             , options
@@ -77,15 +95,24 @@ define [
                 for child, i in children
                     if not (child instanceof ContextNodeModel)
                         children[i] = getContextNodeModel(child, options)
+
             super(attrs, options)
 
+        # If `deep` is true, children are also validated (and recursed). If
+        # any fail to validate, the branch is considered invalid. If `strict`
+        # is true, the branch must have at least one child to be valid
         validate: (attrs, options) ->
+            options = c._.extend
+                deep: true
+                strict: false
+            , options
+
             if not (attrs.type is 'and' or attrs.type is 'or')
-                return 'Not a valid branch node'
+                return 'Not a valid branch type'
 
-            options = c._.extend deep: true, options
+            if options.strict and not attrs.children.length
+                return 'No children in branch'
 
-            # Recurse children and validate
             if options.deep
                 for child in attrs.children
                     if child instanceof ContextNodeModel
@@ -95,30 +122,40 @@ define [
                         return message
             return
 
+        # Attempts to fetch this node or one of the children based on the
+        # query attributes. To prevent pre-maturely creating a new node, the
+        # `create` option is explicity set to false during the recursion.
+        # One thing to note, is that a fetch does not uniformly increase it's
+        # depth of search per iteration. It will recurse as deep as it can go
+        # per child.
         fetch: (query, options={}) ->
-            # Set false to prevent shadowing the children below
             create = options.create
             options.create = false
 
+            # Initially check if this node matches
             if (node = super(query, options))
                 return node
 
             children = @get('children')
 
-            # Recurse on each child node for a match, converting raw
-            # attributes into nodes as needed
             for child, i in children
                 if not (child instanceof ContextNodeModel)
                     child = children[i] = getContextNodeModel(child, options)
                 if (node = child.fetch(query, options))
                     return node
 
-            if create isnt false
-                @add(node = new @constructor query)
+            # No nodes matched, create a node of the specified type with the
+            # query as the default attributes.
+            if create
+                klass = contextNodeModels[create]
+                @add(node = new klass query)
                 return node
 
-        # If this is a deep save, recursively save children prior to
-        # creating a copy to publicAttributes.
+        # If `deep` is true, the save is recursed to each child. If `ignore`
+        # is true, child nodes that do validate will not be updated, but not
+        # be removed from the public attributes if already present, but their
+        # public attributes are not replaced. If `strict` is true, an invalid
+        # node will stop processing and return false
         save: (options) ->
             options = c._.extend
                 deep: true
@@ -126,44 +163,30 @@ define [
                 strict: false
             , options
 
-            if not super(deep: false) then return false
+            previousPublic = @publicAttributes
 
+            if not super(deep: false)
+                return false
+
+            # New attributes from super save
             attrs = @publicAttributes
             children = []
 
-            # Recurse on children to ensure no node instances are present
             for child in attrs.children
                 if child instanceof ContextNodeModel
-                    # Save child node if the deep option is passed. If strict
-                    # if true, any validation error will cause the save to fail
                     if options.deep
-                        if child.save(options)
-                            child = child.publicAttributes
-                        else
-                            if options.strict
-                                return false
-                            # Invalid children can be ignored (excluded from the array)
-                            # otherwise the previous state is maintained
-                            child = if options.ignore then null else child.publicAttributes
-                    else
-                        child = child.publicAttributes
-
-                # Only if the child is not empty, append to the output
-                if child? then children.push(child)
+                        if child.isValid(options)
+                            child.save(options)
+                        else if options.strict
+                            @publicAttributes = previousPublic
+                            return false
+                        else if not options.ignore
+                            continue
+                    child = child.toJSON()
+                children.push(child)
 
             attrs.children = children
             return true
-
-        toJSON: ->
-            attrs = super
-            children = []
-            # Recurse on children to ensure no node instances are present
-            for child in attrs.children
-                if child instanceof ContextNodeModel
-                    child = child.toJSON()
-                children.push(child)
-            attrs.children = children
-            return attrs
 
         # Adds variable number of nodes to branch ensuring the same node
         # is not added twice
@@ -195,25 +218,15 @@ define [
             return @
 
         clear: (options) ->
-            options = c._.extend
-                deep: true
-                destroy: false
-            , options
+            if not (children = @get('children')) or not children.length
+                return
 
-            if options.deep or options.destroy
-                children = []
+            # Recurse on children and clear
+            for child in children
+                if child instanceof ContextNodeModel
+                    child.clear(options)
 
-                # Recurse on children to ensure no node instances are present
-                for child in @get('children') or []
-                    if child instanceof ContextNodeModel
-                        if options.destroy
-                            child.destroy()
-                        else
-                            child.clear(options)
-                            children.push(child)
-
-                @set('children', children)
-            return @
+            return
 
 
     class ConditionNodeModel extends ContextNodeModel
@@ -232,15 +245,14 @@ define [
                 return 'Not a valid composite node'
 
 
-    contextNodeModels = [
-        BranchNodeModel
-        ConditionNodeModel
-        CompositeNodeModel
-    ]
+    contextNodeModels =
+        branch: BranchNodeModel
+        condition: ConditionNodeModel
+        composite: CompositeNodeModel
 
     # Returns the node model class appropriate for attrs
     getContextNodeModel = (attrs, options) ->
-        for model in contextNodeModels
+        for type, model of contextNodeModels
             if not model::validate.call(null, attrs, options)
                 return new model(attrs, options)
         throw new ContextNodeError 'Unknown context node type'
@@ -260,6 +272,9 @@ define [
                 type: 'and'
                 children: []
             super attrs, options
+
+            @on 'request', ->
+                c.publish c.CONTEXT_SYNCING, @
 
             @on 'sync', ->
                 @resolve()
@@ -308,6 +323,10 @@ define [
                 if @id is id or not id and @isSession()
                     @clear()
 
+            c.subscribe c.CONTEXT_SAVE, (id) =>
+                if @id is id or not id and @isSession()
+                    @save()
+
             @resolve()
 
         parse: (resp) =>
@@ -321,11 +340,9 @@ define [
                     @root.add(node)
             return resp
 
-        save: =>
-            @set 'json', @root.toJSON()
-            c.publish c.CONTEXT_SYNCING, @
+        save: ->
+            @root.save()
             super
-            return
 
         toJSON: ->
             attrs = super

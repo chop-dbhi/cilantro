@@ -59,12 +59,12 @@ define [
                 $el.attr(@dataAttrs[attr], value)
             return
 
-        getId: -> @model?.id or @_getAttr('id')
+        getField: -> @model?.id or @_getAttr('field')
         getOperator: -> @_getAttr('operator', 'string')
         getValue: -> @_getAttr('value', @model?.get('simple_type'))
         getNulls: -> @_getAttr('nulls', 'boolean')
 
-        setId: (value) -> not @model?.id and @_setAttr('id', value)
+        setField: (value) -> not @model?.id and @_setAttr('field', value)
         setOperator: (value) -> @_setAttr('operator', value)
         setValue: (value) -> @_setAttr('value', value)
         setNulls: (value) -> @_setAttr('nulls', Boolean(value))

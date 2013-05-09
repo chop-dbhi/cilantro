@@ -36,7 +36,7 @@ define [
             update: '.field-actions [data-toggle=update]'
 
         regions:
-            main: '.field-main'
+            info: '.field-info'
             stats: '.field-stats'
             control: '.field-control'
             chart: '.field-chart'
@@ -45,23 +45,28 @@ define [
         # easier to extend. This can also be a function that returns
         # an object.
         regionViews:
-            main: item.Field
+            info: item.Field
             stats: stats.FieldStats
             control: controls.FieldControl
 
         onRender: ->
             for key, klass of c._.result @, 'regionViews'
+                if key is 'info' and @options.hideInfo
+                    continue
+
                 view = new klass
                     model: @model
                     context: @context
+
                 @[key].show view
 
             # Only represent for fields that support distributions
             if @options.showChart and @model.links.distribution?
-                chart = new charts.FieldChart
+                @chart.show new charts.FieldChart
                     model: @model
                     context: @context
-                @chart.show chart
+                    chart:
+                        height: 200
 
             @setDefaultState()
 
@@ -86,13 +91,16 @@ define [
         # synced with the server.
         save: ->
             @context?.save()
-            if @options.managed then @setUpdateState()
+            if @options.managed
+                @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
-            @context?.clear()
-            @context?.save()
-            if @options.managed then @setNewState()
+            if @context?
+                @context.clear()
+                @context.save()
+            if @options.managed
+                @setNewState()
 
 
     class FieldFormCollection extends c.Marionette.CollectionView
@@ -106,6 +114,14 @@ define [
                 context: context.fetch
                     field: model.id
                     concept: context.get 'concept'
+                ,
+                    create: 'condition'
+
+            # This collection is used by a concept, therefore if only one
+            # field is present, the concept name and description take
+            # precedence
+            if @options.hideSingleFieldInfo and @collection.length < 2
+                options.hideInfo = true
 
             if not @fieldChartIndex? and model.links.distribution?
                 @fieldChartIndex = index

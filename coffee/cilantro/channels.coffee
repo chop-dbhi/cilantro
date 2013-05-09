@@ -44,6 +44,7 @@ define ->
     CONTEXT_ADD: 'context.add'
     CONTEXT_REMOVE: 'context.remove'
     CONTEXT_CLEAR: 'context.clear'
+    CONTEXT_SAVE: 'context.save'
 
     VIEW_CHANGED: 'view.changed'
     VIEW_SYNCING: 'view.syncing'

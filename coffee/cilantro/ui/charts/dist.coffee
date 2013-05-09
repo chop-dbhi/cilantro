@@ -42,7 +42,7 @@ define [
             options.chart.renderTo = @ui.chart[0]
             return options
 
-        getId: -> @model.id
+        getField: -> @model.id
 
         getValue: (options) ->
             points = @chart.getSelectedPoints()
@@ -67,7 +67,6 @@ define [
             @model.distribution (resp) =>
                 options = @getChartOptions(resp)
                 @renderChart(options)
-
 
         setValue: (value) =>
             if not c._.isArray(value) then value = []

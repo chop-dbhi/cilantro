@@ -131,16 +131,10 @@ define(['cilantro'], function (c) {
             model.remove(node);
         });
 
-        it('should clear (but not destroy)', function() {
+        it('should clear', function() {
             model.add(node);
             model.clear();
-            expect(model.get('children')[0].attributes).toEqual({});
-        });
-
-        it('should clear and destroy', function() {
-            model.add(node);
-            model.clear({destroy: true});
-            expect(model.get('children').length).toBe(0);
+            expect(model.get('children')[0].attributes).toEqual({field: 1, concept: 1});
         });
 
         it('should fetch child node (by field)', function() {
@@ -206,108 +200,82 @@ define(['cilantro'], function (c) {
 
         describe('Local vs. Public attributes', function() {
 
-            it('toJSON should recurse on public attributes', function() {
-                model.add(node);
+            describe('toJSON', function() {
 
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
+                it('should recurse on public attributes', function() {
+                    model.add(node);
+
+                    expect(model.toJSON()).toEqual({
+                        type: 'and',
+                        children: []
+                    });
+
+                    expect(model.save({deep: false})).toBe(true);
+
+                    expect(model.toJSON()).toEqual({
+                        type: 'and',
+                        children: [{
+                            field: 1,
+                            concept: 1,
+                            value: 30,
+                            operator: 'exact'
+                        }]
+                    });
                 });
 
-                model.save({deep: false});
+                it('should not recurse unless the deep=true option is passed', function() {
+                    model.add(node);
+                    node.set('value', 50);
+                    expect(model.save({deep: true})).toBe(true);
 
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
-                });
-            });
-
-            it('should not recurse unless the deep=true option is passed', function() {
-                model.add(node);
-                node.set('value', 50);
-
-                model.save({deep: false});
-
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
+                    expect(model.toJSON()).toEqual({
+                        type: 'and',
+                        children: [{
+                            field: 1,
+                            concept: 1,
+                            value: 50,
+                            operator: 'exact'
+                        }]
+                    });
                 });
 
-                model.save({deep: true});
+                it('should ignore invalid children but not remove them', function() {
+                    model.add(node);
+                    node.set('value', null);
+                    expect(model.save({ignore: true})).toBe(true);
 
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 50,
-                        operator: 'exact'
-                    }]
-                });
-            });
-
-            it('toJSON should not include invalid children by default', function() {
-                model.add(node);
-
-                expect(model.save()).toBe(true);
-
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
+                    expect(model.toJSON()).toEqual({
+                        type: 'and',
+                        children: [{
+                            field: 1,
+                            concept: 1,
+                            value: 30,
+                            operator: 'exact'
+                        }]
+                    });
                 });
 
-                // Make the node invalid
-                node.set('value', null);
+                it('should not ignore invalid children', function() {
+                    model.add(node);
+                    node.set('value', null);
+                    expect(model.save({ignore: false})).toBe(true);
 
-                // Still considered valid since the branch itself is valid
-                expect(model.save({ignore: false})).toBe(true);
-
-                // Invalid node not saved
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
+                    // Invalid node not saved
+                    expect(model.toJSON()).toEqual({
+                        type: 'and',
+                        children: []
+                    });
                 });
 
-                // Still considered valid since the branch itself is valid
-                expect(model.save()).toBe(true);
+                it('should stop processing if strict is true', function() {
+                    model.add(node);
+                    node.set('value', null);
+                    expect(model.save({strict: true})).toBe(false);
 
-                // Invalid node not saved
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
-
-                expect(model.save({strict: true})).toBe(false);
-
-                // Invalid node not saved
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
+                    expect(model.toJSON()).toEqual({
+                        type: 'and',
+                        children: []
+                    });
                 });
 
             });

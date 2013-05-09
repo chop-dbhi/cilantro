@@ -33,13 +33,19 @@ define [
         chartOptions: chartOptions.defaults
 
         initialize: (options) ->
+            chartOptions = c._.extend {}, options.chart
+
+            if chartOptions?
+                # Map convenience options to the real ones
+                for key, value of chartOptions
+                    if OPTIONS_MAP[key]
+                        @setOption OPTIONS_MAP[key], value
+                        delete chartOptions[key]
+
+                @chartOptions = $.extend true, {}, @chartOptions, chartOptions
+
             super(options)
-            if not options.el? then options.el = @el
-            @chartOptions = $.extend true, {}, @chartOptions, options.options
-            # Map convenience options to the real ones
-            for key, value of options
-                if OPTIONS_MAP[key]
-                    @setOption OPTIONS_MAP[key], value
+            @chartOptions.el ?= @el
             return
 
         # Convenience method for setting an option since the option hierarchy
@@ -61,6 +67,7 @@ define [
         renderChart: (options) ->
             if @chart then @chart.destroy?()
             @chart = new Highcharts.Chart(options)
+            @set(@context)
 
 
     # Set a default option for the class
@@ -83,7 +90,7 @@ define [
 
     class AreaChart extends Chart
     AreaChart.setDefaultOption('chart.type', 'area')
- 
+
     class AreaSplineChart extends Chart
     AreaSplineChart.setDefaultOption('chart.type', 'areaspline')
 

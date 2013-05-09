@@ -1,0 +1,12 @@
+{
+    "indentation": 4,
+    "camel_case_classes": true,
+    "no_trailing_semicolons": true,
+    "no_entry_param_list": true,
+    "no_tabs": true,
+    "no_trailing_whitespace": true,
+    "no_throwing_strings": true,
+    "no_backticks": true,
+    "line_endings": true,
+    "no_stand_along_at": true
+}

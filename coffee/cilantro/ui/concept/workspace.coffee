@@ -1,17 +1,18 @@
 define ['../../core'
         '../field'
         '../charts'
+        '../empty'
         './form'
         './item'
         'tpl!templates/views/concept-workspace.html'
         'tpl!templates/views/concept-workspace-start.html'
         'tpl!templates/views/concept-workspace-log.html'
-], (c, field, charts, form, item, templates...) ->
+], (c, field, charts, empty, form, item, templates...) ->
 
     templates = c._.object ['workspace', 'start', 'log'], templates
 
 
-    class ConceptWorkspaceStart extends c.Marionette.ItemView
+    class ConceptWorkspaceStart extends empty.EmptyView
         template: templates.start
 
 
@@ -47,6 +48,7 @@ define ['../../core'
         template: templates.workspace
 
         emptyView: ConceptWorkspaceStart
+
         logView: ConceptWorkspaceLog
 
         regions:
