@@ -67,6 +67,7 @@ define [
         renderChart: (options) ->
             if @chart then @chart.destroy?()
             @chart = new Highcharts.Chart(options)
+            @set(@context)
 
 
     # Set a default option for the class

@@ -13,13 +13,13 @@ define(['cilantro.ui', 'text!../mock/fields.json'], function (c, fieldsJSON) {
                 control.render();
             });
 
-            it('should have an id by default', function() {
-                expect(control.get()).toEqual({id: 30});
+            it('should have an field by default', function() {
+                expect(control.get()).toEqual({field: 30});
             });
 
-            it('should never clear the id attr', function() {
+            it('should never clear the field attr', function() {
                 control.clear();
-                expect(control.get()).toEqual({id: 30});
+                expect(control.get()).toEqual({field: 30});
             });
         });
 

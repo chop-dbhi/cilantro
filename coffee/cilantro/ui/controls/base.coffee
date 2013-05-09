@@ -14,10 +14,10 @@ define [
     class Control extends c.Marionette.Layout
         className: 'control'
 
-        attrNames: ['id', 'operator', 'value', 'nulls']
+        attrNames: ['field', 'operator', 'value', 'nulls']
 
         regions:
-            id: '.control-id'
+            field: '.control-field'
             operator: '.control-operator'
             value: '.control-value'
             nulls: '.control-nulls'
@@ -27,25 +27,25 @@ define [
         regionOptions: {}
 
         dataAttrs:
-            id: 'data-id'
+            field: 'data-field'
             operator: 'data-operator'
             value: 'data-value'
             nulls: 'data-nulls'
 
         dataSelectors:
-            id: '[data-id]'
+            field: '[data-field]'
             operator: '[data-operator]'
             value: '[data-value]'
             nulls: '[data-nulls]'
 
         attrGetters:
-            id: 'getId'
+            field: 'getField'
             operator: 'getOperator'
             value: 'getValue'
             nulls: 'getNulls'
 
         attrSetters:
-            id: 'setId'
+            field: 'setField'
             operator: 'setOperator'
             value: 'setValue'
             nulls: 'setNulls'
@@ -90,6 +90,8 @@ define [
 
                 @[key].show new klass(options)
 
+            @set(@context)
+
         _get: (key, options) ->
             if not (method = @attrGetters[key]) then return
             if (func = @[method])?
@@ -118,7 +120,10 @@ define [
 
         set: (key, value, options) ->
             if key? and typeof key is 'object'
-                attrs = key
+                if key instanceof c.Backbone.Model
+                    attrs = key.toJSON()
+                else
+                    attrs = key
                 options = value
             else
                 (attrs = {})[key] = value
@@ -146,12 +151,12 @@ define [
             @trigger 'change', @, @get()
 
 
-        getId: ->
+        getField: ->
         getOperator: ->
         getValue: ->
         getNulls: ->
 
-        setId: ->
+        setField: ->
         setOperator: ->
         setValue: ->
         setNulls: ->

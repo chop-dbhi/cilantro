@@ -88,13 +88,16 @@ define [
         # synced with the server.
         save: ->
             @context?.save()
-            if @options.managed then @setUpdateState()
+            if @options.managed
+                @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
-            @context?.clear()
-            @context?.save()
-            if @options.managed then @setNewState()
+            if @context?
+                @context.clear()
+                @context.save()
+            if @options.managed
+                @setNewState()
 
 
     class FieldFormCollection extends c.Marionette.CollectionView
@@ -108,6 +111,8 @@ define [
                 context: context.fetch
                     field: model.id
                     concept: context.get 'concept'
+                ,
+                    create: 'condition'
 
             if not @fieldChartIndex? and model.links.distribution?
                 @fieldChartIndex = index
