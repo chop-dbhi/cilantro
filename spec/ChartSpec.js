@@ -1,5 +1,4 @@
-define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/concepts.json'], 
-    function (_, charts, models, mocks) {
+define(['cilantro.ui', 'text!/mock/concepts.json'], function (c, mocks) {
 
     describe("Spy FieldChart", function(){
        var async = new AsyncSpec(this);
@@ -10,13 +9,13 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
        async.beforeEach(function(done) {
             window.Highcharts.Chart = jasmine.createSpy();
             window.Highcharts.Chart.prototype.series = [{points:[]}];
-            model = new models.ConceptModel(concepts[0], { parse:true });
+            model = new c.models.ConceptModel(concepts[0], { parse:true });
             if (model.fields.length){
-               context = new models.ContextNodeModel({id:model.fields.at(0).id});
+               context = new c.models.ContextNodeModel({id:model.fields.at(0).id});
                done();
             }else{
                model.fields.once('reset', function() {
-                  context = new models.ContextNodeModel({id:model.fields.at(0).id});
+                  context = new c.models.ContextNodeModel({id:model.fields.at(0).id});
                   done();
                });
             }
@@ -29,7 +28,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
        });
 
        async.it("should only create one Highcharts.Chart object on calls to render", function(done){
-            var testChart = new charts.FieldChart({
+            var testChart = new c.ui.FieldChart({
                  editable: false,
                  model: model.fields.at(0),
                  context: null
@@ -42,7 +41,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
            }, 1000);
        });
     });
-    
+
     describe("FieldChart", function(){
         var async = new AsyncSpec(this);
         var concept = JSON.parse(mocks)[2];
@@ -50,13 +49,13 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
         var context;
 
         async.beforeEach(function(done){
-            model = new models.ConceptModel(concept, {parse: true});
+            model = new c.models.ConceptModel(concept, {parse: true});
             if (model.fields.length){
-               context = new models.ContextNodeModel({id:model.fields.at(0).id});
+               context = new c.models.ContextNodeModel({id:model.fields.at(0).id});
                done();
             }else{
                model.fields.once('reset', function() {
-                  context = new models.ContextNodeModel({id:model.fields.at(0).id});
+                  context = new c.models.ContextNodeModel({id:model.fields.at(0).id});
                   done();
                });
             }
@@ -65,7 +64,7 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
 
         async.it("should update when it's context changes", function(done){
 
-           var testChart = new charts.FieldChart({
+           var testChart = new c.ui.FieldChart({
                  editable: true,
                  model: model.fields.at(0),
                  context: context
@@ -75,9 +74,9 @@ define(['underscore', 'cilantro/ui/charts', 'cilantro/models', 'text!/mock/conce
 
            setTimeout(function(){
                points = testChart.chart.series[0].points;
-               expect(_.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeUndefined();
+               expect(c._.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeUndefined();
                context.set({value:["ABNORMAL"]});
-               expect(_.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeTruthy();
+               expect(c._.filter(points, function(point){return point.category == "ABNORMAL"; })[0].selected).toBeTruthy();
                done();
            }, 1000);
         });
