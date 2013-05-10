@@ -6,6 +6,7 @@ define [
     './concept/panel'
     './concept/form'
     './concept/workspace'
+    './concept/columns'
 ], (c, mods...) ->
 
     c._.extend {}, mods...
