@@ -1,10 +1,17 @@
 define [
   '../core'
   './base'
-], (c, base) ->
+  './stats'
+], (c, base, stats) ->
 
 
     class FieldModel extends base.Model
+        constructor: ->
+            super
+            if @links.stats
+                @stats = new stats.StatCollection
+                @stats.url = => @links.stats
+
         parse: ->
             @_cache = {}
             super
@@ -19,19 +26,6 @@ define [
                     dataType: 'json'
                     success: (resp) =>
                         @_cache.distribution = if cache then resp else null
-                        handler(resp)
-            return
-
-        stats: (handler, cache=true) ->
-            if not @links.stats? then handler()
-            if cache and @_cache.stats?
-                handler(@_cache.stats)
-            else
-                c.Backbone.ajax
-                    url: @links.stats
-                    dataType: 'json'
-                    success: (resp) =>
-                        @_cache.stats = if cache then resp else null
                         handler(resp)
             return
 
