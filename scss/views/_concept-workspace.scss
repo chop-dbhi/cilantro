@@ -1,21 +1,38 @@
-.concept-workspace .concept-workspace-log {
-    list-style: none;
-    margin-left: 0;
+.concept-workspace .nav-tabs {
+    display: none;
+}
+
+.concept-workspace-log {
+    margin: 0;
 
     .concept {
-        @include box-shadow(none);
-        background-color: inherit;
-        border: none;
-        border-top: 1px solid #ccc;
-        padding: 5px 0;
+        @include concept;
+        border-bottom: 1px solid #ccc;
 
-        &:first-child {
-            border-top: none;
+        &:last-child {
+            border-bottom: none;
         }
 
-        > * {
-            font-size: 14px;
+        // Make it link-like..
+        .name {
+            @extend a;
+            cursor: pointer;
+        }
+
+    }
+}
+
+.concept-workspace .empty-view {
+    color: #777;
+
+    .workflow {
+        h3 {
             display: inline;
+        }
+
+        .icon-angle-right {
+            float: right;
+            margin-top: 4px;
         }
     }
 }
