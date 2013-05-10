@@ -41,24 +41,19 @@ define [
             control: '.field-control'
             chart: '.field-chart'
 
-        # Map corresponding view class to region. This makes it
-        # easier to extend. This can also be a function that returns
-        # an object.
-        regionViews:
-            info: item.Field
-            stats: stats.FieldStats
-            control: controls.FieldControl
-
         onRender: ->
-            for key, klass of c._.result @, 'regionViews'
-                if key is 'info' and @options.hideInfo
-                    continue
-
-                view = new klass
+            if not @options.hideInfo
+                @info.show new item.Field
                     model: @model
                     context: @context
 
-                @[key].show view
+            if @model.stats?
+                @stats.show new stats.FieldStats
+                    model: @model
+
+            @control.show new controls.FieldControl
+                model: @model
+                context: @context
 
             # Only represent for fields that support distributions
             if @options.showChart and @model.links.distribution?

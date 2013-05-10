@@ -1,8 +1,26 @@
 .field-stats {
-    list-style: none;
-    margin-left: 0;
+
+    ul {
+        margin-left: 0;
+        list-style: none;
+    }
+
+    li {
+        display: inline;
+        margin-right: 10px;
+    }
 
     .stat-label {
+        font-weight: 200;
+        background-color: #eee;
+        text-shadow: 0 1px 1px #fff;
+        border-radius: 3px 0 0 3px;
+        padding: 2px 5px;
+    }
+
+    .stat-value {
         font-weight: 500;
+        padding: 0 5px;
+        border-bottom: 2px solid #eee;
     }
 }

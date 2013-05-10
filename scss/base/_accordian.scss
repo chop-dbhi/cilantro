@@ -1,12 +1,7 @@
 .accordian {
-    @include backdrop;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
-    padding: 0;
-
-    .empty {
-        padding: 5px;
-    }
+    @include border-radius(3px);
 
     .accordian-group {
         padding: 5px;
@@ -35,8 +30,13 @@
         background-color: #fff;
         border: 1px solid #ccc;
 
+        li.nav-header {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
         li a {
-            padding: 3px 5px;
+            padding: 3px 15px;
         }
     }
 }

@@ -1,19 +1,15 @@
 @mixin concept {
-    @include backdrop;
-
-    .concept-name {
-        margin-top: 0;
-    }
-
-    .concept-name {
-        display: block;
+    .name {
         font-weight: 500;
-        font-size: 1.4em;
-        margin-bottom: 10px;
     }
 
-    .concept-description {
+    .category {
+        font-size: 0.85em;
         color: #999;
-        margin-bottom: 0;
+    }
+
+    .description {
+        font-size: 1.1em;
+        font-weight: 200;
     }
 }

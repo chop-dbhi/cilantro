@@ -1,19 +1,14 @@
 @mixin field {
-    @include backdrop;
-
-    .field-name {
-        display: block;
+    .name {
         font-weight: 500;
-        font-size: 1.2em;
-        margin-bottom: 10px;
     }
 
-    .field-unit {
+    .unit {
         font-size: 0.9em;
         color: #999;
     }
 
-    .field-description {
+    .description {
         color: #999;
     }
 }

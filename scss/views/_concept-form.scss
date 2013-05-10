@@ -1,8 +1,7 @@
 .concept-form {
-    @include concept;
-
-    .field-form {
-        @include nobackdrop;
+    .concept-info {
+        @include concept;
+        margin-bottom: 10px;
     }
 
     // No extra margins..

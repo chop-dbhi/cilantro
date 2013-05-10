@@ -1,9 +1,9 @@
-<div class=field-name>
+<h4 class=name>
     <%= data.name %>
     <% if (data.unit) { %>
-        <span class=field-unit><%= data.unit %></span>
+        <small class=unit><%= data.unit %></small>
     <% } %>
-</div>
+</h4>
 
 <% if (data.description) { %>
     <p class=field-description><%= data.description %></p>
