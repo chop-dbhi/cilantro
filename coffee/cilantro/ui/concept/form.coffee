@@ -2,9 +2,9 @@ define [
     '../../core'
     '../field'
     '../charts'
-    './item'
+    './info'
     'tpl!templates/views/concept-form.html'
-], (c, field, charts, item, templates...) ->
+], (c, field, charts, info, templates...) ->
 
     templates = c._.object ['form'], templates
 
@@ -43,16 +43,13 @@ define [
             fields: '.concept-fields'
 
         onRender: ->
-            info = new item.Concept
+            @info.show new info.ConceptInfo
                 model: @model
 
-            fields = new field.FieldFormCollection
+            @fields.show new field.FieldFormCollection
                 collection: @model.fields
                 context: @context
                 hideSingleFieldInfo: true
-
-            @info.show(info)
-            @fields.show(fields)
 
             @setDefaultState()
 

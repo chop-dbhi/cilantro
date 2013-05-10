@@ -1,7 +1,7 @@
 define [
     './core'
     './concept/search'
-    './concept/item'
+    './concept/info'
     './concept/index'
     './concept/form'
     './concept/workspace'

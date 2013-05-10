@@ -1,16 +1,16 @@
 define [
     '../core'
-    './item'
+    './info'
     '../empty'
     'tpl!templates/views/concept-accordian-group.html'
     'tpl!templates/views/concept-accordian-item.html'
-], (c, items, empty, templates...) ->
+], (c, info, empty, templates...) ->
 
     # Create an object of templates by name..
     templates = c._.object ['group', 'item'], templates
 
 
-    class ConceptAccordianItem extends items.Concept
+    class ConceptAccordianItem extends info.ConceptInfo
         tagName: 'li'
 
         className: ''

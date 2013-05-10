@@ -3,11 +3,11 @@ define ['../../core'
         '../charts'
         '../empty'
         './form'
-        './item'
+        './info'
         'tpl!templates/views/concept-workspace.html'
         'tpl!templates/views/concept-workspace-start.html'
         'tpl!templates/views/concept-workspace-log.html'
-], (c, field, charts, empty, form, item, templates...) ->
+], (c, field, charts, empty, form, info, templates...) ->
 
     templates = c._.object ['workspace', 'start', 'log'], templates
 
@@ -16,7 +16,7 @@ define ['../../core'
         template: templates.start
 
 
-    class ConceptWorkspaceLogItem extends item.Concept
+    class ConceptWorkspaceLogItem extends info.ConceptInfo
         events:
             click: 'focus'
 

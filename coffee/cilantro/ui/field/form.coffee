@@ -1,11 +1,11 @@
 define [
     '../core'
-    './item'
+    './info'
     './stats'
     './controls'
     '../charts'
     'tpl!templates/views/field-form.html'
-], (c, item, stats, controls, charts, templates...) ->
+], (c, info, stats, controls, charts, templates...) ->
 
     templates = c._.object ['form'], templates
 
@@ -43,7 +43,7 @@ define [
 
         onRender: ->
             if not @options.hideInfo
-                @info.show new item.Field
+                @info.show new info.FieldInfo
                     model: @model
                     context: @context
 
