@@ -22,7 +22,7 @@ define [
         constructor: ->
             super
             session = c.data.contexts.getSession()
-            @context = session.fetch
+            @context = session.root.fetch
                 concept: @model.id
             ,
                 create: 'branch'
