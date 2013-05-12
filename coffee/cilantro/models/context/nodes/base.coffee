@@ -81,7 +81,10 @@ define [
 
     class BaseNodeCollection extends c.Backbone.Collection
         model: (attrs, options) ->
-            klass = if attrs.children? then BaseBranchNodeModel else BaseNodeModel
+            if options.create is 'branch'  or attrs.children?
+                klass = BaseBranchNodeModel
+            else
+                klass = BaseNodeModel
             new klass(attrs, options)
 
         constructor: (models, options) ->
@@ -112,7 +115,10 @@ define [
 
             # No nodes matched, create a node of the specified type with the
             # query as the default attributes.
-            if create then return @add(query, options)
+            if create
+                options.create = create
+                @add(query, options)
+                return @get(query)
 
 
     class ContextNodeModel extends BaseNodeModel

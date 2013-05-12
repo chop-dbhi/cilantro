@@ -6,7 +6,10 @@ define [
 
     class ContextNodeCollection extends base.BaseNodeCollection
         model: (attrs, options) ->
-            base.ContextNodeModel.create(attrs, options)
+            args = [attrs, options]
+            if options.create?
+                args.splice(0, 0, options.create)
+            base.ContextNodeModel.create(args...)
 
 
     # Branch-type node that acts as a container for other nodes. The `type`
