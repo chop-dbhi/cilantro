@@ -48,6 +48,30 @@ define(['cilantro'], function (c) {
             expect(model.toJSON()).toEqual({field: 1, concept: 1});
         });
 
+        it('should trigger a change event', function() {
+            var triggered = 0,
+                model = new c.models.ContextNodeModel;
+
+            model.on('change', function() {
+                triggered++;
+            });
+
+            model.public.on('change', function() {
+                triggered++;
+            });
+
+            model.set({
+                field: 1,
+                concept: 1,
+                operator: 'exact',
+                value: 1
+            });
+            expect(triggered).toBe(1);
+
+            model.save();
+            expect(triggered).toBe(2);
+        });
+
         describe('public node', function() {
             var model;
 
@@ -234,6 +258,95 @@ define(['cilantro'], function (c) {
             });
             model.children.add(node);
             expect(model.isValid({deep: true})).toBe(false);
+        });
+
+        it('should trigger change events', function() {
+            var changed = 0,
+                added = 0,
+                removed = 0,
+                model = new c.models.BranchNodeModel;
+
+            var attrs = {
+                type: 'and',
+                children: [{
+                    field: 1,
+                    concept: 1,
+                    value: 50,
+                    operator: 'gt'
+                }, {
+                    concept: 2,
+                    type: 'or',
+                    children: [{
+                        field: 2,
+                        concept: 2,
+                        value: [1, 3],
+                        operator: '-range'
+                    }]
+                }]
+            };
+
+            model.on('change', function() {
+                changed++;
+            });
+
+            model.children.on('add', function() {
+                added++;
+            });
+
+            model.children.on('remove', function() {
+                removed++;
+            });
+
+            model.public.on('change', function() {
+                changed++;
+            });
+
+            model.public.children.on('add', function() {
+                added++;
+            });
+
+            model.public.children.on('remove', function() {
+                removed++;
+            });
+
+            model.set(attrs);
+
+            expect(changed).toBe(1);
+            expect(added).toBe(2);
+            expect(removed).toBe(0);
+
+            model.save();
+
+            expect(changed).toBe(2);
+            expect(added).toBe(4);
+            expect(removed).toBe(0);
+
+            var newAttrs = {
+                type: 'and',
+                children: [{
+                    field: 1,
+                    concept: 1,
+                    value: 50,
+                    operator: 'gt'
+                }]
+            };
+
+            model.set(newAttrs);
+
+            expect(changed).toBe(3);
+            expect(added).toBe(4);
+            expect(removed).toBe(1);
+
+            // No save, public attributes should still be the original ones
+            expect(model.public.toJSON()).toEqual(attrs);
+
+            model.save();
+
+            expect(changed).toBe(4);
+            expect(added).toBe(4);
+            expect(removed).toBe(2);
+
+            expect(model.public.toJSON()).toEqual(newAttrs);
         });
 
         describe('children collection', function() {
