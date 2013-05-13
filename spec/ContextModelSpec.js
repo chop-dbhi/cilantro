@@ -261,10 +261,13 @@ define(['cilantro'], function (c) {
         });
 
         it('should trigger change events', function() {
-            var changed = 0,
+            var model = new c.models.BranchNodeModel,
+                changed = 0,
                 added = 0,
                 removed = 0,
-                model = new c.models.BranchNodeModel;
+                pchanged = 0,
+                padded = 0,
+                premoved = 0;
 
             var attrs = {
                 type: 'and',
@@ -298,15 +301,15 @@ define(['cilantro'], function (c) {
             });
 
             model.public.on('change', function() {
-                changed++;
+                pchanged++;
             });
 
             model.public.children.on('add', function() {
-                added++;
+                padded++;
             });
 
             model.public.children.on('remove', function() {
-                removed++;
+                premoved++;
             });
 
             model.set(attrs);
@@ -317,8 +320,12 @@ define(['cilantro'], function (c) {
 
             model.save();
 
-            expect(changed).toBe(2);
-            expect(added).toBe(4);
+            expect(changed).toBe(1);
+            expect(added).toBe(2);
+            expect(removed).toBe(0);
+
+            expect(changed).toBe(1);
+            expect(added).toBe(2);
             expect(removed).toBe(0);
 
             var newAttrs = {
@@ -333,8 +340,8 @@ define(['cilantro'], function (c) {
 
             model.set(newAttrs);
 
-            expect(changed).toBe(3);
-            expect(added).toBe(4);
+            expect(changed).toBe(2);
+            expect(added).toBe(2);
             expect(removed).toBe(1);
 
             // No save, public attributes should still be the original ones
@@ -342,9 +349,13 @@ define(['cilantro'], function (c) {
 
             model.save();
 
-            expect(changed).toBe(4);
-            expect(added).toBe(4);
-            expect(removed).toBe(2);
+            expect(changed).toBe(2);
+            expect(added).toBe(2);
+            expect(removed).toBe(1);
+
+            expect(changed).toBe(2);
+            expect(added).toBe(2);
+            expect(removed).toBe(1);
 
             expect(model.public.toJSON()).toEqual(newAttrs);
         });
@@ -391,6 +402,19 @@ define(['cilantro'], function (c) {
                 expect(model.public.toJSON()).toEqual(model.toJSON());
             });
 
+            it('children should contain references to internal public nodes', function() {
+                var children = model.children.map(function(model) {
+                    return model.public;
+                });
+
+                // For starters, ensure they are the same length
+                expect(children.length).toEqual(model.public.children.length);
+
+                for (var i = 0; i < children.length; i++) {
+                    expect(children[i]).toBe(model.public.children.models[i]);
+                }
+            });
+
             it('should update on successful save', function() {
                 model.children.add(node);
                 expect(model.public.toJSON()).not.toEqual(model.toJSON());
@@ -399,7 +423,7 @@ define(['cilantro'], function (c) {
                 expect(model.public.toJSON()).toEqual(model.toJSON());
             });
 
-            it('should update on intternal set and save option', function() {
+            it('should update on internal set and save option', function() {
                 var attrs = {
                     type: 'and',
                     children: [{

@@ -36,9 +36,6 @@ define [
             @children = new BaseNodeCollection null,
                 parent: @
 
-            @on 'change:children', (model, value, options) ->
-                @children.set value, options
-
             super
 
         model: (attrs, options) ->

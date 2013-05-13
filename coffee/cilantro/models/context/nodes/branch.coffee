@@ -107,7 +107,11 @@ define [
             if not @isValid(deep: false)
                 return false
 
+            # Clone attributes, remove reference to children. The public
+            # node has no reason to carry about the reference
             attrs = c._.clone @attributes
+            delete attrs.children
+
             children = []
 
             for child in @children.models
@@ -117,14 +121,14 @@ define [
                     return false
                 else
                     continue
-                child = child.public.toJSON()
+                child = child.public
                 children.push(child)
 
-            # Update pending public attributes with validated children
-            attrs.children = children
-            if @field? then attrs.field = @field
-            if @concept? then attrs.concept = @concept
+            # Set direct attributes on node
             @public.set(attrs)
+            # Update references to children
+            @public.children.set(children)
+
             return true
 
         clear: (options) ->
