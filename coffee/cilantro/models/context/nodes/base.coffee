@@ -14,15 +14,6 @@ define [
             @set(attrs, silent: true)
             return
 
-        enable: ->
-            @set('enabled', true)
-
-        disable: ->
-            @set('enabled', false)
-
-        isEnabled: ->
-            @get('enabled') isnt false
-
         # Attempts to fetch a node relative to this one. The `query` is a set
         # of attributes the target node must match in order to be returned.
         # Takes an option `create` which specifies a valid node type.
@@ -131,6 +122,15 @@ define [
         initialize: ->
             # Save the initial attributes to the public node.
             @save(silent: true)
+
+        enable: ->
+            @set('enabled', true, save: true)
+
+        disable: ->
+            @set('enabled', false, save: true)
+
+        isEnabled: ->
+            @get('enabled') isnt false
 
         # Override to create a copy of the internal attributes for exposing
         # as `public` attributes.
