@@ -1,10 +1,10 @@
 define [
     '../core'
-    '../empty'
+    '../base'
     '../charts'
     '../charts/utils'
     'tpl!templates/views/field-stats.html'
-], (c, empty, charts, utils, templates...) ->
+], (c, base, charts, utils, templates...) ->
 
     templates = c._.object ['layout'], templates
 
@@ -19,7 +19,7 @@ define [
     class FieldStatsValues extends c.Marionette.CollectionView
         tagName: 'ul'
 
-        emptyView: empty.EmptyView
+        emptyView: base.EmptyView
 
         itemView: FieldStatValue
 

@@ -1,10 +1,10 @@
 define [
     '../core'
+    '../base'
     './info'
-    '../empty'
     'tpl!templates/views/concept-accordian-group.html'
     'tpl!templates/views/concept-accordian-item.html'
-], (c, info, empty, templates...) ->
+], (c, base, info, templates...) ->
 
     # Create an object of templates by name..
     templates = c._.object ['group', 'item'], templates
@@ -71,7 +71,7 @@ define [
 
         itemView: ConceptAccordianGroup
 
-        emptyView: empty.EmptyView
+        emptyView: base.EmptyView
 
         # Temporarily override
         showCollection: ->

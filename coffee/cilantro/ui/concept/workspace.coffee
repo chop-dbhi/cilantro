@@ -1,18 +1,19 @@
-define ['../../core'
-        '../field'
-        '../charts'
-        '../empty'
-        './form'
-        './info'
-        'tpl!templates/views/concept-workspace.html'
-        'tpl!templates/views/concept-workspace-start.html'
-        'tpl!templates/views/concept-workspace-log.html'
-], (c, field, charts, empty, form, info, templates...) ->
+define [
+    '../core'
+    '../base'
+    '../field'
+    '../charts'
+    './form'
+    './info'
+    'tpl!templates/views/concept-workspace.html'
+    'tpl!templates/views/concept-workspace-start.html'
+    'tpl!templates/views/concept-workspace-log.html'
+], (c, base, field, charts, form, info, templates...) ->
 
     templates = c._.object ['workspace', 'start', 'log'], templates
 
 
-    class ConceptWorkspaceStart extends empty.EmptyView
+    class ConceptWorkspaceStart extends base.EmptyView
         template: templates.start
 
 
