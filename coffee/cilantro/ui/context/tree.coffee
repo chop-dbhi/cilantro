@@ -1,17 +1,18 @@
 define [
     '../core'
+    '../base'
     './item'
+    './info'
     './actions'
-    '../empty'
     'tpl!templates/views/context.html'
     'tpl!templates/views/context-empty.html'
     'tpl!templates/views/context-tree.html'
-], (c, item, actions, empty, templates...) ->
+], (c, base, item, info, actions, templates...) ->
 
     templates = c._.object ['context', 'empty', 'tree'], templates
 
 
-    class ContextEmptyTree extends empty.EmptyView
+    class ContextEmptyTree extends base.EmptyView
         template: templates.empty
 
 
@@ -23,6 +24,12 @@ define [
         itemView: item.ContextNode
 
         emptyView: ContextEmptyTree
+
+        # Filter out non-valid items, the strict flag is used to exclude
+        # branches without a condition
+        addChildView: (item, collection, options) ->
+            if item.isValid(strict: true)
+                return super
 
         modelEvents:
             'change:enabled': 'toggleState'
@@ -38,10 +45,14 @@ define [
         template: templates.context
 
         regions:
+            info: '.context-info'
             actions: '.context-actions'
             tree: '.context-tree'
 
         onRender: ->
+            @info.show new info.ContextInfo
+                model: @model
+
             @actions.show new actions.ContextActions
                 model: @model.root
 
