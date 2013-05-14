@@ -4,13 +4,35 @@ module.exports = function(grunt) {
     grunt.initConfig({
 
         watch: {
+            coffeeSrc: {
+                tasks: ['coffee:compileSrc'],
+                files: [
+                    'coffee/**/**/**/**/*.coffee',
+                    'templates/**/**/*.html'
+                ]
+            },
+
             buildRunner: {
                 tasks: ['jasmine:src:build'],
                 files: ['spec/**/**/*.js']
             },
+
             sass: {
                 tasks: ['sass'],
                 files: ['scss/**/**/*.scss']
+            }
+        },
+
+        coffee: {
+            compileSrc: {
+                options: {
+                    bare: true
+                },
+                expand: true,
+                cwd: 'coffee/',
+                src: '**/**/**/**/*.coffee',
+                dest: 'build',
+                ext: '.js'
             }
         },
 
@@ -112,6 +134,7 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
 
