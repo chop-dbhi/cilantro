@@ -6,7 +6,6 @@ define [
     'tpl!templates/views/concept-accordian-item.html'
 ], (c, base, info, templates...) ->
 
-    # Create an object of templates by name..
     templates = c._.object ['group', 'item'], templates
 
 

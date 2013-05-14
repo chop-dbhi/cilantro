@@ -1,8 +1,9 @@
 define [
     './core'
-    './concept/search'
     './concept/info'
+    './concept/search'
     './concept/index'
+    './concept/panel'
     './concept/form'
     './concept/workspace'
 ], (c, mods...) ->

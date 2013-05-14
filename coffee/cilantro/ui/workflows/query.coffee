@@ -7,18 +7,19 @@ define [
 
     templates = c._.object ['query'], templates
 
+
     class QueryWorkflow extends c.Marionette.Layout
         className: 'query-workflow'
 
         template: templates.query
 
         regions:
-            index: '.concept-index-region'
-            workspace: '.concept-workspace-region'
-            context: '.context-region'
+            concepts: '.concept-panel'
+            workspace: '.concept-workspace'
+            context: '.context-panel'
 
         onRender: ->
-            @index.show new concept.ConceptIndex
+            @concepts.show new concept.ConceptPanel
                 collection: c.data.concepts.queryable
 
             @workspace.show new concept.ConceptWorkspace
