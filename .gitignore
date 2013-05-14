@@ -4,6 +4,7 @@
 .sass-cache
 .watch-pid
 build
+dist
 css/style.css
 css/vocab/
 .idea
@@ -12,7 +13,7 @@ _SpecRunner.html
 spec-runner.html
 node_modules
 gallery/extensions
-extensions/
-templates/vocab/
+extensions
+templates/vocab
 harvest-vocab
-img/vocab/
+img/vocab
