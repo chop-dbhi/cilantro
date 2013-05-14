@@ -1,0 +1,15 @@
+<% if (data.category) { %>
+    <p class=category>
+    <% if (data.category.parent) { %>
+        <%= data.category.parent.name %>
+        <i class=icon-angle-right></i>
+    <% } %>
+    <%= data.category.name %>
+    </p>
+<% } %>
+
+<h4 class=name><%= data.name %></h4>
+
+<% if (data.description) { %>
+    <p class=description><%= data.description %></p>
+<% } %>

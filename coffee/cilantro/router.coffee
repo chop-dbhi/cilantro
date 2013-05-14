@@ -70,7 +70,7 @@ define [
 
         _register: (options) ->
             if @_registered[options.id]?
-                throw new Error "Route #{ id } already registered"
+                throw new Error "Route #{ options.id } already registered"
 
             # Clone since the options options will be augmented
             options = _.clone options

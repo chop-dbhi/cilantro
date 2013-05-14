@@ -1,11 +1,11 @@
 define [
     '../core'
-    './item'
+    './info'
     './stats'
     './controls'
     '../charts'
     'tpl!templates/views/field-form.html'
-], (c, item, stats, controls, charts, templates...) ->
+], (c, info, stats, controls, charts, templates...) ->
 
     templates = c._.object ['form'], templates
 
@@ -36,39 +36,38 @@ define [
             update: '.field-actions [data-toggle=update]'
 
         regions:
-            main: '.field-main'
+            info: '.field-info'
             stats: '.field-stats'
             control: '.field-control'
             chart: '.field-chart'
 
-        # Map corresponding view class to region. This makes it
-        # easier to extend. This can also be a function that returns
-        # an object.
-        regionViews:
-            main: item.Field
-            stats: stats.FieldStats
-            control: controls.FieldControl
-
         onRender: ->
-            for key, klass of c._.result @, 'regionViews'
-                view = new klass
+            @ui.actions.toggle(not @options.managed)
+
+            if not @options.hideInfo
+                @info.show new info.FieldInfo
                     model: @model
                     context: @context
-                @[key].show view
+
+            if @model.stats?
+                @stats.show new stats.FieldStats
+                    model: @model
+
+            @control.show new controls.FieldControl
+                model: @model
+                context: @context
 
             # Only represent for fields that support distributions
             if @options.showChart and @model.links.distribution?
-                chart = new charts.FieldChart
+                @chart.show new charts.FieldChart
                     model: @model
                     context: @context
                     chart:
                         height: 200
-                @chart.show chart
 
-            @setDefaultState()
+            @setState()
 
-        setDefaultState: ->
-            if @options.managed then @ui.actions.hide()
+        setState: ->
             if @context?.isValid()
                 @setUpdateState()
             else
@@ -88,13 +87,13 @@ define [
         # synced with the server.
         save: ->
             @context?.save()
-            if @options.managed then @setUpdateState()
+            @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
-            @context?.clear()
-            @context?.save()
-            if @options.managed then @setNewState()
+            if @context?
+                @context.clear()
+            @setNewState()
 
 
     class FieldFormCollection extends c.Marionette.CollectionView
@@ -108,6 +107,14 @@ define [
                 context: context.fetch
                     field: model.id
                     concept: context.get 'concept'
+                ,
+                    create: 'condition'
+
+            # This collection is used by a concept, therefore if only one
+            # field is present, the concept name and description take
+            # precedence
+            if @options.hideSingleFieldInfo and @collection.length < 2
+                options.hideInfo = true
 
             if not @fieldChartIndex? and model.links.distribution?
                 @fieldChartIndex = index

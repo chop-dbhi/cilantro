@@ -1,7 +1,7 @@
 # This extends cilantro and attached libraries with UI-related components
 define [
     './cilantro'
-    './cilantro/ui/empty'
+    './cilantro/ui/base'
     './cilantro/ui/concept'
     './cilantro/ui/field'
     './cilantro/ui/charts'

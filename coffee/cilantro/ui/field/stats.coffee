@@ -1,46 +1,27 @@
 define [
     '../core'
+    '../base'
     '../charts'
     '../charts/utils'
     'tpl!templates/views/field-stats.html'
-    'tpl!templates/views/field-stats-values.html'
-], (c, charts, utils, templates...) ->
+], (c, base, charts, utils, templates...) ->
 
-    templates = c._.object ['layout', 'values'], templates
-
-    
-    # Prettifies a key for display
-    prettyKey = (key) ->
-        key = key.replace(/[_\-\s]+/, ' ').trim()
-        key.charAt(0).toUpperCase() + key.substr(1)
+    templates = c._.object ['layout'], templates
 
 
-    # Prettifies a value for display
-    prettyValue = (value) ->
-        if c._.isNumber(value) then c.utils.prettyNumber(value) else value
+    class FieldStatValue extends c.Marionette.ItemView
+        tagName: 'li'
+
+        template: (data) ->
+            "<span class=stat-label>#{ data.label }</span><span class=stat-value>#{ data.value }</span>"
 
 
-    # Takes an object of key/value pairs representing stats and prettifies
-    # the key and number for display
-    prettyStats = (data, rawValue=false) ->
-        stats = {}
-        for key, value of data
-            if key.slice(0, 1) is '_' then continue
-            stats[prettyKey(key)] = prettyValue(value)
-        return stats
-
-
-    class FieldStatsValues extends c.Marionette.ItemView
+    class FieldStatsValues extends c.Marionette.CollectionView
         tagName: 'ul'
-        className: 'field-stats'
 
-        template: ->
+        emptyView: base.EmptyView
 
-        onRender: ->
-            @model.stats (data) =>
-                data = prettyStats(data)
-                html = c.renderTemplate(templates.values, data)
-                @$el.html(html)
+        itemView: FieldStatValue
 
 
     class FieldStatsChart extends charts.FieldChart
@@ -62,10 +43,13 @@ define [
 
         regions:
             values: '.stats-values'
+            chart: '.stats-chart'
 
         onRender: ->
-            @values.show new FieldStatsValues
-                model: @model
+            if @model.stats?
+                @values.show new FieldStatsValues
+                    collection: @model.stats
+                @model.stats.fetch(reset: true)
 
 
     { FieldStats }

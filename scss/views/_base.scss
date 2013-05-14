@@ -1,0 +1,24 @@
+.load-view, .error-view, .empty-view {
+    > i {
+        margin-right: 5px;
+    }
+}
+
+.load-view {
+    color: #999;
+    text-align: center;
+}
+
+.error-view {
+    i {
+        @extend .text-error;
+    }
+}
+
+.empty-view {
+    color: #999;
+
+    i {
+        @extend .text-warning;
+    }
+}

@@ -1,10 +1,4 @@
 .concept-form {
-    @include concept;
-
-    .field-form {
-        @include nobackdrop;
-    }
-
     // No extra margins..
     .concept-fields .field-form:last-child {
         margin-bottom: 0;

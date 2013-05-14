@@ -14,37 +14,46 @@ define [
         return items
 
 
-    class ContextNode extends c.Marionette.ItemView
-        className: 'context-node'
+    class ContextItem extends c.Marionette.ItemView
+        className: 'context-item'
 
         template: templates.item
 
         events:
-            'click .actions .destroy': 'clickDestroy'
+            'click .language': 'clickShow'
             'click .actions .state': 'clickState'
+            'click .actions .remove': 'clickRemove'
 
         ui:
+            loader: '.actions .loader'
+            actions: '.actions button'
             state: '.actions .state'
+            language: '.language'
 
-        initialize: ->
-            @listenTo(@model, 'destroy', @destroyNode, @)
-            @listenTo(@model, 'change:enabled', @toggleState, @)
+        modelEvents:
+            'change': 'renderLanguage'
+            'change:enabled': 'toggleState'
+            'request': 'showLoading'
+            'sync': 'doneLoading'
+            'error': 'doneLoading'
 
         serializeData: ->
-            language: flattenLanguage(@model.toJSON()).join(', ')
+            language: flattenLanguage(@model.public.toJSON()).join(', ')
 
-        clickDestroy: (event) ->
-            @model.destroy()
+        clickShow: (event) ->
+            c.publish c.CONCEPT_FOCUS, @model.get('concept')
 
-        clickState: (event) ->
-            enabled = @model.get('enabled') isnt false
-            @model.set('enabled', !enabled)
-
-        destroyNode: (event) ->
+        clickRemove: (event) ->
+            @model.clear()
             @$el.fadeOut
                 duration: 400
                 easing: 'easeOutExpo'
-                complete: => @close()
+
+            c.publish c.CONTEXT_SAVE
+
+        clickState: (event) ->
+            if @model.isEnabled() then @model.disable() else @model.enable()
+            c.publish c.CONTEXT_SAVE
 
         disable: ->
             @$el.addClass('disabled')
@@ -62,12 +71,24 @@ define [
                     .addClass('icon-circle')
                     .removeClass('icon-circle-blank')
 
-        toggleState: (event) ->
-            enabled = @model.get('enabled') isnt false
-            if enabled then @enable() else @disable()
+        toggleState: (model, value, options) ->
+            if @model.isEnabled() then @enable() else @disable()
+
+        renderLanguage: (model, options) ->
+            text = flattenLanguage(model.public.toJSON()).join(', ')
+            @ui.language.html(text)
+
+        showLoading: ->
+            @ui.loader.show()
+            @ui.actions.hide()
+
+        doneLoading: ->
+            @ui.loader.hide()
+            @ui.actions.show()
 
         onRender: ->
+            @ui.loader.hide()
             @toggleState()
 
 
-    { ContextNode }
+    { ContextItem }

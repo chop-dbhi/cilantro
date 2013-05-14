@@ -1,18 +1,5 @@
-<div class=concept-name>
-    <%= data.name %>
-    <% if (data.category) { %>
-        <span class=concept-category><%= data.category.name %></span>
-    <% } %>
-</div>
-
-<% if (data.description) { %>
-    <p class=concept-description><%= data.description %></p>
-<% } %>
-
-<div class=concept-chart></div>
-<div class=concept-main></div>
+<div class=concept-info></div>
 <div class=concept-fields></div>
-
 <div class=concept-actions>
     <button data-toggle=add class="btn btn-success btn-mini">Add</button>
     <button data-toggle=update class="btn btn-primary btn-mini">Update</button>

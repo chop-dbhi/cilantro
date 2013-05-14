@@ -1,15 +1,64 @@
 define [
     '../core'
+    '../base'
     './item'
+    './info'
+    './actions'
     'tpl!templates/views/context.html'
-], (c, item, templates...) ->
+    'tpl!templates/views/context-empty.html'
+    'tpl!templates/views/context-tree.html'
+], (c, base, item, info, actions, templates...) ->
 
-    templates = c._.object ['tree'], templates
+    templates = c._.object ['context', 'empty', 'tree'], templates
 
-    class Context extends c.Marionette.CollectionView
+
+    class ContextEmptyTree extends base.EmptyView
+        template: templates.empty
+
+
+    class ContextTree extends c.Marionette.CompositeView
         template: templates.tree
 
-        itemView: item.ContextNode
+        itemViewContainer: '.branch-children'
+
+        itemView: item.ContextItem
+
+        emptyView: ContextEmptyTree
+
+        # Filter out non-valid items, the strict flag is used to exclude
+        # branches without a condition
+        addChildView: (item, collection, options) ->
+            if item.isValid(strict: true)
+                return super
+
+        modelEvents:
+            'change:enabled': 'toggleState'
+
+        toggleState: ->
+            @$el.toggleClass('disabled', not @model.isEnabled())
+
+        onRender: ->
+            @toggleState()
+
+
+    class Context extends c.Marionette.Layout
+        template: templates.context
+
+        regions:
+            info: '.context-info'
+            actions: '.context-actions'
+            tree: '.context-tree'
+
+        onRender: ->
+            @info.show new info.ContextInfo
+                model: @model
+
+            @actions.show new actions.ContextActions
+                model: @model.root
+
+            @tree.show new ContextTree
+                model: @model.root
+                collection: @model.root.children
 
 
     { Context }

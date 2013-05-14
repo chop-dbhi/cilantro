@@ -9,16 +9,16 @@
 
 @import "mixins/backdrop";
 
-@import "base/empty";
+@import "base/style";
 @import "base/accordian";
-@import "base/control";
-@import "base/charts";
 
-@import "views/empty";
+@import "views/base";
 
 @import "views/concept";
+@import "views/concept-info";
 @import "views/concept-form";
 @import "views/concept-workspace";
+@import "views/concept-panel";
 
 @import "views/field";
 @import "views/field-stats";
@@ -28,7 +28,4 @@
 
 @import "views/context";
 
-
-body {
-    text-shadow: 0 1px 1px #fff;
-}
+@import "workflows/query";

@@ -1,12 +1,40 @@
-.context-node {
-    @include transition(color, 0.2s);
-    @include backdrop;
+.context-tree .disabled {
+    .language {
+        color: #ccc;
+    }
+}
+
+.context-info {
+    border-radius: 3px;
+    margin-bottom: 10px;
+    padding: 5px;
+    background-color: #eee;
+    text-shadow: 0 1px 1px #fff;
+
+    > p {
+        margin-bottom: 0;
+    }
+
+    .count-label {
+        font-size: 1.1em;
+        font-weight: 500;
+    }
+    .details {
+        display: none;
+    }
+}
+
+.context-item {
     @extend .clearfix;
 
-    padding: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #ccc;
 
-    &.disabled {
-        color: #ccc;
+    .language {
+        @include transition(color, 0.2s);
+        @extend a;
+        cursor: pointer;
     }
 
     .actions {
@@ -15,12 +43,26 @@
         font-size: 12px;
         margin-left: 5px;
 
-        .destroy {
+        .remove {
             color: rgb(180, 0, 0);
         }
-
-        .state {
-            color: #999;
-        }
     }
+}
+
+
+.branch-type {
+    color: #999;
+    font-weight: 500;
+    font-size: 0.85em;
+    font-variant: small-caps;
+}
+
+.branch-children {
+    margin-left: 0;
+}
+
+.context-actions {
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
 }

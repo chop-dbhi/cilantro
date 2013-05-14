@@ -2,8 +2,9 @@ define [
     '../../core'
     '../field'
     '../charts'
+    './info'
     'tpl!templates/views/concept-form.html'
-], (c, field, charts, templates...) ->
+], (c, field, charts, info, templates...) ->
 
     templates = c._.object ['form'], templates
 
@@ -13,15 +14,13 @@ define [
 
         template: templates.form
 
-        options:
-            managed: true
-            showChart: true
-            chartField: null
-
         constructor: ->
             super
             session = c.data.contexts.getSession()
-            @context = session.fetch(concept: @model.id)
+            @context = session.root.fetch
+                concept: @model.id
+            ,
+                create: 'branch'
 
         events:
             'click .concept-actions [data-toggle=add]': 'save'
@@ -35,19 +34,21 @@ define [
             update: '.concept-actions [data-toggle=update]'
 
         regions:
-            main: '.concept-main'
-            chart: '.concept-chart'
+            info: '.concept-info'
             fields: '.concept-fields'
 
         onRender: ->
-            fields = new field.FieldFormCollection
+            @info.show new info.ConceptInfo
+                model: @model
+
+            @fields.show new field.FieldFormCollection
                 collection: @model.fields
                 context: @context
+                hideSingleFieldInfo: true
 
-            @fields.show(fields)
-            @setDefaultState()
+            @setState()
 
-        setDefaultState: ->
+        setState: ->
             # If this is valid field-level context update the state
             # of the concept form. Only one of the fields need to be
             # valid to update the context
@@ -68,16 +69,15 @@ define [
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
-        save: (options) ->
-            options = c._.extend(deep: @options.managed, options)
-            @context?.save(options)
+        save: ->
+            if @context?
+                @context.save()
+                c.publish c.CONTEXT_SAVE
             @setUpdateState()
 
         # Clears the local context of conditions
-        clear: (options) ->
-            options = c._.extend(deep: @options.managed, options)
-            @context?.clear(options)
-            @context?.save(options)
+        clear: ->
+            @context?.clear()
             @setNewState()
 
 

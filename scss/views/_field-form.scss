@@ -1,4 +1,10 @@
 .field-form {
-    @include field;
-    margin-bottom: 20px;
+    .field-info {
+        @include field;
+        margin-bottom: 10px;
+    }
+
+    .field-stats {
+        font-size: 0.85em;
+    }
 }

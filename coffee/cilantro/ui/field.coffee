@@ -1,6 +1,6 @@
 define [
     './core'
-    './field/item'
+    './field/info'
     './field/form'
     './field/controls'
     './field/stats'

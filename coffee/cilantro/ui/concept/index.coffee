@@ -1,16 +1,15 @@
 define [
     '../core'
-    './item'
-    '../empty'
+    '../base'
+    './info'
     'tpl!templates/views/concept-accordian-group.html'
     'tpl!templates/views/concept-accordian-item.html'
-], (c, items, empty, templates...) ->
+], (c, base, info, templates...) ->
 
-    # Create an object of templates by name..
     templates = c._.object ['group', 'item'], templates
 
 
-    class ConceptAccordianItem extends items.Concept
+    class ConceptAccordianItem extends info.ConceptInfo
         tagName: 'li'
 
         className: ''
@@ -71,7 +70,7 @@ define [
 
         itemView: ConceptAccordianGroup
 
-        emptyView: empty.EmptyView
+        emptyView: base.EmptyView
 
         # Temporarily override
         showCollection: ->

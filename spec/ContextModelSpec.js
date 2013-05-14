@@ -1,9 +1,10 @@
 define(['cilantro'], function (c) {
 
     describe('ContextNodeModel (base class)', function() {
+
         it('should validate as condition', function() {
             var model = new c.models.ContextNodeModel({
-                field: 3,
+                field: 1,
                 operator: 'exact',
                 value: 30
             });
@@ -21,53 +22,96 @@ define(['cilantro'], function (c) {
 
         it('should validate as composite', function() {
             var model = new c.models.ContextNodeModel({
-                composite: 40
+                composite: 1
             });
             expect(model.isValid()).toBe(true);
         });
 
         it('should fetch itself', function() {
             var model = new c.models.ContextNodeModel({
-                field: 3,
+                field: 1,
                 operator: 'exact',
                 value: 30
             });
 
-            expect(model.fetch({field: 3})).toBe(model);
+            expect(model.fetch({field: 1})).toBe(model);
         });
 
-        describe('Local vs. public attributes', function() {
+        it('should clear (non-fixed attributes)', function() {
+            var model = new c.models.ContextNodeModel({
+                concept: 1,
+                field: 1,
+                operator: 'exact',
+                value: 30
+            });
+            model.clear();
+            expect(model.toJSON()).toEqual({field: 1, concept: 1});
+        });
+
+        it('should trigger a change event', function() {
+            var triggered = 0,
+                model = new c.models.ContextNodeModel;
+
+            model.on('change', function() {
+                triggered++;
+            });
+
+            model.public.on('change', function() {
+                triggered++;
+            });
+
+            model.set({
+                field: 1,
+                concept: 1,
+                operator: 'exact',
+                value: 1
+            });
+            expect(triggered).toBe(1);
+
+            model.save();
+            expect(triggered).toBe(2);
+        });
+
+        describe('public node', function() {
             var model;
+
             beforeEach(function() {
                 model = new c.models.ContextNodeModel({
-                    field: 3,
+                    field: 1,
                     operator: 'exact',
                     value: 30
                 });
             });
 
             it('should create a copy of the internal attributes', function() {
-                expect(model.publicAttributes).toEqual(model.attributes);
+                expect(model.public.attributes).toEqual(model.attributes);
             });
 
-            it('toJSON should not reflect local attributes on set', function() {
+            it('should not update on internal set', function() {
                 model.set('value', 50);
-                expect(model.toJSON()).not.toEqual(model.attributes);
+                expect(model.public.toJSON()).not.toEqual(model.toJSON());
             });
 
-            it('toJSON should reflect local attributes after save', function() {
+            it('should update after internal save', function() {
                 model.set('value', 50);
                 model.save();
-                expect(model.toJSON()).toEqual(model.attributes);
+                expect(model.public.toJSON()).toEqual(model.toJSON());
             });
 
-            it('toJSON should not change on an invalid state', function() {
+            it('should update on internal set with save option', function() {
+                model.set('value', 50, {save: true});
+                expect(model.public.toJSON()).toEqual(model.toJSON());
+            });
+
+            it('should not change on an invalid state', function() {
                 model.set('value', null);
                 model.save();
-                expect(model.toJSON()).not.toEqual(model.attributes);
-                expect(model.toJSON().value).toEqual(30);
+                expect(model.public.toJSON()).not.toEqual(model.toJSON());
+                expect(model.public.toJSON().value).toEqual(30);
             });
+
         });
+
     });
 
     describe('ConditionNodeModel', function() {
@@ -75,7 +119,7 @@ define(['cilantro'], function (c) {
 
         beforeEach(function() {
             model = new c.models.ConditionNodeModel({
-                field: 3,
+                field: 1,
                 operator: 'exact',
                 value: 30
             });
@@ -92,224 +136,341 @@ define(['cilantro'], function (c) {
         beforeEach(function() {
             model = new c.models.BranchNodeModel({
                 type: 'and',
-                children: []
+                children: [{
+                    field: 1,
+                    concept: 1,
+                    value: 30,
+                    operator: 'exact'
+                }, {
+                    concept: 2,
+                    type: 'and',
+                    children: [{
+                        field: 2,
+                        concept: 2,
+                        value: [0.5, 1],
+                        operator: 'range'
+                    }]
+                }]
             });
 
             node = new c.models.ConditionNodeModel({
-                field: 1,
-                concept: 1,
+                field: 3,
+                concept: 3,
                 value: 30,
                 operator: 'exact'
             });
         });
 
-        it('should validate', function() {
+        it('should have a children collection', function() {
+            expect(model.children).toBeDefined();
+            expect(model.children.length).toBe(2);
+        });
+
+        it('should convert descendants into nodes', function() {
+            var c0 = model.children.at(0);
+            var c1 = model.children.at(1);
+            var c1_0 = c1.children.at(0);
+            expect(c0 instanceof c.models.ConditionNodeModel).toBe(true);
+            expect(c1 instanceof c.models.BranchNodeModel).toBe(true);
+            expect(c1_0 instanceof c.models.ConditionNodeModel).toBe(true);
+        });
+
+        it('should validate (shallow)', function() {
             expect(model.isValid({deep: false})).toBe(true);
         });
 
-        it('should deep validate', function() {
-            model.add(node);
+        it('should validate (deep)', function() {
+            model.children.add(node);
             expect(model.isValid({deep: true})).toBe(true);
         });
 
-        it('should add', function() {
-            model.add(node);
-            expect(model.get('children').length).toBe(1);
+        it('should set and merge', function() {
+            var attrs = {
+                type: 'and',
+                children: [{
+                    field: 1,
+                    concept: 1,
+                    value: 50,
+                    operator: 'gt'
+                }, {
+                    concept: 2,
+                    type: 'or',
+                    children: [{
+                        field: 2,
+                        concept: 2,
+                        value: [1, 3],
+                        operator: '-range'
+                    }]
+                }]
+            };
 
-            // Adding again is a no-op
-            model.add(node);
-            expect(model.get('children').length).toBe(1);
+            var cidsBefore = model.children.each(function(model) {
+                return model.cid;
+            });
+            model.set(attrs);
+            var cidsAfter = model.children.each(function(model) {
+                return model.cid;
+            });
+            expect(model.toJSON()).toEqual(attrs);
+            expect(cidsBefore).toEqual(cidsAfter);
         });
 
-        it('should remove', function() {
-            model.add(node);
-
-            model.remove(node);
-            expect(model.get('children').length).toBe(0);
-
-            // Removing again is a no-op
-            model.remove(node);
-        });
-
-        it('should clear (but not destroy)', function() {
-            model.add(node);
+        it('should clear', function() {
+            model.children.add(node);
             model.clear();
-            expect(model.get('children')[0].attributes).toEqual({});
-        });
-
-        it('should clear and destroy', function() {
-            model.add(node);
-            model.clear({destroy: true});
-            expect(model.get('children').length).toBe(0);
+            expect(model.toJSON()).toEqual({
+                type: 'and',
+                children: [{
+                    concept: 1,
+                    field: 1,
+                }, {
+                    concept: 2,
+                    type: 'and',
+                    children: [{
+                        field: 2,
+                        concept: 2,
+                    }]
+                }, {
+                    concept: 3,
+                    field: 3
+                }]
+            });
         });
 
         it('should fetch child node (by field)', function() {
-            model.add(node);
-            expect(model.fetch({field: 1})).toBe(node);
+            model.children.add(node);
+            expect(model.fetch({field: 3})).toBe(node);
         });
 
         it('should fetch child node (by concept)', function() {
-            model.add(node);
-            expect(model.fetch({concept: 1})).toBe(node);
+            model.children.add(node);
+            expect(model.fetch({concept: 3})).toBe(node);
+        });
+
+        it('should fetch child node (by field and concept)', function() {
+            model.children.add(node);
+            expect(model.fetch({field: 3, concept: 3})).toBe(node);
         });
 
         it('should not deep validate', function() {
-            model.attributes.children.push({
+            node = new c.models.ContextNodeModel({
                 bad: 1
             });
+            model.children.add(node);
             expect(model.isValid({deep: true})).toBe(false);
         });
 
-        it('should not add itself', function() {
-            expect(function() {
-                model.add(model);
-            }).toThrow();
-        });
+        it('should trigger change events', function() {
+            var model = new c.models.BranchNodeModel,
+                changed = 0,
+                added = 0,
+                removed = 0,
+                pchanged = 0,
+                padded = 0,
+                premoved = 0;
 
-        it('should not add bare attributes', function() {
-            expect(function() {
-                model.add(model.attributes);
-            }).toThrow();
-        });
-
-        describe('Deep initialization', function() {
-            it('should convert descendants into nodes', function() {
-                var model = new c.models.BranchNodeModel({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }, {
-                        concept: 2,
-                        type: 'and',
-                        children: [{
-                            field: 2,
-                            concept: 2,
-                            value: [0.5, 1],
-                            operator: 'range'
-                        }]
-                    }]
+            var attrs = {
+                type: 'and',
+                children: [{
+                    field: 1,
+                    concept: 1,
+                    value: 50,
+                    operator: 'gt'
                 }, {
-                    deep: true
-                });
+                    concept: 2,
+                    type: 'or',
+                    children: [{
+                        field: 2,
+                        concept: 2,
+                        value: [1, 3],
+                        operator: '-range'
+                    }]
+                }]
+            };
 
-                c0 = model.get('children')[0]
-                c1 = model.get('children')[1]
-                c1_0 = c1.get('children')[0]
-                expect(c0 instanceof c.models.ConditionNodeModel).toBe(true);
-                expect(c1 instanceof c.models.BranchNodeModel).toBe(true);
-                expect(c1_0 instanceof c.models.ConditionNodeModel).toBe(true);
+            model.on('change', function() {
+                changed++;
             });
+
+            model.children.on('add', function() {
+                added++;
+            });
+
+            model.children.on('remove', function() {
+                removed++;
+            });
+
+            model.public.on('change', function() {
+                pchanged++;
+            });
+
+            model.public.children.on('add', function() {
+                padded++;
+            });
+
+            model.public.children.on('remove', function() {
+                premoved++;
+            });
+
+            model.set(attrs);
+
+            expect(changed).toBe(1);
+            expect(added).toBe(2);
+            expect(removed).toBe(0);
+
+            model.save();
+
+            expect(changed).toBe(1);
+            expect(added).toBe(2);
+            expect(removed).toBe(0);
+
+            expect(changed).toBe(1);
+            expect(added).toBe(2);
+            expect(removed).toBe(0);
+
+            var newAttrs = {
+                type: 'and',
+                children: [{
+                    field: 1,
+                    concept: 1,
+                    value: 50,
+                    operator: 'gt'
+                }]
+            };
+
+            model.set(newAttrs);
+
+            expect(changed).toBe(2);
+            expect(added).toBe(2);
+            expect(removed).toBe(1);
+
+            // No save, public attributes should still be the original ones
+            expect(model.public.toJSON()).toEqual(attrs);
+
+            model.save();
+
+            expect(changed).toBe(2);
+            expect(added).toBe(2);
+            expect(removed).toBe(1);
+
+            expect(changed).toBe(2);
+            expect(added).toBe(2);
+            expect(removed).toBe(1);
+
+            expect(model.public.toJSON()).toEqual(newAttrs);
         });
 
-        describe('Local vs. Public attributes', function() {
+        describe('children collection', function() {
 
-            it('toJSON should recurse on public attributes', function() {
-                model.add(node);
+            it('should add', function() {
+                model.children.add(node);
+                expect(model.children.length).toBe(3);
 
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
-
-                model.save({deep: false});
-
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
-                });
+                // Adding again is a no-op
+                model.children.add(node);
+                expect(model.children.length).toBe(3);
             });
 
-            it('should not recurse unless the deep=true option is passed', function() {
-                model.add(node);
-                node.set('value', 50);
+            it('should remove', function() {
+                model.children.add(node);
 
-                model.save({deep: false});
+                model.children.remove(node);
+                expect(model.children.length).toBe(2);
 
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
+                // Removing again is a no-op
+                model.children.remove(node);
+                expect(model.children.length).toBe(2);
+            });
+
+            it('should not add itself', function() {
+                expect(function() {
+                    model.children.add(model);
+                }).toThrow();
+            });
+
+            it('should not add bare invalid attributes', function() {
+                expect(function() {
+                    model.children.add({bad: 1});
+                }).toThrow();
+            });
+
+        });
+
+        describe('public node', function() {
+
+            it('should equal the internal attributes on initialization', function() {
+                expect(model.public.toJSON()).toEqual(model.toJSON());
+            });
+
+            it('children should contain references to internal public nodes', function() {
+                var children = model.children.map(function(model) {
+                    return model.public;
                 });
 
-                model.save({deep: true});
+                // For starters, ensure they are the same length
+                expect(children.length).toEqual(model.public.children.length);
 
-                expect(model.toJSON()).toEqual({
+                for (var i = 0; i < children.length; i++) {
+                    expect(children[i]).toBe(model.public.children.models[i]);
+                }
+            });
+
+            it('should update on successful save', function() {
+                model.children.add(node);
+                expect(model.public.toJSON()).not.toEqual(model.toJSON());
+
+                expect(model.save()).toBe(true);
+                expect(model.public.toJSON()).toEqual(model.toJSON());
+            });
+
+            it('should update on internal set and save option', function() {
+                var attrs = {
                     type: 'and',
                     children: [{
                         field: 1,
                         concept: 1,
                         value: 50,
-                        operator: 'exact'
+                        operator: 'gt'
+                    }, {
+                        concept: 2,
+                        type: 'or',
+                        children: [{
+                            field: 2,
+                            concept: 2,
+                            value: [1, 3],
+                            operator: '-range'
+                        }]
                     }]
+                };
+                var cidsBefore = model.public.children.each(function(model) {
+                    return model.cid;
                 });
+
+                model.set(attrs, {save: true});
+
+                var cidsAfter = model.public.children.each(function(model) {
+                    return model.cid;
+                });
+                expect(model.public.toJSON()).toEqual(model.toJSON());
+                expect(cidsBefore).toEqual(cidsAfter);
             });
 
-            it('toJSON should not include invalid children by default', function() {
-                model.add(node);
+            it('should ignore invalid children when strict is false', function() {
+                model.children.add(node);
+                model.save();
+                expect(model.public.children.at(2)).toBeDefined();
 
-                expect(model.save()).toBe(true);
-
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
-                });
-
-                // Make the node invalid
                 node.set('value', null);
+                expect(model.save({strict: false})).toBe(true);
+                expect(model.public.children.at(2)).toBeUndefined();
+            });
 
-                // Still considered valid since the branch itself is valid
-                expect(model.save({ignore: false})).toBe(true);
-
-                // Invalid node not saved
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
-                });
-
-                // Still considered valid since the branch itself is valid
-                expect(model.save()).toBe(true);
-
-                // Invalid node not saved
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
+            it('should not ignore invalid children', function() {
+                node.set('value', null);
+                model.children.add(node);
 
                 expect(model.save({strict: true})).toBe(false);
-
-                // Invalid node not saved
-                expect(model.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 30,
-                        operator: 'exact'
-                    }]
-                });
-
+                expect(model.public.children.at(2)).toBeUndefined();
             });
         });
     });
@@ -328,7 +489,7 @@ define(['cilantro'], function (c) {
         });
     });
 
-    describe('ContextModel', function () {
+    describe('ContextModel', function() {
 
         it('should define a root branch', function() {
             model = new c.models.ContextModel;
@@ -342,9 +503,9 @@ define(['cilantro'], function (c) {
                   operator: 'in',
                   value: [1, 2, 3]
                 }
-            });
+            }, {parse: true});
             expect(model.root.nodeType).toBe('branch');
-            expect(model.root.get('children').length).toBe(1);
+            expect(model.root.children.length).toBe(1);
         });
 
     });

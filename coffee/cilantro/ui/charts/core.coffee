@@ -1,8 +1,9 @@
 define [
     '../core'
+    '../base'
     '../controls'
     './options'
-], (c, controls, chartOptions) ->
+], (c, base, controls, chartOptions) ->
 
 
     # Highcharts options are very nested.. this makes the common ones more
@@ -29,6 +30,8 @@ define [
 
     class Chart extends controls.Control
         template: ->
+
+        emptyView: base.EmptyView
 
         chartOptions: chartOptions.defaults
 
@@ -64,9 +67,15 @@ define [
         getChartOptions: ->
             @chartOptions
 
+        showEmptyView: ->
+            view = new @emptyView
+                message: 'No data is available for charting'
+            @$el.html(view.render().el)
+
         renderChart: (options) ->
             if @chart then @chart.destroy?()
             @chart = new Highcharts.Chart(options)
+            @set(@context)
 
 
     # Set a default option for the class

@@ -1,0 +1,22 @@
+<button class="btn btn-mini pull-right"><i class=icon-info-sign></i></button>
+
+<div class=count-label>
+    <span class=count><%= data.count %></span>
+
+    <% if (data.count == 1) { %>
+        <%= data.object_name %>
+    <% } else { %>
+        <%= data.object_name_plural %>
+    <% } %>
+</div>
+
+<div class=details>
+    <% if (data.name) { %>
+        <h4 class=name><%= data.name %></h4>
+    <% } %>
+    <% if (data.description) { %>
+        <p class=description><%= data.description %></p>
+    <% } %>
+    <p class=timestamp>Created: <%= data.created %><br>
+        Modified: <%= data.modified %></p>
+</div>

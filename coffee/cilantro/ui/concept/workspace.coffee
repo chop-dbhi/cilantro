@@ -1,23 +1,23 @@
-define ['../../core'
-        '../field'
-        '../charts'
-        '../empty'
-        './form'
-        './item'
-        'tpl!templates/views/concept-workspace.html'
-        'tpl!templates/views/concept-workspace-start.html'
-        'tpl!templates/views/concept-workspace-log.html'
-], (c, field, charts, empty, form, item, templates...) ->
+define [
+    '../core'
+    '../base'
+    '../field'
+    '../charts'
+    './form'
+    './info'
+    'tpl!templates/views/concept-workspace.html'
+    'tpl!templates/views/concept-workspace-start.html'
+], (c, base, field, charts, form, info, templates...) ->
 
-    templates = c._.object ['workspace', 'start', 'log'], templates
+    templates = c._.object ['workspace', 'start'], templates
 
 
-    class ConceptWorkspaceStart extends empty.EmptyView
+    class ConceptWorkspaceStart extends base.EmptyView
         template: templates.start
 
 
-    class ConceptWorkspaceLogItem extends item.Concept
-        tagName: 'li'
+    class ConceptWorkspaceLogItem extends info.ConceptInfo
+        className: 'concept-info'
 
         events:
             click: 'focus'
@@ -26,18 +26,13 @@ define ['../../core'
             @publish c.CONCEPT_FOCUS, @model.id
 
 
-    class ConceptWorkspaceLog extends c.Backbone.View
-        tagName: 'ul'
+    class ConceptWorkspaceLog extends c.Marionette.CollectionView
         className: 'concept-workspace-log'
 
         itemView: ConceptWorkspaceLogItem
 
-        add: (model) ->
-            view = new @itemView
-                model: model
-
-            view.render()
-            @$el.prepend view.el
+        appendHtml: (collectionView, itemView, index) ->
+            collectionView.$el.prepend(itemView.el)
 
 
     # Some of the class properties here are mimicked after CollectionView
@@ -47,13 +42,20 @@ define ['../../core'
 
         template: templates.workspace
 
-        emptyView: ConceptWorkspaceStart
+        itemView: form.ConceptForm
 
-        logView: ConceptWorkspaceLog
+        ui:
+            tabs: '.nav-tabs'
+            mainTab: '.nav-tabs [data-name=main]'
+            logTab: '.nav-tabs [data-name=log]'
 
         regions:
-            main: '.main'
             log: '.log'
+            main: '.main'
+
+        regionViews:
+            log: ConceptWorkspaceLog
+            main: ConceptWorkspaceStart
 
         _ensureModel: (model) ->
             if not (model instanceof c.models.ConceptModel)
@@ -67,10 +69,12 @@ define ['../../core'
             if @options.emptyView?
                 @emptyView = @options.emptyView
 
-            @subscribe c.CONCEPT_FOCUS, @renderItem
+            @subscribe c.CONCEPT_FOCUS, @showItem
             @itemsViews = {}
 
-        renderItem: (model) =>
+        showItem: (model) =>
+            @ui.mainTab.tab('show')
+
             model = @_ensureModel(model)
 
             if @currentView and model.id is @currentView.model.id
@@ -84,29 +88,34 @@ define ['../../core'
 
             # Determine if this is registered as a custom concept
             customForm = c.getOption("concepts.forms.#{ model.id }")
+
+            options = model: model
+
             if customForm?
                 require [customForm.module], (CustomForm) =>
-                    options = customForm.options or {}
-                    options.model = model
+                    options = c._.extend {}, customForm.options, options
                     @createView(CustomForm, options)
             else
-                    @createView(form.ConceptForm, model: model)
+                    @createView(@itemView, options)
 
-        createView: (ConceptForm, options) =>
-            view = new ConceptForm(options)
+        createView: (itemViewClass, options) =>
+            view = new itemViewClass(options)
 
             @itemsViews[options.model.id] = view
-            @log.currentView.add(options.model)
+            @log.currentView.collection.add(options.model)
 
             @setCurrentView(view)
 
         setCurrentView: (view) ->
+            if not @currentView?
+                @ui.tabs.fadeIn()
             @currentView = view
             @main.show(view)
 
         onRender: ->
-            @main.show new @emptyView
-            @log.show new @logView
+            @main.show new @regionViews.main
+            @log.show new @regionViews.log
+                collection: new c.Backbone.Collection
 
 
     { ConceptWorkspace }
