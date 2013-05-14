@@ -21,7 +21,7 @@ define [
 
         itemViewContainer: '.branch-children'
 
-        itemView: item.ContextNode
+        itemView: item.ContextItem
 
         emptyView: ContextEmptyTree
 

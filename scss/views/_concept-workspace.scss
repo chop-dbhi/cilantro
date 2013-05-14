@@ -5,8 +5,7 @@
 .concept-workspace-log {
     margin: 0;
 
-    .concept {
-        @include concept;
+    .concept-info {
         border-bottom: 1px solid #ccc;
 
         &:last-child {

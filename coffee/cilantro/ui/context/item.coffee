@@ -14,8 +14,8 @@ define [
         return items
 
 
-    class ContextNode extends c.Marionette.ItemView
-        className: 'context-node'
+    class ContextItem extends c.Marionette.ItemView
+        className: 'context-item'
 
         template: templates.item
 
@@ -91,4 +91,4 @@ define [
             @toggleState()
 
 
-    { ContextNode }
+    { ContextItem }

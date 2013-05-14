@@ -42,6 +42,8 @@ define [
             chart: '.field-chart'
 
         onRender: ->
+            @ui.actions.toggle(not @options.managed)
+
             if not @options.hideInfo
                 @info.show new info.FieldInfo
                     model: @model
@@ -63,10 +65,9 @@ define [
                     chart:
                         height: 200
 
-            @setDefaultState()
+            @setState()
 
-        setDefaultState: ->
-            if @options.managed then @ui.actions.hide()
+        setState: ->
             if @context?.isValid()
                 @setUpdateState()
             else
@@ -86,16 +87,13 @@ define [
         # synced with the server.
         save: ->
             @context?.save()
-            if @options.managed
-                @setUpdateState()
+            @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
             if @context?
                 @context.clear()
-                @context.save()
-            if @options.managed
-                @setNewState()
+            @setNewState()
 
 
     class FieldFormCollection extends c.Marionette.CollectionView

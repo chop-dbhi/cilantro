@@ -14,11 +14,6 @@ define [
 
         template: templates.form
 
-        options:
-            managed: true
-            showChart: true
-            chartField: null
-
         constructor: ->
             super
             session = c.data.contexts.getSession()
@@ -51,13 +46,13 @@ define [
                 context: @context
                 hideSingleFieldInfo: true
 
-            @setDefaultState()
+            @setState()
 
-        setDefaultState: ->
+        setState: ->
             # If this is valid field-level context update the state
             # of the concept form. Only one of the fields need to be
             # valid to update the context
-            if @context?.isValid(strict: true)
+            if @context?.isValid()
                 @setUpdateState()
             else
                 @setNewState()
@@ -75,18 +70,14 @@ define [
         # Saves the current state of the context which enables it to be
         # synced with the server.
         save: ->
-            options = deep: @options.managed
             if @context?
-                @context.save(options)
+                @context.save()
                 c.publish c.CONTEXT_SAVE
             @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
-            options = deep: @options.managed
-            if @context?
-                @context.clear(options)
-                @context.save(options)
+            @context?.clear()
             @setNewState()
 
 

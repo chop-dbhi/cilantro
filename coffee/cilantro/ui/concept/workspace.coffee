@@ -7,10 +7,9 @@ define [
     './info'
     'tpl!templates/views/concept-workspace.html'
     'tpl!templates/views/concept-workspace-start.html'
-    'tpl!templates/views/concept-workspace-log.html'
 ], (c, base, field, charts, form, info, templates...) ->
 
-    templates = c._.object ['workspace', 'start', 'log'], templates
+    templates = c._.object ['workspace', 'start'], templates
 
 
     class ConceptWorkspaceStart extends base.EmptyView
@@ -18,6 +17,8 @@ define [
 
 
     class ConceptWorkspaceLogItem extends info.ConceptInfo
+        className: 'concept-info'
+
         events:
             click: 'focus'
 

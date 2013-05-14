@@ -51,7 +51,7 @@ define [
         validate: (attrs, options) ->
             options = c._.extend
                 deep: true
-                strict: false
+                strict: true
             , options
 
             if not (attrs.type is 'and' or attrs.type is 'or')

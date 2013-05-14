@@ -51,6 +51,7 @@ define ->
         return text
 
     prettyNumber = (value) ->
+        if not value? then return '&infin;'
         if value isnt 0
             # Small float
             if Math.abs(value) < 0.01

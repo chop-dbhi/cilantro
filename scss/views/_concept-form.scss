@@ -1,9 +1,4 @@
 .concept-form {
-    .concept-info {
-        @include concept;
-        margin-bottom: 10px;
-    }
-
     // No extra margins..
     .concept-fields .field-form:last-child {
         margin-bottom: 0;

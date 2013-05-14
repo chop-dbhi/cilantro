@@ -24,7 +24,6 @@ define [
 
             @workspace.show new concept.ConceptWorkspace
 
-            # TODO fix
             c.data.contexts.ready =>
                 @context.show new context.Context
                     model: c.data.contexts.getSession()
