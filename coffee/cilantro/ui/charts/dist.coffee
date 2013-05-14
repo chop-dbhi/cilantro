@@ -55,8 +55,6 @@ define [
             if @node then @node.destroy()
 
         onRender: ->
-            @$el.addClass 'loading'
-
             # Explicitly set the width of the chart so Highcharts knows
             # how to fill out the space. Otherwise if this element is
             # not in the DOM by the time the distribution request is finished,
@@ -66,7 +64,10 @@ define [
 
             @model.distribution (resp) =>
                 options = @getChartOptions(resp)
-                @renderChart(options)
+                if resp.size
+                    @renderChart(options)
+                else
+                    @showEmptyView(options)
 
         setValue: (value) =>
             if not c._.isArray(value) then value = []
