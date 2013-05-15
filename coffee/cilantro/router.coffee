@@ -29,11 +29,9 @@ define [
                 @_loaded.splice(idx, 1)
                 if (view = route._view)?
                     view?.$el.hide()
-                    view?.unload?()
-                    view?.pending?()
+                    view.trigger?('router:unload', @, Backbone.history.fragment)
 
         _load: (options) =>
-
             # If the view has not be loaded before, check if it's a
             # module string and loader asynchronously
             if not options._view?
@@ -64,8 +62,7 @@ define [
                 view.render?()
 
             view.$el.show()
-            view.load?()
-            view.resolve?()
+            view.trigger?('router:load', @, Backbone.history.fragment)
             return
 
         _register: (options) ->

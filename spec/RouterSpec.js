@@ -1,34 +1,36 @@
 define(['cilantro.ui'], function(c) {
 
-    var routes = [{
-        id: 1,
-        route: 'foo/',
-        view: new c.Backbone.View,
-        el: '.region1'
-    }, {
-        id: 2,
-        route: 'foo/',
-        view: '/spec/route-spec-mod.js',
-        el: '.region2'
-    }, {
-        id: 3,
-        route: 'foo/',
-        view: new c.Backbone.View,
-        el: '.region3'
-    }, {
-        id: 4,
-        route: 'bar/',
-        view: new c.ui.QueryWorkflow,
-        el: '.region3'
-    }];
+    var routes;
 
     beforeEach(function() {
+        routes = [{
+            id: 1,
+            route: 'foo/',
+            view: new c.Backbone.View,
+            el: '.region1'
+        }, {
+            id: 2,
+            route: 'foo/',
+            view: '/spec/route-spec-mod.js',
+            el: '.region2'
+        }, {
+            id: 3,
+            route: 'foo/',
+            view: new c.Backbone.View,
+            el: '.region3'
+        }, {
+            id: 4,
+            route: 'bar/',
+            view: new c.ui.QueryWorkflow,
+            el: '.region3'
+        }];
+
         c.$('#arena')
             .append('<div class=region1></div>')
             .append('<div class=region2></div>')
-            .append('<div class=region3></div>')
+            .append('<div class=region3></div>');
 
-        c.router.options.el = '#arena'
+        c.router.options.el = '#arena';
         c.router.register(routes);
         c.Backbone.history.start({pushState: false, hashChange: true});
     });
@@ -116,20 +118,50 @@ define(['cilantro.ui'], function(c) {
                 expect(c.Backbone.history.navigate('bar/', {trigger: true})).toBe(true);
                 expect(c.router._loaded.length).toEqual(1);
 
-                children = $('#arena .region3').children()
+                children = $('#arena .region3').children();
                 expect(children.length).toEqual(1);
 
                 expect(c.Backbone.history.navigate('foo/', {trigger: true})).toBe(true);
 
                 // New element is added, but only the new one is visible
-                children = $('#arena .region3').children()
+                children = $('#arena .region3').children();
                 expect(children.length).toEqual(2);
                 expect(children.filter(':visible').length).toEqual(1);
                 expect(children.filter(':visible').is(c.router._registered[3]._view.el)).toBe(true);
             });
 
+            describe('Events', function() {
+                var loaded;
+
+                beforeEach(function() {
+                    loaded = false;
+
+                    routes[0].view.on('router:load', function(router, route) {
+                        loaded = true;
+                    });
+
+                    routes[0].view.on('router:unload', function(router, route) {
+                        loaded = false;
+                    });
+                });
+
+                afterEach(function() {
+                    routes[0].view.off('router:load');
+                    routes[0].view.off('router:unload');
+                });
+
+                it('should trigger the load event', function() {
+                    c.Backbone.history.navigate('foo/', {trigger: true});
+                    expect(loaded).toBe(true);
+                });
+
+                it('should trigger the unload event', function() {
+                    c.Backbone.history.navigate('foo/', {trigger: true});
+                    c.Backbone.history.navigate('bar/', {trigger: true});
+                    expect(loaded).toBe(false);
+                });
+            });
+
         });
-
     });
-
 });
