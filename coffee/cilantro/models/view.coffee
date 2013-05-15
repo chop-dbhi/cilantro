@@ -1,70 +1,75 @@
 define [
     '../core'
-], (c) ->
-    
+    './base'
+], (c, base) ->
 
-    class ViewModel extends c.Backbone.Model
-        deferred:
-            save: true
 
-        url: ->
-            if @isNew() then return super
-            return @get('_links').self.href
+    class Facet extends c.Backbone.Model
+
+
+    class Facets extends c.Backbone.Collection
+        model: Facet
+
+        get: (obj) ->
+            if not (model = super(obj)) and obj.concept?
+                model = @findWhere concept: obj.concept
+            return model
+
+
+    class ViewModel extends base.Model
+        constructor: ->
+            @facets = new Facets
+
+            # HACK: Convert columns in facets with the specific sets of models
+            # This is a until the facets API is supported on the server
+            @on 'change:json', (model, value, options) ->
+                # Implies this is an array of object, set directly
+                if c._.isArray(value)
+                    @facets.set(value)
+                    return
+
+                models = []
+
+                columns = value.columns or []
+                ordering = value.ordering or []
+
+                for id in columns
+                    attrs = concept: id
+                    for [_id, sort], i in ordering
+                        if id is _id
+                            attrs.sort = sort
+                            attrs.sort_index = i
+                    models.push attrs
+
+                @facets.set models
+
+            super
 
         initialize: ->
             super
 
-            if @isArchived()
-                @resolve()
-                return
+            @on 'request', ->
+                @pending()
+                c.publish c.VIEW_SYNCING, @
 
-            # Initial publish of being synced since Backbone does
-            # not consider a fetch or reset to be a _sync_ operation
-            # in this version. This has been changed in Backbone
-            # @ commit 1f3f4525
             @on 'sync', ->
                 @resolve()
                 c.publish c.VIEW_SYNCED, @, 'success'
 
-            # If the sync fails on the server
             @on 'error', ->
+                @resolve()
                 c.publish c.VIEW_SYNCED, @, 'error'
 
-            # Notify subscribers the this object has changed
             @on 'change', ->
                 c.publish c.VIEW_CHANGED, @
 
-            # Pause syncing with the server
             c.subscribe c.VIEW_PAUSE, (id) =>
                 if @id is id or not id and @isSession()
                     @pending()
 
-            # Resume syncing with the server
             c.subscribe c.VIEW_RESUME, (id) =>
                 if @id is id or not id and @isSession()
                     @resolve()
-
-            c.subscribe c.VIEW_COLUMNS, (id, columns) =>
-                if c._.isArray id
-                    columns = id
-                    id = null
-
-                if @id is id or not id and @isSession()
-                    json = @get('json') or {}
-                    json.columns = columns
-                    @set 'json', json
-                    @save()
-
-            c.subscribe c.VIEW_ORDERING, (id, ordering) =>
-                if c._.isArray id
-                    ordering = id
-                    id = null
-
-                if @id is id or not id and @isSession()
-                    json = @get('json') or {}
-                    json.ordering = ordering
-                    @set 'json', json
-                    @save()
 
             @resolve()
 
@@ -76,18 +81,28 @@ define [
 
         toJSON: ->
             id: @id
-            json: @get 'json'
+            json: @facetsToJSON()
             session: @get 'session'
             archived: @get 'archived'
             published: @get 'published'
 
-        save: ->
-            super
-            c.publish c.VIEW_SYNCING, @
-            @pending()
+        facetsToJSON: ->
+            json =
+                ordering: []
+                columns: []
+
+            @facets.each (model) ->
+                json.columns.push(model.get('concept'))
+
+                if (direction = model.get('sort'))
+                    index = model.get('sort_index')
+                    sort = [model.get('concept'), direction]
+                    json.ordering.splice(index, 0, sort)
+
+            return json
 
 
-    class ViewCollection extends c.Backbone.Collection
+    class ViewCollection extends base.Collection
         model: ViewModel
 
         url: ->
