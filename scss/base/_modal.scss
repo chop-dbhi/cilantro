@@ -1,0 +1,56 @@
+.modal.full {
+    position: fixed;
+    top: 10%;
+    bottom: 10%;
+    margin: 0;
+
+    .modal-body {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 48px;
+        bottom: 58px;
+        max-height: none;
+    }
+
+    .modal-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+
+    .modal-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+}
+
+
+/* Do not grow beyond specific (and arbitrary) size */
+@media (min-width: 1200px) {
+    .modal.full {
+        width: 1000px;
+        margin-left: -500px;
+    }
+}
+
+/* Just right.. expand close to the edges */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .modal.full {
+        right: 10%;
+        left: 10%;
+        width: auto;
+    }
+}
+
+/* Fill the screen */
+@media (max-width: 767px) {
+    .modal.full {
+        width: auto;
+        margin-left: auto;
+        bottom: 20px;
+    }
+}
