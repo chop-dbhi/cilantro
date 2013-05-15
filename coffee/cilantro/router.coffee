@@ -54,7 +54,7 @@ define [
             view = options._view
 
             if not view._rendered
-                options._rendered = true
+                view._rendered = true
                 if options.el isnt false
                     if options.el?
                         target = Backbone.$(options.el, @el)
