@@ -38,11 +38,6 @@ define ->
     CONTEXT_PAUSE: 'context.pause'
     CONTEXT_RESUME: 'context.resume'
 
-    # Specific to the ContextModel to enable add and removing nodes from
-    # the tree. Both take a node (remove can also take just a node CID) as
-    # well as a flag to sync immediately with the server.
-    CONTEXT_ADD: 'context.add'
-    CONTEXT_REMOVE: 'context.remove'
     CONTEXT_CLEAR: 'context.clear'
     CONTEXT_SAVE: 'context.save'
 
@@ -53,7 +48,5 @@ define ->
     VIEW_PAUSE: 'view.pause'
     VIEW_RESUME: 'view.resume'
 
-    # Speicifc to the ViewModel to enable setting the output columns
-    # and sorting options.
-    VIEW_COLUMNS: 'view.columns'
-    VIEW_ORDERING: 'view.ordering'
+    VIEW_CLEAR: 'view.clear'
+    VIEW_SAVE: 'view.save'

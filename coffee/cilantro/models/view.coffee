@@ -23,25 +23,7 @@ define [
             # HACK: Convert columns in facets with the specific sets of models
             # This is a until the facets API is supported on the server
             @on 'change:json', (model, value, options) ->
-                # Implies this is an array of object, set directly
-                if c._.isArray(value)
-                    @facets.set(value)
-                    return
-
-                models = []
-
-                columns = value.columns or []
-                ordering = value.ordering or []
-
-                for id in columns
-                    attrs = concept: id
-                    for [_id, sort], i in ordering
-                        if id is _id
-                            attrs.sort = sort
-                            attrs.sort_index = i
-                    models.push attrs
-
-                @facets.set models
+                @jsonToFacets(value)
 
             super
 
@@ -71,6 +53,10 @@ define [
                 if @id is id or not id and @isSession()
                     @resolve()
 
+            c.subscribe c.VIEW_SAVE, (id) =>
+                if @id is id or not id and @isSession()
+                    @save()
+
             @resolve()
 
         isSession: ->
@@ -85,6 +71,32 @@ define [
             session: @get 'session'
             archived: @get 'archived'
             published: @get 'published'
+
+        parse: (attrs) ->
+            super
+            @jsonToFacets(attrs.json)
+            return attrs
+
+        jsonToFacets: (json) ->
+            # Implies this is an array of object, set directly
+            if c._.isArray(json)
+                @facets.set(json)
+                return
+
+            models = []
+
+            columns = json.columns or []
+            ordering = json.ordering or []
+
+            for id in columns
+                attrs = concept: id
+                for [_id, sort], i in ordering
+                    if id is _id
+                        attrs.sort = sort
+                        attrs.sort_index = i
+                models.push attrs
+
+            @facets.set models
 
         facetsToJSON: ->
             json =
