@@ -15,8 +15,11 @@ define [
         onRender: ->
             @ui.input.on 'keyup', c._.debounce =>
                 query = @ui.input.val()
-                @collection.search query, (resp) =>
-                    @options.handler(query, resp)
+                if query
+                    @collection.search query, (resp) =>
+                        @options.handler(query, resp)
+                else
+                    @options.handler(null, [])
             , 300
 
 
@@ -40,11 +43,8 @@ define [
     class AvailableSection extends index.ConceptSection
         itemView: AvailableItem
 
-
-    class AvailableGroup extends index.ConceptGroup
-        itemView: AvailableSection
-
         filter: (query, models) ->
+            # If any children are visible, show this group, otherwise hide it
             show = false
             @children.each (view) ->
                 if not query or models[view.model.cid]?
@@ -53,7 +53,20 @@ define [
                 else
                     view.$el.hide()
             @$el.toggle(show)
-            return
+            return show
+
+
+    class AvailableGroup extends index.ConceptGroup
+        itemView: AvailableSection
+
+        filter: (query, models) ->
+            # If any children are visible, show this group, otherwise hide it
+            show = false
+            @children.each (view) ->
+                if view.filter(query, models)
+                    show = true
+            @$el.toggle(show)
+            return show
 
         find: (model) ->
             for cid, view of @children._views
