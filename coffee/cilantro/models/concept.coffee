@@ -32,15 +32,24 @@ define [
             return resp
 
 
-    class ConceptCollection extends base.Collection
+    class BaseConceptCollection extends base.Collection
         model: ConceptModel
 
         url: ->
             c.getSessionUrl('concepts')
 
+        search: (query, handler) ->
+            c.ajax
+                url: c._.result @, 'url'
+                data: query: query, brief: 1
+                dataType: 'json'
+                success: (resp) -> handler(resp)
+
+
+    class ConceptCollection extends BaseConceptCollection
         constructor: ->
-            @queryable = new c.Backbone.Collection
-            @viewable = new c.Backbone.Collection
+            @queryable = new BaseConceptCollection
+            @viewable = new BaseConceptCollection
             super
 
         initialize: ->
@@ -53,12 +62,6 @@ define [
                 @queryable.reset @filter (m) -> !!m.get('queryview')
                 @viewable.reset @filter (m) -> !!m.get('formatter_name')
 
-        search: (query, handler) ->
-            c.Backbone.ajax
-                url: c._.result @, 'url'
-                data: query: query
-                dataType: 'json'
-                success: (resp) -> handler(resp)
             @on 'reset', @resolve
 
 
