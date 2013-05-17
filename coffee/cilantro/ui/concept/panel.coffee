@@ -9,11 +9,13 @@ define [
 
 
     class ConceptPanel extends c.Marionette.Layout
+        className: 'concept-panel'
+
         template: templates.panel
 
         regions:
-            search: '.concept-search'
-            index: '.concept-index'
+            search: '.search-region'
+            index: '.index-region'
 
         onRender: ->
             @search.show new search.ConceptSearch
