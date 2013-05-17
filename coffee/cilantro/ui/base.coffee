@@ -38,7 +38,7 @@ define [
         message: 'Something went awry..'
 
 
-    class LoadView extends c.Marionette.ItemView
+    class LoadView extends StateView
         className: 'load-view'
 
         icon: '<i class="icon-spinner icon-spin"></i>'
