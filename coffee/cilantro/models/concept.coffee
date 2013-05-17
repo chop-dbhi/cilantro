@@ -48,8 +48,6 @@ define [
             c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
 
-            @on 'reset', @resolve
-
             # Update the sub-collections with the specific sets of models
             @on 'reset', ->
                 @queryable.reset @filter (m) -> !!m.get('queryview')
@@ -61,6 +59,7 @@ define [
                 data: query: query
                 dataType: 'json'
                 success: (resp) -> handler(resp)
+            @on 'reset', @resolve
 
 
     { ConceptModel, ConceptCollection }
