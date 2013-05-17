@@ -1,7 +1,8 @@
 define [
     '../../core'
+    '../base'
     './nodes'
-], (c, nodes) ->
+], (c, base, nodes) ->
 
     contextNodeModels =
         branch: nodes.BranchNodeModel
@@ -31,10 +32,7 @@ define [
         return new klass(attrs, options)
 
 
-    class ContextModel extends c.Backbone.Model
-        url: ->
-            if @isNew() then return super
-            return @get('_links').self.href
+    class ContextModel extends base.Model
 
         constructor: (attrs, options={}) ->
             @root = new nodes.BranchNodeModel
@@ -42,32 +40,30 @@ define [
             super(attrs, options)
 
         initialize: ->
+
             @on 'request', ->
+                @pending()
                 c.publish c.CONTEXT_SYNCING, @
 
             @on 'sync', ->
                 @resolve()
                 c.publish c.CONTEXT_SYNCED, @, 'success'
 
-            # If the sync fails on the server
             @on 'error', ->
+                @resolve()
                 c.publish c.CONTEXT_SYNCED, @, 'error'
 
-            # Notify subscribers the this object has changed
             @on 'change', ->
                 c.publish c.CONTEXT_CHANGED, @
 
-            # Pause syncing with the server
             c.subscribe c.CONTEXT_PAUSE, (id) =>
                 if @id is id or not id and @isSession()
                     @pending()
 
-            # Resume syncing with the server
             c.subscribe c.CONTEXT_RESUME, (id) =>
                 if @id is id or not id and @isSession()
                     @resolve()
 
-            # Clear all nodes from the context
             c.subscribe c.CONTEXT_CLEAR, (id) =>
                 if @id is id or not id and @isSession()
                     @clear()
@@ -87,7 +83,7 @@ define [
                 else
                     @root.set(attrs, save: true)
                 delete resp.json
-            return resp
+            super(resp)
 
         save: ->
             @root.save()
@@ -105,7 +101,7 @@ define [
             @get 'archived'
 
 
-    class ContextCollection extends c.Backbone.Collection
+    class ContextCollection extends base.Collection
         model: ContextModel
 
         url: ->
