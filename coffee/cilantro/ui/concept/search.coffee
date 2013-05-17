@@ -1,33 +1,35 @@
 define [
     '../core'
-    'tpl!templates/views/concept-search.html'
-], (c, templates...) ->
+    '../search'
+], (c, search)->
 
-    templates = c._.object ['search'], templates
+    # Takes a collection of concepts to filter/get the concept model instances
+    # for rendering
+    class ConceptSearch extends search.Search
+        className: 'concept-search search'
 
+        events:
+            'input typeahead:selected': 'focusConcept'
 
-    class ConceptSearch extends c.Marionette.ItemView
-        className: 'concept-search'
+        options: ->
+            url = c.data.concepts.url()
 
-        template: templates.search
-
-        ui:
-            input:  'input'
-
-        onRender: ->
-            c.data.concepts.when =>
-                url = c.data.concepts.url()
-
-                search = @ui.input.typeahead
-                    name: 'Concepts'
-                    remote: "#{ url }?query=%QUERY&brief=1"
-                    valueKey: 'name'
+            return {
+                name: 'Concepts'
+                valueKey: 'name'
+                limit: 10
+                remote:
+                    url: "#{ url }?query=%QUERY&brief=1"
                     filter: (resp) =>
-                        c._.filter resp, (datum) =>
-                            @collection.get(datum)
+                        datums = []
+                        c._.each resp, (datum) =>
+                            if @collection.get(datum.id)
+                                datums.push(datum)
+                        return datums
+            }
 
-                search.on 'typeahead:selected', (event, datum) ->
-                    c.publish c.CONCEPT_FOCUS, datum.id
+        focusConcept: (event, datum) ->
+            c.publish c.CONCEPT_FOCUS, datum.id
 
 
     { ConceptSearch }
