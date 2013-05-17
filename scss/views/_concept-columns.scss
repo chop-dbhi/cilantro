@@ -1,0 +1,60 @@
+.concept-columns {
+
+    .selected-columns, .available-columns {
+        margin-left: 0;
+
+        li {
+            line-height: 28px;
+            position: relative;
+
+            button {
+                position: absolute;
+                right: 0;
+                top: 3px;
+            }
+
+            &.disabled {
+                @extend .muted;
+                button {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .available-columns {
+        background-color: inherit;
+        border: none;
+        border-radius: 0;
+
+        .group {
+            margin-bottom: 10px;
+            border-bottom: none;
+        }
+
+        .group > .heading {
+            cursor: normal;
+            padding: 0;
+            font-size: 1.2em;
+        }
+
+        .group .sections {
+            border: none;
+        }
+
+        .section > .heading {
+            padding: 5px 0;
+        }
+    }
+
+    .selected-columns {
+        list-style: none;
+        margin-left: 0;
+
+        .placeholder {
+            border: 1px dashed #aaa;
+            background-color: #fcf8e3;
+            height: 26px;
+        }
+    }
+}
