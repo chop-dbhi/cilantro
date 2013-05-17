@@ -1,23 +1,13 @@
 define [
     '../core'
     '../base'
-    './info'
-    'tpl!templates/views/concept-accordian-group.html'
-    'tpl!templates/views/concept-accordian-item.html'
-], (c, base, info, templates...) ->
-
-    templates = c._.object ['group', 'item'], templates
+    '../accordian'
+], (c, base, accordian) ->
 
 
-    class ConceptAccordianItem extends info.ConceptInfo
-        tagName: 'li'
-
-        className: ''
-
+    class ConceptItem extends accordian.Item
         events:
             'click a': 'click'
-
-        template: templates.item
 
         initialize: ->
             @subscribe c.CONCEPT_FOCUS, @toggleFocus
@@ -30,54 +20,24 @@ define [
             @$el.toggleClass('active', (id is @model.id))
 
 
-    class ConceptAccordianGroup extends c.Marionette.ItemView
-        className: 'accordian-group'
-
-        itemView: ConceptAccordianItem
-
-        ui:
-            'icon': '.accordian-heading i'
-
-        events:
-            'click .accordian-heading': 'toggleIcon'
-
-        toggleIcon: ->
-            @ui.icon.toggleClass 'icon-plus icon-minus'
-
-        template: (data) ->
-            $inner = c.$(templates.group(data))
-            $items = $inner.find('.accordian-items')
-
-            sections = data.sections
-
-            for section, i in sections
-                # If there are more than one sections, add a nav header
-                if sections.length > 1
-                    $items.append("<li class=nav-header>#{ section.name }</li>")
-
-                # Render each item view
-                for model in section.models
-                    view = new ConceptAccordianItem
-                        model: model
-                    view.render()
-                    $items.append(view.el)
-
-            return $inner
+    class ConceptSection extends accordian.Section
+        itemView: ConceptItem
 
 
-    class ConceptIndex extends c.Marionette.CollectionView
-        className: 'accordian'
+    class ConceptGroup extends accordian.Group
+        itemView: ConceptSection
 
-        itemView: ConceptAccordianGroup
 
-        emptyView: base.EmptyView
+    class ConceptIndex extends accordian.Accordian
+        className: 'concept-index accordian'
 
-        # Temporarily override
+        itemView: ConceptGroup
+
+        # Override to create the parsed collection and render it
         showCollection: ->
-            collection = @collection
-            @collection = new c.Backbone.Collection @groupModels(collection)
-            super
-            @collection = collection
+            @resetGroups()
+            @groups.each (item, index) =>
+                @addItemView item, @getItemView(item), index
             return
 
         getGroup: (attrs) ->
@@ -93,36 +53,40 @@ define [
                 return attrs.category
             return id: null, name: 'Other'
 
-        groupModels: (collection) ->
-            groups = {}
+        resetGroups: ->
+            if not @groups?
+                @groups = new c.Backbone.Collection null,
+                    comparator: 'order'
+            else
+                @groups.reset()
 
-            # Group by category and sub-category
-            for model in collection.models
-                attrs = model.attributes
-                groupAttrs = null
-                sectionAttrs = null
+            for model in @collection.models
+                @groupModel(model)
+            return
 
-                # Determine the group and section for the current model.
-                groupAttrs = @getGroup attrs
-                sectionAttrs = @getSection attrs
+        # Group by category and sub-category
+        groupModel: (model) ->
+            attrs = model.attributes
+            groupAttrs = @getGroup attrs
+            sectionAttrs = @getSection attrs
 
-                # Create the group object with an array of sections
-                if not (group = groups[groupAttrs.id])
-                    group = groups[groupAttrs.id] = c._.extend {},
-                        groupAttrs, sections: {}
+            # Get the top-level group for the model
+            if not (group = @groups.get(groupAttrs.id))
+                group = new c.Backbone.Model groupAttrs
+                group.sections = new c.Backbone.Collection null,
+                    comparator: 'order'
+                @groups.add(group)
 
-                if not (section = group.sections[sectionAttrs.id])
-                    section = group.sections[sectionAttrs.id] = c._.extend {},
-                        sectionAttrs, models: []
+            # Get the section (sub-group) for the model
+            if not (section = group.sections.get(sectionAttrs.id))
+                section = new c.Backbone.Model sectionAttrs
+                section.items = new c.Backbone.Collection null,
+                    comparator: 'order'
+                group.sections.add(section)
 
-                # Models will be sorted relative to their groups later
-                section.models.push model
+            section.items.add(model)
 
-            # Sort the sections within each group, then sort the groups
-            for id, group of groups
-                group.sections = _.sortBy c._.values group.sections, 'order'
-
-            return c._.sortBy c._.values groups, 'order'
+            return
 
 
-    { ConceptIndex }
+    { ConceptIndex, ConceptGroup, ConceptSection, ConceptItem }
