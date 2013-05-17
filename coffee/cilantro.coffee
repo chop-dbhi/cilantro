@@ -7,13 +7,13 @@ define [
     c.models = models
     c.structs = structs
 
-    # TODO move this logic into a workflow..
     c.data =
         concepts: new models.ConceptCollection
         fields: new models.FieldCollection
         contexts: new models.ContextCollection
         views: new models.ViewCollection
-        
+        results: new models.Results
+
     if c.getOption('autoload') then c.openSession()
 
     # Register pre-define routes
