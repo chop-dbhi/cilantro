@@ -1,8 +1,18 @@
+// Lighter backdrop
+.modal-backdrop, .modal-backdrop.fade.in {
+    opacity: 0.3;
+}
+
+// Full-screen modal (with margins)
 .modal.full {
     position: fixed;
-    top: 10%;
-    bottom: 10%;
+    top: 5%;
+    bottom: 5%;
     margin: 0;
+
+    &.in {
+      top: 5%;
+    }
 
     .modal-body {
         position: absolute;
@@ -29,7 +39,7 @@
 }
 
 
-/* Do not grow beyond specific (and arbitrary) size */
+// Do not grow beyond specific (and arbitrary) size
 @media (min-width: 1200px) {
     .modal.full {
         width: 1000px;
@@ -37,16 +47,16 @@
     }
 }
 
-/* Just right.. expand close to the edges */
+// Just right.. expand close to the edges
 @media (min-width: 768px) and (max-width: 1199px) {
     .modal.full {
-        right: 10%;
-        left: 10%;
+        right: 5%;
+        left: 5%;
         width: auto;
     }
 }
 
-/* Fill the screen */
+// Fill the screen
 @media (max-width: 767px) {
     .modal.full {
         width: auto;
