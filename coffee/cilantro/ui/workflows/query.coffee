@@ -1,9 +1,10 @@
 define [
-    '../../core'
+    '../core'
+    '../base'
     '../concept'
     '../context'
     'tpl!templates/workflows/query.html'
-], (c, concept, context, templates...) ->
+], (c, base, concept, context, templates...) ->
 
     templates = c._.object ['query'], templates
 
@@ -19,10 +20,15 @@ define [
             context: '.context-panel'
 
         onRender: ->
-            @concepts.show new concept.ConceptPanel
-                collection: c.data.concepts.queryable
-
             @workspace.show new concept.ConceptWorkspace
+
+            # Deferred loading of views..
+            @concepts.show new base.LoadView
+            @context.show new base.LoadView
+
+            c.data.concepts.ready =>
+                @concepts.show new concept.ConceptPanel
+                    collection: c.data.concepts.queryable
 
             c.data.contexts.ready =>
                 @context.show new context.Context
