@@ -59,7 +59,7 @@ define [
         toggleCollapse: ->
             if @options.collapsable
                 @ui.inner.collapse('toggle')
-                @ui.icon.toggleClass('icon-plus icon-minus')
+                @ui.icon.toggleClass('icon-plus-sign-alt icon-minus-sign-alt')
 
 
     class Accordian extends c.Marionette.CollectionView
