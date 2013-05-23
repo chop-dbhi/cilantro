@@ -1,13 +1,14 @@
 define [
     '../core'
     '../base'
+    '../paginator'
     '../../structs'
     '../../models'
     '../tables'
     '../context'
     '../concept'
     'tpl!templates/workflows/results.html'
-], (c, base, structs, models, tables, context, concept, templates...) ->
+], (c, base, paginator, structs, models, tables, context, concept, templates...) ->
 
     templates = c._.object ['results'], templates
 
@@ -26,11 +27,15 @@ define [
 
         regions:
             table: '.table-region'
+            paginator: '.paginator-region'
             context: '.context-region'
             columns: '.columns-modal .modal-body'
 
         onRender: ->
             @table.show new tables.Table
+                collection: c.data.results
+
+            @paginator.show new paginator.Paginator
                 model: c.data.results
 
             @context.show new base.LoadView

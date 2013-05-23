@@ -1,6 +1,7 @@
 define [
     './core'
-], (c) ->
+    './models/base'
+], (c, base) ->
 
 
     class Index extends c.Backbone.Model
@@ -66,7 +67,8 @@ define [
 
         parse: (resp, options) ->
             @data.reset(resp.values, options)
-            return
+            delete resp.values
+            return resp
 
         isColumn: ->
             @width() is 1
@@ -90,11 +92,7 @@ define [
             new Series attrs, @indexes, options
 
 
-    class Frame extends c.Backbone.Model
-        options:
-            paginate: true
-            paginateBy: 50
-
+    class Frame extends base.Model
         constructor: (attrs, indexes, options={}) ->
             if not (indexes instanceof Indexes)
                 indexes = new Indexes indexes
@@ -111,9 +109,12 @@ define [
             super(attrs, options)
 
         parse: (resp, options) ->
+            super(resp, options)
             @indexes.reset(resp.keys, options)
             @series.reset(resp.objects, options)
-            return
+            delete resp.keys
+            delete resp.objects
+            return resp
 
         size: ->
             @series.length
@@ -127,4 +128,21 @@ define [
             new Series data, @indexes.at(index)
 
 
-    { Frame, Series, Datum, Index, Indexes }
+    class FrameArray extends base.Collection
+        model: Frame
+
+        constructor: (attrs, options) ->
+            @indexes = new Indexes
+
+            @on 'reset', (collection) ->
+                if (model = collection.models[0])
+                    @indexes.reset(model.indexes.models)
+
+            @on 'add', (model, collection, options) ->
+                if collection.length is 1
+                    @indexes.reset(model.indexes.models)
+
+            super(attrs, options)
+
+
+    { FrameArray, Frame, Series, Datum, Index, Indexes }

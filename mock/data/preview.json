@@ -28,6 +28,7 @@
         }
     ],
     "page_num":1,
+    "per_page":30,
     "object_name":"patient",
     "objects":[
         {
