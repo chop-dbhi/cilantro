@@ -110,10 +110,20 @@ define [
 
         events:
             'click button': 'triggerRemove'
+            'sortupdate': 'updateIndex'
 
         triggerRemove: (event) ->
             event.preventDefault()
             @model.trigger 'columns:remove', @model
+
+        # Updates the index of the model within the collection relative
+        # DOM index
+        updateIndex: (event, index) ->
+            event.stopPropagation()
+            collection = @model.collection
+            # Silently move the model to a new index
+            collection.remove(@model, silent: true)
+            collection.add(@model, at: index, silent: true)
 
 
     class SelectedColumns extends c.Marionette.CollectionView
@@ -123,11 +133,20 @@ define [
 
         itemView: SelectedItem
 
+        events:
+            'sortupdate': 'triggerItemSort'
+
         initialize: ->
             @$el.sortable
                 cursor: 'move'
                 forcePlaceholderSize: true
                 placeholder: 'placeholder'
+
+        # 'Sortable' events are not triggered on the item being sorted
+        # so this handles proxying the event to the item itself.
+        # See the SelectedItem handler for the event above.
+        triggerItemSort: (event, ui) ->
+            ui.item.trigger(event, ui.item.index())
 
 
     class ConceptColumns extends c.Marionette.Layout
