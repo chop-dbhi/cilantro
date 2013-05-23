@@ -16,7 +16,7 @@ define [
         template: templates.start
 
 
-    class ConceptWorkspaceLogItem extends info.ConceptInfo
+    class ConceptWorkspaceHistoryItem extends info.ConceptInfo
         className: 'concept-info'
 
         events:
@@ -26,10 +26,10 @@ define [
             @publish c.CONCEPT_FOCUS, @model.id
 
 
-    class ConceptWorkspaceLog extends c.Marionette.CollectionView
-        className: 'concept-workspace-log'
+    class ConceptWorkspaceHistory extends c.Marionette.CollectionView
+        className: 'concept-workspace-history'
 
-        itemView: ConceptWorkspaceLogItem
+        itemView: ConceptWorkspaceHistoryItem
 
         appendHtml: (collectionView, itemView, index) ->
             collectionView.$el.prepend(itemView.el)
@@ -47,14 +47,14 @@ define [
         ui:
             tabs: '.nav-tabs'
             mainTab: '.nav-tabs [data-name=main]'
-            logTab: '.nav-tabs [data-name=log]'
+            historyTab: '.nav-tabs [data-name=history]'
 
         regions:
-            log: '.log'
-            main: '.main'
+            main: '.main-region'
+            history: '.history-region'
 
         regionViews:
-            log: ConceptWorkspaceLog
+            history: ConceptWorkspaceHistory
             main: ConceptWorkspaceStart
 
         _ensureModel: (model) ->
@@ -102,7 +102,7 @@ define [
             view = new itemViewClass(options)
 
             @itemsViews[options.model.id] = view
-            @log.currentView.collection.add(options.model)
+            @history.currentView.collection.add(options.model)
 
             @setCurrentView(view)
 
@@ -114,7 +114,7 @@ define [
 
         onRender: ->
             @main.show new @regionViews.main
-            @log.show new @regionViews.log
+            @history.show new @regionViews.history
                 collection: new c.Backbone.Collection
 
 
