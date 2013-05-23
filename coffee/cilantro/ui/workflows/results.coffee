@@ -59,6 +59,7 @@ define [
 
         saveColumns: ->
             c.publish c.VIEW_SAVE
+            @ui.columns.modal('hide')
 
 
     { ResultsWorkflow }
