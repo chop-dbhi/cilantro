@@ -9,7 +9,8 @@ define [
         className: 'concept-search search'
 
         events:
-            'input typeahead:selected': 'focusConcept'
+            'typeahead:selected input': 'focusConcept'
+            'typeahead:autocompleted input': 'focusConcept'
 
         options: ->
             url = c.data.concepts.url()
