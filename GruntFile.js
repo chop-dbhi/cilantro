@@ -32,7 +32,7 @@ module.exports = function(grunt) {
                 cwd: 'coffee/',
                 src: '**/**/**/**/*.coffee',
                 dest: 'build',
-                ext: '.js'
+                rename: function(dest, src){ return dest + '/' + src.replace('.coffee', '.js') },
             }
         },
 
