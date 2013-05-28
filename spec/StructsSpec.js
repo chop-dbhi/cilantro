@@ -1,8 +1,12 @@
 define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
 
-    var data = JSON.parse(dataJSON);
 
     describe('Structures', function() {
+        var data;
+
+        beforeEach(function() {
+            data = JSON.parse(dataJSON);
+        });
 
         describe('Frame', function() {
 
