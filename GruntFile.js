@@ -13,7 +13,7 @@ module.exports = function(grunt) {
             },
 
             buildRunner: {
-                tasks: ['jasmine:src:build'],
+                tasks: ['jasmine:tests:build'],
                 files: ['spec/**/**/*.js']
             },
 
