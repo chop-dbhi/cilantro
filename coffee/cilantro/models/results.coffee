@@ -75,12 +75,10 @@ define [
             if not @hasPage(num)
                 throw new Error 'Cannot set the current page out of bounds'
 
-            previous = @currentPageNum
+            @previousPageNum = @currentPageNum
             @currentPageNum = num
-            @trigger 'change:currentpage', @, num,
-                previous: previous
-                first: num is 1
-                last: num is @numPages
+
+            @trigger 'change:currentpage', @, @getCurrentPageStats()...
 
         # Gets or fetches the page for num, if options.active is true
         # the page is set as the current one.
@@ -123,6 +121,17 @@ define [
         pageIsLoading: (num=@currentPageNum) ->
             if (page = @getPage(num, active: false, load: false))
                 return page.isPending()
+
+        getPageCount: ->
+            return @numPages
+
+        getCurrentPageStats: ->
+            [
+                @currentPageNum
+                previous: @previousPageNum
+                first: @currentPageNum is 1
+                last: @currentPageNum is @numPages
+            ]
 
 
     { Results }

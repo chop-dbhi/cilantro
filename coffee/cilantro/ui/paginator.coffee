@@ -31,6 +31,11 @@ define [
             'click [data-page=next]': 'showNextPage'
             'click [data-page=last]': 'showLastPage'
 
+        onRender: ->
+            if not @model.pageIsLoading()
+                @renderPageCount(@model, @model.getPageCount())
+                @renderCurrentPage(@model, @model.getCurrentPageStats()...)
+
         renderPageCount: (model, value, options) ->
             @ui.pageCount.text(value)
 
