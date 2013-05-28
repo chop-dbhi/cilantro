@@ -46,12 +46,12 @@ define [
                 while group.parent?
                     group = group.parent
                 return group
-            return id: null, name: 'Other'
+            return id: -1, name: 'Other'
 
         getSection: (attrs) ->
             if attrs.category?.parent?
                 return attrs.category
-            return id: null, name: 'Other'
+            return id: -1, name: 'Other'
 
         resetGroups: ->
             if not @groups?
