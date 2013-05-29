@@ -35,8 +35,7 @@ define ->
                 color: '#cbcbcb'
                 states: 
                     select:
-                        color: '#91e7f7'
-                        borderWidth: 3
+                        color: '#0088cc'
                     hover:
                         enabled: false
             area:
