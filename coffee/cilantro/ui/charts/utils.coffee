@@ -145,22 +145,32 @@ define [
                         p.marker.radius = 7
             seriesNo++
 
+        # TODO: This is really ugly, clean up the code that creates and 
+        # returns the formatter.
         if chartType is 'scatter' and xEnum
             # Multiple series
             if seriesList[1]
                 formatterFunc = ->
-                    return "<b>#{ @series.name }</b><br>#{ @point.count } for (#{ @series.xAxis.categories[@point.x] }, #{ @series.yAxis.categories[@point.y] })"
+                    return "<h5>#{ @series.name }</h5><br /><b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ @series.yAxis.categories[@point.y] }"
             else
                 formatterFunc = ->
-                    return "#{ @point.count } for (#{ @series.xAxis.categories[@point.x] }, #{ @series.yAxis.categories[@point.y] })"
+                    return "<b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ @series.yAxis.categories[@point.y] }"
+        else if chartType is 'column' and xEnum
+            # Multiple series
+            if seriesList[1]
+                formatterFunc = ->
+                    return "<h5>#{ @series.name }</h5><br /><b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
+            else
+                formatterFunc = ->
+                    return "<b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
         else
             # Multiple series
             if seriesList[1]
                 formatterFunc = ->
-                    return "<b>#{ @series.name }</b><br>#{ @point.count } for (#{ c.Highcharts.numberFormat parseFloat @x }, #{ c.Highcharts.numberFormat parseFloat @y })"
+                    return "<h5>#{ @series.name }</h5><br /><b>#{ xName }:</b> #{ c.Highcharts.numberFormat parseFloat @x }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
             else
                 formatterFunc = ->
-                    return "#{ @point.count } for (#{ c.Highcharts.numberFormat parseFloat @x }, #{ c.Highcharts.numberFormat parseFloat @y })"
+                    return "<b>#{ xName }:</b> #{ c.Highcharts.numberFormat parseFloat @x }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
 
         options = {
             clustered: clustered
