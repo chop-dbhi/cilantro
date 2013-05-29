@@ -97,4 +97,15 @@ define [
             @toggleRange()
 
 
-    { FieldControl, StringControl, NumberControl }
+    select = (model) ->
+        simpleType = model.get('simple_type')
+
+        if simpleType is 'number'
+            NumberControl
+        else if simpleType is 'boolean'
+            BooleanControl
+        else
+            StringControl
+
+
+    { FieldControl, StringControl, NumberControl, select }

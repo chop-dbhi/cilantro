@@ -9,5 +9,32 @@
         }
     }
 
+    &.condensed {
+        .stats-region, .chart-region {
+            display: none;
+        }
+
+        .info-region {
+            font-size: 0.9em;
+        }
+
+        .info-bar-chart {
+            .toolbar {
+                display: none;
+            }
+
+            .info-bar {
+                height: 20px;
+
+                .bar {
+                    height: 20px;
+                }
+
+                .bar-mask {
+                    padding-top: 0;
+                    padding-bottom: 0;
+                }
+            }
+        }
     }
 }

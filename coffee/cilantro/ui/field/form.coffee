@@ -3,11 +3,19 @@ define [
     './info'
     './stats'
     './controls'
+    '../infograph'
     '../charts'
     'tpl!templates/views/field-form.html'
-], (c, info, stats, controls, charts, templates...) ->
+], (c, info, stats, controls, infograph, charts, templates...) ->
 
     templates = c._.object ['form'], templates
+
+
+    getControlInterface = (model) ->
+        if model.get('enumerable')
+            infograph.BarChart
+        else
+            controls.select(model)
 
 
     # Contained within the ConceptForm containing views for a single FieldModel
@@ -55,17 +63,21 @@ define [
                 @stats.show new stats.FieldStats
                     model: @model
 
-            @control.show new controls.FieldControl
+            Control = getControlInterface(@model)
+            @control.show new Control
                 model: @model
                 context: @context
 
-            # Only represent for fields that support distributions
-            if @options.showChart and @model.links.distribution?
-                @chart.show new charts.FieldChart
-                    model: @model
-                    context: @context
-                    chart:
-                        height: 200
+            # Only represent for fields that support distributions. This
+            # enumerable condition is a hack since the above control
+            # may already have chart-like display..
+            if not @model.get('enumerable')
+                if @options.showChart and @model.links.distribution?
+                    @chart.show new charts.FieldChart
+                        model: @model
+                        context: @context
+                        chart:
+                            height: 200
 
             if @options.condensedLayout
                 @$el.addClass('condensed')

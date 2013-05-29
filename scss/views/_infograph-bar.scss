@@ -1,0 +1,62 @@
+.info-bar-chart {
+    .toolbar {
+        position: relative;
+
+        [name=sort] {
+            position: absolute;
+            right: 15px;
+            font-size: 0.85em;
+        }
+    }
+}
+
+.info-bar {
+    margin-bottom: 5px;
+    position: relative;
+    height: 40px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #eee;
+    }
+
+    .bar {
+        @include transition((box-shadow, background-color) 0.2s);
+        position: absolute;
+        left: 0;
+        background-color: #ddd;
+        height: 40px;
+        min-width: 5px;
+    }
+
+    .bar-mask {
+        padding: 10px 5px;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+    }
+
+    .bar-label {
+        font-weight: 500;
+    }
+
+    .bar-count {
+        position: absolute;
+        right: 5px;
+    }
+
+    .bar-percentage {
+        font-weight: 300;
+    }
+
+    &.selected {
+        .bar {
+            background-color: lighten(#3498db, 0.3);
+            box-shadow: 2px 2px 3px #ccc;
+        }
+
+        .bar-mask {
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+    }
+}
