@@ -7,6 +7,8 @@ define [
 
 
     class ConceptInfo extends c.Marionette.ItemView
+        className: 'concept-info'
+
         template: templates.info
 
         serializeData: ->

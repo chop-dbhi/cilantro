@@ -27,7 +27,7 @@ define [
 
         icon: '<i class="icon-info"></i>'
 
-        message: 'Move along. Nothing to see here...'
+        message: 'No data available'
 
 
     class ErrorView extends StateView

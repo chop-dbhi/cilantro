@@ -2,7 +2,7 @@ define [
     '../core'
     '../controls'
     'inputio'
-    'tpl!templates/views/field-control.html'
+    'tpl!templates/views/controls/base.html'
 ], (c, controls, InputIO, templates...) ->
 
     templates = c._.object ['control'], templates

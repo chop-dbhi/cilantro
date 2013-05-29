@@ -18,33 +18,35 @@ define [
 
         options:
             managed: true
-            showChart: true
+            showInfo: true
+            showChart: false
+            condensedLayout: false
 
         constructor: ->
             super
             @context = @options.context
 
         events:
-            'click .concept-actions [data-toggle=add]': 'save'
-            'click .concept-actions [data-toggle=update]': 'save'
-            'click .concept-actions [data-toggle=remove]': 'clear'
+            'click .actions [data-toggle=add]': 'save'
+            'click .actions [data-toggle=update]': 'save'
+            'click .actions [data-toggle=remove]': 'clear'
 
         ui:
-            actions: '.field-actions'
-            add: '.field-actions [data-toggle=add]'
-            remove: '.field-actions [data-toggle=remove]'
-            update: '.field-actions [data-toggle=update]'
+            actions: '.actions'
+            add: '.actions [data-toggle=add]'
+            remove: '.actions [data-toggle=remove]'
+            update: '.actions [data-toggle=update]'
 
         regions:
-            info: '.field-info'
-            stats: '.field-stats'
-            control: '.field-control'
-            chart: '.field-chart'
+            info: '.info-region'
+            stats: '.stats-region'
+            control: '.control-region'
+            chart: '.chart-region'
 
         onRender: ->
             @ui.actions.toggle(not @options.managed)
 
-            if not @options.hideInfo
+            if @options.showInfo
                 @info.show new info.FieldInfo
                     model: @model
                     context: @context
@@ -64,6 +66,9 @@ define [
                     context: @context
                     chart:
                         height: 200
+
+            if @options.condensedLayout
+                @$el.addClass('condensed')
 
             @setState()
 
@@ -114,11 +119,15 @@ define [
             # field is present, the concept name and description take
             # precedence
             if @options.hideSingleFieldInfo and @collection.length < 2
-                options.hideInfo = true
+                options.showInfo = false
 
-            if not @fieldChartIndex? and model.links.distribution?
-                @fieldChartIndex = index
-                options.showChart = true
+            # Only check if another is not already rendered
+            if not @fieldChartIndex?
+                if model.links.distribution?
+                    @fieldChartIndex = index
+                    options.showChart = true
+            else
+                options.condensedLayout = true
 
             return options
 

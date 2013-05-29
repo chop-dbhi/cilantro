@@ -1,6 +1,9 @@
-@mixin field {
+.field-info {
+    margin-bottom: 10px;
+
     .name {
         font-weight: 500;
+        font-size: 1.2em;
     }
 
     .unit {

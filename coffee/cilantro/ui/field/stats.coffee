@@ -39,6 +39,8 @@ define [
 
 
     class FieldStats extends c.Marionette.Layout
+        className: 'field-stats'
+
         template: templates.layout
 
         regions:

@@ -1,4 +1,17 @@
 .concept-info {
-    @include concept;
     margin-bottom: 10px;
+
+    .name {
+        font-weight: 500;
+        font-size: 1.4em;
+    }
+
+    .category {
+        font-size: 0.85em;
+        color: #999;
+    }
+
+    .description {
+        font-weight: 200;
+    }
 }

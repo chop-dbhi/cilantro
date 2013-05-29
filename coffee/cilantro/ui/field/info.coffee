@@ -7,6 +7,8 @@ define [
 
 
     class FieldInfo extends c.Marionette.ItemView
+        className: 'field-info'
+
         template: templates.info
 
 

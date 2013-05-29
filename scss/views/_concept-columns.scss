@@ -50,10 +50,17 @@
     .selected-columns {
         list-style: none;
         margin-left: 0;
+        cursor: move;
+
+        li:hover, .ui-sortable-helper, .placeholder {
+            background-color: #fcf8e3;
+        }
+
+        .ui-sortable-helper {
+            box-shadow: 0 2px 3px #ccc;
+        }
 
         .placeholder {
-            border: 1px dashed #aaa;
-            background-color: #fcf8e3;
             height: 26px;
         }
     }

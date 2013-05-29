@@ -23,19 +23,19 @@ define [
                 create: 'branch'
 
         events:
-            'click .concept-actions [data-toggle=add]': 'save'
-            'click .concept-actions [data-toggle=update]': 'save'
-            'click .concept-actions [data-toggle=remove]': 'clear'
+            'click .actions [data-toggle=add]': 'save'
+            'click .actions [data-toggle=update]': 'save'
+            'click .actions [data-toggle=remove]': 'clear'
 
         ui:
-            actions: '.concept-actions'
-            add: '.concept-actions [data-toggle=add]'
-            remove: '.concept-actions [data-toggle=remove]'
-            update: '.concept-actions [data-toggle=update]'
+            actions: '.actions'
+            add: '.actions [data-toggle=add]'
+            remove: '.actions [data-toggle=remove]'
+            update: '.actions [data-toggle=update]'
 
         regions:
-            info: '.concept-info'
-            fields: '.concept-fields'
+            info: '.info-region'
+            fields: '.fields-region'
 
         onRender: ->
             @info.show new info.ConceptInfo

@@ -4,21 +4,12 @@
     }
 }
 
-.load-view {
+.load-view, .empty-view {
     color: #999;
-    text-align: center;
 }
 
 .error-view {
     i {
         @extend .text-error;
-    }
-}
-
-.empty-view {
-    color: #999;
-
-    i {
-        @extend .text-warning;
     }
 }

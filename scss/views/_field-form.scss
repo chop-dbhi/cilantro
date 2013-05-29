@@ -1,10 +1,13 @@
 .field-form {
-    .field-info {
-        @include field;
-        margin-bottom: 10px;
+    .actions {
+        text-align: right;
+        border-top: 1px dashed #ccc;
+        padding-top: 10px;
+
+        > * {
+            margin-left: 5px;
+        }
     }
 
-    .field-stats {
-        font-size: 0.85em;
     }
 }
