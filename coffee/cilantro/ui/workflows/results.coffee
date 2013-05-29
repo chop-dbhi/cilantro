@@ -32,9 +32,6 @@ define [
             columns: '.columns-modal .modal-body'
 
         onRender: ->
-            @table.show new tables.Table
-                collection: c.data.results
-
             @paginator.show new paginator.Paginator
                 model: c.data.results
 
@@ -50,6 +47,10 @@ define [
 
             c.data.concepts.ready =>
                 c.data.views.ready =>
+                    @table.show new tables.Table
+                        view: c.data.views.getSession()
+                        collection: c.data.results
+
                     @columns.show new concept.ConceptColumns
                         view: c.data.views.getSession()
                         collection: c.data.concepts.viewable
