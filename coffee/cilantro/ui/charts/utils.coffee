@@ -179,8 +179,6 @@ define [
                 type: yType
             tooltip:
                 formatter: formatterFunc
-                borderRadius: 3
-                borderWidth: 1
         }
 
         if xLabels.length
