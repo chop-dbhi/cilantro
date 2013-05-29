@@ -7,36 +7,26 @@ define [
 
 
     controlOptions = ['attrNames', 'dataAttrs', 'dataSelectors', 'regions',
-        'regionViews', 'attrGetters', 'attrSetters']
+        'regionViews', 'regionOptions', 'attrGetters', 'attrSetters']
 
 
-    # Control interface, this should not be used directly
-    class Control extends c.Marionette.Layout
-        className: 'control'
-
+    # Mixin for view prototypes. This can be applied using `_.extend`
+    # (override) or `_.defaults` (supplement) on the prototype, e.g.
+    #
+    #    c._.defaults MyView::, ControlViewMixin
+    #
+    # The constructor on the view itself should call the `mergeOptions`
+    # passing the options followed by the `bindContext` method passing
+    # in @context object passed in.
+    #
+    #   class MyView extends c.Backbone.View
+    #       constructor: ->
+    #           super
+    #           @mergeOptions(@options)
+    #           @bindContext(@options.context)
+    #
+    ControlViewMixin =
         attrNames: ['field', 'operator', 'value', 'nulls']
-
-        regions:
-            field: '.control-field'
-            operator: '.control-operator'
-            value: '.control-value'
-            nulls: '.control-nulls'
-
-        regionViews: {}
-
-        regionOptions: {}
-
-        dataAttrs:
-            field: 'data-field'
-            operator: 'data-operator'
-            value: 'data-value'
-            nulls: 'data-nulls'
-
-        dataSelectors:
-            field: '[data-field]'
-            operator: '[data-operator]'
-            value: '[data-value]'
-            nulls: '[data-nulls]'
 
         attrGetters:
             field: 'getField'
@@ -50,12 +40,10 @@ define [
             value: 'setValue'
             nulls: 'setNulls'
 
-        constructor: ->
-            super
-            @bindContext(@options.context)
-
+        # Merge options into local references
+        mergeOptions: (options) ->
             for optionKey in controlOptions
-                if (option = @options[optionKey])?
+                if (option = c._.result(options, optionKey))?
                     if c._.isArray(option)
                         @[optionKey] = option
                     else if c._.isObject(option)
@@ -80,16 +68,6 @@ define [
             @stopListening(@context)
 
         onRender: ->
-            for key, klass of c._.result @, 'regionViews'
-                inputAttrs = {}
-                inputAttrs[@dataAttrs[key]] = ''
-
-                options = c._.extend {}, c._.result(@regionOptions, key),
-                    inputAttrs: inputAttrs
-                    model: @model
-
-                @[key].show new klass(options)
-
             @set(@context)
 
         _get: (key, options) ->
@@ -146,10 +124,9 @@ define [
 
         # Triggered any time the control contents have changed. Upstream, the
         # context can be bound to this event and update itself as changes
-        # occur. The small timer is prevent chatty typing
-        change: (event) =>
+        # occur.
+        change: (event) ->
             @trigger 'change', @, @get()
-
 
         getField: ->
         getOperator: ->
@@ -162,4 +139,52 @@ define [
         setNulls: ->
 
 
-    { Control }
+    # Control interface, this should not be used directly
+    class Control extends c.Marionette.Layout
+        className: 'control'
+
+        regions:
+            field: '.control-field'
+            operator: '.control-operator'
+            value: '.control-value'
+            nulls: '.control-nulls'
+
+        regionViews: {}
+
+        regionOptions: {}
+
+        dataAttrs:
+            field: 'data-field'
+            operator: 'data-operator'
+            value: 'data-value'
+            nulls: 'data-nulls'
+
+        dataSelectors:
+            field: '[data-field]'
+            operator: '[data-operator]'
+            value: '[data-value]'
+            nulls: '[data-nulls]'
+
+        constructor: ->
+            super
+            @mergeOptions(@options)
+            @bindContext(@options.context)
+
+        onRender: ->
+            for key, klass of c._.result @, 'regionViews'
+                inputAttrs = {}
+                inputAttrs[@dataAttrs[key]] = ''
+
+                options = c._.extend {}, c._.result(@regionOptions, key),
+                    inputAttrs: inputAttrs
+                    model: @model
+
+                @[key].show new klass(options)
+
+            @set(@context)
+
+
+    c._.defaults Control::, ControlViewMixin
+
+
+    { Control, ControlViewMixin }
