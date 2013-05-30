@@ -154,7 +154,7 @@ define [
         # each known type.
         validate: (attrs, options) ->
             try
-                model = ContextNodeModel.create(attrs)
+                model = ContextNodeModel.create(attrs, options)
                 if not model.isValid(options)
                     return model.validationError
             catch error

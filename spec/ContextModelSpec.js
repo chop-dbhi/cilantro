@@ -17,7 +17,7 @@ define(['cilantro'], function (c) {
                 children: []
             });
 
-            expect(model.isValid()).toBe(true);
+            expect(model.isValid({strict: false})).toBe(true);
         });
 
         it('should validate as composite', function() {

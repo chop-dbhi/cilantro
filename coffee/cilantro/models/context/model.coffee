@@ -25,6 +25,7 @@ define [
     nodes.ContextNodeModel.create = (type, attrs, options) ->
         # No type provided, infer the type and validate
         if typeof type is 'object'
+            options = attrs
             attrs = type
             type = getContextNodeType(attrs, options)
         if not (klass = contextNodeModels[type])?
