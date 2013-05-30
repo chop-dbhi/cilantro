@@ -117,12 +117,13 @@ define [
         publicModel: BaseNodeModel
 
         constructor: (attrs, options) ->
-            @public = new @publicModel(attrs, options)
+            @public = new @publicModel(null, options)
+            @public.local = @
             super
 
         initialize: ->
             # Save the initial attributes to the public node.
-            @save(silent: true)
+            @save()
 
         enable: ->
             @set('enabled', true, save: true)

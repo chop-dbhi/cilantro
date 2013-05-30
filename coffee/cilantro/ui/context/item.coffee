@@ -38,13 +38,13 @@ define [
             'error': 'doneLoading'
 
         serializeData: ->
-            language: flattenLanguage(@model.public.toJSON()).join(', ')
+            language: flattenLanguage(@model.toJSON()).join(', ')
 
         clickShow: (event) ->
             c.publish c.CONCEPT_FOCUS, @model.get('concept')
 
         clickRemove: (event) ->
-            @model.clear()
+            @model.local.clear()
             @$el.fadeOut
                 duration: 400
                 easing: 'easeOutExpo'
@@ -52,7 +52,11 @@ define [
             c.publish c.CONTEXT_SAVE
 
         clickState: (event) ->
-            if @model.isEnabled() then @model.disable() else @model.enable()
+            local = @model.local
+            if local.isEnabled()
+                local.disable()
+            else
+                local.enable()
             c.publish c.CONTEXT_SAVE
 
         disable: ->
@@ -72,10 +76,13 @@ define [
                     .removeClass('icon-circle-blank')
 
         toggleState: (model, value, options) ->
-            if @model.isEnabled() then @enable() else @disable()
+            if @model.local.isEnabled()
+                @enable()
+            else
+                @disable()
 
         renderLanguage: (model, options) ->
-            text = flattenLanguage(model.public.toJSON()).join(', ')
+            text = flattenLanguage(model.toJSON()).join(', ')
             @ui.language.html(text)
 
         showLoading: ->

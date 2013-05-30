@@ -25,12 +25,6 @@ define [
 
         emptyView: ContextEmptyTree
 
-        # Filter out non-valid items, the strict flag is used to exclude
-        # branches without a condition
-        addChildView: (item, collection, options) ->
-            if item.isValid(strict: true)
-                return super
-
         modelEvents:
             'change:enabled': 'toggleState'
 
@@ -58,7 +52,7 @@ define [
 
             @tree.show new ContextTree
                 model: @model.root
-                collection: @model.root.children
+                collection: @model.root.public.children
 
 
     { Context }
