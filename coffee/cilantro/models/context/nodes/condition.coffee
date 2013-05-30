@@ -10,6 +10,8 @@ define [
         validate: (attrs) ->
             if not (attrs.operator? and attrs.field? and attrs.value?)
                 return 'Not a valid condition node'
+            if c._.isArray(attrs.value) and not attrs.value.length
+                return 'Empty condition value'
 
         toJSON: (options) ->
             attrs = super(options)
