@@ -41,6 +41,7 @@ define [
             language: flattenLanguage(@model.toJSON()).join(', ')
 
         clickShow: (event) ->
+            c.router.navigate('query', trigger: true)
             c.publish c.CONCEPT_FOCUS, @model.get('concept')
 
         clickRemove: (event) ->
