@@ -1,0 +1,26 @@
+{
+    "_links": {
+       " csv": {
+            "href": "/mock/data/export/csv/"
+        },
+        "excel": {
+            "href": "/mock/data/export/excel/"
+        },
+        "html": {
+            "href": "/mock/data/export/html/"
+        },
+        "json": {
+            "href": "/mock/data/export/json/"
+        },
+        "r": {
+            "href": "/mock/data/export/r/"
+        },
+        "sas": {
+            "href": "/mock/data/export/sas/"
+        },
+        "self": {
+            "href": "/mock/data/export.json"
+        }
+    },
+    "title": "Mock Serrano Exporter Endpoints"
+}
