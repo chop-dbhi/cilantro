@@ -53,6 +53,8 @@ define [
                     @reset(null, silent: true)
                 @currentPageNum = null
                 @perPage = resp.per_page
+                @trigger('change:pagesize', @, @perPage)
+
             if @numPages isnt resp.num_pages
                 @numPages = resp.num_pages
                 @trigger('change:pagecount', @, @numPages)
