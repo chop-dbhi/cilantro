@@ -86,6 +86,19 @@ define [
                 @_routes[options.route].push options.id
             @_registered[options.id] = options
 
+        # Returns a route config by id
+        get: (id) ->
+            @_registered[id]
+
+        # Attempt to get the corresponding config if one exists and use
+        # the route specified on the config. This provides a means of
+        # aliasing a name/key to a particular route.
+        navigate: (fragment, options) ->
+            if (config = @get(fragment))? and config.navigable
+                fragment = config.route
+            super(fragment, options)
+
+        # Register one or more routes
         register: (routes) ->
             if not _.isArray routes
                 routes = [routes]
@@ -94,6 +107,7 @@ define [
                 @_register options
             return
 
+        # Unregister a route by id
         unregister: (id) ->
             if (options = @_registered[id])?
                 @_unload(options)

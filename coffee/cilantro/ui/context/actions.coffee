@@ -50,5 +50,10 @@ define [
         onRender: ->
             @toggleState()
 
+        navigateResults: (event) ->
+            event.preventDefault()
+            c.router.navigate('results', trigger: true)
+
+
 
     { ContextActions }
