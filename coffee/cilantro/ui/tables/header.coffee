@@ -42,9 +42,41 @@ define [
         events:
             "click": "onClick"
 
+        # Finds and returns the sort icon html associatied with the sort 
+        # direction of the Facet being represented by this header cell.
+        getSortIconHtml: ->
+            model = _.find(
+                @view.facets.models, 
+                (m) -> m.get('concept') == @model.id,
+                this) 
+            
+            # If there are no view facets for the this header cell's model 
+            # then the this really shouldn't be displaying anyway so return
+            # the empty string. We really should not ever get into this 
+            # situation since the facets should be driving the columns but
+            # this check prevents TypeErrors just in case.
+            if not model?
+                return ""
+
+            direction = (model.get('sort') || "").toLowerCase() 
+
+            if direction == "asc"
+                iconClass = "icon-sort-up"
+            else if direction == "desc"
+                iconClass = "icon-sort-down"
+            else
+                iconClass = "icon-sort"
+
+            "<i class=#{ iconClass }></i>"
         render: ->
             @toggleVisible()
-            @$el.html(@model.get('name'))
+            
+            iconHtml = @getSortIconHtml() 
+
+            # TODO: Could we use a template here instead and then just modify
+            # the class on the icon in the template?
+            @$el.html("<span>" + @model.get('name') + iconHtml)
+            
             return @
 
         toggleVisible: ->
