@@ -67,7 +67,8 @@ define [
             if options.strict and not attrs.children.length
                 return 'No children in branch'
 
-            if options.deep
+            # TODO deep may be redundant here
+            if options.deep and options.strict
                 for child in attrs.children
                     if child instanceof base.ContextNodeModel
                         if not child.isValid(options)
