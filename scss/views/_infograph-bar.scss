@@ -16,15 +16,11 @@
     height: 40px;
     cursor: pointer;
 
-    &:hover {
-        background-color: #eee;
-    }
-
     .bar {
         @include transition((box-shadow, background-color) 0.2s);
         position: absolute;
         left: 0;
-        background-color: #ddd;
+        background-color: #e9e9e9;
         height: 40px;
         min-width: 5px;
     }
@@ -51,7 +47,7 @@
 
     &.selected {
         .bar {
-            background-color: lighten(#3498db, 0.3);
+            background-color: lighten(#0088cc, 0.7);
             box-shadow: 2px 2px 3px #ccc;
         }
 
