@@ -67,7 +67,7 @@ define [
 
             c.subscribe c.CONTEXT_CLEAR, (id) =>
                 if @id is id or not id and @isSession()
-                    @clear()
+                    @root.clear()
 
             c.subscribe c.CONTEXT_SAVE, (id) =>
                 if @id is id or not id and @isSession()
