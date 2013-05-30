@@ -20,16 +20,19 @@ define [
 
         ui:
             columns: '.columns-modal'
+            export: '.export-modal'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
             'click .toolbar [data-toggle=columns]': 'showColumns'
+            'click [data-toggle=export]': 'showExport'
 
         regions:
             table: '.table-region'
             paginator: '.paginator-region'
             context: '.context-region'
             columns: '.columns-modal .modal-body'
+            export: '.export-modal .modal-body'
 
         onRender: ->
             @paginator.show new paginator.Paginator
@@ -54,6 +57,9 @@ define [
                     @columns.show new concept.ConceptColumns
                         view: c.data.views.getSession()
                         collection: c.data.concepts.viewable
+
+        showExport: ->
+            @ui.export.modal('show')
 
         showColumns: ->
             @ui.columns.modal('show')
