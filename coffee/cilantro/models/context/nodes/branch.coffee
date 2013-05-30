@@ -27,6 +27,10 @@ define [
             @children = new ContextNodeCollection null,
                 parent: @
 
+            # Proxy change events from children
+            @children.on 'change', (model, collection, options) =>
+                @trigger 'change', @, options
+
             # Update chidren collection when the children attributes change.
             # This should only ever occur after a sync with the server. All
             # local changes should use the `children` collection directly.

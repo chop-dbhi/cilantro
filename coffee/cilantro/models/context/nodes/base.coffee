@@ -36,6 +36,10 @@ define [
             @children = new BaseNodeCollection null,
                 parent: @
 
+            # Proxy change events from children
+            @children.on 'change', (model, collection, options) =>
+                @trigger('change', @, options)
+
             super
 
         model: (attrs, options) ->
