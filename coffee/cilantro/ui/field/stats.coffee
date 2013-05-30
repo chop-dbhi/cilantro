@@ -51,7 +51,8 @@ define [
             if @model.stats?
                 @values.show new FieldStatsValues
                     collection: @model.stats
-                @model.stats.fetch(reset: true)
+                if not @model.stats.length
+                    @model.stats.fetch(reset: true)
 
 
     { FieldStats }
