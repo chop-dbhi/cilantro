@@ -70,7 +70,6 @@ define [
                 @emptyView = @options.emptyView
 
             @subscribe c.CONCEPT_FOCUS, @showItem
-            @itemsViews = {}
 
         showItem: (model) =>
             @ui.mainTab.tab('show')
@@ -78,12 +77,6 @@ define [
             model = @_ensureModel(model)
 
             if @currentView and model.id is @currentView.model.id
-                return
-
-            # Initialize a ConceptForm view if not already present.
-            # And the corresponding history item
-            if (view = @itemsViews[model.id])?
-                @setCurrentView(view)
                 return
 
             # Determine if this is registered as a custom concept
@@ -100,10 +93,7 @@ define [
 
         createView: (itemViewClass, options) =>
             view = new itemViewClass(options)
-
-            @itemsViews[options.model.id] = view
             @history.currentView.collection.add(options.model)
-
             @setCurrentView(view)
 
         setCurrentView: (view) ->
