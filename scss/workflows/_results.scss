@@ -1,0 +1,13 @@
+.results-workflow {
+    th {
+        cursor: pointer;
+
+        .icon-sort, .icon-sort-up, .icon-sort-down {
+            float: right;
+            padding-top: 3px;
+        }
+    }
+    th:hover {
+        background-color: #c9c9c9;
+    }
+}
