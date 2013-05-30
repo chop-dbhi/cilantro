@@ -112,6 +112,9 @@ define [
             if not @isValid(deep: false)
                 return false
 
+            if not @children.length
+                return false
+
             # Clone attributes, remove reference to children. The public
             # node has no reason to carry about the reference
             attrs = c._.clone @attributes
@@ -120,8 +123,8 @@ define [
             children = []
 
             for child in @children.models
-                if child.isValid(options)
-                    child.save(options)
+                if child.isValid()
+                    child.save()
                 else if options.strict
                     return false
                 else
