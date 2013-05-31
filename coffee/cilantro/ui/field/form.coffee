@@ -7,9 +7,10 @@ define [
     '../infograph'
     '../charts'
     'tpl!templates/views/field-form.html'
+    'tpl!templates/views/field-form-condensed.html'
 ], (c, base, info, stats, controls, infograph, charts, templates...) ->
 
-    templates = c._.object ['form'], templates
+    templates = c._.object ['form', 'condensed'], templates
 
 
     getControlView = (model) ->
@@ -52,7 +53,11 @@ define [
     class FieldForm extends c.Marionette.Layout
         className: 'field-form'
 
-        template: templates.form
+        getTemplate: ->
+            if @options.condensedLayout
+                templates.condensed
+            else
+                templates.form
 
         options:
             showInfo: true
