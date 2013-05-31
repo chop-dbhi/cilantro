@@ -1,21 +1,51 @@
 define [
     '../core'
+    '../base'
     './info'
     './stats'
     './controls'
     '../infograph'
     '../charts'
     'tpl!templates/views/field-form.html'
-], (c, info, stats, controls, infograph, charts, templates...) ->
+], (c, base, info, stats, controls, infograph, charts, templates...) ->
 
     templates = c._.object ['form'], templates
 
 
-    getControlInterface = (model) ->
+    getControlView = (model) ->
         if model.get('enumerable')
             infograph.BarChart
         else
             controls.select(model)
+
+
+    class LoadingControls extends base.LoadView
+        message: 'Loading and rendering controls...'
+
+
+    class FieldControls extends c.Marionette.CollectionView
+        emptyView: LoadingControls
+
+        getItemView: (model) ->
+            # If the options specify an explicit view class use it. Otherwise
+            # fallback to infering the interface based on the model's
+            # properties.
+            if not (itemView = model.get('itemView'))?
+                itemView = getControlView(model.get('model'))
+            return itemView
+
+        itemViewOptions: (model, index) ->
+            model.attributes
+
+        buildItemView: (model, itemView, options) ->
+            new itemView options
+
+
+    # Stores the view class and various options for a control. This is
+    # used by FieldForm for adding new controls to the UI. A new instance
+    # is created by specifying the `viewClass`. Any additional options will
+    # be passed into the constructor of the view when initialized.
+    class FieldControlOptions extends c.Backbone.Model
 
 
     # Contained within the ConceptForm containing views for a single FieldModel
@@ -25,92 +55,58 @@ define [
         template: templates.form
 
         options:
-            managed: true
             showInfo: true
             showChart: false
+            showDefaultControl: true
             condensedLayout: false
 
         constructor: ->
             super
             @context = @options.context
 
-        events:
-            'click .actions [data-toggle=add]': 'save'
-            'click .actions [data-toggle=update]': 'save'
-            'click .actions [data-toggle=remove]': 'clear'
-
-        ui:
-            actions: '.actions'
-            add: '.actions [data-toggle=add]'
-            remove: '.actions [data-toggle=remove]'
-            update: '.actions [data-toggle=update]'
-
         regions:
             info: '.info-region'
             stats: '.stats-region'
-            control: '.control-region'
-            chart: '.chart-region'
+            controls: '.controls-region'
 
         onRender: ->
-            @ui.actions.toggle(not @options.managed)
-
             if @options.showInfo
                 @info.show new info.FieldInfo
                     model: @model
-                    context: @context
 
             if @model.stats?
                 @stats.show new stats.FieldStats
                     model: @model
 
-            Control = getControlInterface(@model)
-            @control.show new Control
-                model: @model
-                context: @context
+            # Initialize empty collection view in which controls can
+            # be added to.
+            @controls.show new FieldControls
+                collection: new c.Backbone.Collection
 
+            # Add the default control
+            if @options.showDefaultControl
+                @addControl()
+
+            # HACK
             # Only represent for fields that support distributions. This
             # enumerable condition is a hack since the above control
             # may already have chart-like display..
             if not @model.get('enumerable')
                 if @options.showChart and @model.links.distribution?
-                    @chart.show new charts.FieldChart
-                        model: @model
-                        context: @context
+                    @addControl charts.FieldChart,
                         chart:
                             height: 200
 
             if @options.condensedLayout
                 @$el.addClass('condensed')
 
-            @setState()
-
-        setState: ->
-            if @context?.isValid()
-                @setUpdateState()
-            else
-                @setNewState()
-
-        setUpdateState: ->
-            @ui.add.hide()
-            @ui.update.show()
-            @ui.remove.show()
-
-        setNewState: ->
-            @ui.add.show()
-            @ui.update.hide()
-            @ui.remove.hide()
-
-        # Saves the current state of the context which enables it to be
-        # synced with the server.
-        save: ->
-            @context?.save()
-            @setUpdateState()
-
-        # Clears the local context of conditions
-        clear: ->
-            if @context?
-                @context.clear()
-            @setNewState()
+        addControl: (itemView, options) ->
+            model = new FieldControlOptions c._.defaults
+                model: @model
+                context: @context
+                itemView: itemView
+            , options
+            @controls.currentView.collection.add(model)
 
 
     class FieldFormCollection extends c.Marionette.CollectionView
