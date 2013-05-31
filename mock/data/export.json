@@ -1,22 +1,28 @@
 {
     "_links": {
-       " csv": {
-            "href": "/mock/data/export/csv/"
+       "csv": {
+            "href": "/mock/data/export/csv/",
+            "title": "CSV"
         },
         "excel": {
-            "href": "/mock/data/export/excel/"
+            "href": "/mock/data/export/excel/",
+            "title": "Excel"
         },
         "html": {
-            "href": "/mock/data/export/html/"
+            "href": "/mock/data/export/html/",
+            "title": "HTML"
         },
         "json": {
-            "href": "/mock/data/export/json/"
+            "href": "/mock/data/export/json/",
+            "title": "JSON"
         },
         "r": {
-            "href": "/mock/data/export/r/"
+            "href": "/mock/data/export/r/",
+            "title": "R"
         },
         "sas": {
-            "href": "/mock/data/export/sas/"
+            "href": "/mock/data/export/sas/",
+            "title": "SAS"
         },
         "self": {
             "href": "/mock/data/export.json"
