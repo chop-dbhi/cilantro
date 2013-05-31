@@ -10,8 +10,15 @@ define [
 
     class BarModel extends c.Backbone.Model
         parse: (attrs) ->
-            attrs.label = attrs.values[0]
+            attrs.value = attrs.values[0]
             return attrs
+
+    sortModelAttr = (attr) ->
+        (model) ->
+            value = model.get(attr)
+            if c._.isString(value)
+                value = value.toLowerCase()
+            return value
 
 
     class BarCollection extends c.Backbone.Collection
@@ -20,36 +27,13 @@ define [
         comparator: (model) ->
             -model.get('count')
 
-        sortModelsBy: (value) ->
-            if value is 'count'
-                @sortByCount()
-            else if value is '-count'
-                @sortByCountRev()
-            else if value is 'alpha'
-                @sortByAlpha()
-            else if value is '-alpha'
-                @sortByAlphaRev()
+        sortModelsBy: (attr) ->
+            if (reverse = attr.charAt(0) is '-')
+                attr = attr.slice(1)
+            @models = @sortBy(sortModelAttr(attr))
+            if reverse then @models.reverse()
+            @trigger 'sort', @
             return
-
-        sortByCount: ->
-            @models = @sortBy('count')
-            @trigger 'sort', @
-
-        sortByCountRev: ->
-            @models = @sortBy('count').reverse()
-            @trigger 'sort', @
-
-        sortByAlpha: ->
-            @models = @sortBy (model) ->
-                model.get('label').toLowerCase()
-            @trigger 'sort', @
-
-        sortByAlphaRev: ->
-            @models = @sortBy (model) ->
-                model.get('label').toLowerCase()
-            @models.reverse()
-            @trigger 'sort', @
-
 
 
     class Bar extends c.Marionette.ItemView
@@ -71,7 +55,7 @@ define [
 
         serializeData: ->
             attrs = @model.toJSON()
-            attrs.label = attrs.values[0]
+            attrs.value = attrs.values[0]
             percentage = @getPercentage()
             attrs.width = percentage
             if percentage < 1
@@ -93,7 +77,7 @@ define [
             @$el.toggleClass('selected', value)
 
 
-    # Renders a series of bars for each value. This contains the label,
+    # Renders a series of bars for each value. This contains the value,
     # count and percentage for the value.
     class BarChart extends c.Marionette.CompositeView
         className: 'info-bar-chart'
@@ -159,7 +143,7 @@ define [
             regex = new RegExp(text, 'i')
 
             @children.each (view) ->
-                if not text or regex.test(view.model.get('label'))
+                if not text or regex.test(view.model.get('value'))
                     view.$el.show()
                 else
                     view.$el.hide()
@@ -190,12 +174,12 @@ define [
 
         getValue: ->
             c._.map @collection.where(selected: true), (model) ->
-                model.get('label')
+                model.get('value')
 
         setValue: (values) ->
             if not values?.length then return
             for value in values
-                if (model = @collection.findWhere label: value)
+                if (model = @collection.findWhere value: value)
                     model.set 'selected', true
             return
 
