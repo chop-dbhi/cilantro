@@ -18,4 +18,12 @@ define [
             c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
 
+        parse: (attrs) ->
+            if attrs? and attrs._links?
+                for key in Object.keys(attrs._links)
+                    # Ignore the exporter endpoint itself
+                    if key != "self"
+                        this.push(new ExporterModel(attrs._links[key]))
+                return this.models
+
     { ExporterModel, ExporterCollection }
