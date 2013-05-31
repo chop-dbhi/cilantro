@@ -95,6 +95,9 @@ define [
     class BarChart extends c.Marionette.CompositeView
         className: 'info-bar-chart'
 
+        options:
+            minValuesForToolbar: 10
+
         template: templates.chart
 
         itemView: Bar
@@ -108,6 +111,7 @@ define [
         collectionEvents:
             'sort': 'sortChildren'
             'change': 'change'
+            'reset': 'toggleToolbar'
 
         events:
             'change [name=sort]': 'sortBy'
@@ -115,6 +119,7 @@ define [
             'click [name=invert]': 'invertSelection'
 
         ui:
+            toolbar: '.toolbar'
             sortOrder: '[name=sort]'
             filterInput: '[name=filter]'
             invertButton: '[name=invert]'
@@ -133,6 +138,16 @@ define [
 
         sortBy: (event) ->
             @collection.sortModelsBy(@ui.sortOrder.val())
+
+        toggleToolbar: ->
+            # Not yet rendered, this will be called again in onRender
+            if not @_isRendered then return
+            @ui.toolbar.toggle(@collection.length >= @options.minValuesForToolbar)
+
+        onRender: ->
+            # Hide toolbar by default, this will be shown only if the
+            # data size exceeds the threshold
+            @toggleToolbar()
 
         filterBars: (event) ->
             event.stopPropagation()
