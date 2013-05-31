@@ -40,11 +40,14 @@ define [
             @trigger 'sort', @
 
         sortByAlpha: ->
-            @models = @sortBy('label')
+            @models = @sortBy (model) ->
+                model.get('label').toLowerCase()
             @trigger 'sort', @
 
         sortByAlphaRev: ->
-            @models = @sortBy('label').reverse()
+            @models = @sortBy (model) ->
+                model.get('label').toLowerCase()
+            @models.reverse()
             @trigger 'sort', @
 
 
