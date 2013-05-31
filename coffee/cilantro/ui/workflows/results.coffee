@@ -7,8 +7,9 @@ define [
     '../tables'
     '../context'
     '../concept'
+    '../exporter'
     'tpl!templates/workflows/results.html'
-], (c, base, paginator, structs, models, tables, context, concept, templates...) ->
+], (c, base, paginator, structs, models, tables, context, concept, exporter, templates...) ->
 
     templates = c._.object ['results'], templates
 
@@ -20,7 +21,7 @@ define [
 
         ui:
             columns: '.columns-modal'
-            export: '.export-modal'
+            exporter: '.export-modal'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
@@ -32,7 +33,7 @@ define [
             paginator: '.paginator-region'
             context: '.context-region'
             columns: '.columns-modal .modal-body'
-            export: '.export-modal .modal-body'
+            exporter: '.export-modal .export-type-region'
 
         onRender: ->
             @paginator.show new paginator.Paginator
@@ -43,6 +44,9 @@ define [
 
             @columns.show new base.LoadView
                 message: 'Loading all your query options...'
+
+            @exporter.show new exporter.ExportTypeCollection
+                collection: c.data.exporters
 
             c.data.contexts.ready =>
                 @context.show new context.Context
@@ -57,9 +61,9 @@ define [
                     @columns.show new concept.ConceptColumns
                         view: c.data.views.getSession()
                         collection: c.data.concepts.viewable
-
+        
         showExport: ->
-            @ui.export.modal('show')
+            @ui.exporter.modal('show')
 
         showColumns: ->
             @ui.columns.modal('show')
