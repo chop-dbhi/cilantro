@@ -1,7 +1,7 @@
 {
     "_links": {
        "csv": {
-            "href": "/mock/data/export/csv/",
+            "href": "/mock/data/export.csv",
             "title": "CSV"
         },
         "excel": {
