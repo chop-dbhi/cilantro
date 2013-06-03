@@ -26,6 +26,7 @@ define [
         events:
             'click .columns-modal [data-save]': 'saveColumns'
             'click .toolbar [data-toggle=columns]': 'showColumns'
+            'click .export-modal [data-save]': 'exportData'
             'click [data-toggle=export]': 'showExport'
 
         regions:
@@ -34,6 +35,16 @@ define [
             context: '.context-region'
             columns: '.columns-modal .modal-body'
             exporter: '.export-modal .export-type-region'
+
+        exportData: (event) ->
+            sel = $('input[name=export-type-radio]:checked')
+
+            if sel?
+                $('.export-modal .alert-block').hide()
+                window.location = sel.attr('href')
+            else
+                $('.export-modal .alert-block #export-error-message').html('An export type must be selected.')
+                $('.export-modal .alert-block').show()
 
         onRender: ->
             @paginator.show new paginator.Paginator
@@ -63,6 +74,7 @@ define [
                         collection: c.data.concepts.viewable
         
         showExport: ->
+            $('.export-modal .alert-block').hide()
             @ui.exporter.modal('show')
 
         showColumns: ->

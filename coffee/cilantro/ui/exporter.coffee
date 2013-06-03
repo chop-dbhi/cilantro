@@ -10,7 +10,7 @@ define [
         render: ->
             title = @model.get('title') or 'untitled'
 
-            @$el.html("<input type=radio name=export-type-radio id=export-type-radio-#{ title } /> #{ title }")
+            @$el.html("<input type=radio name=export-type-radio id=export-type-radio-#{ title } href='#{ @model.get('href')}' /> #{ title }")
             return @
 
     class EmptyExportType extends c.Backbone.View
