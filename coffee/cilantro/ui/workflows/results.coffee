@@ -41,7 +41,7 @@ define [
 
             if sel.length > 0
                 $('.export-modal .alert-block').hide()
-                @ui.exporter.modal('show')
+                @ui.exporter.modal('hide')
                 window.location = sel.attr('href')
             else
                 $('.export-modal .alert-block #export-error-message').html('An export type must be selected.')
