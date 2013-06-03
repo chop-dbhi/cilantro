@@ -39,7 +39,7 @@ define [
         exportData: (event) ->
             sel = $('input[name=export-type-radio]:checked')
 
-            if sel?
+            if sel.length > 0
                 $('.export-modal .alert-block').hide()
                 window.location = sel.attr('href')
             else
