@@ -17,12 +17,10 @@
             "title": "JSON"
         },
         "r": {
-            "href": "/mock/data/export/r/",
-            "title": "R"
+            "href": "/mock/data/export/r"
         },
         "sas": {
-            "href": "/mock/data/export/sas/",
-            "title": "SAS"
+            "href": "/mock/data/export/sas/"
         },
         "self": {
             "href": "/mock/data/export.json"
