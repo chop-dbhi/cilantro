@@ -5,7 +5,7 @@ define [
     class ExportType extends c.Backbone.View
         tagName: 'label'
         
-        className: 'radio'
+        className: 'checkbox'
 
         render: ->
             title = @model.get('title')
@@ -24,7 +24,7 @@ define [
                 else
                     title = "Untitled (#{ href })"
 
-            @$el.html("<input type=radio name=export-type-radio id=export-type-radio-#{ title } href='#{ href }' /> #{ title }")
+            @$el.html("<input type=checkbox name=export-type-checkbox id=export-type-checkbox-#{ title } href='#{ href }' /> #{ title }")
             return @
 
     class EmptyExportType extends c.Backbone.View
