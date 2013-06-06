@@ -114,15 +114,15 @@ define [
 
 
     class ContextNodeModel extends BaseNodeModel
-        publicModel: BaseNodeModel
+        stableModel: BaseNodeModel
 
         constructor: (attrs, options) ->
-            @public = new @publicModel(null, options)
-            @public.local = @
+            @stable = new @stableModel(null, options)
+            @stable.local = @
             super
 
         initialize: ->
-            # Save the initial attributes to the public node.
+            # Save the initial attributes to the stable node.
             @save()
 
         enable: ->
@@ -135,10 +135,10 @@ define [
             @get('enabled') isnt false
 
         # Override to create a copy of the internal attributes for exposing
-        # as `public` attributes.
+        # as `stable` attributes.
         save: (options) ->
             if (isValid = @isValid(options))
-                @public.set(@toJSON(options), options)
+                @stable.set(@toJSON(options), options)
             return isValid
 
         set: (key, value, options) ->

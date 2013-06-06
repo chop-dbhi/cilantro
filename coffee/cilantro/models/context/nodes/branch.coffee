@@ -17,7 +17,7 @@ define [
     class BranchNodeModel extends base.ContextNodeModel
         nodeType: 'branch'
 
-        publicModel: base.BaseBranchNodeModel
+        stableModel: base.BaseBranchNodeModel
 
         defaults: ->
             type: 'and'
@@ -115,7 +115,7 @@ define [
             if not @children.length
                 return false
 
-            # Clone attributes, remove reference to children. The public
+            # Clone attributes, remove reference to children. The stable
             # node has no reason to carry about the reference
             attrs = c._.clone @attributes
             delete attrs.children
@@ -129,13 +129,13 @@ define [
                     return false
                 else
                     continue
-                child = child.public
+                child = child.stable
                 children.push(child)
 
             # Set direct attributes on node
-            @public.set(attrs)
+            @stable.set(attrs)
             # Update references to children
-            @public.children.set(children)
+            @stable.children.set(children)
 
             return true
 

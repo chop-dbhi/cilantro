@@ -52,7 +52,7 @@ define [
 
             @tree.show new ContextTree
                 model: @model.root
-                collection: @model.root.public.children
+                collection: @model.root.stable.children
 
 
     { Context }

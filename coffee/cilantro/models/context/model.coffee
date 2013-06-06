@@ -92,7 +92,7 @@ define [
 
         toJSON: ->
             attrs = super
-            attrs.json = @root.public.toJSON()
+            attrs.json = @root.stable.toJSON()
             return attrs
 
         isSession: ->
