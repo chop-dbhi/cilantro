@@ -1,7 +1,8 @@
 define [
     './core'
     'tpl!templates/views/paginator.html'
-], (c, templates...) ->
+    'underscore'
+], (c, templates..., _) ->
 
     templates = c._.object ['links'], templates
 
@@ -10,6 +11,8 @@ define [
     # The object is assumed to implement the 'paginator protocol'
     class Paginator extends c.Marionette.ItemView
         template: templates.links
+
+        debounceDelay: 250 # In milliseconds
 
         className: 'paginator'
 
@@ -26,10 +29,13 @@ define [
             'change:currentpage': 'renderCurrentPage'
 
         events:
-            'click [data-page=first]': 'showFirstPage'
-            'click [data-page=prev]': 'showPreviousPage'
-            'click [data-page=next]': 'showNextPage'
-            'click [data-page=last]': 'showLastPage'
+            'click [data-page=first]': 'requestChangePage'
+            'click [data-page=prev]': 'requestChangePage'
+            'click [data-page=next]': 'requestChangePage'
+            'click [data-page=last]': 'requestChangePage'
+
+        initialize: ->
+            @changePageDebounce = _.debounce(@changePage, @debounceDelay)
 
         onRender: ->
             if not @model.pageIsLoading()
@@ -46,17 +52,16 @@ define [
             @ui.next.prop('disabled', !!options.last)
             @ui.last.prop('disabled', !!options.last)
 
-        showFirstPage: (event) ->
-            @model.getFirstPage()
+        changePage: (newPage) ->
+            switch newPage
+                when "first" then @model.getFirstPage()
+                when "prev" then @model.getPreviousPage()
+                when "next" then @model.getNextPage()
+                when "last" then @model.getLastPage()
+                else console.log "Unknown paginator direction: #{ newPage }"
 
-        showLastPage: (event) ->
-            @model.getLastPage()
-
-        showNextPage: (event) ->
-            @model.getNextPage()
-
-        showPreviousPage: (event) ->
-            @model.getPreviousPage()
-
+        requestChangePage: (event) ->
+            @changePageDebounce event.target.attributes['data-page'].value
+                    
 
     { Paginator }
