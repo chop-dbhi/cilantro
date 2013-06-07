@@ -11,6 +11,8 @@ define [
     class Paginator extends c.Marionette.ItemView
         template: templates.links
 
+        requestDelay: 250 # In milliseconds
+
         className: 'paginator'
 
         ui:
@@ -26,10 +28,13 @@ define [
             'change:currentpage': 'renderCurrentPage'
 
         events:
-            'click [data-page=first]': 'showFirstPage'
-            'click [data-page=prev]': 'showPreviousPage'
-            'click [data-page=next]': 'showNextPage'
-            'click [data-page=last]': 'showLastPage'
+            'click [data-page=first]': 'requestChangePage'
+            'click [data-page=prev]': 'requestChangePage'
+            'click [data-page=next]': 'requestChangePage'
+            'click [data-page=last]': 'requestChangePage'
+
+        initialize: ->
+            @_changePage = c._.debounce(@changePage, @requestDelay)
 
         onRender: ->
             if not @model.pageIsLoading()
@@ -46,17 +51,16 @@ define [
             @ui.next.prop('disabled', !!options.last)
             @ui.last.prop('disabled', !!options.last)
 
-        showFirstPage: (event) ->
-            @model.getFirstPage()
+        changePage: (newPage) ->
+            switch newPage
+                when "first" then @model.getFirstPage()
+                when "prev" then @model.getPreviousPage()
+                when "next" then @model.getNextPage()
+                when "last" then @model.getLastPage()
+                else console.log "Unknown paginator direction: #{ newPage }"
 
-        showLastPage: (event) ->
-            @model.getLastPage()
-
-        showNextPage: (event) ->
-            @model.getNextPage()
-
-        showPreviousPage: (event) ->
-            @model.getPreviousPage()
-
+        requestChangePage: (event) ->
+            @_changePage $(event.target).data('page')
+                    
 
     { Paginator }
