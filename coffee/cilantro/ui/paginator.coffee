@@ -1,8 +1,7 @@
 define [
     './core'
     'tpl!templates/views/paginator.html'
-    'underscore'
-], (c, templates..., _) ->
+], (c, templates...) ->
 
     templates = c._.object ['links'], templates
 
@@ -35,7 +34,7 @@ define [
             'click [data-page=last]': 'requestChangePage'
 
         initialize: ->
-            @changePageDebounce = _.debounce(@changePage, @debounceDelay)
+            @changePageDebounce = c._.debounce(@changePage, @debounceDelay)
 
         onRender: ->
             if not @model.pageIsLoading()
