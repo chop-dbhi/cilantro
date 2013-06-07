@@ -11,7 +11,7 @@ define [
     class Paginator extends c.Marionette.ItemView
         template: templates.links
 
-        debounceDelay: 250 # In milliseconds
+        requestDelay: 250 # In milliseconds
 
         className: 'paginator'
 
@@ -34,7 +34,7 @@ define [
             'click [data-page=last]': 'requestChangePage'
 
         initialize: ->
-            @changePageDebounce = c._.debounce(@changePage, @debounceDelay)
+            @_changePage = c._.debounce(@changePage, @requestDelay)
 
         onRender: ->
             if not @model.pageIsLoading()
@@ -60,7 +60,7 @@ define [
                 else console.log "Unknown paginator direction: #{ newPage }"
 
         requestChangePage: (event) ->
-            @changePageDebounce event.target.attributes['data-page'].value
+            @_changePage $(event.target).data('page')
                     
 
     { Paginator }
