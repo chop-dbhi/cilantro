@@ -24,7 +24,7 @@ define [
                 else
                     title = "Untitled (#{ href })"
 
-            @$el.html("<input type=checkbox name=export-type-checkbox id=export-type-checkbox-#{ title } href='#{ href }' /> #{ title }")
+            @$el.html("<input type=checkbox name=export-type-checkbox id=export-type-checkbox-#{ title } title='#{ title }' href='#{ href }' /> #{ title }")
             return @
 
 
