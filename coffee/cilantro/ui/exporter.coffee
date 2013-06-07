@@ -27,6 +27,7 @@ define [
             @$el.html("<input type=checkbox name=export-type-checkbox id=export-type-checkbox-#{ title } href='#{ href }' /> #{ title }")
             return @
 
+
     class EmptyExportType extends c.Backbone.View
         className: 'empty'
 
@@ -34,11 +35,13 @@ define [
             @$el.html 'No exporters found...'
             return @
 
+
     class ExportTypeCollection extends c.Marionette.CollectionView
         tagName: 'div'
 
         itemView: ExportType
 
         emptyView: EmptyExportType
+
 
     { ExportType, EmptyExportType, ExportTypeCollection}
