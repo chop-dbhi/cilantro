@@ -18,17 +18,33 @@
     </div>
 </div>
 
-<div class="export-modal modal hide">
+<div class="export-iframe-container"></div>
+
+<div class="export-progress-modal modal hide">
     <div class=modal-header>
         <a class=close data-dismiss=modal><i class=icon-remove></i></a>
 
-        <h3>Export Options <small>Choose types and pages for 
-                export</small></h3>
+        <h3>Export Progress</h3>
+    </div>
+
+    <div class=modal-body>
+        <div class="export-progress-region span12"></div>
+    </div>
+
+    <div class=modal-footer>
+        <button data-dismiss=modal class=btn>Close</button>
+    </div>
+</div>
+
+<div class="export-options-modal modal hide">
+    <div class=modal-header>
+        <a class=close data-dismiss=modal><i class=icon-remove></i></a>
+
+        <h3>Export Options <small>Choose export types and pages</small></h3>
     </div>
 
     <div class=modal-body>
         <div class="alert alert-error alert-block">
-            <button type="button" class="close">x</button>
             <div id="export-error-message"></div>
         </div>
         <form id=export-options-form>
