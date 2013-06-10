@@ -24,6 +24,7 @@ define [
         monitorDelay: 500       # In milliseconds
         monitorTimeout: 60000   # Max time(ms) to monitor exports
         numPendingDownloads: 0
+        pageRangePattern: /^[0-9]+(\.\.\.[0-9]+)?$/
 
         ui:
             columns: '.columns-modal'
@@ -36,6 +37,7 @@ define [
             'click .export-options-modal [data-save]': 'exportData'
             'click [data-toggle=export-options]': 'showExportOptions'
             'click [data-toggle=export-progress]': 'showExportProgress'
+            'click #pages-text-ranges': 'selectPagesOption'
 
         regions:
             table: '.table-region'
@@ -48,6 +50,11 @@ define [
         initialize: ->
             c._.bindAll(this, "startExport", "onExportFinished", "checkExportStatus")
             @monitors = {}
+
+        selectPagesOption: () ->
+            $('#pages-radio-all').prop('checked', false)
+            $('#pages-radio-ranges').prop('checked', true)
+            $('#pages-text-ranges').val('')
 
         changeExportStatus: (title, newState) ->
             statusContainer = $(".export-status-#{ title } .span10")
@@ -135,7 +142,7 @@ define [
 
             return value
 
-        startExport: (exportType) ->
+        startExport: (exportType, pages) ->
             title = $(exportType).attr('title')
             @changeExportStatus(title, "downloading")
 
@@ -144,7 +151,12 @@ define [
             cookieName = "export-type-#{ title.toLowerCase() }"
             @setCookie(cookieName, null)
 
-            iframe = "<iframe id=export-download-#{ title } src=#{ $(exportType).attr('href') }></iframe>"
+            url = $(exportType).attr('href')
+            if url[url.length-1] != "/"
+                url = "#{ url }/"
+            url = "#{ url }#{ pages }"
+
+            iframe = "<iframe id=export-download-#{ title } src=#{ url }></iframe>"
             $('.export-iframe-container').append(iframe)
 
             if c.data.exporters.notifiesOnComplete()
@@ -167,6 +179,14 @@ define [
             for st in selectedTypes
                 $(".export-status-#{ st.title }").show()
 
+        isPageRangeValid: ->
+            if $('input[name=pages-radio]:checked').val() == "all"
+                return true
+            else
+                pageRange = $('#pages-text-ranges').val()
+                
+                return @pageRangePattern.test(pageRange)
+
         exportData: (event) ->
             # Clear any of the old iframes. If we are exporting again, these
             # downloads should all have finished based on the UI blocking
@@ -178,9 +198,15 @@ define [
             if selectedTypes.length == 0
                 $('#export-error-message').html('An export type must be selected.')
                 $('.export-options-modal .alert-block').show()
-
+            else if not @isPageRangeValid()
+                $('#export-error-message').html('Page range is invalid. Must be a single page(example: 1) or a range of pages(example: 2...5).')
+                $('.export-options-modal .alert-block').show()
             else
                 @numPendingDownloads = selectedTypes.length
+
+                pagesSuffix = ""
+                if $('input[name=pages-radio]:checked').val() != "all"
+                    pagesSuffix = $('#pages-text-ranges').val() + "/"
 
                 # Disable export button until the downloads finish
                 $("[data-toggle=export-options]").prop('disabled', true)
@@ -208,7 +234,8 @@ define [
                     setTimeout(
                         @startExport, 
                         i * delay,
-                        selectedTypes[i])
+                        selectedTypes[i],
+                        pagesSuffix)
 
         onRender: ->
             @paginator.show new paginator.Paginator
