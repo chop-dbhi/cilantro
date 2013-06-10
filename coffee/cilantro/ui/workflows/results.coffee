@@ -34,7 +34,8 @@ define [
             'click .columns-modal [data-save]': 'saveColumns'
             'click .toolbar [data-toggle=columns]': 'showColumns'
             'click .export-options-modal [data-save]': 'exportData'
-            'click [data-toggle=export]': 'showExportOptions'
+            'click [data-toggle=export-options]': 'showExportOptions'
+            'click [data-toggle=export-progress]': 'showExportProgress'
 
         regions:
             table: '.table-region'
@@ -63,6 +64,7 @@ define [
 
         onExportFinished: (exportTypeTitle) ->
             @numPendingDownloads = @numPendingDownloads - 1
+            $('.export-progress-container .badge-info').html(@numPendingDownloads)
 
             if @hasExportErrorOccurred(exportTypeTitle) 
                 @changeExportStatus(exportTypeTitle, "error")
@@ -71,7 +73,8 @@ define [
 
             # If all the downloads are finished, re-enable the export button
             if @numPendingDownloads == 0
-                $('[data-toggle=export]').prop('disabled', false)
+                $('[data-toggle=export-options]').prop('disabled', false)
+                $('.export-progress-container').hide()
 
         hasExportErrorOccurred: (exportTypeTitle) ->
             id = "#export-download-#{ exportTypeTitle }"
@@ -177,9 +180,12 @@ define [
                 $('.export-options-modal .alert-block').show()
 
             else
-                # Disable export button until the downloads finish
-                $("[data-toggle=export]").prop('disabled', true)
                 @numPendingDownloads = selectedTypes.length
+
+                # Disable export button until the downloads finish
+                $("[data-toggle=export-options]").prop('disabled', true)
+                $('.export-progress-container').show()
+                $('.export-progress-container .badge-info').html(@numPendingDownloads)
 
                 @ui.exportOptions.modal('hide')
 
@@ -240,6 +246,9 @@ define [
             
             if (c.data.exporters.length == 0)
                 $('.export-options-modal .btn-primary').prop('disabled', true)
+
+        showExportProgress: ->
+            @ui.exportProgress.modal('show')
 
         showColumns: ->
             @ui.columns.modal('show')
