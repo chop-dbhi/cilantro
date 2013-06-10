@@ -62,6 +62,8 @@ define [
             statusContainer.children().hide()
 
             switch newState
+                when "pending"
+                    statusContainer.find('.pending-spinner').show()
                 when "downloading"
                     statusContainer.find('.progress').show()
                 when "error"
@@ -231,6 +233,10 @@ define [
                 if not c.data.exporters.notifiesOnComplete()
                     delay = @requestTimeout
                 for i in [0..selectedTypes.length-1] by 1
+                    @changeExportStatus(
+                        $(selectedTypes[i]).attr('title'), 
+                        "pending")
+                    
                     setTimeout(
                         @startExport, 
                         i * delay,
