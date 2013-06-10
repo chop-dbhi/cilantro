@@ -7,6 +7,7 @@ define [
     './cilantro/ui/charts'
     './cilantro/ui/context'
     './cilantro/ui/controls'
+    './cilantro/ui/exporter'
     './cilantro/ui/tables'
     './cilantro/ui/workflows'
 ], (c, mods...) ->

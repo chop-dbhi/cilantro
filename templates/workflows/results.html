@@ -12,7 +12,73 @@
             <div class="table-region span12"></div>
         </div>
     </div>
-    <div class="context-region span3"></div>
+    <div class="span3">
+        <div class="context-region"></div>
+        <button data-toggle=export-options class="btn"><i class=icon-file></i> Export...</button>
+        <div data-toggle=export-progress class='export-progress-container pull-right hide'>
+            <i class='icon-circle-arrow-down'></i>
+            <div class='progress progress-striped active'>
+                <div class='bar'></div>
+            </div>
+            <span class="badge badge-info">8</span>
+        </div>
+    </div>
+</div>
+
+<div class="export-iframe-container"></div>
+
+<div class="export-progress-modal modal hide">
+    <div class=modal-header>
+        <a class=close data-dismiss=modal><i class=icon-remove></i></a>
+
+        <h3>Export Progress</h3>
+    </div>
+
+    <div class=modal-body>
+        <div class="export-progress-region span12"></div>
+    </div>
+
+    <div class=modal-footer>
+        <button data-dismiss=modal class=btn>Close</button>
+    </div>
+</div>
+
+<div class="export-options-modal modal hide">
+    <div class=modal-header>
+        <a class=close data-dismiss=modal><i class=icon-remove></i></a>
+
+        <h3>Export Options <small>Choose export types and pages</small></h3>
+    </div>
+
+    <div class=modal-body>
+        <div class="alert alert-error alert-block">
+            <div id="export-error-message"></div>
+        </div>
+        <form id=export-options-form>
+            <h4>Export Types:</h4>
+            <div class="export-type-region span12"></div>
+            <h4>Pages:</h4>
+            <div class=row-fluid>
+                <div class=span6>
+                    <label class=radio>
+                        <input type=radio value=all name=pages-radio id=pages-radio-all checked />
+                        All pages
+                    </label>
+                </div>
+                <div class=span6>
+                    <label class=radio>
+                        <input type=radio value=ranges name=pages-radio id=pages-radio-ranges />
+                        <input type=text id=pages-text-ranges value="e.g. 1...4, 5" class=muted />
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class=modal-footer>
+        <button data-dismiss=modal class=btn>Close</button>
+        <button data-save class="btn btn-primary">Export</button>
+    </div>
 </div>
 
 <div class="columns-modal modal hide full">
