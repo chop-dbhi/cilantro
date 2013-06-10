@@ -9,8 +9,10 @@ define [
 
     class ExporterCollection extends base.Collection
         model: ExporterModel
-
-        minSerranoVersionProgressEnabled: [2, 0, 16]
+    
+        # Versions greater than or equal to this version are considered to
+        # support notification on completion.
+        minSerranoVersionProgressEnabled: [2, 0, 17]
 
         url: ->
             c.getSessionUrl('exporter')
