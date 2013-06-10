@@ -23,6 +23,7 @@ define [
         requestTimeout: 10000   # Max time(ms) for unmonitored exports
         monitorDelay: 500       # In milliseconds
         monitorTimeout: 60000   # Max time(ms) to monitor exports
+        numPendingDownloads: 0
 
         ui:
             columns: '.columns-modal'
@@ -61,10 +62,16 @@ define [
                     statusContainer.find('.label-success').show()
 
         onExportFinished: (exportTypeTitle) ->
+            @numPendingDownloads = @numPendingDownloads - 1
+
             if @hasExportErrorOccurred(exportTypeTitle) 
                 @changeExportStatus(exportTypeTitle, "error")
             else
                 @changeExportStatus(exportTypeTitle, "success")
+
+            # If all the downloads are finished, re-enable the export button
+            if @numPendingDownloads == 0
+                $('[data-toggle=export]').prop('disabled', false)
 
         hasExportErrorOccurred: (exportTypeTitle) ->
             id = "#export-download-#{ exportTypeTitle }"
@@ -170,6 +177,10 @@ define [
                 $('.export-options-modal .alert-block').show()
 
             else
+                # Disable export button until the downloads finish
+                $("[data-toggle=export]").prop('disabled', true)
+                @numPendingDownloads = selectedTypes.length
+
                 @ui.exportOptions.modal('hide')
 
                 @initializeExportStatusIndicators(selectedTypes)
