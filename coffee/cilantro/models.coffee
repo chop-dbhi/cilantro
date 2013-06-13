@@ -4,6 +4,7 @@ define [
     './models/concept'
     './models/context'
     './models/view'
+    './models/paginator'
     './models/results'
     './models/exporter'
 ], (c, mods...) ->
