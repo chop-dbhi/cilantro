@@ -142,4 +142,3 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', ['jasmine', 'watch']);
 };
-
