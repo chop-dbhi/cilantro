@@ -17,21 +17,5 @@
             @extend a;
             cursor: pointer;
         }
-
-    }
-}
-
-.concept-workspace .empty-view {
-    color: #777;
-
-    .workflow {
-        h3 {
-            display: inline;
-        }
-
-        .icon-angle-right {
-            float: right;
-            margin-top: 4px;
-        }
     }
 }

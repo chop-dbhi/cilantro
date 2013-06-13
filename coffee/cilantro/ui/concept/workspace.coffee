@@ -1,19 +1,14 @@
 define [
     '../core'
-    '../base'
+    '../welcome'
     '../field'
     '../charts'
     './form'
     './info'
     'tpl!templates/views/concept-workspace.html'
-    'tpl!templates/views/concept-workspace-start.html'
-], (c, base, field, charts, form, info, templates...) ->
+], (c, welcome, field, charts, form, info, templates...) ->
 
-    templates = c._.object ['workspace', 'start'], templates
-
-
-    class ConceptWorkspaceStart extends base.EmptyView
-        template: templates.start
+    templates = c._.object ['workspace'], templates
 
 
     class ConceptWorkspaceHistoryItem extends info.ConceptInfo
@@ -55,7 +50,7 @@ define [
 
         regionViews:
             history: ConceptWorkspaceHistory
-            main: ConceptWorkspaceStart
+            main: welcome.Welcome
 
         _ensureModel: (model) ->
             if not (model instanceof c.models.ConceptModel)
