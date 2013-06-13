@@ -52,7 +52,7 @@ unwatch:
 		rm ${PID_FILE}; \
 	fi;
 
-combine: coffee
+combine:
 	@echo 'Combining JavaScript...'
 	@cp -r ${JAVASCRIPT_DIR}/* ${BUILD_DIR}
 	@ln -sf ${TMPL_DIR} ${BUILD_DIR}
