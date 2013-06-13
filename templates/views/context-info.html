@@ -1,4 +1,4 @@
-<button class="btn btn-mini pull-right"><i class=icon-info-sign></i></button>
+<button data-role=view class="btn btn-primary btn-mini">View Results</button>
 
 <div class=count-label>
     <span class=count><%= data.count %></span>
@@ -8,15 +8,4 @@
     <% } else { %>
         <%= data.object_name_plural %>
     <% } %>
-</div>
-
-<div class=details>
-    <% if (data.name) { %>
-        <h4 class=name><%= data.name %></h4>
-    <% } %>
-    <% if (data.description) { %>
-        <p class=description><%= data.description %></p>
-    <% } %>
-    <p class=timestamp>Created: <%= data.created %><br>
-        Modified: <%= data.modified %></p>
 </div>

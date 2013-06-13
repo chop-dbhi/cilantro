@@ -10,12 +10,10 @@ define [
         template: templates.info
 
         ui:
-            toggle: 'button'
-            details: '.details'
             count: '.count'
 
         events:
-            'click button': 'toggleDetails'
+            'click [data-role=view]': 'navigateResults'
 
         modelEvents:
             'change:count': 'renderCount'
@@ -29,9 +27,9 @@ define [
         renderCount: (model, value, options) ->
             @ui.count.text(c.utils.prettyNumber(value))
 
-        toggleDetails: (event) ->
+        navigateResults: (event) ->
             event.preventDefault()
-            @ui.details.slideToggle()
+            c.router.navigate('results', trigger: true)
 
 
     { ContextInfo }

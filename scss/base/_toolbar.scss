@@ -1,4 +1,7 @@
 // Use the breadcrumb style, but name it toolbar for clarity of intention
 .toolbar {
-    @extend .breadcrumb;
+    background-color: #f3f3f3;
+    border-radius: 2px;
+    padding: 5px 7px;
+    margin-bottom: 10px;
 }

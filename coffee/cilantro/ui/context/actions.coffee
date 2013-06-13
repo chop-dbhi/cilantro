@@ -5,6 +5,7 @@ define [
 
     templates = c._.object ['actions'], templates
 
+
     class ContextActions extends c.Marionette.ItemView
         template: templates.actions
 
@@ -13,9 +14,9 @@ define [
 
         ui:
             state: '[data-role=state]'
+            check: '[data-role=state] input'
 
         events:
-            'click [data-role=view]': 'navigateResults'
             'click [data-role=remove]': 'clickRemoveAll'
             'click [data-role=state]': 'clickStateAll'
 
@@ -31,29 +32,18 @@ define [
             c.publish c.CONTEXT_SAVE
 
         disable: ->
-            @ui.state
-                .attr('title', 'Enable All')
-                .find('i')
-                    .addClass('icon-circle-blank')
-                    .removeClass('icon-circle')
+            @ui.state.attr('title', 'Enable All Filters')
+            @ui.check.prop('checked', false)
 
         enable: ->
-            @ui.state
-                .attr('title', 'Disable All')
-                .find('i')
-                    .addClass('icon-circle')
-                    .removeClass('icon-circle-blank')
+            @ui.state.attr('title', 'Disable All Filters')
+            @ui.check.prop('checked', true)
 
         toggleState: (event) ->
             if @model.isEnabled() then @enable() else @disable()
 
         onRender: ->
             @toggleState()
-
-        navigateResults: (event) ->
-            event.preventDefault()
-            c.router.navigate('results', trigger: true)
-
 
 
     { ContextActions }

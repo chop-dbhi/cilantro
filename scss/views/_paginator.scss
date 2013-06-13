@@ -12,4 +12,10 @@
         font-weight: 500;
         color: #333;
     }
+
+    &.mini {
+        [data-page=first], [data-page=last] {
+            display: none;
+        }
+    }
 }

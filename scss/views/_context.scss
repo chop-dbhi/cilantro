@@ -1,16 +1,9 @@
 .context {
 
-    .actions-region {
-        border-bottom: 1px dashed #ccc;
-        padding-bottom: 10px;
-        margin-bottom: 10px;
-    }
-
-
     .info-region {
         border-radius: 3px;
         margin-bottom: 10px;
-        padding: 8px 15px;
+        padding: 8px 5px;
         background-color: #f5f5f5;
         text-shadow: 0 1px 1px #fff;
 
@@ -20,11 +13,22 @@
 
         .count-label {
             font-size: 1.1em;
-            font-weight: 500;
+            font-weight: bold;
         }
+
         .details {
             display: none;
         }
+
+        [data-role=view] {
+            float: right;
+        }
+    }
+
+    .actions-region {
+        @include clearfix;
+        border-bottom: 1px solid #aaa;
+        margin-bottom: 10px;
     }
 
     .tree-region .disabled {

@@ -2,16 +2,21 @@
     margin-bottom: 10px;
 
     .name {
-        font-weight: 500;
-        font-size: 1.4em;
+        font-weight: bold;
+        font-size: 1.5em;
+        color: #333;
     }
 
     .category {
-        font-size: 0.85em;
-        color: #999;
+        color: #777;
+
+        i {
+            margin: 0 5px;
+        }
     }
 
     .description {
         font-weight: 200;
+        font-size: 1.1em;
     }
 }

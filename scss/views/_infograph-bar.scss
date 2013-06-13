@@ -13,27 +13,24 @@
 .info-bar {
     margin-bottom: 5px;
     position: relative;
-    height: 40px;
+    height: 30px;
     cursor: pointer;
 
     .bar {
         @include transition((box-shadow, background-color) 0.2s);
+        border-radius: 0 2px 2px 0;
         position: absolute;
         left: 0;
         background-color: #e9e9e9;
-        height: 40px;
+        height: 30px;
         min-width: 5px;
     }
 
     .bar-mask {
-        padding: 10px 5px;
+        padding: 5px;
         position: relative;
         z-index: 1;
         text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
-    }
-
-    .bar-label {
-        font-weight: 500;
     }
 
     .bar-count {
@@ -47,12 +44,14 @@
 
     &.selected {
         .bar {
-            background-color: lighten(#0088cc, 0.7);
+            background-color: #fbb046;
+            @include linear-gradient(#fbb450, #faa937);
             box-shadow: 2px 2px 3px #ccc;
         }
 
         .bar-mask {
             text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+            font-weight: bold;
         }
     }
 }

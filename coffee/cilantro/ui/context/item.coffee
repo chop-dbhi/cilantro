@@ -28,6 +28,7 @@ define [
             loader: '.actions .loader'
             actions: '.actions button'
             state: '.actions .state'
+            check: '.actions .state input'
             language: '.language'
 
         modelEvents:
@@ -62,19 +63,13 @@ define [
 
         disable: ->
             @$el.addClass('disabled')
-            @ui.state
-                .attr('title', 'Enable')
-                .find('i')
-                    .addClass('icon-circle-blank')
-                    .removeClass('icon-circle')
+            @ui.state.attr('title', 'Enable')
+            @ui.check.prop('checked', false)
 
         enable: ->
             @$el.removeClass('disabled')
-            @ui.state
-                .attr('title', 'Disable')
-                .find('i')
-                    .addClass('icon-circle')
-                    .removeClass('icon-circle-blank')
+            @ui.state.attr('title', 'Disable')
+            @ui.check.prop('checked', true)
 
         toggleState: (model, value, options) ->
             if @model.local.isEnabled()
