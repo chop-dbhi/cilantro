@@ -8,31 +8,37 @@ define ['underscore'], (_) ->
 
     # If `once` is true, immediately unsubscribe after it's first
     # invocation.
-    subscribe: (channel, _handler, once) ->
+    subscribe = (channel, _handler, once, context) ->
+        # Shift arguments
+        if once? and typeof once isnt 'boolean'
+            context = once
+            once = null
+
         channels[channel] ?= []
         if once
             handler = ->
-                # Unsubscribe immediately, so no downstream invocations
-                # occur
-                c.unsubscribe channel, handler, true
-                _handler.apply null, arguments
+                # Unsubscribe immediately, so no downstream invocations occur
+                unsubscribe channel, handler, true
+                _handler.apply context, arguments
         else
             handler = _handler
-        channels[channel].push handler
+        channels[channel].push [handler, context]
         return
 
-    publish: (channel, args...) ->
+    publish = (channel, args...) ->
         if not (handlers = channels[channel]) then return
-        for handler in handlers
+        for [handler, context] in handlers
             # Catch any errors, allow all handlers to finish prior to
             # throwing the exception.
-            if handler then handler args...
+            if handler then handler.apply context, args
         setTimeout -> channels[channel] = _.compact handlers
         return
 
-    unsubscribe: (channel, handler, defer) ->
+    unsubscribe = (channel, handler, defer) ->
         if not (handlers = channels[channel]) then return
         if (idx = handlers.indexOf handler) >= 0
             # Defer to ensure mid-iteration in publish is not broken
             if defer then handlers[idx] = null else handlers.splice(idx, 1)
         return
+
+    { subscribe, publish, unsubscribe }
