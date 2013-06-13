@@ -1,68 +1,71 @@
-.context-tree .disabled {
-    .language {
-        color: #ccc;
-    }
-}
+.context {
 
-.context-info {
-    border-radius: 3px;
-    margin-bottom: 10px;
-    padding: 8px 15px;
-    background-color: #f5f5f5;
-    text-shadow: 0 1px 1px #fff;
-
-    > p {
-        margin-bottom: 0;
+    .actions-region {
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
     }
 
-    .count-label {
-        font-size: 1.1em;
-        font-weight: 500;
-    }
-    .details {
-        display: none;
-    }
-}
 
-.context-item {
-    @extend .clearfix;
+    .info-region {
+        border-radius: 3px;
+        margin-bottom: 10px;
+        padding: 8px 15px;
+        background-color: #f5f5f5;
+        text-shadow: 0 1px 1px #fff;
 
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #ccc;
+        > p {
+            margin-bottom: 0;
+        }
 
-    .language {
-        @include transition(color, 0.2s);
-        @extend a;
-        cursor: pointer;
-    }
-
-    .actions {
-        float: right;
-        cursor: pointer;
-        font-size: 12px;
-        margin-left: 5px;
-
-        .remove {
-            color: rgb(180, 0, 0);
+        .count-label {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        .details {
+            display: none;
         }
     }
-}
 
+    .tree-region .disabled {
+        .language {
+            color: #ccc;
+        }
+    }
 
-.branch-type {
-    color: #999;
-    font-weight: 500;
-    font-size: 0.85em;
-    font-variant: small-caps;
-}
+    .context-item {
+        @extend .clearfix;
 
-.branch-children {
-    margin-left: 0;
-}
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed #ccc;
 
-.context-actions {
-    border-bottom: 1px dashed #ccc;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+        .language {
+            @include transition(color, 0.2s);
+            @extend a;
+            cursor: pointer;
+        }
+
+        .actions {
+            float: right;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+
+            .remove {
+                color: rgb(180, 0, 0);
+            }
+        }
+    }
+
+    .branch-type {
+        color: #999;
+        font-weight: 500;
+        font-size: 0.85em;
+        font-variant: small-caps;
+    }
+
+    .branch-children {
+        margin-left: 0;
+    }
 }

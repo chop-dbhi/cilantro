@@ -17,6 +17,8 @@ define [
 
 
     class ContextTree extends c.Marionette.CompositeView
+        className: 'context-tree'
+
         template: templates.tree
 
         itemViewContainer: '.branch-children'
@@ -36,12 +38,14 @@ define [
 
 
     class Context extends c.Marionette.Layout
+        className: 'context'
+
         template: templates.context
 
         regions:
-            info: '.context-info'
-            actions: '.context-actions'
-            tree: '.context-tree'
+            info: '.info-region'
+            actions: '.actions-region'
+            tree: '.tree-region'
 
         onRender: ->
             @info.show new info.ContextInfo
