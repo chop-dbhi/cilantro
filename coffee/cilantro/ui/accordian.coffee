@@ -45,11 +45,13 @@ define [
             collection: model[@itemSectionItems]
 
         ui:
-            icon: '.heading i'
+            icon: '.heading span'
             inner: '.inner'
 
         events:
             'click > .heading': 'toggleCollapse'
+            'shown > .inner': 'showCollapse'
+            'hidden > .inner': 'hideCollapse'
 
         onRender: ->
             if not @options.collapsable
@@ -59,7 +61,12 @@ define [
         toggleCollapse: ->
             if @options.collapsable
                 @ui.inner.collapse('toggle')
-                @ui.icon.toggleClass('icon-plus-sign-alt icon-minus-sign-alt')
+
+        showCollapse: ->
+            @ui.icon.text('-')
+
+        hideCollapse: ->
+            @ui.icon.text('+')
 
 
     class Accordian extends c.Marionette.CollectionView
