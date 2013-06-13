@@ -24,7 +24,7 @@ define [
     #           super
     #           @mergeOptions(@options)
     #           @bindContext(@options.context)
-    #
+
     ControlViewMixin =
         attrNames: ['field', 'operator', 'value', 'nulls']
 
