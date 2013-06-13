@@ -2,6 +2,19 @@ define [
     './core'
 ], (c) ->
 
+    # Simple set of views for representing various states.
+    #
+    # Options include:
+    #   - icon
+    #   - message
+    #   - align
+    #   - template
+    #
+    # If a template is not provided, one will be created based on
+    # the icon and the message.
+    #
+    # `align` corresponds to the text alignment. Options are 'left', 'right'
+    # and 'center'.
 
     class StateView extends c.Marionette.ItemView
         constructor: ->
@@ -20,6 +33,9 @@ define [
 
                     @template = ->
                         html.join ' '
+
+        initialize: ->
+            if @align then @$el.css('text-align', @align)
 
 
     class EmptyView extends StateView
