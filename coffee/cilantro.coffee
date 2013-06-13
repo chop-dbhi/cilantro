@@ -32,7 +32,7 @@ define [
                 pathname = "/#{ pathname }"
 
             # Ensure the pathname does not include the root
-            root = Backbone.history.root
+            root = Backbone.history.root or '/'
             if pathname.slice(0, root.length) is root
                 pathname = pathname.slice(root.length)
 
