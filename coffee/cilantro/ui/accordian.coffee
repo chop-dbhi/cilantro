@@ -56,7 +56,7 @@ define [
         onRender: ->
             if not @options.collapsable
                 @$('.inner').removeClass('collapse')
-                @$('.heading i').hide()
+                @ui.icon.hide()
 
         toggleCollapse: ->
             if @options.collapsable
