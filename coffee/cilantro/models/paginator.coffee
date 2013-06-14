@@ -31,6 +31,10 @@ define [
                 @numPages = resp.num_pages
                 @trigger('change:pagecount', @, @numPages)
 
+            if @objectCount isnt resp.object_count
+                @objectCount = resp.object_count
+                @trigger('change:objectcount', @, @objectCount)
+
             return [resp]
 
         # Ensures `num` is within the bounds
