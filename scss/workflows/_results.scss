@@ -1,31 +1,51 @@
 .results-workflow {
-    thead {
-        th {
-            position: relative;
-            cursor: pointer;
 
-            i {
-                position: absolute;
-                right: 5px;
-                top: 50%;
+    .count-region {
+        font-weight: bold;
+        font-size: 1.4em;
+    }
 
-                // Only about 6/13px are visible, margin is used to offset
-                // visible portion
-                &.icon-sort-up {
-                    margin-top: -4px;
+    .paginator-region {
+        display: inline-block;
+    }
+
+    [data-toggle=columns] {
+        margin-left: 10px;
+    }
+
+    .context-region {
+
+    }
+
+    .table-region {
+        thead {
+            th {
+                position: relative;
+                cursor: pointer;
+
+                i {
+                    position: absolute;
+                    right: 5px;
+                    top: 50%;
+
+                    // Only about 6/13px are visible, margin is used to offset
+                    // visible portion
+                    &.icon-sort-up {
+                        margin-top: -4px;
+                    }
+
+                    &.icon-sort-down {
+                        margin-top: -8px;
+                    }
+
+                    &.icon-sort {
+                        margin-top: -6px;
+                    }
                 }
 
-                &.icon-sort-down {
-                    margin-top: -8px;
+                &:hover {
+                    background-color: #ffc;
                 }
-
-                &.icon-sort {
-                    margin-top: -6px;
-                }
-            }
-
-            &:hover {
-                background-color: #ffc;
             }
         }
     }

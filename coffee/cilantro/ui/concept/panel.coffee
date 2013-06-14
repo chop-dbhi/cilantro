@@ -24,5 +24,9 @@ define [
             @index.show new index.ConceptIndex
                 collection: @collection
 
+            # TODO document
+            # Defer focus of concept search until end of event loop
+            c._.defer =>
+                @search.currentView.ui.input.focus()
 
     { ConceptPanel }

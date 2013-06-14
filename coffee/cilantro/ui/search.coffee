@@ -20,6 +20,9 @@ define [
 
         onRender: ->
             @ui.input.typeahead(@options)
+            # TODO document
+            if @options.placeholder
+                @ui.input.attr('placeholder', @options.placeholder)
 
 
     { Search }

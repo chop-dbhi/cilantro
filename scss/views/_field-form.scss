@@ -1,14 +1,4 @@
 .field-form {
-    .actions {
-        text-align: right;
-        border-top: 1px dashed #ccc;
-        padding-top: 10px;
-
-        > * {
-            margin-left: 5px;
-        }
-    }
-
     &.condensed {
         .stats-region {
             display: none;

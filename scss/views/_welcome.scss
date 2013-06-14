@@ -1,4 +1,15 @@
 .welcome {
+    > :first-child {
+        margin-top: 0;
+    }
+
+    p {
+        font-size: 1.5em;
+        font-weight: 200;
+        line-height: 28px;
+        margin-bottom: 20px;
+    }
+
     strong {
         background-color: #ffc;
     }

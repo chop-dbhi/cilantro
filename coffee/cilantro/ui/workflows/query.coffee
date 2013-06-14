@@ -15,9 +15,9 @@ define [
         template: templates.query
 
         regions:
-            concepts: '.concept-panel'
-            workspace: '.concept-workspace'
-            context: '.context-panel'
+            concepts: '.concept-panel-region'
+            workspace: '.concept-workspace-region'
+            context: '.context-panel-region'
 
         onRender: ->
             @workspace.show new concept.ConceptWorkspace
@@ -31,7 +31,7 @@ define [
                     collection: c.data.concepts.queryable
 
             c.data.contexts.ready =>
-                @context.show new context.Context
+                @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
 
 

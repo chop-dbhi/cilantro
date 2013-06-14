@@ -37,7 +37,7 @@ define [
             @toggleState()
 
 
-    class Context extends c.Marionette.Layout
+    class ContextPanel extends c.Marionette.Layout
         className: 'context'
 
         template: templates.context
@@ -59,4 +59,4 @@ define [
                 collection: @model.root.stable.children
 
 
-    { Context }
+    { ContextPanel }

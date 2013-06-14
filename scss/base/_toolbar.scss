@@ -1,5 +1,6 @@
 // Use the breadcrumb style, but name it toolbar for clarity of intention
 .toolbar {
+    @include clearfix;
     background-color: #f3f3f3;
     border-radius: 2px;
     padding: 5px 7px;

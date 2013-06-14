@@ -27,11 +27,6 @@
         &:hover {
             box-shadow: 0 1px 3px #ddd;
         }
-
-        .sections {
-            background-color: #f9f9f9;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
-        }
     }
 
     .section {
@@ -41,6 +36,14 @@
             font-size: 0.8em;
             font-weight: 600;
             padding: 5px;
+        }
+    }
+
+    // Bootstrap assumes the icon will be on the left side before the text.
+    // However, this gets applied to the button as well.
+    .nav-list button {
+        [class^=icon-], [class*=icon-] {
+            margin-right: 0;
         }
     }
 }

@@ -9,24 +9,10 @@ define [
     class ContextInfo extends c.Marionette.ItemView
         template: templates.info
 
-        ui:
-            count: '.count'
-
         events:
             'click [data-role=view]': 'navigateResults'
 
-        modelEvents:
-            'change:count': 'renderCount'
-
-        serializeData: ->
-            attrs = c._.clone(@model.attributes)
-            delete attrs.json
-            attrs.count = c.utils.prettyNumber(attrs.count)
-            return attrs
-
-        renderCount: (model, value, options) ->
-            @ui.count.text(c.utils.prettyNumber(value))
-
+        # TODO hide if already on the results page
         navigateResults: (event) ->
             event.preventDefault()
             c.router.navigate('results', trigger: true)

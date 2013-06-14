@@ -2,16 +2,37 @@ define [
     '../core'
     '../base'
     '../paginator'
+    '../numbers'
     '../../structs'
     '../../models'
     '../tables'
     '../context'
     '../concept'
     '../exporter'
+    'tpl!templates/views/count.html'
     'tpl!templates/workflows/results.html'
-], (c, base, paginator, structs, models, tables, context, concept, exporter, templates...) ->
+], (c, base, paginator, numbers, structs, models, tables, context, concept, exporter, templates...) ->
 
-    templates = c._.object ['results'], templates
+    templates = c._.object ['count', 'results'], templates
+
+
+    class ResultCount extends c.Marionette.ItemView
+        tagName: 'span'
+
+        className: 'result-count'
+
+        template: templates.count
+
+        ui:
+            count: '.count'
+            label: '.count-label'
+
+        modelEvents:
+            'change:objectcount': 'renderCount'
+
+        renderCount: (model, count, options) ->
+            numbers.renderCount(@ui.count, count)
+            @ui.label.text('records')
 
 
     class ResultsWorkflow extends c.Marionette.Layout
@@ -40,13 +61,14 @@ define [
             'click #pages-text-ranges': 'selectPagesOption'
 
         regions:
+            count: '.count-region'
             table: '.table-region'
             paginator: '.paginator-region'
             context: '.context-region'
             columns: '.columns-modal .modal-body'
             exportTypes: '.export-options-modal .export-type-region'
             exportProgress: '.export-progress-modal .export-progress-region'
-        
+
         initialize: ->
             c._.bindAll(this, "startExport", "onExportFinished", "checkExportStatus")
             @monitors = {}
@@ -75,7 +97,7 @@ define [
             @numPendingDownloads = @numPendingDownloads - 1
             $('.export-progress-container .badge-info').html(@numPendingDownloads)
 
-            if @hasExportErrorOccurred(exportTypeTitle) 
+            if @hasExportErrorOccurred(exportTypeTitle)
                 @changeExportStatus(exportTypeTitle, "error")
             else
                 @changeExportStatus(exportTypeTitle, "success")
@@ -100,9 +122,9 @@ define [
                 true
 
         checkExportStatus: (exportTypeTitle) ->
-            @monitors[exportTypeTitle]["execution_time"] = 
+            @monitors[exportTypeTitle]["execution_time"] =
                 @monitors[exportTypeTitle]["execution_time"] + @monitorDelay
-            
+
             cookieName = "export-type-#{ exportTypeTitle.toLowerCase() }"
 
             # Check if the download finished and the cookie was set
@@ -116,7 +138,7 @@ define [
             # download finished so take the best guess as to the result. Also,
             # check for an error. If an error occurred then kill the monitor
             # and send it to the completed handler.
-            else if (@monitors[exportTypeTitle]["execution_time"] > @monitorTimeout or 
+            else if (@monitors[exportTypeTitle]["execution_time"] > @monitorTimeout or
                      @hasExportErrorOccurred(exportTypeTitle))
                 clearInterval(@monitors[exportTypeTitle]["interval"])
                 @onExportFinished(exportTypeTitle)
@@ -186,7 +208,7 @@ define [
                 return true
             else
                 pageRange = $('#pages-text-ranges').val()
-                
+
                 return @pageRangePattern.test(pageRange)
 
         exportData: (event) ->
@@ -221,30 +243,28 @@ define [
 
                 @ui.exportProgress.modal('show')
 
-                # Introduce an artificial delay in between download requests 
-                # to keep the browser from freaking out about too many 
+                # Introduce an artificial delay in between download requests
+                # to keep the browser from freaking out about too many
                 # simultaneous download requests. We go slower for unmonitored
-                # downloads because we don't know for sure when a download 
+                # downloads because we don't know for sure when a download
                 # completes so we need to give it plenty of time to finish
                 # before we make a judgement call on the download. Essentially
-                # if the server notifies on complete, we use parallel(to a 
+                # if the server notifies on complete, we use parallel(to a
                 # degree) downloads, otherwise, we take a more serial approach.
                 delay = @requestDelay
                 if not c.data.exporters.notifiesOnComplete()
                     delay = @requestTimeout
                 for i in [0..selectedTypes.length-1] by 1
                     @changeExportStatus(
-                        $(selectedTypes[i]).attr('title'), 
-                        "pending")
-                    
-                    setTimeout(
-                        @startExport, 
-                        i * delay,
-                        selectedTypes[i],
-                        pagesSuffix)
+                        $(selectedTypes[i]).attr('title'), "pending")
+
+                    setTimeout(@startExport, i * delay, selectedTypes[i], pagesSuffix)
 
         onRender: ->
             @paginator.show new paginator.Paginator
+                model: c.data.results
+
+            @count.show new ResultCount
                 model: c.data.results
 
             @context.show new base.LoadView
@@ -255,12 +275,12 @@ define [
 
             @exportTypes.show new exporter.ExportTypeCollection
                 collection: c.data.exporters
-            
+
             @exportProgress.show new exporter.ExportProgressCollection
                 collection: c.data.exporters
 
             c.data.contexts.ready =>
-                @context.show new context.Context
+                @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
 
             c.data.concepts.ready =>
@@ -272,11 +292,11 @@ define [
                     @columns.show new concept.ConceptColumns
                         view: c.data.views.getSession()
                         collection: c.data.concepts.viewable
-        
+
         showExportOptions: ->
             $('.export-options-modal .alert-block').hide()
             @ui.exportOptions.modal('show')
-            
+
             if (c.data.exporters.length == 0)
                 $('.export-options-modal .btn-primary').prop('disabled', true)
 

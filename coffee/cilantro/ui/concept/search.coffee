@@ -16,6 +16,7 @@ define [
             url = c.data.concepts.url()
 
             return {
+                placeholder: 'Search name, description, data...'
                 name: 'Concepts'
                 valueKey: 'name'
                 limit: 10

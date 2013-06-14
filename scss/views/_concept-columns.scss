@@ -25,11 +25,15 @@
     .available-columns {
         background-color: inherit;
         border: none;
-        border-radius: 0;
 
         .group {
             margin-bottom: 10px;
             border-bottom: none;
+
+            // Disabled box shadow from accordian
+            &:hover {
+                box-shadow: none;
+            }
         }
 
         .group > .heading {

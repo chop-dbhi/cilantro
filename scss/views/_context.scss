@@ -1,40 +1,25 @@
 .context {
 
-    .info-region {
-        border-radius: 3px;
-        margin-bottom: 10px;
-        padding: 8px 5px;
-        background-color: #f5f5f5;
-        text-shadow: 0 1px 1px #fff;
-
-        > p {
-            margin-bottom: 0;
-        }
-
-        .count-label {
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-
-        .details {
-            display: none;
-        }
-
-        [data-role=view] {
-            float: right;
-        }
-    }
-
     .actions-region {
         @include clearfix;
         border-bottom: 1px solid #aaa;
         margin-bottom: 10px;
+        padding-bottom: 10px;
+
+        .count-label {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
     }
 
     .tree-region .disabled {
         .language {
             color: #ccc;
         }
+    }
+
+    .info-region {
+
     }
 
     .context-item {
@@ -47,14 +32,14 @@
         .language {
             @include transition(color, 0.2s);
             @extend a;
-            cursor: pointer;
+            cursor: default;
         }
 
         .actions {
             float: right;
-            cursor: pointer;
             font-size: 12px;
             margin-left: 5px;
+            margin-bottom: 5px;
 
             .remove {
                 color: rgb(180, 0, 0);
