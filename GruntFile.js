@@ -4,33 +4,34 @@ module.exports = function(grunt) {
     grunt.initConfig({
 
         watch: {
-            coffeeSrc: {
-                tasks: ['coffee:compileSrc'],
+            coffee: {
+                tasks: ['coffee:compile'],
                 files: [
-                    'coffee/**/**/**/**/*.coffee',
-                    'templates/**/**/*.html'
+                    'coffee/**/*.coffee',
+                    'templates/**/*.html'
                 ]
             },
 
             buildRunner: {
                 tasks: ['jasmine:tests:build'],
-                files: ['spec/**/**/*.js']
+                files: ['spec/**/*.js']
             },
 
             sass: {
                 tasks: ['sass'],
-                files: ['scss/**/**/*.scss']
+                files: ['scss/**/*.scss']
             }
         },
 
         coffee: {
-            compileSrc: {
+            compile: {
                 options: {
-                    bare: true
+                    bare: true,
+                    sourceMap: true
                 },
                 expand: true,
                 cwd: 'coffee/',
-                src: '**/**/**/**/*.coffee',
+                src: '**/*.coffee',
                 dest: 'build',
                 rename: function(dest, src) {
                     return dest + '/' + src.replace('.coffee', '.js');
@@ -44,9 +45,10 @@ module.exports = function(grunt) {
                     'css/style.css': 'scss/style.scss'
                 },
                 options: {
-                    style: 'compressed',
+                    //style: 'compressed',
                     quiet: true,
-                    unixNewlines: true
+                    unixNewlines: true,
+                    debugInfo: true
                 }
             }
         },
