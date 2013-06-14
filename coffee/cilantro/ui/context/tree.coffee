@@ -28,7 +28,7 @@ define [
         emptyView: ContextEmptyTree
 
         modelEvents:
-            'change:enabled': 'toggleState'
+            'root:change:enabled': 'toggleState'
 
         toggleState: ->
             @$el.toggleClass('disabled', not @model.isEnabled())
@@ -43,20 +43,20 @@ define [
         template: templates.context
 
         regions:
-            info: '.info-region'
             actions: '.actions-region'
             tree: '.tree-region'
+            info: '.info-region'
 
         onRender: ->
             @info.show new info.ContextInfo
                 model: @model
 
             @actions.show new actions.ContextActions
-                model: @model.root
+                model: @model
 
             @tree.show new ContextTree
-                model: @model.root
-                collection: @model.root.stable.children
+                model: @model
+                collection: @model.root.children
 
 
     { ContextPanel }

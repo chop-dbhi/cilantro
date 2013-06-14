@@ -34,9 +34,15 @@ define [
 
 
     class ContextModel extends base.Model
+        rootEventPrefix: 'root'
 
         constructor: (attrs, options={}) ->
             @root = new nodes.BranchNodeModel
+
+            # Proxy events from the root node through the context model
+            @listenTo @root, 'all', (event, args...) =>
+                @trigger "#{ @rootEventPrefix }:#{ event }", args...
+
             options.parse = true
             super(attrs, options)
 
@@ -100,6 +106,16 @@ define [
 
         isArchived: ->
             @get 'archived'
+
+        # Root node proxy methods
+        isEnabled: ->
+            @root.isEnabled()
+
+        enable: ->
+            @root.enable()
+
+        disable: ->
+            @root.disable()
 
 
     class ContextCollection extends base.Collection
