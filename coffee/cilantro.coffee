@@ -13,6 +13,7 @@ define [
         contexts: new models.ContextCollection
         views: new models.ViewCollection
         results: new models.Results
+        exporters: new models.ExporterCollection
 
     if c.getOption('autoload') then c.openSession()
 
