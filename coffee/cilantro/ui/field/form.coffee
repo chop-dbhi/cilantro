@@ -14,10 +14,16 @@ define [
 
 
     getControlView = (model) ->
-        if model.get('enumerable')
+        type = model.get('simple_type')
+
+        if model.get('enumerable') or type is 'boolean'
             infograph.BarChart
-        else
-            controls.select(model)
+        else if model.get('searchable')
+            controls.FieldValueSearch
+        else if type is 'number'
+            controls.NumberControl
+        else if type is 'boolean'
+            controls.BooleanControl
 
 
     class LoadingControls extends base.LoadView

@@ -7,6 +7,7 @@ define [
     './models/paginator'
     './models/results'
     './models/exporter'
+    './models/value'
 ], (c, mods...) ->
 
     c._.extend {}, mods...

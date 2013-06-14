@@ -6,8 +6,11 @@ define [
     templates = c._.object ['links'], templates
 
 
-    # Set of pagination links that are used to navigate the bound object.
-    # The object is assumed to implement the 'paginator protocol'
+    # Set of pagination links that are used to control/navigation the bound
+    # model.
+    #
+    # The model is assumed to implement the 'paginator protocol', see
+    # cilantro/models/paginator
     class Paginator extends c.Marionette.ItemView
         template: templates.links
 
@@ -63,4 +66,53 @@ define [
             @_changePage $(event.target).data('page')
                     
 
-    { Paginator }
+    # Page for containing model-based data
+    class Page extends c.Marionette.ItemView
+
+
+    # Page for containing collection-based data
+    class ListingPage extends c.Marionette.CollectionView
+        itemView: Page
+
+
+    # Renders multiples pages as requested, but only shows the current
+    # page. This is delegated by the paginator-based collection bound to
+    # this view.
+    #
+    # The contained views may be model-based or collection-based. This is
+    # toggled based on the `options.list` flag. If true, the `listView`
+    # will be used as the item view class. Otherwise the standard `itemView`
+    # will be used for model-based data.
+    #
+    # If list is true, the `listViewOptions` will be called to produce the
+    # view options for the collection view. By default the item passed in
+    # is assumed to have an `items` collection on it that will be used.
+    class PageRoll extends c.Marionette.CollectionView
+        options:
+            list: true
+
+        itemView: Page
+
+        listView: ListingPage
+
+        getItemView: ->
+            if @options.list then @listView else @itemView
+
+        listViewOptions: (item, index) ->
+            collection: item.items
+            index: index
+
+        itemViewOptions: (item, index) ->
+            if @options.list
+                return @listViewOptions(item, index)
+            return super(item, index)
+
+        collectionEvents:
+            'change:currentpage': 'showCurentPage'
+
+        showCurentPage: (model, num, options) ->
+            @children.each (view) ->
+                view.$el.toggle(view.model.id is num)
+
+
+    { Paginator, Page, ListingPage, PageRoll }
