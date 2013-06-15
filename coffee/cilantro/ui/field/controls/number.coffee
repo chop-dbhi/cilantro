@@ -11,7 +11,7 @@ define [
                 value: controls.RangeInput
 
         events: ->
-            events = c._.clone base.FieldControl.events
+            events = c._.clone base.FieldControl::events
             events["change #{@dataSelectors.operator}"] = 'toggleRange'
             return events
 
