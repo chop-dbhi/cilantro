@@ -2,6 +2,7 @@
 define [
     './cilantro'
     './cilantro/ui/base'
+    './cilantro/ui/button'
     './cilantro/ui/concept'
     './cilantro/ui/field'
     './cilantro/ui/charts'

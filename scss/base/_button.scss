@@ -1,6 +1,55 @@
+// Override
+.dropdown-menu {
+    padding: 0;
+}
+
 .btn.btn-checkbox {
     padding: 1px 4px 2px 4px;
     [type=checkbox] {
         margin-top: 0;
+    }
+}
+
+.btn-group.btn-select {
+    .dropdown-toggle {
+        padding-left: 0;
+        padding-right: 8px;
+    }
+
+    .dropdown-selection {
+        @include linear-gradient(#f9f9f9, #fff);
+        border-radius: 2px 0 0 2px;
+        border-right: 1px solid #dcdcdc;
+        margin-right: 4px;
+        padding: 6px 12px 7px 12px;
+    }
+
+    .dropdown-toggle {
+        &.btn-large {
+            padding-right: 9px;
+
+            .dropdown-selection {
+                margin-right: 4px;
+                padding: 9px 14px 10px 14px;
+            }
+        }
+
+        &.btn-small {
+            padding-right: 7px;
+
+            .dropdown-selection {
+                margin-right: 3px;
+                padding: 6px 9px 7px 9px;
+            }
+        }
+
+        &.btn-mini {
+            padding-right: 4px;
+
+            .dropdown-selection {
+                margin-right: 1px;
+                padding: 3px 6px 3px 6px;
+            }
+        }
     }
 }
