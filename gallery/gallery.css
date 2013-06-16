@@ -1,11 +1,9 @@
 body {
-    background: #f9f9f9 url(images/furley_bg.png);
     padding-top: 60px;
 }
 
 .gallery-ui {
     text-shadow: 0 1px 1px #fff;
-    box-shadow: inset 1px 2px 2px #ddd;
     border-radius: 3px;
     border: 1px solid #ccc;
     background-color: rgba(0, 0, 0, 0.05);
@@ -18,11 +16,7 @@ body {
 
 #preview-area {}
 
-.preview-ui {
-    border-radius: 3px;
-    border: 1px dashed #ccc;
-    padding: 10px;
-}
+.preview-ui {}
 
 #preview-area > .preview-label {
     color: #999;
@@ -57,7 +51,6 @@ body {
 
 #gallery-nav .well {
     padding: 10px;
-    box-shadow: none;
     border: 1px solid #ccc;
     background-color: #f9f9f9;
     margin-bottom: 10px;
@@ -129,12 +122,6 @@ body {
     width: 20px;
     height: 20px;
     margin-right: 10px;
-}
-
-@media screen and (-webkit-min-device-pixel-ratio: 1.5) {
-    body {
-        background-image: url('images/furley_bg_@2x.png');
-    }
 }
 
 @media (max-width: 979px) {

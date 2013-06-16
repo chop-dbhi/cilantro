@@ -98,26 +98,9 @@ require(['jquery', 'mediator'], function($, mediator) {
     });
 
     // Build navigation
-    var i, color, swatch, link, view, region, layout;
-    
-    var swatches = $('#swatches ul'),
-        components = $('#components ul');
+    var i, link, view, region, layout;
 
-    // Add background color options
-    for (i = 0; i < this.colors.length; i++) {
-        color = this.colors[i];
-
-        swatch = $('<span>')
-            .addClass('swatch')
-            .css('background', color[0]);
-
-        swatches.append($('<li>').append(swatch, color[1]));
-    }
-
-    // Bind click to switch between background colors
-    swatches.on('click', '.swatch', function(event) {
-        previewArea.css('background-color', $(this).css('background-color'));
-    });
+    var components = $('#components ul');
 
     // Constructs the list items and links for loading modules
     function moduleLinks(section, modules) {
@@ -143,7 +126,7 @@ require(['jquery', 'mediator'], function($, mediator) {
 
     moduleLinks('Views', this.views);
     moduleLinks('Regions', this.regions);
-    moduleLinks('Layouts', this.layouts);            
+    moduleLinks('Layouts', this.layouts);
     moduleLinks('Workflows', this.workflows);
 
     // Bind click to load modules
@@ -158,8 +141,8 @@ require(['jquery', 'mediator'], function($, mediator) {
             .removeClass('active');
 
         // The module is expected to return a callback that takes
-        // the preview area DOM element. This primarily is 
-        // useful for rendering the view at an arbitary 
+        // the preview area DOM element. This primarily is
+        // useful for rendering the view at an arbitary
         // time (e.g. when data finally loads)
 
         require([modname], function(handler) {
@@ -189,7 +172,7 @@ require(['jquery', 'mediator'], function($, mediator) {
                 builtinChannel.append(option);
             }
         }
-        
+
         $('#builtin-channel-form').on('submit', function(event) {
             event.preventDefault();
             var data, args = [builtinChannel.val()];
