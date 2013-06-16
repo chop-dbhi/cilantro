@@ -1,6 +1,6 @@
 define [
     '../core'
-    '../search'
+    './search'
     './index'
     'tpl!templates/views/concept-columns.html'
     'tpl!templates/views/concept-columns-available.html'
@@ -8,19 +8,6 @@ define [
 ], (c, search, index, templates...) ->
 
     templates = c._.object ['columns', 'available', 'selected'], templates
-
-
-    # Custom search that filters the available items
-    class ColumnsSearch extends search.Search
-        onRender: ->
-            @ui.input.on 'keyup', c._.debounce =>
-                query = @ui.input.val()
-                if query
-                    @collection.search query, (resp) =>
-                        @options.handler(query, resp)
-                else
-                    @options.handler(null, [])
-            , 300
 
 
     class AvailableItem extends index.ConceptItem
@@ -43,58 +30,15 @@ define [
     class AvailableSection extends index.ConceptSection
         itemView: AvailableItem
 
-        filter: (query, models) ->
-            # If any children are visible, show this group, otherwise hide it
-            show = false
-            @children.each (view) ->
-                if not query or models[view.model.cid]?
-                    view.$el.show()
-                    show = true
-                else
-                    view.$el.hide()
-            @$el.toggle(show)
-            return show
-
 
     class AvailableGroup extends index.ConceptGroup
         itemView: AvailableSection
-
-        filter: (query, models) ->
-            # If any children are visible, show this group, otherwise hide it
-            show = false
-            @children.each (view) ->
-                if view.filter(query, models)
-                    show = true
-            @$el.toggle(show)
-            return show
-
-        find: (model) ->
-            for cid, view of @children._views
-                if (child = view.children?.findByModel(model))
-                    return child
-            return
 
 
     class AvailableColumns extends index.ConceptIndex
         itemView: AvailableGroup
 
         className: 'available-columns accordian'
-
-        filter: (query, resp) ->
-            models = {}
-            if query
-                for datum in resp
-                    if (model = @collection.get datum.id)
-                        models[model.cid] = model
-
-            @children.each (view) ->
-                view.filter(query, models)
-
-        find: (model) ->
-            for cid, view of @children._views
-                if (child = view.find?(model))
-                    return child
-            return
 
 
     class SelectedItem extends c.Marionette.ItemView
@@ -104,9 +48,7 @@ define [
 
         serializeData: ->
             concept = c.data.concepts.get(@model.get('concept'))
-            return {
-                name: concept.get('name')
-            }
+            return name: concept.get('name')
 
         events:
             'click button': 'triggerRemove'
@@ -178,7 +120,7 @@ define [
                 collection: @collection
                 collapsable: false
 
-            @search.show new ColumnsSearch
+            @search.show new search.ConceptSearch
                 collection: @collection
                 handler: (query, resp) =>
                     @available.currentView.filter(query, resp)

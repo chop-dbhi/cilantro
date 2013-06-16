@@ -23,9 +23,36 @@ define [
     class ConceptSection extends accordian.Section
         itemView: ConceptItem
 
+        filter: (query, models) ->
+            # If any children are visible, show this group, otherwise hide it
+            show = false
+            @children.each (view) ->
+                if not query or models[view.model.cid]?
+                    view.$el.show()
+                    show = true
+                else
+                    view.$el.hide()
+            @$el.toggle(show)
+            return show
+
 
     class ConceptGroup extends accordian.Group
         itemView: ConceptSection
+
+        filter: (query, models) ->
+            # If any children are visible, show this group, otherwise hide it
+            show = false
+            @children.each (view) ->
+                if view.filter(query, models)
+                    show = true
+            @$el.toggle(show)
+            return show
+
+        find: (model) ->
+            for cid, view of @children._views
+                if (child = view.children?.findByModel(model))
+                    return child
+            return
 
 
     class ConceptIndex extends accordian.Accordian
@@ -86,6 +113,22 @@ define [
 
             section.items.add(model)
 
+            return
+
+        filter: (query, resp) ->
+            models = {}
+            if query
+                for datum in resp
+                    if (model = @collection.get datum.id)
+                        models[model.cid] = model
+
+            @children.each (view) ->
+                view.filter(query, models)
+
+        find: (model) ->
+            for cid, view of @children._views
+                if (child = view.find?(model))
+                    return child
             return
 
 

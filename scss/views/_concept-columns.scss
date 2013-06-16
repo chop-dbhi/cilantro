@@ -22,35 +22,6 @@
         }
     }
 
-    .available-columns {
-        background-color: inherit;
-        border: none;
-
-        .group {
-            margin-bottom: 10px;
-            border-bottom: none;
-
-            // Disabled box shadow from accordian
-            &:hover {
-                box-shadow: none;
-            }
-        }
-
-        .group > .heading {
-            cursor: normal;
-            padding: 0;
-            font-size: 1.2em;
-        }
-
-        .group .sections {
-            border: none;
-        }
-
-        .section > .heading {
-            padding: 5px 0;
-        }
-    }
-
     .selected-columns {
         list-style: none;
         margin-left: 0;
