@@ -1,9 +1,11 @@
 define [
     './cilantro/core'
+    './cilantro/changelog'
     './cilantro/models'
     './cilantro/structs'
-], (c, models, structs) ->
+], (c, changelog, models, structs) ->
 
+    c.changelog = changelog
     c.models = models
     c.structs = structs
 
