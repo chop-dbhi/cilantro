@@ -180,7 +180,7 @@ define [
                 url = "#{ url }/"
             url = "#{ url }#{ pages }"
 
-            iframe = "<iframe id=export-download-#{ title } src=#{ url }></iframe>"
+            iframe = "<iframe id=export-download-#{ title } src=#{ url } style='display: none'></iframe>"
             $('.export-iframe-container').append(iframe)
 
             if c.data.exporters.notifiesOnComplete()
