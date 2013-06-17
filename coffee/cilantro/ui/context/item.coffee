@@ -38,28 +38,23 @@ define [
             'sync': 'doneLoading'
             'error': 'doneLoading'
 
-        serializeData: ->
-            language: flattenLanguage(@model.toJSON()).join(', ')
-
         clickShow: (event) ->
             c.router.navigate('query', trigger: true)
-            c.publish c.CONCEPT_FOCUS, @model.get('concept')
+            c.publish(c.CONCEPT_FOCUS, @model.get('concept'))
 
         clickRemove: (event) ->
-            @model.local.clear()
+            @model.destroy()
             @$el.fadeOut
                 duration: 400
                 easing: 'easeOutExpo'
-
-            c.publish c.CONTEXT_SAVE
+            c.publish(c.CONTEXT_SAVE, null, 'stable')
 
         clickState: (event) ->
-            local = @model.local
-            if local.isEnabled()
-                local.disable()
+            if @model.isEnabled()
+                @model.disable()
             else
-                local.enable()
-            c.publish c.CONTEXT_SAVE
+                @model.enable()
+            c.publish(c.CONTEXT_SAVE, null, 'stable')
 
         disable: ->
             @$el.addClass('disabled')
@@ -72,13 +67,14 @@ define [
             @ui.check.prop('checked', true)
 
         toggleState: (model, value, options) ->
-            if @model.local.isEnabled()
+            if @model.isEnabled()
                 @enable()
             else
                 @disable()
 
-        renderLanguage: (model, options) ->
-            text = flattenLanguage(model.toJSON()).join(', ')
+        renderLanguage: ->
+            text = flattenLanguage(@model.toJSON()).join(', ')
+            @$el.toggle(!!text)
             @ui.language.html(text)
 
         showLoading: ->
@@ -91,6 +87,7 @@ define [
 
         onRender: ->
             @ui.loader.hide()
+            @renderLanguage()
             @toggleState()
 
 

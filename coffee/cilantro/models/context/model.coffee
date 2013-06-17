@@ -73,9 +73,9 @@ define [
 
             c.subscribe c.CONTEXT_CLEAR, (id) =>
                 if @id is id or not id and @isSession()
-                    @root.clear()
+                    @root.destroy()
 
-            c.subscribe c.CONTEXT_SAVE, (id) =>
+            c.subscribe c.CONTEXT_SAVE, (id, source) =>
                 if @id is id or not id and @isSession()
                     @save()
 
@@ -83,22 +83,21 @@ define [
 
         parse: (resp) =>
             if (attrs = resp.json)?
+                copy = c.$.extend(true, {}, attrs)
+
                 # This is for legacy responses where the root node has not
                 # been correctly defined
                 if attrs.concept? or attrs.field?
                     @root.children.add(attrs)
                 else
-                    @root.set(attrs, save: true)
+                    @root.set(attrs, remove: false, save: true)
                 delete resp.json
             super(resp)
 
-        save: ->
-            @root.save()
-            super
-
-        toJSON: ->
+        toJSON: (options={}) ->
             attrs = super
-            attrs.json = @root.stable.toJSON()
+            @root.save()
+            attrs.json = @root.stableAttributes
             return attrs
 
         isSession: ->

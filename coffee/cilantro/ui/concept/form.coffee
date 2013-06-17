@@ -22,6 +22,8 @@ define [
             ,
                 create: 'branch'
 
+            @listenTo @context, 'change', @setState, @
+
         events:
             'click .actions [data-toggle=add]': 'save'
             'click .actions [data-toggle=update]': 'save'
@@ -52,7 +54,7 @@ define [
             # If this is valid field-level context update the state
             # of the concept form. Only one of the fields need to be
             # valid to update the context
-            if @context?.isValid()
+            if @context.isSynced()
                 @setUpdateState()
             else
                 @setNewState()
@@ -70,14 +72,13 @@ define [
         # Saves the current state of the context which enables it to be
         # synced with the server.
         save: ->
-            if @context?
-                @context.save()
+            if @context.save(deep: true)
                 c.publish c.CONTEXT_SAVE
-            @setUpdateState()
+                @setUpdateState()
 
         # Clears the local context of conditions
         clear: ->
-            @context?.clear()
+            @context.clear()
             @setNewState()
 
 

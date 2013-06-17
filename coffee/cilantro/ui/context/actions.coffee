@@ -32,12 +32,12 @@ define [
             @ui.count.text(c.utils.prettyNumber(value))
 
         clickRemoveAll: ->
-            @model.clear()
-            c.publish c.CONTEXT_SAVE
+            @model.destroy()
+            c.publish(c.CONTEXT_SAVE, null, 'stable')
 
         clickStateAll: ->
             if @model.isEnabled() then @model.disable() else @model.enable()
-            c.publish c.CONTEXT_SAVE
+            c.publish(c.CONTEXT_SAVE, null, 'stable')
 
         disable: ->
             @ui.state.attr('title', 'Enable All Filters')

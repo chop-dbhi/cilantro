@@ -48,31 +48,7 @@ define(['cilantro'], function (c) {
             expect(model.toJSON()).toEqual({field: 1, concept: 1});
         });
 
-        it('should trigger a change event', function() {
-            var triggered = 0,
-                model = new c.models.ContextNodeModel;
-
-            model.on('change', function() {
-                triggered++;
-            });
-
-            model.public.on('change', function() {
-                triggered++;
-            });
-
-            model.set({
-                field: 1,
-                concept: 1,
-                operator: 'exact',
-                value: 1
-            });
-            expect(triggered).toBe(1);
-
-            model.save();
-            expect(triggered).toBe(2);
-        });
-
-        describe('public node', function() {
+        describe('stable attributes', function() {
             var model;
 
             beforeEach(function() {
@@ -84,30 +60,28 @@ define(['cilantro'], function (c) {
             });
 
             it('should create a copy of the internal attributes', function() {
-                expect(model.public.attributes).toEqual(model.attributes);
+                expect(model.stableAttributes).toEqual(model.attributes);
             });
 
-            it('should not update on internal set', function() {
+            it('should be dirty on change', function() {
                 model.set('value', 50);
-                expect(model.public.toJSON()).not.toEqual(model.toJSON());
+                expect(model.isDirty()).toBe(true);
             });
 
-            it('should update after internal save', function() {
+            it('should not be dirty after save', function() {
                 model.set('value', 50);
                 model.save();
-                expect(model.public.toJSON()).toEqual(model.toJSON());
-            });
-
-            it('should update on internal set with save option', function() {
-                model.set('value', 50, {save: true});
-                expect(model.public.toJSON()).toEqual(model.toJSON());
+                expect(model.isDirty()).toBe(false);
+                expect(model.stableAttributes).toEqual(model.attributes);
             });
 
             it('should not change on an invalid state', function() {
                 model.set('value', null);
+                expect(model.isDirty()).toBe(true);
                 model.save();
-                expect(model.public.toJSON()).not.toEqual(model.toJSON());
-                expect(model.public.toJSON().value).toEqual(30);
+                expect(model.isDirty()).toBe(true);
+                expect(model.stableAttributes).toNotEqual(model.attributes);
+                expect(model.stableAttributes.value).toEqual(30);
             });
 
         });
@@ -204,11 +178,11 @@ define(['cilantro'], function (c) {
                 }]
             };
 
-            var cidsBefore = model.children.each(function(model) {
+            var cidsBefore = model.children.map(function(model) {
                 return model.cid;
             });
             model.set(attrs);
-            var cidsAfter = model.children.each(function(model) {
+            var cidsAfter = model.children.map(function(model) {
                 return model.cid;
             });
             expect(model.toJSON()).toEqual(attrs);
@@ -300,18 +274,6 @@ define(['cilantro'], function (c) {
                 removed++;
             });
 
-            model.public.on('change', function() {
-                pchanged++;
-            });
-
-            model.public.children.on('add', function() {
-                padded++;
-            });
-
-            model.public.children.on('remove', function() {
-                premoved++;
-            });
-
             model.set(attrs);
 
             expect(changed).toBe(1);
@@ -319,10 +281,6 @@ define(['cilantro'], function (c) {
             expect(removed).toBe(0);
 
             model.save();
-
-            expect(changed).toBe(1);
-            expect(added).toBe(2);
-            expect(removed).toBe(0);
 
             expect(changed).toBe(1);
             expect(added).toBe(2);
@@ -344,8 +302,8 @@ define(['cilantro'], function (c) {
             expect(added).toBe(2);
             expect(removed).toBe(1);
 
-            // No save, public attributes should still be the original ones
-            expect(model.public.toJSON()).toEqual(attrs);
+            // No save, stable attributes should still be the original ones
+            expect(model.isDirty()).toBe(true);
 
             model.save();
 
@@ -357,7 +315,8 @@ define(['cilantro'], function (c) {
             expect(added).toBe(2);
             expect(removed).toBe(1);
 
-            expect(model.public.toJSON()).toEqual(newAttrs);
+            expect(model.isDirty()).toBe(false);
+            expect(model.stableAttributes).toEqual(newAttrs);
         });
 
         describe('children collection', function() {
@@ -394,75 +353,14 @@ define(['cilantro'], function (c) {
                 }).toThrow();
             });
 
-        });
-
-        describe('public node', function() {
-
-            it('should equal the internal attributes on initialization', function() {
-                expect(model.public.toJSON()).toEqual(model.toJSON());
-            });
-
-            it('children should contain references to internal public nodes', function() {
-                var children = model.children.map(function(model) {
-                    return model.public;
-                });
-
-                // For starters, ensure they are the same length
-                expect(children.length).toEqual(model.public.children.length);
-
-                for (var i = 0; i < children.length; i++) {
-                    expect(children[i]).toBe(model.public.children.models[i]);
-                }
-            });
-
-            it('should update on successful save', function() {
-                model.children.add(node);
-                expect(model.public.toJSON()).not.toEqual(model.toJSON());
-
-                expect(model.save()).toBe(true);
-                expect(model.public.toJSON()).toEqual(model.toJSON());
-            });
-
-            it('should update on internal set and save option', function() {
-                var attrs = {
-                    type: 'and',
-                    children: [{
-                        field: 1,
-                        concept: 1,
-                        value: 50,
-                        operator: 'gt'
-                    }, {
-                        concept: 2,
-                        type: 'or',
-                        children: [{
-                            field: 2,
-                            concept: 2,
-                            value: [1, 3],
-                            operator: '-range'
-                        }]
-                    }]
-                };
-                var cidsBefore = model.public.children.each(function(model) {
-                    return model.cid;
-                });
-
-                model.set(attrs, {save: true});
-
-                var cidsAfter = model.public.children.each(function(model) {
-                    return model.cid;
-                });
-                expect(model.public.toJSON()).toEqual(model.toJSON());
-                expect(cidsBefore).toEqual(cidsAfter);
-            });
-
             it('should ignore invalid children when strict is false', function() {
                 model.children.add(node);
                 model.save();
-                expect(model.public.children.at(2)).toBeDefined();
+                expect(model.stableAttributes.children[2]).toBeDefined();
 
                 node.set('value', null);
                 expect(model.save({strict: false})).toBe(true);
-                expect(model.public.children.at(2)).toBeUndefined();
+                expect(model.stableAttributes.children[2]).toBeUndefined();
             });
 
             it('should not ignore invalid children', function() {
@@ -470,7 +368,7 @@ define(['cilantro'], function (c) {
                 model.children.add(node);
 
                 expect(model.save({strict: true})).toBe(false);
-                expect(model.public.children.at(2)).toBeUndefined();
+                expect(model.stableAttributes.children[2]).toBeUndefined();
             });
         });
     });

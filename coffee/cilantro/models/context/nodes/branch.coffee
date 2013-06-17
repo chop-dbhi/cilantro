@@ -4,20 +4,58 @@ define [
 ], (c, base) ->
 
 
-    class ContextNodeCollection extends base.BaseNodeCollection
+    class ContextNodeCollection extends c.Backbone.Collection
+        constructor: (models, options) ->
+            super(models, options)
+            @parent = options?.parent
+
         model: (attrs, options) ->
             args = [attrs, options]
             if options.create?
                 args.splice(0, 0, options.create)
             base.ContextNodeModel.create(args...)
 
+        get: (attrs) ->
+            if attrs instanceof c.Backbone.Model
+                attrs = attrs.pick 'concept', 'field'
+            @fetch(attrs)
+
+        set: (models, options) ->
+            models = if c._.isArray(models) then models else [models]
+            cleaned = []
+
+            for model in models
+                if model is @parent
+                    throw new base.ContextNodeError 'Cannot add self as child'
+                else if model instanceof base.ContextNodeModel and model.get('removed')
+                    continue
+                else if model.removed
+                    continue
+                else
+                    cleaned.push model
+
+            super(cleaned, options)
+
+        fetch: (query, options={}) ->
+            create = options.create
+            options.create = false
+
+            for child in @models
+                if (node = child.fetch(query, options))
+                    return node
+
+            # No nodes matched, create a node of the specified type with the
+            # query as the default attributes.
+            if create
+                options.create = create
+                @add(query, options)
+                return @get(query)
+
 
     # Branch-type node that acts as a container for other nodes. The `type`
     # determines the conditional relationship between the child nodes.
     class BranchNodeModel extends base.ContextNodeModel
         nodeType: 'branch'
-
-        stableModel: base.BaseBranchNodeModel
 
         defaults: ->
             type: 'and'
@@ -29,19 +67,23 @@ define [
 
             # Proxy change events from children
             @children.on 'change', (model, collection, options) =>
-                @trigger 'change', @, options
+                @trigger('change', @, options)
 
             # Update chidren collection when the children attributes change.
             # This should only ever occur after a sync with the server. All
             # local changes should use the `children` collection directly.
             @on 'change:children', (model, value, options) ->
-                @children.set value, options
+                @children.set(value, options)
 
             super
 
         toJSON: ->
-            attrs = super
-            attrs.children = @children.toJSON()
+            # Clone attributes, remove reference to children. The stable
+            # node has no reason to carry about the reference
+            (attrs = super).children = []
+            for child in @children.models
+                if not child.get('removed')
+                    attrs.children.push child.toJSON()
             return attrs
 
         # Override to ensure the attributes are set
@@ -49,13 +91,16 @@ define [
             options.validate = true
             @_validate(@toJSON(), options)
 
+        # Returns true is no children nodes are present
+        isEmpty: ->
+            @children.length is 0
+
         # If `deep` is true, children are also validated (and recursed). If
-        # any fail to validate, the branch is considered invalid. If `strict`
-        # is true, the branch must have at least one child to be valid
+        # any fail to validate, the branch is considered invalid.
         validate: (attrs, options) ->
             options = c._.extend
                 deep: true
-                strict: true
+                empty: true
             , options
 
             if not (attrs.type is 'and' or attrs.type is 'or')
@@ -64,11 +109,10 @@ define [
             if not attrs.children?
                 return 'No branch children'
 
-            if options.strict and not attrs.children.length
-                return 'No children in branch'
+            if not options.empty and @isEmpty()
+                return 'Children are empty'
 
-            # TODO deep may be redundant here
-            if options.deep and options.strict
+            if options.deep
                 for child in attrs.children
                     if child instanceof base.ContextNodeModel
                         if not child.isValid(options)
@@ -101,48 +145,42 @@ define [
                 if (node = @children.fetch(query, options))
                     return node
 
-        # If strict is `true` all child must be valid to perform the save.
-        # The default is `false` and will simply ignore invalid children.
+        destroy: (options={}) ->
+            @set('removed', true)
+            @stableAttributes = null
+            return
+
+        # Check if the branch itself is valid and saves all child. A deep
+        # saves children recursively.
         save: (options) ->
             options = c._.extend
+                deep: false
                 strict: false
             , options
 
-            # Confirm the branch itself is valid
-            if not @isValid(deep: false)
+            if not @isValid(deep: false, empty: false)
                 return false
 
-            if not @children.length
-                return false
-
-            # Clone attributes, remove reference to children. The stable
-            # node has no reason to carry about the reference
             attrs = c._.clone @attributes
-            delete attrs.children
 
+            delete attrs.children
             children = []
 
             for child in @children.models
-                if child.isValid()
-                    child.save()
-                else if options.strict
-                    return false
-                else
+                # Ignore removed children
+                if child.get('removed')
                     continue
-                child = child.stable
-                children.push(child)
 
-            # Set direct attributes on node
-            @stable.set(attrs)
-            # Update references to children
-            @stable.children.set(children)
+                if (options.deep and not child.save(null, deep: true)) or not child.isValid()
+                    if options.strict then return false
+                else
+                    if child.stableAttributes?
+                        children.push(child.stableAttributes)
 
+            attrs.children = children
+            @stableAttributes = attrs
+            @unset('removed')
             return true
-
-        clear: (options) ->
-            if not @children.length then return
-            @children.each (model) -> model.clear(options)
-            return
 
 
     { BranchNodeModel }
