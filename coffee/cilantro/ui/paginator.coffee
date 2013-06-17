@@ -60,11 +60,11 @@ define [
                 when "prev" then @model.getPreviousPage()
                 when "next" then @model.getNextPage()
                 when "last" then @model.getLastPage()
-                else console.log "Unknown paginator direction: #{ newPage }"
+                else throw new Error "Unknown paginator direction: #{ newPage }"
 
         requestChangePage: (event) ->
             @_changePage $(event.target).data('page')
-                    
+
 
     # Page for containing model-based data
     class Page extends c.Marionette.ItemView
