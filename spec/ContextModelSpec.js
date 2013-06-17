@@ -37,17 +37,6 @@ define(['cilantro'], function (c) {
             expect(model.fetch({field: 1})).toBe(model);
         });
 
-        it('should clear (non-fixed attributes)', function() {
-            var model = new c.models.ContextNodeModel({
-                concept: 1,
-                field: 1,
-                operator: 'exact',
-                value: 30
-            });
-            model.clear();
-            expect(model.toJSON()).toEqual({field: 1, concept: 1});
-        });
-
         describe('stable attributes', function() {
             var model;
 
@@ -187,28 +176,6 @@ define(['cilantro'], function (c) {
             });
             expect(model.toJSON()).toEqual(attrs);
             expect(cidsBefore).toEqual(cidsAfter);
-        });
-
-        it('should clear', function() {
-            model.children.add(node);
-            model.clear();
-            expect(model.toJSON()).toEqual({
-                type: 'and',
-                children: [{
-                    concept: 1,
-                    field: 1,
-                }, {
-                    concept: 2,
-                    type: 'and',
-                    children: [{
-                        field: 2,
-                        concept: 2,
-                    }]
-                }, {
-                    concept: 3,
-                    field: 3
-                }]
-            });
         });
 
         it('should fetch child node (by field)', function() {

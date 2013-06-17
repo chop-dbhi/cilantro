@@ -15,7 +15,6 @@ define [
                 @links = {}
                 for name, link of attrs._links
                     @links[name] = link.href
-                delete attrs._links
             return attrs
 
 
@@ -34,7 +33,6 @@ define [
                 @links = {}
                 for name, link of attrs._links
                     @links[name] = link.href
-                delete attrs._links
             return attrs
 
 

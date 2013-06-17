@@ -5,9 +5,7 @@ define(['cilantro.ui','text!/mock/concepts.json'], function (c, mocks) {
         var form, model;
 
         beforeEach(function () {
-            model = new c.models.ConceptModel(concepts[0], {
-                parse: true
-            });
+            model = new c.models.ConceptModel(concepts[0]);
             form = new c.ui.ConceptForm({
                 model: model
             });
@@ -17,8 +15,8 @@ define(['cilantro.ui','text!/mock/concepts.json'], function (c, mocks) {
             expect(form.model).toEqual(model);
         });
 
-        it('should have a fields array on its model', function(){
-            expect(form.model.fields).toEqual(jasmine.any(Array));
+        it('should have a fields collection on its model', function(){
+            expect(form.model.fields).toEqual(jasmine.any(c.Backbone.Collection));
         });
 
         describe('Chart', function() {
@@ -26,19 +24,19 @@ define(['cilantro.ui','text!/mock/concepts.json'], function (c, mocks) {
 
            async.beforeEach(function (done) {
                c.data.contexts.when(function(){
-                   model = new c.models.ConceptModel(concepts[0], {
-                       parse: true
-                   });
+                   model = new c.models.ConceptModel(concepts[0]);
                    form = new c.ui.ConceptForm({
                        model: model
                    });
-                   done();
+                   model.fields.fetch().done(function() {
+                       done();
+                   });
                });
            });
 
            async.it('maintains size across renderings when removed from dom', function(done){
                 form.render();
-                var el = form.chart.currentView.$el;
+                var el = form.fields.currentView.children.first().$el;
                 $('#arena').html(form.el);
 
                 setTimeout(function(){
@@ -47,13 +45,13 @@ define(['cilantro.ui','text!/mock/concepts.json'], function (c, mocks) {
                     form.close();
                     form.render();
                     $('#arena').html(form.el);
-                    el = form.chart.currentView.$el;
+                    el = form.fields.currentView.children.first().$el;
 
                     setTimeout(function(){
                         var width2 = $('.highcharts-container', el).css('width');
                         expect(width2).toBeDefined();
                         expect(width1).toEqual(width2);
-                        form.close()
+                        form.close();
                         done();
                     }, 1000);
                 }, 1000);

@@ -21,14 +21,12 @@ define [
 
         parse: (resp, options) ->
             super
+            # Set the endpoint for related fields
+            @fields.url = => @links.fields
 
-            if resp?
-                # Set the endpoint for related fields
-                @fields.url = => @links.fields
-
-                if resp.fields?
-                    @fields.set(resp.fields, options)
-                    delete resp.fields
+            if resp?.fields?
+                @fields.set(resp.fields, options)
+                delete resp.fields
             return resp
 
 

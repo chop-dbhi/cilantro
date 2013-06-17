@@ -17,7 +17,7 @@ define [
     c.ui = c._.extend {}, mods...
 
     # TODO clean this up
-    ui = c.getOption('ui')
+    ui = c.getOption('ui') or {}
     c.router = new router.Router
         el: ui.main
         maxHeight: ui.maxHeight

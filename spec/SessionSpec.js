@@ -16,6 +16,7 @@ define(['cilantro'], function(c) {
         });
 
         beforeEach(function() {
+            c.closeSession();
             events = [];
             c.config = {};
         });
