@@ -12,6 +12,13 @@
             right: 7px;
             margin-left: 10px;
         }
+
+        &.disabled {
+            color: #999;
+            > .actions {
+                display: none;
+            }
+        }
     }
 }
 

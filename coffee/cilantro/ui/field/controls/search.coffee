@@ -26,7 +26,8 @@ define [
             return resp
 
 
-    # Paginator (collection) of pages
+    # Paginator (collection) of pages which is driven by a field values
+    # endpoint.
     class SearchPaginator extends models.Paginator
         model: SearchPageModel
 
@@ -59,14 +60,11 @@ define [
 
         search: (event) ->
             value = @ui.input.val()
-
             if value
                 @paginator.urlParams = query: value
             else
                 @paginator.urlParams = null
-
             @paginator.refresh()
-
 
 
     # Single search result item
@@ -74,6 +72,30 @@ define [
         className: 'value-item'
 
         template: templates.item
+
+        ui:
+            actions: '.actions'
+
+        events:
+            'click button': 'addItem'
+
+        constructor: (options={}) ->
+            if (@values = options.values)
+                @listenTo @values, 'add', @setState, @
+                @listenTo @values, 'remove', @setState, @
+                @listenTo @values, 'reset', @setState, @
+            super(options)
+
+        addItem: ->
+            # Mark as valid since it was derived from a controlled list
+            attrs = c._.extend @model.toJSON(), valid: true
+            @values.add(attrs)
+
+        setState: ->
+            @$el.toggleClass('disabled', !!@values.get(@model))
+
+        onRender: ->
+            @setState()
 
 
     # A single page of search results
@@ -125,6 +147,7 @@ define [
 
             @browse.show new SearchPageRoll
                 collection: @valuesPaginator
+                values: @collection
 
             @paginator.show new paginator.Paginator
                 className: 'paginator mini'
@@ -147,7 +170,9 @@ define [
             @collection.toJSON()
 
         setValue: (value) ->
-            @collection.set(value)
+            # Do not merge into existing models since the collection contains
+            # additional state (which would be removed due to the merge).
+            @collection.set(value, merge: false)
 
 
     { FieldValueSearch }

@@ -25,7 +25,7 @@ define [
             remove: 'button'
 
         events:
-            'click i': 'destroy'
+            'click button': 'destroy'
 
         modelEvents:
             'change:valid': 'toggleValid'

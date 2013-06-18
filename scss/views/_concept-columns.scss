@@ -14,7 +14,7 @@
             }
 
             &.disabled {
-                @extend .muted;
+                color: #999;
                 button {
                     display: none;
                 }
