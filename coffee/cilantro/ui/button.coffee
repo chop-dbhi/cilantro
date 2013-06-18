@@ -70,9 +70,13 @@ define [
                 options.collection = new c.Backbone.Collection choices
             super(options)
 
-        select: (value) ->
+        setSelection: (value) ->
             if (model = @collection.findWhere(value: value))
                 model.set('selected', true)
+
+        getSelection: (value) ->
+            if (model = @collection.findWhere(selected: true))
+                model.get('value')
 
         updateSelection: (model, selected, options) ->
             if not selected then return

@@ -10,6 +10,32 @@ define [
         'regionViews', 'regionOptions', 'attrGetters', 'attrSetters']
 
 
+    # Unbinds the view from it's previously bound context
+    unbindContext = (view) ->
+        if (model = view.context)
+            delete view.context
+            model.stopListening(view)
+            view.stopListening(model)
+        return
+
+    # Sets up a two-way binding between the view and context and
+    # unbinds a previously bound context
+    bindContext = (view, model) ->
+        unbindContext(view)
+        if not model? then return
+
+        # Listen for a change event from the view, update the model
+        model.listenTo view, 'change', (view, attrs) ->
+            model.set(attrs)
+
+        # Listen for a change event from the model, update the view
+        view.listenTo model, 'change', (model, options) ->
+            view.set(model.changedAttributes())
+
+        view.context = model
+        return
+
+
     # Mixin for view prototypes. This can be applied using `_.extend`
     # (override) or `_.defaults` (supplement) on the prototype, e.g.
     #
@@ -52,20 +78,17 @@ define [
                         @[optionKey] = option
             return
 
-        bindContext: (context) ->
-            @unbindContext()
-            if context?
-                @context = context
+        getContext: ->
+            @context
 
-                @context.listenTo @, 'change', (view, attrs) =>
-                    @context.set(attrs)
+        hasBoundContext: ->
+            @getContext()?
 
-                @listenTo context, 'change', (model, options) =>
-                    @set(model.changedAttributes())
+         bindContext: (context) ->
+            bindContext(@, context)
 
         unbindContext: ->
-            @context?.stopListening(@)
-            @stopListening(@context)
+            unbindContext(@)
 
         onRender: ->
             @set(@context)

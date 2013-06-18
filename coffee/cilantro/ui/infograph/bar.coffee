@@ -1,17 +1,20 @@
 define [
     '../core'
     '../controls'
-    'tpl!templates/infograph/bar-chart.html'
+    '../button'
     'tpl!templates/infograph/bar.html'
-], (c, controls, templates...) ->
+    'tpl!templates/infograph/bar-chart-toolbar.html'
+    'tpl!templates/infograph/bar-chart.html'
+], (c, controls, button, templates...) ->
 
-    templates = c._.object ['chart', 'bar'], templates
+    templates = c._.object ['bar', 'toolbar', 'chart'], templates
 
 
     class BarModel extends c.Backbone.Model
         parse: (attrs) ->
             attrs.value = attrs.values[0]
             return attrs
+
 
     sortModelAttr = (attr) ->
         (model) ->
@@ -52,6 +55,7 @@ define [
 
         modelEvents:
             'change:selected': 'setSelected'
+            'change:visible': 'setVisible'
 
         serializeData: ->
             attrs = @model.toJSON()
@@ -75,47 +79,39 @@ define [
 
         setSelected: (model, value) ->
             @$el.toggleClass('selected', value)
+            # If a delect occurs while a bar is selected, this ensures it
+            # is now hidden
+            if not value and model.get('visible') is false
+                @$el.removeClass('filtered').hide()
+
+        setVisible: (model, value) ->
+            if value
+                @$el.removeClass('filtered').show()
+            else if model.get('selected')
+                @$el.addClass('filtered')
+            else
+                @$el.hide()
 
 
     # Renders a series of bars for each value. This contains the value,
     # count and percentage for the value.
-    class BarChart extends c.Marionette.CompositeView
+    class Bars extends c.Marionette.CollectionView
         className: 'info-bar-chart'
 
-        options:
-            minValuesForToolbar: 10
-
-        template: templates.chart
-
         itemView: Bar
-
-        itemViewContainer: '.bars'
 
         itemViewOptions: (model, index) ->
             model: model
             total: @calcTotal()
 
         collectionEvents:
-            'sort': 'sortChildren'
             'change': 'change'
-            'reset': 'toggleToolbar'
-
-        events:
-            'change [name=sort]': 'sortBy'
-            'keyup [name=filter]': 'filterBars'
-            'click [name=invert]': 'invertSelection'
-
-        ui:
-            toolbar: '.toolbar'
-            sortOrder: '[name=sort]'
-            filterInput: '[name=filter]'
-            invertButton: '[name=invert]'
+            'sort': 'sortChildren'
 
         constructor: (options) ->
             options.collection ?= new BarCollection
             @bindContext(options.context)
             super(options)
-            @mergeOptions(@options)
 
         initialize: ->
             # Fetch the field distribution, do not cache
@@ -123,50 +119,23 @@ define [
                 @collection.reset(resp.data, parse: true)
                 @setValue(@context.get('value'))
 
-        sortBy: (event) ->
-            @collection.sortModelsBy(@ui.sortOrder.val())
-
-        toggleToolbar: ->
-            # Not yet rendered, this will be called again in onRender
-            if not @_isRendered then return
-            @ui.toolbar.toggle(@collection.length >= @options.minValuesForToolbar)
+        # Sums the total count across all values
+        calcTotal: ->
+            total = 0
+            total += count for count in @collection.pluck('count')
+            return total
 
         onRender: ->
-            # Hide toolbar by default, this will be shown only if the
-            # data size exceeds the threshold
-            @toggleToolbar()
+            @set(@getContext())
 
-        filterBars: (event) ->
-            event.stopPropagation()
-
-            text = @ui.filterInput.val()
-            regex = new RegExp(text, 'i')
-
-            @children.each (view) ->
-                if not text or regex.test(view.model.get('value'))
-                    view.$el.show()
-                else
-                    view.$el.hide()
-            return
-
-        invertSelection: (event) ->
-            @collection.each (model) ->
-                model.set('selected', not model.get('selected'))
-            @change()
-            return
-
+        # Sorts the children based the on the current order of the collection
         sortChildren: (collection, options) ->
             # Iterates over the newly sorted models and re-appends the
             # child views relative to the new indexes
             @collection.each (model) =>
                 view = @children.findByModel(model)
-                @$(@itemViewContainer).append(view.el)
+                @$el.append(view.el)
             return
-
-        calcTotal: ->
-            total = 0
-            total += count for count in @collection.pluck('count')
-            return total
 
         getField: -> @model.id
 
@@ -184,7 +153,103 @@ define [
             return
 
 
-    c._.defaults BarChart::, controls.ControlViewMixin
+    c._.defaults Bars::, controls.ControlViewMixin
 
+
+    class BarChartToolbar extends c.Marionette.ItemView
+        className: 'navbar navbar-toolbar'
+
+        template: templates.toolbar
+
+        events:
+            'change .btn-select': 'sortBy'
+            'keyup [name=filter]': 'filterBars'
+            'click [name=invert]': 'invertSelection'
+
+        ui:
+            toolbar: '.btn-toolbar'
+            sortSelect: '.btn-select'
+            filterInput: '[name=filter]'
+            invertButton: '[name=invert]'
+
+        onRender: ->
+            @sortSelect = new button.ButtonSelect
+                collection: [
+                    value: '-count'
+                    label: 'Count (desc)'
+                    selected: true
+                ,
+                    value: 'count'
+                    label: 'Count (asc)'
+                ,
+                    value: '-value'
+                    label: 'Value (desc)'
+                ,
+                    value: 'value'
+                    label: 'Value (asc)'
+                ]
+
+            @sortSelect.render()
+            @sortSelect.$el.addClass('pull-right')
+            @ui.toolbar.append(@sortSelect.el)
+
+        # Sorts the collection based on the current selected value
+        sortBy: (event) ->
+            @collection.sortModelsBy(@sortSelect.getSelection())
+
+        # 'Filters' the bars given the input
+        filterBars: (event) ->
+            event.stopPropagation()
+
+            text = @ui.filterInput.val()
+            regex = new RegExp(text, 'i')
+
+            @collection.each (model) ->
+                model.set('visible', not text or regex.test(model.get('value')))
+            return
+
+        # Inverts the selected bars. If the bar is not visible and not
+        # selected it will not be inverted.
+        invertSelection: (event) ->
+            @collection.each (model) ->
+                if model.get('visible') isnt false or model.get('selected')
+                    model.set('selected', not model.get('selected'))
+            @collection.trigger('change')
+            return
+
+
+
+    class BarChart extends controls.Control
+        template: templates.chart
+
+        options:
+            minValuesForToolbar: 10
+
+        regions:
+            toolbar: '.toolbar-region'
+            bars: '.bars-region'
+
+        collectionEvents:
+            'reset': 'toggleToolbar'
+
+        constructor: (options) ->
+            options.collection ?= new BarCollection
+            super(options)
+
+        toggleToolbar: =>
+            # Not yet rendered, this will be called again in onRender
+            if not @toolbar.currentView then return
+            @toolbar.currentView.$el.toggle(@collection.length >= @options.minValuesForToolbar)
+
+        onRender: ->
+            @bars.show new Bars
+                model: @model
+                context: @context
+                collection: @collection
+
+            @toolbar.show new BarChartToolbar
+                collection: @collection
+
+            @toggleToolbar()
 
     { BarChart }

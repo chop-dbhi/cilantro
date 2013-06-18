@@ -1,12 +1,8 @@
 .info-bar-chart {
-    .toolbar {
-        position: relative;
-
-        [name=sort] {
-            position: absolute;
-            right: 15px;
-            font-size: 0.85em;
-        }
+    .toolbar-region {
+        // hide by default, the view will display the toolbar if it is
+        // necessary
+        display: none;
     }
 }
 
@@ -40,6 +36,12 @@
 
     .bar-percentage {
         font-weight: 300;
+    }
+
+    // This class is used when the bar is selected, but has been filtered
+    // of by the text matching.
+    &.filtered {
+        opacity: 0.4;
     }
 
     &.selected {

@@ -15,7 +15,7 @@ define(['cilantro.ui'], function(c) {
                 selection = value;
             });
 
-            view.select(4);
+            view.setSelection(4);
             expect(selection).toBe(4);
             expect(triggered).toBe(true);
             expect(view.collection.where({selected: true}).length).toEqual(1);
