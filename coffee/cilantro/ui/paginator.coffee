@@ -1,9 +1,18 @@
 define [
     './core'
+    './base'
     'tpl!templates/views/paginator.html'
-], (c, templates...) ->
+], (c, base, templates...) ->
 
     templates = c._.object ['links'], templates
+
+
+    class EmptyPage extends base.EmptyView
+        message: 'No page results'
+
+
+    class LoadingPage extends base.LoadView
+        message: 'Loading page...'
 
 
     # Set of pagination links that are used to control/navigation the bound
@@ -14,7 +23,7 @@ define [
     class Paginator extends c.Marionette.ItemView
         template: templates.links
 
-        requestDelay: 250 # In milliseconds
+        requestDelay: 250
 
         className: 'paginator'
 
@@ -74,6 +83,8 @@ define [
     class ListingPage extends c.Marionette.CollectionView
         itemView: Page
 
+        emptyPage: EmptyPage
+
 
     # Renders multiples pages as requested, but only shows the current
     # page. This is delegated by the paginator-based collection bound to
@@ -95,6 +106,11 @@ define [
 
         listView: ListingPage
 
+        # The first page is guaranteed (assumed) to be fetch and rendered,
+        # thus the empty view for the page roll is the loading state.
+        emptyView: LoadingPage
+
+        # Toggle between the list-based vs. item-based page roll
         getItemView: ->
             if @options.list then @listView else @itemView
 

@@ -17,6 +17,8 @@ define [
     # and 'center'.
 
     class StateView extends c.Marionette.ItemView
+        align: 'center'
+
         constructor: ->
             super
 

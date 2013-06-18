@@ -14,13 +14,7 @@ define [
         ui:
             input: 'input'
 
-        options:
-            valueKey: 'label'
-            limit: 10
-
         onRender: ->
-            @ui.input.typeahead(@options)
-            # TODO document
             if @options.placeholder
                 @ui.input.attr('placeholder', @options.placeholder)
 

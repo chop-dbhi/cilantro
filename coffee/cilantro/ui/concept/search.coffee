@@ -7,12 +7,11 @@ define [
     class ConceptSearch extends search.Search
         className: 'concept-search search'
 
-        options: ->
-            attrs = c._.clone search.Search::options
-            attrs.placeholder = 'Search name, description, data...'
-            return attrs
+        options:
+            placeholder: 'Search by name, description, or data...'
 
         onRender: ->
+            super
             @ui.input.on 'keyup', c._.debounce =>
                 query = @ui.input.val()
                 if query

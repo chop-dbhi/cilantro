@@ -24,7 +24,10 @@ define [
 
             # Deferred loading of views..
             @concepts.show new base.LoadView
+                message: 'Loading query concepts...'
+
             @context.show new base.LoadView
+                message: 'Loading session context...'
 
             c.data.concepts.ready =>
                 @concepts.show new concept.ConceptPanel

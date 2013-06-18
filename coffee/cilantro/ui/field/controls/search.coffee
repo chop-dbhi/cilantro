@@ -4,10 +4,11 @@ define [
     '../../controls'
     '../../paginator'
     '../../values'
+    '../../search'
     'tpl!templates/views/search.html'
     'tpl!templates/views/controls/multi-value-item.html'
     'tpl!templates/views/controls/multi-value-search.html'
-], (c, models, controls, paginator, values, templates...) ->
+], (c, models, controls, paginator, values, search, templates...) ->
 
     templates = c._.object ['search', 'item', 'layout'], templates
 
@@ -40,7 +41,7 @@ define [
 
 
     # View for querying field values
-    class ValueSearch extends c.Marionette.ItemView
+    class ValueSearch extends search.Search
         className: 'field-search search'
 
         template: templates.search
@@ -120,6 +121,7 @@ define [
             @search.show new ValueSearch
                 model: @model
                 paginator: @valuesPaginator
+                placeholder: "Search #{ @model.get('plural_name') }..."
 
             @browse.show new SearchPageRoll
                 collection: @valuesPaginator
