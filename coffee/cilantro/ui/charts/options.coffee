@@ -28,12 +28,12 @@ define ->
             series:
                 cursor: 'pointer'
                 shadow: false
-                borderWidth: 1
-                borderColor: 'black'
+                borderWidth: 0
+                borderColor: '#4b8cf7'
                 animation:
                     duration: 400
-                color: '#cbcbcb'
-                states: 
+                color: '#777'
+                states:
                     select:
                         color: '#0088cc'
                     hover:

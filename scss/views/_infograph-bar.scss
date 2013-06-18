@@ -44,9 +44,9 @@
 
     &.selected {
         .bar {
-            background-color: #fbb046;
-            @include linear-gradient(#fbb450, #faa937);
-            box-shadow: 2px 2px 3px #ccc;
+            background-color: #4b8cf7;
+            @include linear-gradient(#4d90fe, #4787ed);
+            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
         }
 
         .bar-mask {
