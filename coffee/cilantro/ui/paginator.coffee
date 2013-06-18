@@ -85,6 +85,12 @@ define [
 
         emptyPage: EmptyPage
 
+        itemViewOptions: (item, index) ->
+            c._.defaults
+                model: item
+                index: index
+            , @options
+
 
     # Renders multiples pages as requested, but only shows the current
     # page. This is delegated by the paginator-based collection bound to
@@ -116,12 +122,12 @@ define [
 
         listViewOptions: (item, index) ->
             collection: item.items
-            index: index
 
         itemViewOptions: (item, index) ->
+            options = model: item, index: index
             if @options.list
-                return @listViewOptions(item, index)
-            return super(item, index)
+                c._.extend options, @listViewOptions(item, index)
+            c._.defaults options, @options
 
         collectionEvents:
             'change:currentpage': 'showCurentPage'
