@@ -72,7 +72,7 @@ define [
                 else throw new Error "Unknown paginator direction: #{ newPage }"
 
         requestChangePage: (event) ->
-            @_changePage $(event.target).data('page')
+            @_changePage $(event.currentTarget).data('page')
 
 
     # Page for containing model-based data
