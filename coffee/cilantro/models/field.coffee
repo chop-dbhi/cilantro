@@ -29,13 +29,23 @@ define [
                         handler(resp)
             return
 
-        values: (handler, cache=true) ->
+        values: (query, handler, cache=true) ->
+            # Shift argument is not query is supplied
+            if typeof query is 'function'
+                handler = query
+                cache = handler
+                query = ''
+            # Do not cache query-based lookups
+            else
+                cache = false
+
             if not @links.values? then handler()
             if cache and @_cache.values?
                 handler(@_cache.values)
             else
                 c.Backbone.ajax
                     url: @links.values
+                    data: query: query
                     dataType: 'json'
                     success: (resp) =>
                         @_cache.values = if cache then resp else null
