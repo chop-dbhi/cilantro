@@ -17,6 +17,7 @@ define [
         onRender: ->
             if @options.placeholder
                 @ui.input.attr('placeholder', @options.placeholder)
+            c._.defer => @ui.input.focus()
 
 
     { Search }
