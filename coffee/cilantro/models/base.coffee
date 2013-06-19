@@ -28,6 +28,10 @@ define [
             @links = {}
             super(attrs, options)
 
+        fetch: (options={}) ->
+            options.cache ?= false
+            super(options)
+
         parse: (attrs, options) ->
             if attrs? and attrs._links?
                 @links = {}
