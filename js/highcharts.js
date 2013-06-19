@@ -12,7 +12,7 @@
 // JSLint options:
 /*global Highcharts, document, window, navigator, setInterval, clearInterval, clearTimeout, setTimeout, location, jQuery, $, console, each, grep */
 
-define(['jquery'], funcion($) {
+define(['jquery'], function($) {
 // encapsulated variables
 var UNDEFINED,
 	doc = document,
