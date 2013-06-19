@@ -30,6 +30,9 @@ define [
             c.subscribe c.CONTEXT_SYNCED, @refresh, @
             c.subscribe c.VIEW_SYNCED, @refresh, @
 
+        fetch: (options={}) ->
+            options.cache ?= false
+            super(options)
 
     c._.extend Results::, paginator.PaginatorMixin
 
