@@ -11,7 +11,7 @@ define [
     class Table extends c.Marionette.CollectionView
         tagName: 'table'
 
-        className: 'table table-bordered table-striped table-condensed'
+        className: 'table table-striped'
 
         itemView: body.Body
 

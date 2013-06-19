@@ -1,0 +1,7 @@
+table thead th {
+    border-left: 1px solid #ddd;
+
+    &:first-child {
+        border-left: 0;
+    }
+}
