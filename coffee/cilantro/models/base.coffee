@@ -28,10 +28,9 @@ define [
             @links = {}
             super(attrs, options)
 
-        fetch: (options) ->
-            options = options or {}
-            options.cache = false
-            return c.Backbone.Collection.prototype.fetch.call(this, options)
+        fetch: (options={}) ->
+            options.cache ?= false
+            super(options)
 
         parse: (attrs, options) ->
             if attrs? and attrs._links?
