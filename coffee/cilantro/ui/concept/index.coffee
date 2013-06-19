@@ -32,7 +32,7 @@ define [
                     show = true
                 else
                     view.$el.hide()
-            @$el.toggle(show)
+            @$el.toggle(show and not @isEmpty())
             return show
 
 
@@ -45,7 +45,7 @@ define [
             @children.each (view) ->
                 if view.filter(query, models)
                     show = true
-            @$el.toggle(show)
+            @$el.toggle(show and not @isEmpty())
             return show
 
         find: (model) ->

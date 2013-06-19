@@ -24,6 +24,16 @@ define [
 
         itemViewContainer: '.items'
 
+        ui:
+            heading: '.heading'
+
+        # Returns true if this group is *empty*
+        isEmpty: ->
+            not @collection.length
+
+        onCompositeCollectionRendered: ->
+            @$el.toggle(not @isEmpty())
+
 
     class Group extends c.Marionette.CompositeView
         className: 'group'
@@ -45,6 +55,7 @@ define [
             collection: model[@itemSectionItems]
 
         ui:
+            heading: '.heading'
             icon: '.heading span'
             inner: '.inner'
 
@@ -57,6 +68,28 @@ define [
             if not @options.collapsable
                 @$('.inner').removeClass('collapse')
                 @ui.icon.hide()
+
+        # Returns true if this group is *empty* which includes having no
+        # sections or having sections without any items.
+        isEmpty: ->
+            if @collection.length
+                return false
+            for model in @collection.models
+                if model.items.length
+                    return false
+            return true
+
+        onCompositeCollectionRendered: ->
+            @$el.toggle(not @isEmpty())
+
+            # Hide the first heading i
+            if (length = @collection.length)
+                # Get the first model and view for toggle conditions
+                view = @children.findByModel(model = @collection.at(0))
+
+                # If only a single child is present, hide the heading unless it
+                # is using an explicit heading
+                view.ui.heading.toggle(length > 1 or model.id >= 0)
 
         toggleCollapse: ->
             if @options.collapsable
