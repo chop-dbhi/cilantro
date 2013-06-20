@@ -116,6 +116,9 @@ define [
 
         template: templates.columns
 
+        events:
+            'click .columns-remove-all-button': 'triggerRemoveAll'
+
         regions:
             search: '.search-region'
             available: '.available-region'
@@ -158,6 +161,11 @@ define [
                     return false
 
             return true
+
+        triggerRemoveAll: ->
+            facets = @view.facets.clone()
+            for facet in facets.models
+                @removeColumn(facet)
 
         addColumn: (concept, add=true) ->
             @available.currentView.find(concept)?.disable()
