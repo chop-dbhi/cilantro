@@ -1,6 +1,6 @@
 define [
     '../core'
-    'tpl!templates/views/context-actions.html'
+    'tpl!templates/context/actions.html'
 ], (c, templates...) ->
 
     templates = c._.object ['actions'], templates
