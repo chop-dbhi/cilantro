@@ -36,9 +36,9 @@ define [
             if attrs? and attrs._links?
                 if attrs.version? and attrs.version.split(".").length == 3
                     versionFields = attrs.version.split(".")
-                    @version = [parseInt(versionFields[0]),
-                                parseInt(versionFields[1]),
-                                parseInt(versionFields[2])]
+                    @version = [parseInt(versionFields[0], 10),
+                                parseInt(versionFields[1], 10),
+                                parseInt(versionFields[2], 10)]
                 
                 for key in Object.keys(attrs._links)
                     # Ignore the exporter endpoint itself
