@@ -1,7 +1,7 @@
 define [
     './core'
     './base'
-    'tpl!templates/views/paginator.html'
+    'tpl!templates/paginator.html'
 ], (c, base, templates...) ->
 
     templates = c._.object ['links'], templates

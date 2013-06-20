@@ -2,11 +2,11 @@ define [
     '../core'
     './search'
     './index'
-    'tpl!templates/views/concept-columns.html'
-    'tpl!templates/views/concept-columns-available.html'
-    'tpl!templates/views/concept-columns-available-section.html'
-    'tpl!templates/views/concept-columns-available-group.html'
-    'tpl!templates/views/concept-columns-selected.html'
+    'tpl!templates/concept/columns.html'
+    'tpl!templates/concept/columns-available.html'
+    'tpl!templates/concept/columns-available-section.html'
+    'tpl!templates/concept/columns-available-group.html'
+    'tpl!templates/concept/columns-selected.html'
 ], (c, search, index, templates...) ->
 
     templates = c._.object ['columns', 'available', 'section', 'group', 'selected'], templates

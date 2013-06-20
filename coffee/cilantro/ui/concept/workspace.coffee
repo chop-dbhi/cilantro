@@ -5,7 +5,7 @@ define [
     '../charts'
     './form'
     './info'
-    'tpl!templates/views/concept-workspace.html'
+    'tpl!templates/concept/workspace.html'
 ], (c, welcome, field, charts, form, info, templates...) ->
 
     templates = c._.object ['workspace'], templates

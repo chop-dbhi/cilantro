@@ -6,8 +6,8 @@ define [
     './controls'
     '../infograph'
     '../charts'
-    'tpl!templates/views/field-form.html'
-    'tpl!templates/views/field-form-condensed.html'
+    'tpl!templates/field/form.html'
+    'tpl!templates/field/form-condensed.html'
 ], (c, base, info, stats, controls, infograph, charts, templates...) ->
 
     templates = c._.object ['form', 'condensed'], templates

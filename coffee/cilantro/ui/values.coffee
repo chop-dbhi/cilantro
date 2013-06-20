@@ -2,8 +2,8 @@ define [
     './core'
     './base'
     '../models'
-    'tpl!templates/views/controls/value-list.html'
-    'tpl!templates/views/controls/value-item.html'
+    'tpl!templates/values/list.html'
+    'tpl!templates/values/item.html'
 ], (c, base, models, templates...) ->
 
     templates = c._.object ['list', 'item'], templates

@@ -2,7 +2,7 @@ define [
     '../core'
     './core'
     './utils'
-    'tpl!templates/views/chart.html'
+    'tpl!templates/charts/chart.html'
 ], (c, charts, utils, templates...) ->
 
     templates = c._.object ['chart'], templates

@@ -1,7 +1,7 @@
 define [
     './core'
-    'tpl!templates/views/button-select.html'
-    'tpl!templates/views/button-select-option.html'
+    'tpl!templates/button/select.html'
+    'tpl!templates/button/select-option.html'
 ], (c, templates...) ->
 
     templates = c._.object ['select', 'option'], templates
