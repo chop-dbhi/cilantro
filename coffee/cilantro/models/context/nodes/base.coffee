@@ -68,7 +68,7 @@ define [
         # Attempts to fetch a node relative to this one. The `query` is a set
         # of attributes the target node must match in order to be returned.
         # Takes an option `create` which specifies a valid node type.
-        fetch: (query, options={}) ->
+        find: (query, options={}) ->
             if c._.isEmpty(query)
                 return false
 
@@ -84,6 +84,10 @@ define [
 
             if (type = options.create)
                 return ContextNodeModel.create(type, query, options)
+
+        # Alias for backwards compatibility
+        fetch: (args...) ->
+            @find(args...)
 
 
     { ContextNodeError, ContextNodeModel }

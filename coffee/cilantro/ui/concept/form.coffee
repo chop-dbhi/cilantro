@@ -17,7 +17,7 @@ define [
         constructor: ->
             super
             session = c.data.contexts.getSession()
-            @context = session.root.fetch
+            @context = session.root.find
                 concept: @model.id
             ,
                 create: 'branch'

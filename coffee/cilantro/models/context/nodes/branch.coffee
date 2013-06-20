@@ -18,7 +18,7 @@ define [
         get: (attrs) ->
             if attrs instanceof c.Backbone.Model
                 attrs = attrs.pick 'concept', 'field'
-            @fetch(attrs)
+            @find(attrs)
 
         set: (models, options) ->
             models = if c._.isArray(models) then models else [models]
@@ -36,12 +36,12 @@ define [
 
             super(cleaned, options)
 
-        fetch: (query, options={}) ->
+        find: (query, options={}) ->
             create = options.create
             options.create = false
 
             for child in @models
-                if (node = child.fetch(query, options))
+                if (node = child.find(query, options))
                     return node
 
             # No nodes matched, create a node of the specified type with the
@@ -50,6 +50,10 @@ define [
                 options.create = create
                 @add(query, options)
                 return @get(query)
+
+        # Alias for backwards compatibility
+        fetch: (args...) ->
+            @find(args...)
 
 
     # Branch-type node that acts as a container for other nodes. The `type`
@@ -121,13 +125,13 @@ define [
                         return message
             return
 
-        # Attempts to fetch this node or one of the children based on the
+        # Attempts to find this node or one of the children based on the
         # query attributes. To prevent pre-maturely creating a new node, the
         # `create` option is explicity set to false during the recursion.
-        # One thing to note, is that a fetch does not uniformly increase it's
+        # One thing to note, is that a find does not uniformly increase it's
         # depth of search per iteration. It will recurse as deep as it can go
         # per child.
-        fetch: (query, options) ->
+        find: (query, options) ->
             options = c._.extend
                 deep: true
                 create: false
@@ -142,7 +146,7 @@ define [
 
             if options.deep
                 options.create = create
-                if (node = @children.fetch(query, options))
+                if (node = @children.find(query, options))
                     return node
 
         destroy: (options={}) ->

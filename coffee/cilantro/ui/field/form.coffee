@@ -128,7 +128,7 @@ define [
 
             options =
                 model: model
-                context: context.fetch
+                context: context.find
                     field: model.id
                     concept: context.get 'concept'
                 ,

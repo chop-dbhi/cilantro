@@ -27,14 +27,14 @@ define(['cilantro'], function (c) {
             expect(model.isValid()).toBe(true);
         });
 
-        it('should fetch itself', function() {
+        it('should find itself', function() {
             var model = new c.models.ContextNodeModel({
                 field: 1,
                 operator: 'exact',
                 value: 30
             });
 
-            expect(model.fetch({field: 1})).toBe(model);
+            expect(model.find({field: 1})).toBe(model);
         });
 
         describe('stable attributes', function() {
@@ -178,19 +178,19 @@ define(['cilantro'], function (c) {
             expect(cidsBefore).toEqual(cidsAfter);
         });
 
-        it('should fetch child node (by field)', function() {
+        it('should find child node (by field)', function() {
             model.children.add(node);
-            expect(model.fetch({field: 3})).toBe(node);
+            expect(model.find({field: 3})).toBe(node);
         });
 
-        it('should fetch child node (by concept)', function() {
+        it('should find child node (by concept)', function() {
             model.children.add(node);
-            expect(model.fetch({concept: 3})).toBe(node);
+            expect(model.find({concept: 3})).toBe(node);
         });
 
-        it('should fetch child node (by field and concept)', function() {
+        it('should find child node (by field and concept)', function() {
             model.children.add(node);
-            expect(model.fetch({field: 3, concept: 3})).toBe(node);
+            expect(model.find({field: 3, concept: 3})).toBe(node);
         });
 
         it('should not deep validate', function() {
