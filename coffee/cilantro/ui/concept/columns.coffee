@@ -4,17 +4,19 @@ define [
     './index'
     'tpl!templates/views/concept-columns.html'
     'tpl!templates/views/concept-columns-available.html'
+    'tpl!templates/views/concept-columns-available-section.html'
+    'tpl!templates/views/concept-columns-available-group.html'
     'tpl!templates/views/concept-columns-selected.html'
 ], (c, search, index, templates...) ->
 
-    templates = c._.object ['columns', 'available', 'selected'], templates
+    templates = c._.object ['columns', 'available', 'section', 'group', 'selected'], templates
 
 
     class AvailableItem extends index.ConceptItem
         template: templates.available
 
         events:
-            'click button': 'triggerAdd'
+            'click .column-item-button': 'triggerAdd'
 
         triggerAdd: (event) ->
             event.preventDefault()
@@ -28,11 +30,45 @@ define [
 
 
     class AvailableSection extends index.ConceptSection
+        template: templates.section
+
         itemView: AvailableItem
+
+        options:
+            enableAddAll: true
+
+        events:
+            'click .column-section-button': 'triggerAdd'
+
+        triggerAdd: (event) ->
+            for itemModel in @model.items.models
+                itemModel.trigger 'columns:add', itemModel
+
+        onRender: ->
+            if not @options.enableAddAll
+                @$('.column-section-button').hide()
 
 
     class AvailableGroup extends index.ConceptGroup
+        template: templates.group
+
         itemView: AvailableSection
+
+        options:
+            enableAddAll: false
+
+        events:
+            'click .column-group-button': 'triggerAdd'
+
+        triggerAdd: (event) ->
+            for sectionModel in @model.sections.models
+                for itemModel in sectionModel.items.models
+                    itemModel.trigger 'columns:add', itemModel
+
+        onRender: ->
+            super
+            if not @options.enableAddAll
+                @$('.column-group-button').hide()
 
 
     class AvailableColumns extends index.ConceptIndex
@@ -96,6 +132,9 @@ define [
 
         template: templates.columns
 
+        events:
+            'click .columns-remove-all-button': 'triggerRemoveAll'
+
         regions:
             search: '.search-region'
             available: '.available-region'
@@ -132,10 +171,21 @@ define [
                 if (concept = @collection.get(facet.get('concept')))
                     @addColumn(concept, false)
 
+        isConceptUnselected: (concept) ->
+            for facet in @view.facets.models
+                if facet.get('concept') is concept.id
+                    return false
+            return true
+
+        triggerRemoveAll: ->
+            facets = @view.facets.clone()
+            for facet in facets.models
+                @removeColumn(facet)
+
         addColumn: (concept, add=true) ->
             @available.currentView.find(concept)?.disable()
 
-            if add
+            if add and @isConceptUnselected(concept)
                 facet = new @view.facets.model
                     concept: concept.id
                 @view.facets.add(facet)
