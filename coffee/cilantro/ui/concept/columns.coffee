@@ -4,10 +4,12 @@ define [
     './index'
     'tpl!templates/views/concept-columns.html'
     'tpl!templates/views/concept-columns-available.html'
+    'tpl!templates/views/concept-columns-available-section.html'
+    'tpl!templates/views/concept-columns-available-group.html'
     'tpl!templates/views/concept-columns-selected.html'
 ], (c, search, index, templates...) ->
 
-    templates = c._.object ['columns', 'available', 'selected'], templates
+    templates = c._.object ['columns', 'available', 'availableSection', 'availableGroup', 'selected'], templates
 
 
     class AvailableItem extends index.ConceptItem
@@ -28,10 +30,14 @@ define [
 
 
     class AvailableSection extends index.ConceptSection
+        template: templates.availableSection
+
         itemView: AvailableItem
 
 
     class AvailableGroup extends index.ConceptGroup
+        template: templates.availableGroup
+
         itemView: AvailableSection
 
 
