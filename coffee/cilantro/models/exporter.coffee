@@ -12,7 +12,7 @@ define [
     
         # Versions greater than or equal to this version are considered to
         # support notification on completion.
-        minSerranoVersionProgressEnabled: [2, 0, 17]
+        minSerranoVersionProgressEnabled: [2, 0, 16]
 
         url: ->
             c.getSessionUrl('exporter')
