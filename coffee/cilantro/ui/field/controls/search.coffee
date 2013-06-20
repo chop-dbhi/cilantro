@@ -6,8 +6,8 @@ define [
     '../../values'
     '../../search'
     'tpl!templates/views/search.html'
-    'tpl!templates/views/controls/multi-value-item.html'
-    'tpl!templates/views/controls/multi-value-search.html'
+    'tpl!templates/field/controls/multi-value-item.html'
+    'tpl!templates/field/controls/multi-value-search.html'
 ], (c, models, controls, paginator, values, search, templates...) ->
 
     templates = c._.object ['search', 'item', 'layout'], templates
