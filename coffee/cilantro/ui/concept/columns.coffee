@@ -16,7 +16,7 @@ define [
         template: templates.available
 
         events:
-            'click button': 'triggerAdd'
+            'click .column-item-button': 'triggerAdd'
 
         triggerAdd: (event) ->
             event.preventDefault()
@@ -34,11 +34,25 @@ define [
 
         itemView: AvailableItem
 
+        events:
+            'click .column-section-button': 'triggerAdd'
+
+        triggerAdd: (event) ->
+            for itemModel in @model.items.models
+                itemModel.trigger 'columns:add', itemModel
 
     class AvailableGroup extends index.ConceptGroup
         template: templates.availableGroup
 
         itemView: AvailableSection
+
+        events:
+            'click .column-group-button': 'triggerAdd'
+
+        triggerAdd: (event) ->
+            for sectionModel in @model.sections.models
+                for itemModel in sectionModel.items.models
+                    itemModel.trigger 'columns:add', itemModel
 
 
     class AvailableColumns extends index.ConceptIndex
@@ -138,10 +152,17 @@ define [
                 if (concept = @collection.get(facet.get('concept')))
                     @addColumn(concept, false)
 
+        isConceptUnselected: (concept) ->
+            for facet in @view.facets.models
+                if facet.attributes.concept == concept.id
+                    return false
+
+            return true
+
         addColumn: (concept, add=true) ->
             @available.currentView.find(concept)?.disable()
 
-            if add
+            if add and @isConceptUnselected(concept)
                 facet = new @view.facets.model
                     concept: concept.id
                 @view.facets.add(facet)
