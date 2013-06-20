@@ -9,7 +9,7 @@ define [
     '../context'
     '../concept'
     '../exporter'
-    'tpl!templates/views/count.html'
+    'tpl!templates/count.html'
     'tpl!templates/workflows/results.html'
 ], (c, base, paginator, numbers, structs, models, tables, context, concept, exporter, templates...) ->
 

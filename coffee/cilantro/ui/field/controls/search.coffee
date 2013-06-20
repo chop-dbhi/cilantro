@@ -5,7 +5,7 @@ define [
     '../../paginator'
     '../../values'
     '../../search'
-    'tpl!templates/views/search.html'
+    'tpl!templates/search.html'
     'tpl!templates/field/controls/multi-value-item.html'
     'tpl!templates/field/controls/multi-value-search.html'
 ], (c, models, controls, paginator, values, search, templates...) ->

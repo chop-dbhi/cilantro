@@ -1,12 +1,12 @@
 define [
     '../core'
-    'tpl!templates/views/text-input.html'
-    'tpl!templates/views/static-input.html'
-    'tpl!templates/views/boolean-input.html'
-    'tpl!templates/views/select-input.html'
-    'tpl!templates/views/typeahead-input.html'
-    'tpl!templates/views/range-input.html'
-    'tpl!templates/views/operator-input.html'
+    'tpl!templates/controls/text-input.html'
+    'tpl!templates/controls/static-input.html'
+    'tpl!templates/controls/boolean-input.html'
+    'tpl!templates/controls/select-input.html'
+    'tpl!templates/controls/typeahead-input.html'
+    'tpl!templates/controls/range-input.html'
+    'tpl!templates/controls/operator-input.html'
 ], (c, templates...) ->
 
     templates = c._.object ['text', 'static', 'boolean', 'select', 'typeahead', 'range', 'operator'], templates
