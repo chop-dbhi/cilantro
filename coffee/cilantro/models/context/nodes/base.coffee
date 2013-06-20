@@ -65,6 +65,12 @@ define [
                 return error.message
             return
 
+        # Clears the contents of the node without except for ID-based fields
+        clear: ->
+            ids = @pick('field', 'concept')
+            super
+            @set(ids, silent: true)
+
         # Attempts to fetch a node relative to this one. The `query` is a set
         # of attributes the target node must match in order to be returned.
         # Takes an option `create` which specifies a valid node type.

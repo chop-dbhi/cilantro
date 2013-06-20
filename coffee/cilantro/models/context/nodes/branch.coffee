@@ -21,6 +21,9 @@ define [
             @find(attrs)
 
         set: (models, options) ->
+            if not models?
+                return super(null, options)
+
             models = if c._.isArray(models) then models else [models]
             cleaned = []
 
@@ -185,6 +188,14 @@ define [
             @stableAttributes = attrs
             @unset('removed')
             return true
+
+        # Clears recursively clears all children
+        clear: (options={})->
+            @children.each (model) ->
+                model.clear(options)
+            if options.reset
+                @children.reset()
+            return
 
 
     { BranchNodeModel }

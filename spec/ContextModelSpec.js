@@ -37,6 +37,17 @@ define(['cilantro'], function (c) {
             expect(model.find({field: 1})).toBe(model);
         });
 
+        it('should clear non-IDs', function() {
+            var model = new c.models.ContextNodeModel({
+                field: 1,
+                operator: 'exact',
+                value: 30
+            });
+
+            model.clear();
+            expect(model.attributes).toEqual({field: 1});
+        });
+
         describe('stable attributes', function() {
             var model;
 
@@ -167,10 +178,12 @@ define(['cilantro'], function (c) {
                 }]
             };
 
+            // Ensure a real merge occurs rather than recreating the nodes
             var cidsBefore = model.children.map(function(model) {
                 return model.cid;
             });
             model.set(attrs);
+
             var cidsAfter = model.children.map(function(model) {
                 return model.cid;
             });
@@ -199,6 +212,32 @@ define(['cilantro'], function (c) {
             });
             model.children.add(node);
             expect(model.isValid({deep: true})).toBe(false);
+        });
+
+        it('should clear children', function() {
+            model.clear()
+            expect(model.toJSON()).toEqual({
+                type: 'and',
+                children: [{
+                    field: 1,
+                    concept: 1,
+                }, {
+                    concept: 2,
+                    type: 'and',
+                    children: [{
+                        field: 2,
+                        concept: 2,
+                    }]
+                }]
+            })
+        });
+
+        it('should clear and reset children', function() {
+            model.clear({reset: true})
+            expect(model.toJSON()).toEqual({
+                type: 'and',
+                children: []
+            })
         });
 
         it('should trigger change events', function() {
