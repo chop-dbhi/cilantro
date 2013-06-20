@@ -17,6 +17,8 @@
     }
 
     .section {
+        margin-bottom: 15px;
+
         > .heading {
             color: #575757;
             text-transform: uppercase;
@@ -28,6 +30,8 @@
 
     .section .items {
         margin-top: 5px;
+        // Flush against the right side
+        padding-right: 0;
     }
 
     // Bootstrap assumes the icon will be on the left side before the text.
