@@ -9,7 +9,7 @@ define [
     'tpl!templates/views/concept-columns-selected.html'
 ], (c, search, index, templates...) ->
 
-    templates = c._.object ['columns', 'available', 'availableSection', 'availableGroup', 'selected'], templates
+    templates = c._.object ['columns', 'available', 'section', 'group', 'selected'], templates
 
 
     class AvailableItem extends index.ConceptItem
@@ -30,9 +30,12 @@ define [
 
 
     class AvailableSection extends index.ConceptSection
-        template: templates.availableSection
+        template: templates.section
 
         itemView: AvailableItem
+
+        options:
+            enableAddAll: true
 
         events:
             'click .column-section-button': 'triggerAdd'
@@ -41,10 +44,18 @@ define [
             for itemModel in @model.items.models
                 itemModel.trigger 'columns:add', itemModel
 
+        onRender: ->
+            if not @options.enableAddAll
+                @$('.column-section-button').hide()
+
+
     class AvailableGroup extends index.ConceptGroup
-        template: templates.availableGroup
+        template: templates.group
 
         itemView: AvailableSection
+
+        options:
+            enableAddAll: false
 
         events:
             'click .column-group-button': 'triggerAdd'
@@ -53,6 +64,11 @@ define [
             for sectionModel in @model.sections.models
                 for itemModel in sectionModel.items.models
                     itemModel.trigger 'columns:add', itemModel
+
+        onRender: ->
+            super
+            if not @options.enableAddAll
+                @$('.column-group-button').hide()
 
 
     class AvailableColumns extends index.ConceptIndex
@@ -157,9 +173,8 @@ define [
 
         isConceptUnselected: (concept) ->
             for facet in @view.facets.models
-                if facet.attributes.concept == concept.id
+                if facet.get('concept') is concept.id
                     return false
-
             return true
 
         triggerRemoveAll: ->
