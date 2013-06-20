@@ -2,7 +2,7 @@ define [
     '../core'
     './dist'
     './axis'
-    'tpl!templates/views/editable-chart.html'
+    'tpl!templates/charts/editable-chart.html'
 ], (c, dist, axis, templates...) ->
 
     templates = c._.object ['editable'], templates
