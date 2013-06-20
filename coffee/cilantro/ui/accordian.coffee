@@ -1,9 +1,9 @@
 define [
     './core'
     './base'
-    'tpl!templates/views/accordian-group.html'
-    'tpl!templates/views/accordian-section.html'
-    'tpl!templates/views/accordian-item.html'
+    'tpl!templates/accordian/group.html'
+    'tpl!templates/accordian/section.html'
+    'tpl!templates/accordian/item.html'
 ], (c, base, templates...) ->
 
     templates = c._.object ['group', 'section', 'item'], templates
