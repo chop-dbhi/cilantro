@@ -11,16 +11,12 @@ define [
 
         ui:
             count: '.count'
-            state: '[data-role=state]'
-            check: '[data-role=state] input'
 
         events:
             'click [data-role=remove]': 'clickRemoveAll'
-            'click [data-role=state]': 'clickStateAll'
 
         modelEvents:
             'change:count': 'renderCount'
-            'root:change:enabled': 'toggleState'
 
         serializeData: ->
             attrs = c._.clone(@model.attributes)
@@ -34,24 +30,6 @@ define [
         clickRemoveAll: ->
             @model.destroy()
             c.publish(c.CONTEXT_SAVE, null, 'stable')
-
-        clickStateAll: ->
-            if @model.isEnabled() then @model.disable() else @model.enable()
-            c.publish(c.CONTEXT_SAVE, null, 'stable')
-
-        disable: ->
-            @ui.state.attr('title', 'Enable All Filters')
-            @ui.check.prop('checked', false)
-
-        enable: ->
-            @ui.state.attr('title', 'Disable All Filters')
-            @ui.check.prop('checked', true)
-
-        toggleState: (event) ->
-            if @model.isEnabled() then @enable() else @disable()
-
-        onRender: ->
-            @toggleState()
 
 
     { ContextActions }
