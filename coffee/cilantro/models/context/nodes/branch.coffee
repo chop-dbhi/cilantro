@@ -16,6 +16,7 @@ define [
             base.ContextNodeModel.create(args...)
 
         get: (attrs) ->
+            if attrs.id? then return super(attrs)
             if attrs instanceof c.Backbone.Model
                 attrs = attrs.pick 'concept', 'field'
             @find(attrs)
