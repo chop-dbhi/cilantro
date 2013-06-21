@@ -4,9 +4,9 @@ define [
     './item'
     './info'
     './actions'
-    'tpl!templates/views/context.html'
-    'tpl!templates/views/context-empty.html'
-    'tpl!templates/views/context-tree.html'
+    'tpl!templates/context.html'
+    'tpl!templates/context/empty.html'
+    'tpl!templates/context/tree.html'
 ], (c, base, item, info, actions, templates...) ->
 
     templates = c._.object ['context', 'empty', 'tree'], templates

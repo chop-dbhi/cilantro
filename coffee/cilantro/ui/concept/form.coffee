@@ -3,7 +3,7 @@ define [
     '../field'
     '../charts'
     './info'
-    'tpl!templates/views/concept-form.html'
+    'tpl!templates/concept/form.html'
 ], (c, field, charts, info, templates...) ->
 
     templates = c._.object ['form'], templates

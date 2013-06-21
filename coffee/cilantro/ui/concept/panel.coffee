@@ -2,7 +2,7 @@ define [
     '../core'
     './index'
     './search'
-    'tpl!templates/views/concept-panel.html'
+    'tpl!templates/concept/panel.html'
 ], (c, index, search, templates...) ->
 
     templates = c._.object ['panel'], templates
