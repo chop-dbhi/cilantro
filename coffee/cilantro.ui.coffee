@@ -44,7 +44,7 @@ define [
             # If this is a valid route then go ahead and navigate to it, 
             # otherwise let the event process normally to load the new 
             # location.
-            if c.router.isRoute(pathname) 
+            if c.router.hasRoute(pathname) 
                 event.preventDefault()
                 Backbone.history.navigate(pathname, trigger: true)
 
