@@ -90,6 +90,11 @@ define [
         get: (id) ->
             @_registered[id]
 
+        # Returns true if the supplied route is in the list of routes known
+        # to this router and false if it isn't known to this router.
+        hasRoute: (route) ->
+            return @_routes.hasOwnProperty(route) 
+
         # Attempt to get the corresponding config if one exists and use
         # the route specified on the config. This provides a means of
         # aliasing a name/key to a particular route.

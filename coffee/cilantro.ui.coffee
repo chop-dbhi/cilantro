@@ -41,10 +41,12 @@ define [
             if pathname.slice(0, root.length) is root
                 pathname = pathname.slice(root.length)
 
-            # Attempt to navigate to the path. If successful, the
-            # default behavior is canceled
-            if Backbone.history.navigate(pathname, trigger: true)
+            # If this is a valid route then go ahead and navigate to it, 
+            # otherwise let the event process normally to load the new 
+            # location.
+            if c.router.hasRoute(pathname) 
                 event.preventDefault()
+                Backbone.history.navigate(pathname, trigger: true)
 
             return
 
