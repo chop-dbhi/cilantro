@@ -6,6 +6,7 @@ define [
     templates = c._.object ['actions'], templates
 
 
+    # Provides a set of actions for manipulating a ContextModel object
     class ContextActions extends c.Marionette.ItemView
         template: templates.actions
 
@@ -28,8 +29,7 @@ define [
             @ui.count.text(c.utils.prettyNumber(value))
 
         clickRemoveAll: ->
-            @model.destroy()
-            c.publish(c.CONTEXT_SAVE, null, 'stable')
+            c.publish c.CONTEXT_CLEAR
 
 
     { ContextActions }

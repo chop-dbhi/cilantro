@@ -73,10 +73,12 @@ define [
 
             c.subscribe c.CONTEXT_CLEAR, (id) =>
                 if @id is id or not id and @isSession()
-                    @root.destroy()
+                    @root.stableAttributes = null
+                    @save()
 
-            c.subscribe c.CONTEXT_SAVE, (id, source) =>
+            c.subscribe c.CONTEXT_SAVE, (id) =>
                 if @id is id or not id and @isSession()
+                    @root.save()
                     @save()
 
             @resolve()
@@ -96,7 +98,6 @@ define [
 
         toJSON: (options={}) ->
             attrs = super
-            @root.save()
             attrs.json = @root.stableAttributes
             return attrs
 
