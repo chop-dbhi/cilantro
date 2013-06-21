@@ -85,7 +85,7 @@ define [
 
             switch newState
                 when "pending"
-                    statusContainer.find('.pending-spinner').show()
+                    statusContainer.find('.pending-container').show()
                 when "downloading"
                     statusContainer.find('.progress').show()
                 when "error"
