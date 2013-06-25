@@ -12,13 +12,19 @@ define [
         events: ->
             'changeDate .datepicker': 'change'
             'keyup .datepicker': 'change'
+            'click .range-help-button': 'toggleHelpText'
 
         initialize: (options) ->
             @model = options.model
-            
+
         onRender: ->
+            @$('.help-block').hide()
             @$('.range-from').datepicker({'autoclose': true})
             @$('.range-to').datepicker({'autoclose': true})
+
+        toggleHelpText: (event) ->
+            @$('.help-block').toggle()
+            event.preventDefault()
 
         getField: ->
             return @model.id
