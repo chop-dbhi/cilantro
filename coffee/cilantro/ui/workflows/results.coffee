@@ -54,6 +54,7 @@ define [
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
+            'click .columns-modal [data-dismiss]': 'cancelColumnChanges'
             'click .toolbar [data-toggle=columns]': 'showColumns'
             'click .export-options-modal [data-save]': 'exportData'
             'click [data-toggle=export-options]': 'showExportOptions'
@@ -304,8 +305,11 @@ define [
             @ui.exportProgress.modal('show')
 
         showColumns: ->
-            @columns.currentView.updateView(c.data.views.getSession())
             @ui.columns.modal('show')
+
+        cancelColumnChanges: ->
+            c._.defer => @columns.currentView.updateView(
+                c.data.views.getSession())
 
         saveColumns: ->
             c.data.views.getSession().facets = @columns.currentView.facets.clone()

@@ -151,18 +151,8 @@ define [
             @$el.modal show: false
 
         updateView: (view) ->
-            oldConcepts = @facets.map (f) -> return f.get('concept')
-            newConcepts = view.facets.map (f) -> return f.get('concept')
-
-            # If there is no difference between the facet arrays then we can 
-            # avoid a re-render and facet update call. If the list of 
-            # available columns is large, the render call can become 
-            # expensive. That is the reason why we bother to check for a 
-            # difference instead of blindly calling render() on every update 
-            # to the view.
-            if c._.difference(oldConcepts, newConcepts).length != 0
-                @facets = view.facets.clone()
-                @render()
+            @facets = view.facets.clone()
+            @render()
 
         onRender: ->
             # Listen for remove event from selected columns
