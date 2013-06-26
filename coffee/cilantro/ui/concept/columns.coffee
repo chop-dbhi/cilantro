@@ -143,17 +143,31 @@ define [
         constructor: (options) ->
             if not options.view?
                 throw new Error 'ViewModel instance required'
-            @view = options.view
+            @facets = options.view.facets.clone()
             delete options.view
             super(options)
 
         initialize: ->
             @$el.modal show: false
 
+        updateView: (view) ->
+            oldConcepts = @facets.map (f) -> return f.get('concept')
+            newConcepts = view.facets.map (f) -> return f.get('concept')
+
+            # If there is no difference between the facet arrays then we can 
+            # avoid a re-render and facet update call. If the list of 
+            # available columns is large, the render call can become 
+            # expensive. That is the reason why we bother to check for a 
+            # difference instead of blindly calling render() on every update 
+            # to the view.
+            if c._.difference(oldConcepts, newConcepts).length != 0
+                @facets = view.facets.clone()
+                @render()
+
         onRender: ->
             # Listen for remove event from selected columns
             @listenTo @collection, 'columns:add', @addColumn, @
-            @listenTo @view.facets, 'columns:remove', @removeColumn, @
+            @listenTo @facets, 'columns:remove', @removeColumn, @
 
             @available.show new AvailableColumns
                 collection: @collection
@@ -165,20 +179,20 @@ define [
                     @available.currentView.filter(query, resp)
 
             @selected.show new SelectedColumns
-                collection: @view.facets
+                collection: @facets
 
-            for facet in @view.facets.models
+            for facet in @facets.models
                 if (concept = @collection.get(facet.get('concept')))
                     @addColumn(concept, false)
 
         isConceptUnselected: (concept) ->
-            for facet in @view.facets.models
+            for facet in @facets.models
                 if facet.get('concept') is concept.id
                     return false
             return true
 
         triggerRemoveAll: ->
-            facets = @view.facets.clone()
+            facets = @facets.clone()
             for facet in facets.models
                 @removeColumn(facet)
 
@@ -186,15 +200,14 @@ define [
             @available.currentView.find(concept)?.disable()
 
             if add and @isConceptUnselected(concept)
-                facet = new @view.facets.model
+                facet = new @facets.model
                     concept: concept.id
-                @view.facets.add(facet)
+                @facets.add(facet)
 
         removeColumn: (facet) ->
-            @view.facets.remove(facet)
+            @facets.remove(facet)
             concept = @collection.get(facet.get('concept'))
             @available.currentView.find(concept)?.enable()
-
 
 
     { ConceptColumns }

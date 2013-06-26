@@ -304,9 +304,11 @@ define [
             @ui.exportProgress.modal('show')
 
         showColumns: ->
+            @columns.currentView.updateView(c.data.views.getSession())
             @ui.columns.modal('show')
 
         saveColumns: ->
+            c.data.views.getSession().facets = @columns.currentView.facets.clone()
             c.publish c.VIEW_SAVE
             @ui.columns.modal('hide')
 
