@@ -1,8 +1,9 @@
 define [
     '../../core'
     '../../controls'
+    '../../button'
     'tpl!templates/controls/date-range-input.html'
-], (c, controls, templates...) ->
+], (c, controls, button, templates...) ->
     
     templates = c._.object ['date'], templates
 
@@ -12,12 +13,27 @@ define [
         events: ->
             'changeDate .datepicker': 'change'
             'keyup .datepicker': 'change'
+            'change .btn-select': 'change'
             'click .range-help-button': 'toggleHelpText'
 
         initialize: (options) ->
             @model = options.model
 
+        ui:
+            inOutSelect: '.btn-select'
+
         onRender: ->
+            @inOutSelect = new button.ButtonSelect
+                collection: [
+                    value: 'between'
+                    label: 'between'
+                    selected: true
+                ,
+                    value: 'not_between'
+                    label: 'not between'
+                ]
+
+            @inOutSelect.render().$el.prependTo(@$el)
             @$('.help-block').hide()
             @$('.range-from').datepicker({'autoclose': true})
             @$('.range-to').datepicker({'autoclose': true})
@@ -25,6 +41,9 @@ define [
         toggleHelpText: (event) ->
             @$('.help-block').toggle()
             event.preventDefault()
+
+        isBetweenSelected: ->
+            return @inOutSelect.getSelection() == 'between'
 
         getField: ->
             return @model.id
@@ -35,14 +54,14 @@ define [
             operator = ''
 
             if from != "" and to != ""
-                operator = 'range'
+                operator = if @isBetweenSelected() then 'range' else '-range'
             else if from != ""
-                operator = 'gte'
+                operator = if @isBetweenSelected() then 'gte' else 'lte'
             else if to != ""
-                operator = 'lte'
+                operator = if @isBetweenSelected() then 'lte' else 'gte'
             else
-                operator = 'range'
-           
+                operator = if @isBetweenSelected() then 'range' else '-range'
+          
             return operator
 
         getValue: ->
