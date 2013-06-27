@@ -65,7 +65,12 @@ module.exports = function(grunt) {
                 relativeSrc: '../templates',
                 dest: 'build/templates',
                 options: {type:'dir'}
-            }
+            },
+            extensions: {
+                relativeSrc: '../extensions',
+                dest: 'build/ext',
+                options: {type:'dir'}
+            },
         },
         requirejs: {
             distSrc: {
@@ -145,7 +150,6 @@ module.exports = function(grunt) {
                 }
             }
         }
-
     });
 
     grunt.loadNpmTasks('grunt-contrib-jasmine');
@@ -157,5 +161,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-symlink');
 
     grunt.registerTask('default', ['jasmine', 'watch']);
-    grunt.registerTask('buildDist',['coffee','sass', 'copy', 'symlink', 'requirejs'])
+    if (grunt.file.exists('extensions/')){
+        grunt.registerTask('buildDist',['coffee','sass', 'copy', 'symlink', 'requirejs']);
+    } else {
+        grunt.registerTask('buildDist',['coffee','sass', 'copy', 'symlink:templates', 'requirejs']);
+    }
 };
