@@ -79,17 +79,23 @@ define [
                 value = from_date
             else if to_text != ""
                 value = to_date
+            # If both fields are emtpy, return null to invalidate this range
             else
-                value = [null, null]
+                value = null 
              
             return value
 
         setOperator: (operator) ->
             @operator = operator
 
+            if operator == '-range'
+                @inOutSelect.setSelection("not_between")
+            else
+                @inOutSelect.setSelection("between")
+
         setValue: (value) ->
             switch @operator
-                when 'range'
+                when 'range', '-range'
                     if value[0]?
                         @$('.range-from').data('datepicker').setDate(
                             new Date(value[0]))
