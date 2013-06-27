@@ -1,0 +1,17 @@
+.range-help-button {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.range-from, .range-to {
+    width: 150px;
+}
+
+.btn-select {
+    margin-bottom: 10px;
+    margin-right: 5px;
+
+    .dropdown-toggle {
+        line-height: 23px;
+    }
+}
