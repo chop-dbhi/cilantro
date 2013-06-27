@@ -308,8 +308,9 @@ define [
             @ui.columns.modal('show')
 
         cancelColumnChanges: ->
-            c._.defer => @columns.currentView.updateView(
-                c.data.views.getSession())
+            c._.delay =>
+                @columns.currentView.updateView(c.data.views.getSession())
+            , 25
 
         saveColumns: ->
             c.data.views.getSession().facets = @columns.currentView.facets.clone()
