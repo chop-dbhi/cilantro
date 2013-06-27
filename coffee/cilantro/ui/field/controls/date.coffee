@@ -17,6 +17,7 @@ define [
             'click .range-help-button': 'toggleHelpText'
 
         initialize: (options) ->
+            super(options)
             @model = options.model
 
         ui:
@@ -38,6 +39,32 @@ define [
             @$('.range-from').datepicker({'autoclose': true})
             @$('.range-to').datepicker({'autoclose': true})
 
+            operator = @context.get('operator')
+            value = @context.get('value')
+          
+            if operator == '-range'
+                @inOutSelect.setSelection("not_between")
+            else
+                @inOutSelect.setSelection("between")
+
+            switch operator
+                when 'range', '-range'
+                    if value[0]?
+                        @$('.range-from').data('datepicker').setDate(
+                            new Date(value[0]))
+                    else
+                        @$('.range-from').val('')
+                    if value[1]?
+                        @$('.range-to').data('datepicker').setDate(
+                            new Date(value[1]))
+                    else
+                        @$('.range-to').val('')
+                when 'gte'
+                    @$('.range-from').data('datepicker').setDate(
+                        new Date(value))
+                when 'lte'
+                    @$('.range-to').data('datepicker').setDate(
+                        new Date(value))
         toggleHelpText: (event) ->
             @$('.help-block').toggle()
             event.preventDefault()
@@ -85,32 +112,5 @@ define [
              
             return value
 
-        setOperator: (operator) ->
-            @operator = operator
-
-            if operator == '-range'
-                @inOutSelect.setSelection("not_between")
-            else
-                @inOutSelect.setSelection("between")
-
-        setValue: (value) ->
-            switch @operator
-                when 'range', '-range'
-                    if value[0]?
-                        @$('.range-from').data('datepicker').setDate(
-                            new Date(value[0]))
-                    else
-                        @$('.range-from').val('')
-                    if value[1]?
-                        @$('.range-to').data('datepicker').setDate(
-                            new Date(value[1]))
-                    else
-                        @$('.range-to').val('')
-                when 'gte'
-                    @$('.range-from').data('datepicker').setDate(
-                        new Date(value))
-                when 'lte'
-                    @$('.range-to').data('datepicker').setDate(
-                        new Date(value))
 
     {DateControl}
