@@ -37,6 +37,8 @@ define [
             @$('.help-block').hide()
             @$('.range-from').datepicker({'autoclose': true})
             @$('.range-to').datepicker({'autoclose': true})
+            
+            @set(@context)
 
         toggleHelpText: (event) ->
             @$('.help-block').toggle()
