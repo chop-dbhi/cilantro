@@ -16,11 +16,12 @@ define [
 
         stackedClass: 'stacked'
 
-        # Overlay class name
+        # Overlay classes for adjacent siblings before and after the
+        # overflowed element
         overlayBeforeClass: 'overlay-before'
         overlayAfterClass: 'overlay-after'
 
-        # Overlay class for the parent for the first and last elements
+        # Overlay classes for the parent for the first and last elements
         overlayFirstClass: 'overlay-first'
         overlayLastClass: 'overlay-last'
 
@@ -114,11 +115,15 @@ define [
         return
 
 
+    getFluidChildren = ($elem, options) ->
+        $elem.children().filter(options.fluid)
+
+
     getStackedHeights = ($elem, options) ->
         remainingHeight = options.maxHeight
 
         $children = $elem.children()
-        $fluidChildren = $children.filter(options.fluid)
+        $fluidChildren = getFluidChildren($elem, options)
 
         heights = []
 
@@ -147,20 +152,29 @@ define [
 
 
     applyStackedHeights = ($elem, heights, options) ->
-        top = 0
-
         # Set the explicit height of the element
-        $elem.height(options.maxHeight)
+        $elem.height((height = options.maxHeight))
+
+        top = 0
+        bottom = height
+        reverse = false
 
         $elem.children().each (i, child) ->
             $child = $(child)
             config = heights[i]
 
-            css = top: top
+            bottom -= config.height
 
-            # Variable elements must have their height explicitly set
+            # The bottom position is set for fluid elements
             if config.fluid
-                css.height = config.height
+                reverse = true
+                css =
+                    top: top
+                    bottom: bottom
+            else if reverse
+                css = bottom: bottom
+            else
+                css = top: top
 
             $child.css(css)
 
@@ -173,13 +187,22 @@ define [
             @$element = $(element).addClass(options.stackedClass)
             @options = options
 
-            # Event handlers
-            @_stack = _.debounce(@stack, 50)
+            @stack()
+            @_applied = true
+
+            @_optimized = getFluidChildren(@$element, @options).length < 2
+
+            # An optimized stack does not require debouncing since it does
+            # not involving recomputing the child positions.
+            if @_optimized
+                @_restack = @stack
+            else
+                @_restack = _.debounce(@stack, 50)
+
             @_scroll = (event) =>
                 $child = $(event.target)
                 toggleChildOverlay($child, @options)
 
-            @stack()
             @listen()
 
         overlay: =>
@@ -192,17 +215,23 @@ define [
                 maxHeight: getMaxHeight(@$element, @options)
                 minHeight: getMinHeight(@$element, @options)
 
-            heights = getStackedHeights(@$element, options)
-            applyStackedHeights(@$element, heights, options)
+            if @_optimized
+                @$element.clearQueue('fx')
+                @$element.animate
+                    height: options.maxHeight
+                , 200
+            else
+                heights = getStackedHeights(@$element, options)
+                applyStackedHeights(@$element, heights, options)
             return @
 
         listen: ->
-            $(window).on('resize', @_stack)
+            $(window).on('resize', @_restack)
             @$element.children().on('scroll', @_scroll)
             return @
 
         unlisten: ->
-            $(window).off('resize', @_stack)
+            $(window).off('resize', @_restack)
             @$element.children().off('scroll', @_scroll)
             return @
 
