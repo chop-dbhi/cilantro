@@ -33,9 +33,15 @@ define [
                 @concepts.show new concept.ConceptPanel
                     collection: c.data.concepts.queryable
 
+                @concepts.currentView.$el.stacked
+                    fluid: '.index-region'
+
             c.data.contexts.ready =>
                 @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
+
+                @context.currentView.$el.stacked
+                    fluid: '.tree-region'
 
 
     { QueryWorkflow }
