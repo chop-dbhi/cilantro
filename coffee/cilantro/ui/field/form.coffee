@@ -24,7 +24,8 @@ define [
             controls.NumberControl
         else if type is 'boolean'
             controls.BooleanControl
-
+        else if type is 'datetime'
+            controls.DateControl
 
     class LoadingControls extends base.LoadView
         message: 'Loading and rendering controls...'
@@ -101,8 +102,10 @@ define [
             # HACK
             # Only represent for fields that support distributions. This
             # enumerable condition is a hack since the above control
-            # may already have chart-like display..
-            if not @model.get('enumerable')
+            # may already have chart-like display...and the hack grows deeper
+            # to prevent a chart being added when dealing with dates...
+            if not @model.get('enumerable') and 
+               not @model.get('simple_type') == 'datetime'
                 if @options.showChart and @model.links.distribution?
                     @addControl charts.FieldChart,
                         chart:
