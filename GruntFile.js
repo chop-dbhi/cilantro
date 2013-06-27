@@ -53,6 +53,25 @@ module.exports = function(grunt) {
             }
         },
 
+        copy: {
+            main: {
+                files: [
+                    {expand: true, cwd:'js/', src: ['**'], dest:'build'}
+                ]
+            }
+        },
+        symlink: {
+            templates: {
+                relativeSrc: '../templates',
+                dest: 'build/templates',
+                options: {type:'dir'}
+            },
+            extensions: {
+                relativeSrc: '../extensions',
+                dest: 'build/ext',
+                options: {type:'dir'}
+            },
+        },
         requirejs: {
             distSrc: {
                 options: {
@@ -64,13 +83,11 @@ module.exports = function(grunt) {
                     optimizeCss: 'none',
                     removeCombined: true,
                     preserveLicenseComments: false,
-
                     config: {
                         tpl: {
                             variable: 'data'
                         }
                     },
-
                     modules: [{
                         name: 'cilantro'
                     }, {
@@ -133,7 +150,6 @@ module.exports = function(grunt) {
                 }
             }
         }
-
     });
 
     grunt.loadNpmTasks('grunt-contrib-jasmine');
@@ -141,6 +157,13 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-symlink');
 
     grunt.registerTask('default', ['jasmine', 'watch']);
+    if (grunt.file.exists('extensions/')){
+        grunt.registerTask('buildDist',['coffee','sass', 'copy', 'symlink', 'requirejs']);
+    } else {
+        grunt.registerTask('buildDist',['coffee','sass', 'copy', 'symlink:templates', 'requirejs']);
+    }
 };
