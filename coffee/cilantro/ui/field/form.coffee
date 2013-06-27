@@ -105,7 +105,7 @@ define [
             # may already have chart-like display...and the hack grows deeper
             # to prevent a chart being added when dealing with dates...
             if not @model.get('enumerable') and 
-               not @model.get('simple_type') == 'datetime'
+               not (@model.get('simple_type') == 'datetime')
                 if @options.showChart and @model.links.distribution?
                     @addControl charts.FieldChart,
                         chart:
