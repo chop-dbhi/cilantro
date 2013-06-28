@@ -32,6 +32,7 @@ define [
         template: ->
 
         emptyView: base.EmptyView
+        loadView: base.LoadView
 
         chartOptions: chartOptions.defaults
 
@@ -76,7 +77,7 @@ define [
             $('.load-view').remove()
             
         renderChart: (options) ->
-            view = new base.LoadView
+            view = new @loadView 
                 message: 'Loading chart'
             @$el.append(view.render().el)
 
