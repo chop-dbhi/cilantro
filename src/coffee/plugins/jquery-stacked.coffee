@@ -28,7 +28,7 @@ define [
 
     # Extracts the number portion of a pixel string, e.g. '50px' => 50
     parsePixelString = (string) ->
-        if (number = string.match(/\d+/)?[0])?
+        if (number = string.match(/\d*(?:\.\d+)?/)?[0])?
             return parseFloat(number)
 
 
@@ -75,10 +75,15 @@ define [
         # Calculate the max-height based on the window height, top offset
         # of the element, and the margins
         if not (height = parsePixelString($elem.css('max-height')))?
+
             windowHeight = $(window).outerHeight()
+
+            # Offset relative to the document
             offsetTop = $elem.offset().top
-            marginTop = parsePixelString($elem.css('marginTop'))
-            marginBottom = parsePixelString($elem.css('marginBottom'))
+
+            # Subtract padding from element to respect layout
+            paddingTop = parsePixelString($elem.css('paddingTop'))
+            paddingBottom = parsePixelString($elem.css('paddingBottom'))
 
             height = windowHeight - offsetTop - marginTop - marginBottom
 
@@ -155,7 +160,9 @@ define [
         # Set the explicit height of the element
         $elem.height((height = options.maxHeight))
 
-        top = 0
+        # Start top after padding; bottom padding already accounted for
+        # in the height
+        top = parsePixelString($elem.css('paddingTop'))
         bottom = height
         reverse = false
 
@@ -163,14 +170,15 @@ define [
             $child = $(child)
             config = heights[i]
 
+            # Update the bottom position with the current height prior to
+            # being set.
             bottom -= config.height
 
-            # The bottom position is set for fluid elements
+            # Fluid elements need both the top and bottom specified to be
+            # anchored relative to the fixed elements.
             if config.fluid
                 reverse = true
-                css =
-                    top: top
-                    bottom: bottom
+                css = top: top, bottom: bottom
             else if reverse
                 css = bottom: bottom
             else
@@ -178,7 +186,8 @@ define [
 
             $child.css(css)
 
-            # Update the top position with the height
+            # Update the top position with the current height after it has
+            # been set.
             top += config.height
 
 
@@ -187,17 +196,16 @@ define [
             @$element = $(element).addClass(options.stackedClass)
             @options = options
 
-            @stack()
-            @_applied = true
+            @restack()
 
             @_optimized = getFluidChildren(@$element, @options).length < 2
 
             # An optimized stack does not require debouncing since it does
             # not involving recomputing the child positions.
             if @_optimized
-                @_restack = @stack
+                @_restack = @restack
             else
-                @_restack = _.debounce(@stack, 50)
+                @_restack = _.debounce(@restack, 50)
 
             @_scroll = (event) =>
                 $child = $(event.target)
@@ -210,7 +218,7 @@ define [
                 toggleChildOverlay($(child), @options)
             return @
 
-        stack: =>
+        restack: =>
             options = $.extend {}, @options,
                 maxHeight: getMaxHeight(@$element, @options)
                 minHeight: getMinHeight(@$element, @options)
