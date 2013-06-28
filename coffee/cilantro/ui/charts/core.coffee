@@ -32,6 +32,7 @@ define [
         template: ->
 
         emptyView: base.EmptyView
+        loadView: base.LoadView
 
         chartOptions: chartOptions.defaults
 
@@ -72,7 +73,18 @@ define [
                 message: 'No data is available for charting'
             @$el.html(view.render().el)
 
+        onChartLoaded: ->
+            $('.load-view').remove()
+            
         renderChart: (options) ->
+            view = new @loadView 
+                message: 'Loading chart'
+            @$el.append(view.render().el)
+
+            options.chart['events'] = {
+                load: @onChartLoaded
+            }
+            
             if @chart then @chart.destroy?()
             @chart = new Highcharts.Chart(options)
             @set(@context)
