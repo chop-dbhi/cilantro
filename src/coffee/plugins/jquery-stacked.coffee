@@ -85,7 +85,7 @@ define [
             paddingTop = parsePixelString($elem.css('paddingTop'))
             paddingBottom = parsePixelString($elem.css('paddingBottom'))
 
-            height = windowHeight - offsetTop - marginTop - marginBottom
+            height = windowHeight - offsetTop - paddingTop - paddingBottom
 
         height = applyRelativeSize(height, maxHeight)
         return height
