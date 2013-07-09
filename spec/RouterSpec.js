@@ -1,6 +1,8 @@
-define(['cilantro.ui'], function(c) {
+define(['cilantro'], function(c) {
 
     var routes;
+
+    c.$('body').append('<div id=arena />');
 
     beforeEach(function() {
         routes = [{
@@ -26,6 +28,7 @@ define(['cilantro.ui'], function(c) {
         }];
 
         c.$('#arena')
+            .empty()
             .append('<div class=region1></div>')
             .append('<div class=region2></div>')
             .append('<div class=region3></div>');

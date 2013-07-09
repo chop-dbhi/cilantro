@@ -1,20 +1,18 @@
 # This extends cilantro and attached libraries with UI-related components
 define [
-    './cilantro'
-    './cilantro/router'
-    './cilantro/ui/base'
-    './cilantro/ui/button'
-    './cilantro/ui/concept'
-    './cilantro/ui/field'
-    './cilantro/ui/charts'
-    './cilantro/ui/context'
-    './cilantro/ui/controls'
-    './cilantro/ui/exporter'
-    './cilantro/ui/tables'
-    './cilantro/ui/workflows'
+    './core'
+    './router'
+    './ui/base'
+    './ui/button'
+    './ui/concept'
+    './ui/field'
+    './ui/charts'
+    './ui/context'
+    './ui/controls'
+    './ui/exporter'
+    './ui/tables'
+    './ui/workflows'
 ], (c, router, mods...) ->
-
-    c.ui = c._.extend {}, mods...
 
     # TODO clean this up
     ui = c.getOption('ui') or {}
@@ -41,13 +39,13 @@ define [
             if pathname.slice(0, root.length) is root
                 pathname = pathname.slice(root.length)
 
-            # If this is a valid route then go ahead and navigate to it, 
-            # otherwise let the event process normally to load the new 
+            # If this is a valid route then go ahead and navigate to it,
+            # otherwise let the event process normally to load the new
             # location.
-            if c.router.hasRoute(pathname) 
+            if c.router.hasRoute(pathname)
                 event.preventDefault()
                 Backbone.history.navigate(pathname, trigger: true)
 
             return
 
-    return c
+    c._.extend {}, mods...
