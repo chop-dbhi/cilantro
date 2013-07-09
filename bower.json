@@ -3,22 +3,28 @@
   "version": "2.0.0",
   "license": "BSD",
   "description": "Client library for Serrano-compatible APIs",
-  "keywords": ["harvest", "avocado", "serrano", "client", "html5"],
-  "homepage": "http://cbmi.github.io/cilantro/",
+  "keywords": [
+    "harvest",
+    "avocado",
+    "serrano",
+    "client",
+    "html5"
+  ],
   "author": "The Children's Hospital of Philadelphia",
   "contributors": [
     {
       "name": "Byron Ruth",
-      "email":  "b@devel.io"
+      "email": "b@devel.io"
     },
     {
       "name": "Jeff Miller",
       "email": "jeffmax@gmail.com"
     }
   ],
+  "homepage": "http://cbmi.github.io/cilantro/",
   "repo": "cbmi/cilantro",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cbmi/cilantro.git",
+    "url": "https://github.com/cbmi/cilantro.git"
   }
 }
