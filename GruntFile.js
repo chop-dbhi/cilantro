@@ -318,7 +318,8 @@ module.exports = function(grunt) {
         'sass:local',
         'coffee:local',
         'copy:local',
-        'symlink'
+        'symlink',
+        'jasmine:local:build'
     ]);
 
     grunt.registerTask('dist', [
