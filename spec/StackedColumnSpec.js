@@ -35,8 +35,16 @@ define(['jquery', 'cilantro.ui'], function($, c) {
         elem.children().each(function(i, child) {
             child = $(child);
             positions.push({
-                top: parsePixelString(child.css('top')),
-                bottom: parsePixelString(child.css('bottom'))
+                top: parsePixelString(child[0].style.top),
+                bottom: parsePixelString(child[0].style.bottom),
+                margin: {
+                    top: parsePixelString(child.css('marginTop')),
+                    bottom: parsePixelString(child.css('marginBottom'))
+                },
+                padding: {
+                    top: parsePixelString(child.css('paddingTop')),
+                    bottom: parsePixelString(child.css('paddingBottom'))
+                }
             });
         });
         return positions;
@@ -66,21 +74,45 @@ define(['jquery', 'cilantro.ui'], function($, c) {
             expect(getChildrenPositions(column)).toEqual([
                 {
                     top: 0,
-                    bottom: undefined
+                    bottom: undefined,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
                     top: 50,
-                    bottom: 20
+                    bottom: 20,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
                     top: undefined,
-                    bottom: 0
+                    bottom: 0,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 }
             ]);
 
         });
 
-        it('no margin, padding', function() {
+        it('no margin, child padding', function() {
             column.append.apply(column, makeChildren(1, 50));
             column.append.apply(column, makeChildren('fluid', 1));
             column.append.apply(column, makeChildren(1, 20));
@@ -88,24 +120,99 @@ define(['jquery', 'cilantro.ui'], function($, c) {
             column.children().css({padding: 10});
             column.stacked({fluid: '.fluid'});
 
+            expect(column.height()).toEqual(200);
+
             expect(getChildrenPositions(column)).toEqual([
                 {
                     top: 0,
-                    bottom: undefined
+                    bottom: undefined,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 10
+                    }
                 },
                 {
                     top: 70,
-                    bottom: 40
+                    bottom: 40,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 10
+                    }
                 },
                 {
                     top: undefined,
-                    bottom: 0
+                    bottom: 0,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 10
+                    }
                 }
             ]);
         });
 
+        it('no margin, stack padding', function() {
+            column.append.apply(column, makeChildren(1, 50));
+            column.append.apply(column, makeChildren('fluid', 1));
+            column.append.apply(column, makeChildren(1, 20));
 
-        it('margin, no padding', function() {
+            column.css({padding: 10});
+            column.stacked({fluid: '.fluid'});
+
+            expect(column.height()).toEqual(200);
+
+            expect(getChildrenPositions(column)).toEqual([
+                {
+                    top: 10,
+                    bottom: undefined,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
+                },
+                {
+                    top: 60,
+                    bottom: 30,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
+                },
+                {
+                    top: undefined,
+                    bottom: 10,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
+                }
+            ]);
+        });
+
+        it('child margin, no padding', function() {
             column.append.apply(column, makeChildren(1, 50));
             column.append.apply(column, makeChildren('fluid', 1));
             column.append.apply(column, makeChildren(1, 20));
@@ -113,21 +220,147 @@ define(['jquery', 'cilantro.ui'], function($, c) {
             column.children().css({margin: 10});
             column.stacked({fluid: '.fluid'});
 
+            expect(column.height()).toEqual(200);
+
             expect(getChildrenPositions(column)).toEqual([
                 {
-                    top: 0,
-                    bottom: undefined
+                    top: 10,
+                    bottom: undefined,
+                    margin: {
+                        top: 10,
+                        bottom: 10
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
-                    top: 70,
-                    bottom: 40
+                    top: 80,
+                    bottom: 50,
+                    margin: {
+                        top: 10,
+                        bottom: 10
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
                     top: undefined,
-                    bottom: 0
+                    bottom: 10,
+                    margin: {
+                        top: 10,
+                        bottom: 10
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 }
             ]);
+        });
 
+        it('stack margin, no padding', function() {
+            column.append.apply(column, makeChildren(1, 50));
+            column.append.apply(column, makeChildren('fluid', 1));
+            column.append.apply(column, makeChildren(1, 20));
+
+            column.css({margin: 10});
+            column.stacked({fluid: '.fluid'});
+
+            expect(column.height()).toEqual(200);
+
+            expect(getChildrenPositions(column)).toEqual([
+                {
+                    top: 0,
+                    bottom: undefined,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
+                },
+                {
+                    top: 50,
+                    bottom: 20,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
+                },
+                {
+                    top: undefined,
+                    bottom: 0,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
+                }
+            ]);
+        });
+
+        it('both margin, both padding', function() {
+            column.append.apply(column, makeChildren(1, 50));
+            column.append.apply(column, makeChildren('fluid', 1));
+            column.append.apply(column, makeChildren(1, 20));
+
+            column.css({margin: 10, padding: 10});
+            column.children().css({margin: 10, padding: 10});
+            column.stacked({fluid: '.fluid'});
+
+            expect(column.height()).toEqual(200);
+
+            expect(getChildrenPositions(column)).toEqual([
+                {
+                    top: 20,
+                    bottom: undefined,
+                    margin: {
+                        top: 10,
+                        bottom: 10
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 10
+                    }
+                },
+                {
+                    top: 110,
+                    bottom: 80,
+                    margin: {
+                        top: 10,
+                        bottom: 10
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 10
+                    }
+                },
+                {
+                    top: undefined,
+                    bottom: 20,
+                    margin: {
+                        top: 10,
+                        bottom: 10
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 10
+                    }
+                }
+            ]);
         });
     });
 
@@ -145,18 +378,44 @@ define(['jquery', 'cilantro.ui'], function($, c) {
             column.css({maxHeight: 300});
             column.stacked('restack');
 
+            expect(column.height()).toEqual(300);
+
             expect(getChildrenPositions(column)).toEqual([
                 {
                     top: 0,
-                    bottom: undefined
+                    bottom: undefined,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
                     top: 50,
-                    bottom: 20
+                    bottom: 20,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
                     top: undefined,
-                    bottom: 0
+                    bottom: 0,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 }
             ]);
         });
@@ -172,18 +431,44 @@ define(['jquery', 'cilantro.ui'], function($, c) {
             column.css({maxHeight: 100});
             column.stacked('restack');
 
+            expect(column.height()).toEqual(100);
+
             expect(getChildrenPositions(column)).toEqual([
                 {
                     top: 0,
-                    bottom: undefined
+                    bottom: undefined,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
                     top: 50,
-                    bottom: 20
+                    bottom: 20,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 },
                 {
                     top: undefined,
-                    bottom: 0
+                    bottom: 0,
+                    margin: {
+                        top: 0,
+                        bottom: 0
+                    },
+                    padding: {
+                        top: 0,
+                        bottom: 0
+                    }
                 }
             ]);
         });

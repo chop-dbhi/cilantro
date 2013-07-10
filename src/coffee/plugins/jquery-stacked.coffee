@@ -28,8 +28,8 @@ define [
 
     # Extracts the number portion of a pixel string, e.g. '50px' => 50
     parsePixelString = (string) ->
-        if (number = string.match(/\d*(?:\.\d+)?/)?[0])?
-            return parseFloat(number)
+        match = string.match(/(\d*(?:\.\d+)?)px/)
+        if match? then return parseFloat(match[1])
 
 
     # Matches relative sizes e.g. -=4, -=4., +=4.0, +=.4, -=0.4
@@ -78,17 +78,31 @@ define [
 
             windowHeight = $(window).outerHeight()
 
-            # Offset relative to the document
+            # Offset relative to the document (including the top margin)
             offsetTop = $elem.offset().top
 
-            # Subtract padding from element to respect layout
-            paddingTop = parsePixelString($elem.css('paddingTop'))
-            paddingBottom = parsePixelString($elem.css('paddingBottom'))
+            # Substract the bottom margin from the height to respect the
+            # spacing
+            marginBottom = parsePixelString($elem.css('marginBottom'))
 
-            height = windowHeight - offsetTop - paddingTop - paddingBottom
+            height = windowHeight - offsetTop - marginBottom
 
         height = applyRelativeSize(height, maxHeight)
         return height
+
+
+    # Returns the vertical padding
+    getPaddingHeight = ($elem, options) ->
+        top = parsePixelString($elem.css('paddingTop'))
+        bottom = parsePixelString($elem.css('paddingBottom'))
+        return top + bottom
+
+
+    # Returns the vertical margin
+    getMarginHeight = ($elem, options) ->
+        top = parsePixelString($elem.css('marginTop'))
+        bottom = parsePixelString($elem.css('marginBottom'))
+        return top + bottom
 
 
     # Calculates the scroll height, not including the height of the element
@@ -120,12 +134,16 @@ define [
         return
 
 
+    # Returns child elements that are fluid
     getFluidChildren = ($elem, options) ->
         $elem.children().filter(options.fluid)
 
 
+    # Returns an array of objects with the pending height of each child.
+    # Fluid element heights will be calculated after all static heights
+    # have been removed from the target height.
     getStackedHeights = ($elem, options) ->
-        remainingHeight = options.maxHeight
+        remainingHeight = options.maxHeight - getPaddingHeight($elem, options)
 
         $children = $elem.children()
         $fluidChildren = getFluidChildren($elem, options)
@@ -136,43 +154,52 @@ define [
         $children.each (i, child) ->
             $child = $(child)
 
+            config =
+                margin: getMarginHeight($child)
+                padding: getPaddingHeight($child)
+
             if $child.is(options.fluid)
-                heights.push
-                    fluid: true
+                config.fluid = true
             else
                 height = $child.outerHeight(true)
                 remainingHeight -= height
-                heights.push
-                    fluid: false
-                    height: height
+                config.fluid = false
+                config.height = height - config.margin
+
+            heights.push(config)
 
         # Calculate the height of each fluid child
         fluidHeight = remainingHeight / $fluidChildren.length
 
         # Fill in the gaps
         for config, i in heights
-            config.height ?= fluidHeight
+            config.height ?= (fluidHeight - config.margin)
 
         return heights
 
 
+    # Calculates and sets the position of each child based on the height and
+    # type which was calculated using getStackedHeights.
     applyStackedHeights = ($elem, heights, options) ->
         # Set the explicit height of the element
         $elem.height((height = options.maxHeight))
 
-        # Start top after padding; bottom padding already accounted for
-        # in the height
+        # Respect padding; the top padding is added to the top position,
+        # the bottom padding is added to the bottom since the inverse is
+        # used.
         top = parsePixelString($elem.css('paddingTop'))
-        bottom = height
+        bottom = parsePixelString($elem.css('paddingBottom'))
+
         reverse = false
 
         $elem.children().each (i, child) ->
             $child = $(child)
             config = heights[i]
 
-            # Update the bottom position with the current height prior to
-            # being set.
-            bottom -= config.height
+            # Top margin of child
+            top += parsePixelString($child.css('marginTop'))
+
+            bottom = height - top - config.height # parsePixelString($child.css('marginBottom'))
 
             # Fluid elements need both the top and bottom specified to be
             # anchored relative to the fixed elements.
@@ -186,9 +213,8 @@ define [
 
             $child.css(css)
 
-            # Update the top position with the current height after it has
-            # been set.
-            top += config.height
+            # Add height and bottom margin for next iteration
+            top += config.height + parsePixelString($child.css('marginBottom'))
 
 
     class StackedColumn
