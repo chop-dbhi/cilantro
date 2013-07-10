@@ -1,4 +1,5 @@
 .context {
+    margin-bottom: 10px;
 
     .actions-region {
         @include clearfix;
@@ -19,7 +20,7 @@
     }
 
     .info-region {
-        padding: 10px 0;
+
     }
 
     .context-item {
