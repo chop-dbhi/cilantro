@@ -372,7 +372,7 @@ define(['jquery', 'cilantro.ui'], function($, c) {
             column.append.apply(column, makeChildren(1, 50));
             column.append.apply(column, makeChildren('fluid', 1));
             column.append.apply(column, makeChildren(1, 20));
-            column.stacked({fluid: '.fluid'});
+            column.stacked({fluid: '.fluid', animate: false});
 
             // Increase height
             column.css({maxHeight: 300});
@@ -425,7 +425,7 @@ define(['jquery', 'cilantro.ui'], function($, c) {
             column.append.apply(column, makeChildren(1, 50));
             column.append.apply(column, makeChildren('fluid', 1));
             column.append.apply(column, makeChildren(1, 20));
-            column.stacked({fluid: '.fluid'});
+            column.stacked({fluid: '.fluid', animate: false});
 
             // Decrease height
             column.css({maxHeight: 100});

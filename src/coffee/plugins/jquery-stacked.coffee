@@ -14,6 +14,9 @@ define [
         # An explicit value or relative offset
         minHeight: null
 
+        # Animate restack
+        animate: true
+
         stackedClass: 'stacked'
 
         # Overlay classes for adjacent siblings before and after the
@@ -251,9 +254,10 @@ define [
 
             if @_optimized
                 @$element.clearQueue('fx')
-                @$element.animate
-                    height: options.maxHeight
-                , 200
+                if @options.animate
+                    @$element.animate(height: options.maxHeight, 200)
+                else
+                    @$element.height(options.maxHeight)
             else
                 heights = getStackedHeights(@$element, options)
                 applyStackedHeights(@$element, heights, options)
