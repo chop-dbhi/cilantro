@@ -23,7 +23,11 @@
 module.exports = function(grunt) {
     'use strict';
 
+    var pkg = grunt.file.readJSON('package.json');
+
     grunt.initConfig({
+
+        pkg: pkg,
 
         srcDir: 'src',
         specDir: 'spec',
@@ -343,4 +347,20 @@ module.exports = function(grunt) {
         'jasmine:local'
     ]);
 
+
+    var shell = require('shelljs');
+
+    function run(cmd) {
+        grunt.log.ok(cmd);
+        shell.exec(cmd);
+    }
+
+    grunt.registerTask('release', 'Create a release on master', function() {
+        run('git checkout master');
+        run('rm -rf font css img js');
+        run('cp -r dist/* .');
+        run('git add .');
+        run('git commit -m "' + pkg.version + ' Release"');
+        run('git tag ' + pkg.version);
+    });
 };
