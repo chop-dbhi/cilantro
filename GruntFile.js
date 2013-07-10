@@ -267,7 +267,7 @@ module.exports = function(grunt) {
         jasmine : {
             options : {
                 specs : '<%= specDir %>/**/*',
-                host: '127.0.0.1:8125',
+                host: 'http://127.0.0.1:8125',
                 keepRunner: true,
                 template: require('grunt-template-jasmine-requirejs'),
             },
