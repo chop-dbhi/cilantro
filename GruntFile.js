@@ -343,6 +343,7 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
+        'local',
         'connect',
         'jasmine:local'
     ]);
