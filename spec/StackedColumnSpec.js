@@ -1,4 +1,4 @@
-define(['jquery', 'cilantro.ui'], function($, c) {
+define(['jquery', 'cilantro'], function($, c) {
 
     function parsePixelString(string) {
         var match = string.match(/(\d*(?:\.\d+)?)px/);
