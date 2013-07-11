@@ -355,7 +355,7 @@ module.exports = function(grunt) {
         shell.exec(cmd);
     }
 
-    grunt.registerTask('release', 'Create a release on master', function() {
+    grunt.registerTask('tag-release', 'Create a release on master', function() {
         run('git checkout master');
         run('rm -rf font css img js');
         run('cp -r dist/* .');
@@ -363,4 +363,10 @@ module.exports = function(grunt) {
         run('git commit -m "' + pkg.version + ' Release"');
         run('git tag ' + pkg.version);
     });
+
+    grunt.registerTask('release', [
+        'dist',
+        'tag-release'
+    ]);
+
 };
