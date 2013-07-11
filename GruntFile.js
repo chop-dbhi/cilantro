@@ -343,7 +343,9 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
-        'local',
+        'coffee:local',
+        'copy:local',
+        'symlink',
         'connect',
         'jasmine:local'
     ]);
