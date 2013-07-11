@@ -1,4 +1,4 @@
-define(['cilantro.ui'], function(c) {
+define(['cilantro'], function(c) {
     var text = new c.ui.TextInput,
         select = new c.ui.SelectInput,
         typeahead = new c.ui.TypeaheadInput;

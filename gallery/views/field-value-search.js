@@ -1,4 +1,4 @@
-define(['cilantro.ui', 'text!/mock/fields/string.json'], function(c, fieldJSON) {
+define(['cilantro', 'text!/mock/fields/string.json'], function(c, fieldJSON) {
     var view = new c.ui.FieldValueSearch({
         model: new c.models.FieldModel(JSON.parse(fieldJSON), {
             parse: true

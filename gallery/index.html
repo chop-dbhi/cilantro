@@ -12,9 +12,9 @@
         <meta name="description" content="Cilantro Gallery">
         <meta name="viewport" content="width=device-width">
 
-        <link rel=stylesheet href="../css/style.css">
+        <link rel=stylesheet href="../local/css/style.css">
         <link rel=stylesheet href="./gallery.css">
-        <script src="../build/modernizr.js"></script>
+        <script src="../local/js/modernizr.js"></script>
     </head>
     <body>
         <!--[if lt IE 9]><p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p><![endif]-->
@@ -101,7 +101,7 @@
         <script>
             // RequireJS config
             var require = {
-                baseUrl: '../build',
+                baseUrl: '../local/js',
                 config: {
                     tpl: {
                         variable: 'data'
@@ -155,6 +155,6 @@
             ];
         </script>
 
-        <script data-main="../gallery/main.js" src="../build/require.js"></script>
+        <script data-main="../../gallery/main.js" src="../local/js/require.js"></script>
     </body>
 </html>

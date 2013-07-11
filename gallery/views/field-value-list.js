@@ -1,4 +1,4 @@
-define(['cilantro.ui'], function(c) {
+define(['cilantro'], function(c) {
     var view = new c.ui.ValueList;
     view.render();
     return function(dom) {

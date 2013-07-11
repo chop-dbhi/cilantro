@@ -1,4 +1,4 @@
-define(['cilantro.ui'], function(c) {
+define(['cilantro'], function(c) {
 
     var frame = new c.structs.Frame(null, null, {
           url: '/mock/data/preview.json'

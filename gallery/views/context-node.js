@@ -1,4 +1,4 @@
-define(['cilantro.ui'], function(c) {
+define(['cilantro'], function(c) {
     return function(dom) {
         c.data.contexts.ready(function() {
             var model = c.data.contexts.getSession();
