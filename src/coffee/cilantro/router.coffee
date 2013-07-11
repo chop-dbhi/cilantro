@@ -9,6 +9,7 @@ define [
             el: 'body'
 
         initialize: (options) ->
+            @options = _.extend({}, _.result(@, 'options'), options)
             @_registered = {}
             @_loaded = []
             @_routes = {}
