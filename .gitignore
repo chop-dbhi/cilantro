@@ -3,8 +3,10 @@
 *.py?
 .sass-cache
 .watch-pid
+local
 build
 dist
+components
 css/style.css
 css/vocab/
 .idea

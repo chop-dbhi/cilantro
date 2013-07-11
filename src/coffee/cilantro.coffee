@@ -3,11 +3,13 @@ define [
     './cilantro/changelog'
     './cilantro/models'
     './cilantro/structs'
-], (c, changelog, models, structs) ->
+    './cilantro/ui'
+], (c, changelog, models, structs, ui) ->
 
     c.changelog = changelog
     c.models = models
     c.structs = structs
+    c.ui = ui
 
     c.data =
         concepts: new models.ConceptCollection

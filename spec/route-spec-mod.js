@@ -1,3 +1,3 @@
-define(['cilantro.ui'], function(c) {
+define(['cilantro'], function(c) {
     return c.Backbone.View;
 });

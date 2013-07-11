@@ -9,7 +9,6 @@ define [
             el: 'body'
 
         initialize: (options) ->
-            @el = options.el or @options.el
             @_registered = {}
             @_loaded = []
             @_routes = {}
@@ -55,9 +54,9 @@ define [
                 view._rendered = true
                 if options.el isnt false
                     if options.el?
-                        target = Backbone.$(options.el, @el)
+                        target = Backbone.$(options.el, @options.el)
                     else
-                        target = Backbone.$(@el)
+                        target = Backbone.$(@options.el)
                     target.append(view.el)
                 view.render?()
 
@@ -93,7 +92,7 @@ define [
         # Returns true if the supplied route is in the list of routes known
         # to this router and false if it isn't known to this router.
         hasRoute: (route) ->
-            return @_routes.hasOwnProperty(route) 
+            return @_routes.hasOwnProperty(route)
 
         # Attempt to get the corresponding config if one exists and use
         # the route specified on the config. This provides a means of

@@ -1,4 +1,4 @@
-define(['cilantro.ui'], function(c) {
+define(['cilantro'], function(c) {
     return function(dom) {
         c.data.concepts.when(function() {
             var view = new c.ui.ConceptForm({model:c.data.concepts.at(2)});

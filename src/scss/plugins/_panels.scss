@@ -3,12 +3,12 @@
     z-index: 100;
 
     &.panel-left {
-        @include box-shadow(2px 0 10px #bbb);
+        box-shadow: 2px 0 10px #bbb;
         border-right: 1px solid #999;
     }
 
     &.panel-right {
-        @include box-shadow(-2px 0 10px #bbb);
+        box-shadow: -2px 0 10px #bbb;
         border-left: 1px solid #999;
     }
 
