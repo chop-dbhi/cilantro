@@ -81,7 +81,7 @@ define [
                     @_unloadAll()
                     @_loadAll()
                     return
-                @route options.route, handler
+                @route options.route, options.id, handler
             if options.route?
                 @_routes[options.route].push options.id
             @_registered[options.id] = options
