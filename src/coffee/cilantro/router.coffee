@@ -95,6 +95,15 @@ define [
         isNavigable: (id) ->
             (config = @get(id))? and config.navigable
 
+        # Checks if the current fragment or id is currently routed
+        isCurrent: (fragment) ->
+            if fragment is Backbone.history.fragment
+                return true
+            if (ids = @_routes[Backbone.history.fragment])?
+                for id in ids
+                    if fragment is id then return true
+            return false
+
         # Returns true if the supplied route is in the list of routes known
         # to this router and false if it isn't known to this router.
         hasRoute: (route) ->
