@@ -284,6 +284,9 @@ define [
                 @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
 
+                @context.currentView.$el.stacked
+                    fluid: '.tree-region'
+
             c.data.concepts.ready =>
                 c.data.views.ready =>
                     @table.show new tables.Table

@@ -35,9 +35,9 @@ define [
                 handler: (query, resp) =>
                     @index.currentView.filter(query, resp)
 
-            # TODO document
             # Defer focus of concept search until end of event loop
             c._.defer =>
                 @search.currentView.ui.input.focus()
+
 
     { ConceptPanel }

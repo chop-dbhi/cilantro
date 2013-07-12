@@ -1,4 +1,5 @@
 .context {
+    margin-bottom: 10px;
 
     .actions-region {
         @include clearfix;
@@ -19,7 +20,12 @@
     }
 
     .info-region {
-
+        // Only a single route-based button is shown at a given time. This is
+        // a fix to ensure the non-leftmost button does not contain a margin
+        // since it is a .span* class.
+        [data-route] {
+            margin-left: 0;
+        }
     }
 
     .context-item {
