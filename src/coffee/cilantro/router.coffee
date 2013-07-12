@@ -90,6 +90,11 @@ define [
         get: (id) ->
             @_registered[id]
 
+        # Returns true if the route config is registered with this router and
+        # is navigable.
+        isNavigable: (id) ->
+            (config = @get(id))? and config.navigable
+
         # Returns true if the supplied route is in the list of routes known
         # to this router and false if it isn't known to this router.
         hasRoute: (route) ->

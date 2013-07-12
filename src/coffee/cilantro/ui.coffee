@@ -27,6 +27,8 @@ define [
     # Catch and process all click events to anchors to see if any routes
     # match the path. If a route matches, prevent the default behavior
     if c.getOption('autoroute')
+
+        # Route based on the URL
         $(document).on 'click', 'a', (event) ->
             pathname = @pathname
 
@@ -44,8 +46,17 @@ define [
             # location.
             if c.router.hasRoute(pathname)
                 event.preventDefault()
-                Backbone.history.navigate(pathname, trigger: true)
+                c.router.navigate(pathname, trigger: true)
 
             return
+
+        # Route by ID specified by the data-route attribute.
+        $(document).on 'click', '[data-route]', (event) ->
+            route = c.$(@).attr('data-route')
+
+            if c.router.isNavigable(route)
+                event.preventDefault()
+                c.router.navigate(route, trigger: true)
+
 
     c._.extend {}, mods...
