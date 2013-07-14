@@ -359,17 +359,31 @@ module.exports = function(grunt) {
     }
 
     grunt.registerTask('tag-release', 'Create a release on master', function() {
-        run('git checkout master');
-        run('rm -rf font css img js');
-        run('cp -r dist/* .');
         run('git add .');
         run('git commit -m "' + pkg.version + ' Release"');
         run('git tag ' + pkg.version);
     });
 
+    grunt.registerTask('release-binaries', 'Create a release binary for upload', function() {
+        var releaseDirName = 'cilantro-' + pkg.version;
+        run('rm -rf cilantro');
+        run('mkdir -p cilantro');
+        run('cp -r dist/* cilantro');
+        run('zip -r ' + releaseDirName + '.zip cilantro');
+        run('tar -Hzcf ' + releaseDirName + '.tar.gz cilantro');
+        run('rm -rf cilantro');
+    });
+
+    grunt.registerTask('release-help', 'Prints the post-release steps', function() {
+        grunt.log.ok('Push the code and tags: git push origin develop && git push --tags');
+        grunt.log.ok('Go to ' + pkg.homepage + '/releases to update the release descriptions and upload the binaries');
+    });
+
     grunt.registerTask('release', [
         'dist',
-        'tag-release'
-    ]);
+        'release-binaries',
+        'tag-release',
+        'release-help'
+    ], 'Builds the distribution files, creates the release binaries, and creates a Git tag');
 
 };
