@@ -9,7 +9,7 @@ define [
         idAttribute: 'page_num'
 
         url: ->
-            "#{ @collection.url() }?page=#{ @id }&per_page=#{ @collection.perPage }"
+            "#{ @collection.url() }?page=#{ @id }&limit=#{ @collection.limit }"
 
 
     # Array of result frames (pages). The first fetch sets the state
