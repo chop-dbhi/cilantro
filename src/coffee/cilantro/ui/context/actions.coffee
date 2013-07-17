@@ -26,7 +26,7 @@ define [
             return attrs
 
         renderCount: (model, value, options) ->
-            @ui.count.text(c.utils.prettyNumber(value))
+            @ui.count.html(c.utils.prettyNumber(value))
 
         clickRemoveAll: ->
             c.publish c.CONTEXT_CLEAR
