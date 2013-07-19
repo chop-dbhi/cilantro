@@ -36,14 +36,11 @@ module.exports = (grunt) ->
         buildDir: 'build'
         distDir: 'dist'
 
-        connect:
-            options:
-                host: '127.0.0.1'
-
-            serve:
+        serve:
+            forever:
                 options:
-                    port: 8125
                     keepalive: true
+                    port: 8125
 
             jasmine:
                 options:
@@ -262,12 +259,72 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-contrib-requirejs'
     grunt.loadNpmTasks 'grunt-contrib-copy'
     grunt.loadNpmTasks 'grunt-contrib-clean'
-    grunt.loadNpmTasks 'grunt-contrib-connect'
     grunt.loadNpmTasks 'grunt-symlink'
 
-    grunt.registerTask 'serve', 'Run a Node server relative to the base directory', [
-        'connect:serve'
-    ]
+    grunt.registerMultiTask 'serve', 'Run a Node server for testing', ->
+        http = require('http')
+        path = require('path')
+        url = require('url')
+        fs = require('fs')
+
+        contentTypes =
+            '.js': 'text/javascript'
+            '.css': 'text/css'
+            '.html': 'text/html'
+
+        options = @options
+            hostname: 'localhost'
+            base: '.'
+            port: 8125
+            keepalive: false
+
+        server = http.createServer (request, response) ->
+            uri = url.parse(request.url).pathname
+            filename = path.join(options.base, uri)
+            extname = path.extname(filename)
+            contentType = contentTypes[extname] or 'text/plain'
+
+            fs.exists filename, (exists) ->
+                if exists
+                    fs.readFile filename, (error, content) ->
+                        if error
+                            response.writeHead 500
+                            response.end()
+                        else
+                            response.writeHead 200,
+                                'Content-Type': contentType
+
+                            stream = fs.createReadStream(filename)
+                            stream.pipe response
+
+                else
+                    response.writeHead 404
+                    response.end()
+
+        if options.hostname is '*'
+            options.hostname = null
+
+        if options.port is '?'
+            options.port = 0
+
+        done = @async()
+
+        server.listen(options.port, options.hostname)
+
+            .on 'listening', ->
+                address = server.address()
+                hostname = server.hostname or 'localhost'
+                if not options.keepalive
+                    done()
+                else
+                    grunt.log.writeln "Listening on #{ hostname }:#{ address.port }..."
+
+            .on 'error', (error) ->
+                if error.code is 'EADDRINUSE'
+                    grunt.fatal("Port #{ options.port } is already in use by another process.")
+                else
+                    grunt.fatal(error)
+
 
     grunt.registerTask 'local', 'Creates a build for local development and testing', [
         'sass:local'
@@ -297,7 +354,7 @@ module.exports = (grunt) ->
         'coffee:local'
         'copy:local'
         'symlink'
-        'connect:jasmine'
+        'serve:jasmine'
         'jasmine:local'
     ]
 
