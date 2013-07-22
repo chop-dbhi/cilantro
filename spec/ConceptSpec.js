@@ -5,6 +5,9 @@ define(['cilantro','text!/mock/concepts.json'], function (c, mocks) {
         var form, model;
 
         beforeEach(function () {
+            $('#arena').remove();
+            $('body').append('<div id=arena />');
+
             model = new c.models.ConceptModel(concepts[0]);
             form = new c.ui.ConceptForm({
                 model: model

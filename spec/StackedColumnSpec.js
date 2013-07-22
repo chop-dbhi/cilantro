@@ -50,14 +50,17 @@ define(['jquery', 'cilantro'], function($, c) {
         return positions;
     }
 
-    var column,
-        arena = $('#arena');
+    var column;
 
     beforeEach(function() {
+        $('#arena').remove();
+        $('body').append('<div id=arena />');
+
         column = $('<div />').css({
             maxHeight: 200
         });
-        arena.html(column);
+
+        $('#arena').html(column);
     });
 
     describe('Stacked Column', function() {
