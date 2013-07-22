@@ -37,17 +37,6 @@ define(['cilantro'], function (c) {
             expect(model.find({field: 1})).toBe(model);
         });
 
-        it('should clear non-IDs', function() {
-            var model = new c.models.ContextNodeModel({
-                field: 1,
-                operator: 'exact',
-                value: 30
-            });
-
-            model.clear();
-            expect(model.attributes).toEqual({field: 1});
-        });
-
     });
 
     describe('ConditionNodeModel', function() {
@@ -111,13 +100,8 @@ define(['cilantro'], function (c) {
             expect(c1_0 instanceof c.models.ConditionNodeModel).toBe(true);
         });
 
-        it('should validate (shallow)', function() {
-            expect(model.isValid({deep: false})).toBe(true);
-        });
-
-        it('should validate (deep)', function() {
-            model.children.add(node);
-            expect(model.isValid({deep: true})).toBe(true);
+        it('should validate', function() {
+            expect(model.isValid()).toBe(true);
         });
 
         it('should set and merge', function() {
@@ -168,32 +152,6 @@ define(['cilantro'], function (c) {
             expect(model.find({field: 3, concept: 3})).toBe(node);
         });
 
-        it('should not deep validate', function() {
-            node = new c.models.ContextNodeModel({
-                bad: 1
-            });
-            model.children.add(node);
-            expect(model.isValid({deep: true})).toBe(false);
-        });
-
-        it('should clear children', function() {
-            model.clear()
-            expect(model.toJSON()).toEqual({
-                type: 'and',
-                children: [{
-                    field: 1,
-                    concept: 1,
-                }, {
-                    concept: 2,
-                    type: 'and',
-                    children: [{
-                        field: 2,
-                        concept: 2,
-                    }]
-                }]
-            })
-        });
-
         it('should clear and reset children', function() {
             model.clear({reset: true})
             expect(model.toJSON()).toEqual({
@@ -206,10 +164,7 @@ define(['cilantro'], function (c) {
             var model = new c.models.BranchNodeModel,
                 changed = 0,
                 added = 0,
-                removed = 0,
-                pchanged = 0,
-                padded = 0,
-                premoved = 0;
+                removed = 0;
 
             var attrs = {
                 type: 'and',
@@ -248,12 +203,6 @@ define(['cilantro'], function (c) {
             expect(added).toBe(2);
             expect(removed).toBe(0);
 
-            model.save();
-
-            expect(changed).toBe(1);
-            expect(added).toBe(2);
-            expect(removed).toBe(0);
-
             var newAttrs = {
                 type: 'and',
                 children: [{
@@ -269,18 +218,6 @@ define(['cilantro'], function (c) {
             expect(changed).toBe(2);
             expect(added).toBe(2);
             expect(removed).toBe(1);
-
-            model.save();
-
-            expect(changed).toBe(2);
-            expect(added).toBe(2);
-            expect(removed).toBe(1);
-
-            expect(changed).toBe(2);
-            expect(added).toBe(2);
-            expect(removed).toBe(1);
-
-            expect(model.isDirty()).toBe(false);
         });
 
         describe('children collection', function() {
@@ -309,27 +246,6 @@ define(['cilantro'], function (c) {
                 expect(function() {
                     model.children.add(model);
                 }).toThrow();
-            });
-
-            it('should not add bare invalid attributes', function() {
-                expect(function() {
-                    model.children.add({bad: 1});
-                }).toThrow();
-            });
-
-            it('should ignore invalid children when strict is false', function() {
-                model.children.add(node);
-                model.save();
-
-                node.set('value', null);
-                expect(model.save({strict: false})).toBe(true);
-            });
-
-            it('should not ignore invalid children', function() {
-                node.set('value', null);
-                model.children.add(node);
-
-                expect(model.save({strict: true})).toBe(false);
             });
         });
     });
