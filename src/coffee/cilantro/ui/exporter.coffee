@@ -8,18 +8,26 @@ define [
         # If the title isn't there, do our best to get something meaningful 
         # from the href attribute.
         if not title?
-            if href[href.length - 1] == "/"
-                fields = href.substring(0, href.length-1).split("/")
-            else 
-                fields = href.split("/")
+            href = exporterModel.get('href')
 
-            if fields? and fields.length > 0
-                title = fields[fields.length - 1].toUpperCase()
-            # If all else fails, just admit defeat and jam the href into a 
-            # non-descript Untitled label.
+            if href?
+                if href[href.length - 1] == "/"
+                    fields = href.substring(0, href.length-1).split("/")
+                else 
+                    fields = href.split("/")
+
+                if fields? and fields.length > 0
+                    title = fields[fields.length - 1].toUpperCase()
+                
+                # If we couldn't get the title from the href then use the whole
+                # href property to try to give some context to the title.
+                else
+                    title = "Untitled (#{ href })"
+
+            # If we have reached this point we have no title and no href so
+            # we have no idea what this exporter is for so use a generic title.
             else
-                title = "Untitled (#{ href })"
-
+                title = "Untitled"
         return title
 
 
