@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Jekyll Docs Template"
+title: "Cilantro: Official client for the Harvest Stack"
 ---
 
 ### Get Started
