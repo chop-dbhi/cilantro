@@ -51,6 +51,7 @@ define [
             columns: '.columns-modal'
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
+            navbar: '.result-workflow-navbar'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
@@ -71,12 +72,35 @@ define [
             exportProgress: '.export-progress-modal .export-progress-region'
 
         initialize: ->
-            c._.bindAll(this, "startExport", "onExportFinished", "checkExportStatus")
+            c._.bindAll(this, "onPageScroll", "startExport",
+                "onExportFinished", "checkExportStatus")
+            $(document).on 'scroll', @onPageScroll
+
             @monitors = {}
 
             c.subscribe c.SESSION_OPENED, () ->
                 if c.isSerranoOutdated()
                     $('.serrano-version-warning').show()
+
+        onPageScroll: () ->
+            scrollPos = $(document).scrollTop()
+
+            console.log "#{scrollPos} #{@navbarVerticalOffset} #{@topNavbarHeight}"
+
+            if @ui.navbar.hasClass('navbar-fixed-top')
+                if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
+                    # Remove the results navbar from the top
+                    @ui.navbar.removeClass('navbar-fixed-top')
+
+                    # Restore any of the top navbars we might have hidden
+                    $('.navbar-fixed-top').show()
+            else
+                if scrollPos >= (@navbarVerticalOffset - @topNavbarHeight)
+                    # Hide anything else that might be taking the top spot
+                    $('.navbar-fixed-top').hide()
+
+                    # Move the results navbar to the top
+                    @ui.navbar.addClass('navbar-fixed-top')
 
         selectPagesOption: () ->
             $('#pages-radio-all').prop('checked', false)
@@ -300,6 +324,21 @@ define [
                     @columns.show new concept.ConceptColumns
                         view: c.data.views.getSession()
                         collection: c.data.concepts.viewable
+
+            # Record the vertical offset of the masthead nav bar if we
+            # haven't done so already. This is used in scroll calculations.
+            if not @navbarVerticalOffset?
+                console.log "Setting vertical offset to #{@ui.navbar.offset().top}"
+                @navbarVerticalOffset = @ui.navbar.offset().top
+
+            # If there is already something fixed to the top, record the height
+            # of it so we can account for it in our scroll calculations later.
+            if not @topNavbarHeight
+                topElement = $('.navbar-fixed-top')
+                if topElement.length
+                    @topNavbarHeight = topElement.height()
+                else
+                    @topNavbarHeight = 0
 
         showExportOptions: ->
             $('.export-options-modal .alert-block').hide()
