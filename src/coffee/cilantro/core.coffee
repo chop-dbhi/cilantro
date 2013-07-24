@@ -56,6 +56,29 @@ define [
         getSessionUrl: (name) ->
             session.getSessionUrl(currentSession, name)
 
+        getSerranoVersion: ->
+            # If there is no version defined, return the absolute minimum
+            if not currentSession.version?
+                return [0, 0, 0]
+
+            # Remove anything after the release level
+            versionString =
+                String(currentSession.version).replace(/[abf].*$/g, "")
+
+            # Try to split the version string into major, minor, and micro
+            # version numbers
+            versionFields = versionString.split(".")
+
+            # If we don't have values for all of major, minor, and micro
+            # version numbers then return the minimum version.
+            if versionFields.length != 3
+                return [0, 0, 0]
+
+            return [parseInt(versionFields[0], 10),
+                    parseInt(versionFields[1], 10),
+                    parseInt(versionFields[2], 10)]
+
+
     channels = _.extend {}, channels, session.channels
 
     props = { $, _, Backbone, utils }
