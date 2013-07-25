@@ -14,6 +14,11 @@ define [
 
         template: templates.query
 
+        initialize: ->
+            c.subscribe c.SESSION_OPENED, () ->
+                if c.isSerranoOutdated()
+                    $('.serrano-version-warning').show()
+
         regions:
             concepts: '.concept-panel-region'
             workspace: '.concept-workspace-region'
