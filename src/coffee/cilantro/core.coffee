@@ -58,7 +58,7 @@ define [
 
         getSerranoVersion: ->
             # If there is no version defined, return the absolute minimum
-            if not currentSession.version?
+            if not currentSession?.version?
                 return [0, 0, 0]
 
             # Remove anything after the release level
