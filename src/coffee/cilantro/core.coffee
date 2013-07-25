@@ -78,6 +78,14 @@ define [
                     parseInt(versionFields[1], 10),
                     parseInt(versionFields[2], 10)]
 
+        isSerranoOutdated: ->
+            serranoVersion = @getSerranoVersion()
+            console.log("#{serranoVersion} v. #{c.minimumSerranoVersion}")
+            for i in [0..2] by 1
+                if serranoVersion[i] < c.minimumSerranoVersion[i]
+                    return true
+
+            return false
 
     channels = _.extend {}, channels, session.channels
 
