@@ -80,7 +80,6 @@ define [
 
         isSerranoOutdated: ->
             serranoVersion = @getSerranoVersion()
-            console.log("#{serranoVersion} v. #{c.minimumSerranoVersion}")
             for i in [0..2] by 1
                 if serranoVersion[i] < c.minimumSerranoVersion[i]
                     return true
