@@ -74,6 +74,10 @@ define [
             c._.bindAll(this, "startExport", "onExportFinished", "checkExportStatus")
             @monitors = {}
 
+            c.subscribe c.SESSION_OPENED, () ->
+                if c.isSerranoOutdated()
+                    $('.serrano-version-warning').show()
+
         selectPagesOption: () ->
             $('#pages-radio-all').prop('checked', false)
             $('#pages-radio-ranges').prop('checked', true)
