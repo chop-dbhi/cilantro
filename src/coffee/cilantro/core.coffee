@@ -80,7 +80,7 @@ define [
 
         isSerranoOutdated: ->
             serranoVersion = @getSerranoVersion()
-            for i in [0..2] by 1
+            for i in [0..2]
                 if serranoVersion[i] < c.minimumSerranoVersion[i]
                     return true
 
