@@ -13,7 +13,7 @@
 
 ### Setup
 
-```
+```bash
 # Clone the cilantro repo or a fork; go into the directory
 git clone git@github.com/cbmi/cilantro.git && cd cilantro
 
@@ -21,13 +21,13 @@ git clone git@github.com/cbmi/cilantro.git && cd cilantro
 npm install
 
 # Run Grunt 'work' task to perform the initial compilation of .coffee
-and .scss files, it finishes by starting a `watch` process
+# and .scss files, it finishes by starting a `watch` process
 grunt work
 ```
 
 ### Testing
 
-```
+```bash
 # Run the tests
 grunt test
 ```
@@ -36,16 +36,10 @@ grunt test
 
 Distribution builds should only be performed on the `develop` branch.
 
-```
-# Run Grunt `dist` which will freshly compile, optimize, and test
-# a build and write the files to the dist directory
-grunt dist
-
-# Switch to the master branch
-git checkout master
-
-# Replace the previous files with the contents of the dist directory
-ls | grep -v dist | xargs rm -rf; cp -r dist/* .
+```bash
+# Tags a release, freshly compiles and optimizes code, creates zip and
+# tarball binaries and prints instructions to upload it to GitHub
+grunt release
 ```
 
 ### Contributing
