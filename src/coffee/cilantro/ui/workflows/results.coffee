@@ -82,7 +82,7 @@ define [
                 if c.isSerranoOutdated()
                     $('.serrano-version-warning').show()
 
-        onPageScroll: () ->
+        onPageScroll: ->
             scrollPos = $(document).scrollTop()
 
             if @ui.navbar.hasClass('navbar-fixed-top')
