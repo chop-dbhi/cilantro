@@ -51,7 +51,7 @@ define [
             columns: '.columns-modal'
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
-            navbar: '.result-workflow-navbar'
+            navbar: '.results-workflow-navbar'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
