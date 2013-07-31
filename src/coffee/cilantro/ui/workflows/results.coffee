@@ -83,6 +83,10 @@ define [
                     $('.serrano-version-warning').show()
 
         onPageScroll: ->
+            # If the view isn't rendered yet, then don't bother
+            if @isClosed
+                return
+
             scrollPos = $(document).scrollTop()
 
             if @ui.navbar.hasClass('navbar-fixed-top')
@@ -100,7 +104,7 @@ define [
                     # Move the results navbar to the top
                     @ui.navbar.addClass('navbar-fixed-top')
 
-        selectPagesOption: () ->
+        selectPagesOption: ->
             $('#pages-radio-all').prop('checked', false)
             $('#pages-radio-ranges').prop('checked', true)
             $('#pages-text-ranges').val('')
