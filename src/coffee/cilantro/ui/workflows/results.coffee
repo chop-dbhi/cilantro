@@ -85,8 +85,6 @@ define [
         onPageScroll: () ->
             scrollPos = $(document).scrollTop()
 
-            console.log "#{scrollPos} #{@navbarVerticalOffset} #{@topNavbarHeight}"
-
             if @ui.navbar.hasClass('navbar-fixed-top')
                 if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
                     # Remove the results navbar from the top
@@ -328,7 +326,6 @@ define [
             # Record the vertical offset of the masthead nav bar if we
             # haven't done so already. This is used in scroll calculations.
             if not @navbarVerticalOffset?
-                console.log "Setting vertical offset to #{@ui.navbar.offset().top}"
                 @navbarVerticalOffset = @ui.navbar.offset().top
 
             # If there is already something fixed to the top, record the height
