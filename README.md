@@ -1,6 +1,8 @@
 # Cilantro
 
-**Documentation**: http://cbmi.github.io/cbmi/
+[![Build Status](https://travis-ci.org/cbmi/cilantro.png?branch=2.1)](https://travis-ci.org/cbmi/cilantro)
+
+**Documentation**: http://cilantro.harvest.io
 
 ## Development
 
