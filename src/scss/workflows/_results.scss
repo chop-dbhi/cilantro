@@ -1,13 +1,18 @@
 .results-workflow {
-    .navbar-fixed-top {
-        .navbar-inner {
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-    }
 
     .results-workflow-navbar {
         margin-bottom: 0px;
+
+        &.navbar-fixed-top {
+            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+            border-bottom-color: #ddd;
+
+            .navbar-inner {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
     }
 
     .serrano-version-warning {
