@@ -72,8 +72,6 @@ define [
             exportProgress: '.export-progress-modal .export-progress-region'
 
         initialize: ->
-            c._.bindAll(this, "onPageScroll", "startExport",
-                "onExportFinished", "checkExportStatus")
             $(document).on 'scroll', @onPageScroll
 
             @monitors = {}
@@ -82,7 +80,7 @@ define [
                 if c.isSerranoOutdated()
                     $('.serrano-version-warning').show()
 
-        onPageScroll: ->
+        onPageScroll: =>
             # If the view isn't rendered yet, then don't bother
             if @isClosed
                 return
@@ -93,15 +91,10 @@ define [
                 if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
                     # Remove the results navbar from the top
                     @ui.navbar.removeClass('navbar-fixed-top')
-
-                    # Restore any of the top navbars we might have hidden
-                    $('.navbar-fixed-top').show()
             else
                 if scrollPos >= (@navbarVerticalOffset - @topNavbarHeight)
-                    # Hide anything else that might be taking the top spot
-                    $('.navbar-fixed-top').hide()
-
                     # Move the results navbar to the top
+                    @ui.navbar.css('top', @topNavbarHeight)
                     @ui.navbar.addClass('navbar-fixed-top')
 
         selectPagesOption: ->
@@ -124,7 +117,7 @@ define [
                 when "success"
                     statusContainer.find('.label-success').show()
 
-        onExportFinished: (exportTypeTitle) ->
+        onExportFinished: (exportTypeTitle) =>
             @numPendingDownloads = @numPendingDownloads - 1
             $('.export-progress-container .badge-info').html(@numPendingDownloads)
 
@@ -152,7 +145,7 @@ define [
             else
                 true
 
-        checkExportStatus: (exportTypeTitle) ->
+        checkExportStatus: (exportTypeTitle) =>
             @monitors[exportTypeTitle]["execution_time"] =
                 @monitors[exportTypeTitle]["execution_time"] + @monitorDelay
 
@@ -197,7 +190,7 @@ define [
 
             return value
 
-        startExport: (exportType, pages) ->
+        startExport: (exportType, pages) =>
             title = $(exportType).attr('title')
             @changeExportStatus(title, "downloading")
 
