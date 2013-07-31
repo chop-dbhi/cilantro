@@ -82,7 +82,7 @@ define [
 
         onPageScroll: =>
             # If the view isn't rendered yet, then don't bother
-            if @isClosed
+            if not @isClosed? or @isClosed
                 return
 
             scrollPos = $(document).scrollTop()
