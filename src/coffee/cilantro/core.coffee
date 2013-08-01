@@ -80,11 +80,22 @@ define [
 
         isSerranoOutdated: ->
             serranoVersion = @getSerranoVersion()
-            for i in [0..2]
-                if serranoVersion[i] < c.minimumSerranoVersion[i]
-                    return true
 
-            return false
+            # If the major version numbers of the minimum and actual versions
+            # are not identical then we can use the major version alone as the
+            # basis for the "outdatedness".
+            if serranoVersion[0] == c.minimumSerranoVersion[0]
+                # If the minor version numbers of the minimum and actual
+                # versions are not identical then we can simply use the minor
+                # version as the basis for the "outdatedness".
+                if serranoVersion[1] == c.minimumSerranoVersion[1]
+                    # At this point the major and micro versions are equal so
+                    # just evaluate based on the micro version
+                    return serranoVersion[2] < c.minimumSerranoVersion[2]
+                else
+                    return serranoVersion[1] < c.minimumSerranoVersion[1]
+            else
+                return serranoVersion[0] < c.minimumSerranoVersion[0]
 
     channels = _.extend {}, channels, session.channels
 
