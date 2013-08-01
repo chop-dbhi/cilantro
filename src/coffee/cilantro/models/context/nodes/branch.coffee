@@ -63,7 +63,7 @@ define [
     # Branch-type node that acts as a container for other nodes. The `type`
     # determines the conditional relationship between the child nodes.
     class BranchNodeModel extends base.ContextNodeModel
-        nodeType: 'branch'
+        type: 'branch'
 
         defaults: ->
             type: 'and'
