@@ -16,7 +16,7 @@ define [
     # the version number received from the server, the user will be warned if
     # no version number is found or if it is less than this minimum to 
     # prepare them in the case of missing or broken functionality.
-    c.minimumSerranoVersion = [2, 0, 24]
+    c.minimumSerranoVersion = [2, 0, 18]
 
     c.data =
         concepts: new models.ConceptCollection
