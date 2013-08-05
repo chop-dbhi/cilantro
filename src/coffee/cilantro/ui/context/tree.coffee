@@ -27,15 +27,6 @@ define [
 
         emptyView: ContextEmptyTree
 
-        modelEvents:
-            'root:change:enabled': 'toggleState'
-
-        toggleState: ->
-            @$el.toggleClass('disabled', not @model.isEnabled())
-
-        onRender: ->
-            @toggleState()
-
 
     class ContextPanel extends c.Marionette.Layout
         className: 'context'
@@ -47,6 +38,11 @@ define [
             tree: '.tree-region'
             info: '.info-region'
 
+        modelEvents:
+            'request': 'showLoading'
+            'sync': 'doneLoading'
+            'error': 'doneLoading'
+
         onRender: ->
             @info.show new info.ContextInfo
                 model: @model
@@ -56,7 +52,12 @@ define [
 
             @tree.show new ContextTree
                 model: @model
-                collection: @model.root.children
+                collection: @model.manager.upstream.children
 
+        showLoading: ->
+            @$el.addClass 'loading'
+
+        doneLoading: ->
+            @$el.removeClass 'loading'
 
     { ContextPanel }
