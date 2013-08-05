@@ -34,7 +34,7 @@ define [
     class Values extends c.Backbone.Collection
         model: Value
 
-        comparator: 'index'
+        comparator: 'label'
 
         initialize: ->
             super
