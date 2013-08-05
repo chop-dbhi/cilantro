@@ -42,7 +42,10 @@ define [
                 @ui.status
                     .html('<i class="icon-ok text-success"></i>')
                     .fadeOut 2000, =>
-                        @ui.status.html('')
+                        # If the view has been closed since this timeout,
+                        # @ui.status will be a string. So check to ensure the
+                        # innerHTML can be set.
+                        @ui.status.html?('')
             else
                 @ui.status
                     .html('<i class="icon-exclamation text-warning"></i>')
