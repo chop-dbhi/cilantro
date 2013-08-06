@@ -44,6 +44,8 @@ define [
             'remove': 'renderNew'
             'change': 'renderChange'
             'child:change': 'renderChange'
+            'invalid': 'renderInvalid'
+            'child:invalid': 'renderInvalid'
 
         delegateEvents: (events) ->
             super
@@ -70,57 +72,56 @@ define [
                 collection: @model.fields
                 hideSingleFieldInfo: true
 
-            @renderState()
+            @renderChange()
 
-        renderState: ->
-            # If this is valid field-level context update the state
-            # of the concept form. Only one of the fields need to be
-            # valid to update the context
+        # Changes the state of the footer elements given a message, class
+        # name and whether the buttons should be enabled.
+        _renderFooter: (message, className, enabled) ->
+            @ui.state.removeClass('alert-error', 'alert-warning')
+
+            if message
+                @ui.state.show().html(message)
+            else
+                @ui.state.hide().html('')
+
+            if className
+                @ui.state.addClass(className)
+
+            @ui.apply.prop('disabled', not enabled)
+            @ui.update.prop('disabled', not enabled)
+
+        renderChange: ->
             if @context.isNew(deep: true)
                 @renderNew()
             else
                 @renderApplied()
 
-            @renderChange()
+        # Renders an error message if the filter is deemed invalid
+        renderInvalid: (model, error, options) ->
+            className = 'alert-error'
+            message = "<strong>Uh oh.</strong> Cannot apply filter: #{ error }"
 
-        renderChange: ->
-            @ui.state.hide()
-                .removeClass('alert-error alert-warning')
+            # Add the ability to revert the context
+            if not @context.isNew(deep: true)
+                message += ' <a class=revert href=#>Revert</a>'
 
-            # Enable the buttons by default, only disable if there is an error
-            # or nothing has changed
-            @ui.update.prop('disabled', true)
-            @ui.apply.prop('disabled', true)
-
-            if not @context.isValid(deep: true)
-                className = 'alert-error'
-                message = '<strong>Uh oh.</strong> There is a problem applying the filter'
-
-            else if @context.isDirty(deep: true)
-                className = 'alert-warning'
-                message = '<strong>Heads up!</strong> The filter has been changed, but not applied.'
-
-                # Only provide a revert option if this is an existing filter
-                if not @context.isNew(deep: true)
-                    message += ' <a class=revert href=#>Revert</a>'
-
-                @ui.apply.prop('disabled', false)
-                @ui.update.prop('disabled', false)
-
-            if message?
-                @ui.state.show()
-                    .html(message)
-                    .addClass(className)
+            @_renderFooter(message, className, false)
 
         renderApplied: ->
             @ui.apply.hide()
             @ui.update.show()
             @ui.remove.show()
 
+            if (enabled = @context.isDirty(deep: true))
+                className = 'alert-warning'
+                message = '<strong>Heads up!</strong> The filter has been changed. <a class=revert href=#>Revert</a>'
+            @_renderFooter(message, className, enabled)
+
         renderNew: ->
             @ui.apply.show()
             @ui.update.hide()
             @ui.remove.hide()
+            @_renderFooter(null, null, true)
 
         # Saves the current state of the context which enables it to be
         # synced with the server.

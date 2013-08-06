@@ -77,60 +77,77 @@ define [
 
         # Attempts to apply a node in the working tree. If the node is not
         # valid, false is returned. Otherwise the node is
-        apply: (options) ->
+        apply: (options={}) ->
+            # Only unmanaged or working nodes can be applied
+            if (node = @_working())? and @ isnt node
+                return @
+
+            if not options.silent
+                @trigger('before:apply', @, options)
+
             if not @isValid(options)
                 return false
+
+            # Apply all descendents
+            if @type is 'branch'
+                passed = true
+                for child in @children.models
+                    if child.apply(c._.extend({}, options, silent: true)) is false
+                        passed = false
+
+                # If the branch contains a single child that does not pass
+                # fail the apply
+                if @children.length is 1 and not passed
+                    return false
 
             # Remove state flags
             delete @dirty
             delete @removed
 
-            # Apply all descendents
-            if @type is 'branch'
-                for child in @children.models
-                    child.apply(silent: true)
-
-            @trigger('apply', @, options)
-
+            if not options.silent
+                @trigger('apply', @, options)
             return @
 
         # Mark the node as removed
-        remove: (options) ->
-            if (node = @_working())
-                node.removed = true
-                node.trigger('remove', node, options)
-            if node isnt @
-                @removed = true
+        remove: (options={}) ->
+            if not options.silent
+                @trigger('before:remove', @, options)
+            @removed = true
+            if not options.silent
                 @trigger('remove', @, options)
+            if (node = @_working()) and node isnt @
+                node.remove(options)
             return @
 
-        revert: (options) ->
+        revert: (options={}) ->
+            if not options.silent
+                @trigger('before:revert', @, options)
             if (node = @_upstream()) and node isnt @
-                @set(node.toJSON())
+                @set(node.toJSON(), options)
+                if not options.silent
+                    @trigger('revert', @, options)
 
         # Enable the node
         enable: (options) ->
-            if (node = @_working())
-                node.set('enabled', true, options)
-            if node isnt @
-                @set('enabled', true, options)
+            @set('enabled', true, options)
+            if (node = @_working()) and node isnt @
+                node.enable(options)
             return @
 
         # Disable the node
         disable: (options) ->
-            if (node = @_working())
-                node.set('enabled', false, options)
-            if node isnt @
-                @set('enabled', false, options)
+            @set('enabled', false, options)
+            if (node = @_working()) and node isnt @
+                node.disable(options)
             return @
 
         # Toggle the enabled state of the node
         toggleEnabled: (options) ->
-            if @isEnabled()
+            if @isEnabled(options)
                  @disable(options)
             else
                  @enable(options)
-            return @isEnabled()
+            return @isEnabled(options)
 
         # Check if this node is defined in the upstream tree
         isNew: (options) ->
