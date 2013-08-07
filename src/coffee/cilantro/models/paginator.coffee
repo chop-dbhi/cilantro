@@ -18,14 +18,14 @@ define [
 
         # Parses the initial fetch which is a single page, resets if necessary
         parse: (resp, options) ->
-            if @limit isnt resp.limit
+            if @perPage isnt resp.per_page
                 if not options.reset
                     # TODO Smartly shuffle pages when only the size changes.
                     # The data is not invalid, just broken up differently
                     @reset(null, silent: true)
                 @currentPageNum = null
-                @limit = resp.limit
-                @trigger('change:pagesize', @, @limit)
+                @perPage = resp.per_page
+                @trigger('change:pagesize', @, @perPage)
 
             if @numPages isnt resp.num_pages
                 @numPages = resp.num_pages
@@ -120,7 +120,7 @@ define [
         idAttribute: 'page_num'
 
         url: ->
-            "#{ @collection.url() }?page=#{ @id }&limit=#{ @collection.limit }"
+            "#{ @collection.url() }?page=#{ @id }&per_page=#{ @collection.perPage }"
 
 
 
