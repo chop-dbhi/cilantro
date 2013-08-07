@@ -1,6 +1,6 @@
 {
   "name": "cilantro",
-  "version": "2.1.0-beta",
+  "version": "2.0.2-beta",
   "license": "BSD",
   "description": "Client library for Serrano-compatible APIs",
   "keywords": [
