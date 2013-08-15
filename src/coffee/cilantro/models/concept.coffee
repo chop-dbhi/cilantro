@@ -60,6 +60,8 @@ define [
                 @queryable.reset @filter (m) -> !!m.get('queryview')
                 @viewable.reset @filter (m) -> !!m.get('formatter_name')
 
+                c.promiser.resolve('concepts')
+
             @on 'reset', @resolve
 
 
