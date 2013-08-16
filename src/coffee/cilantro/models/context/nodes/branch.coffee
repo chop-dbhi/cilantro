@@ -6,7 +6,6 @@ define [
 
     # Collection for representing a branch's child nodes
     class ContextNodeCollection extends c.Backbone.Collection
-
         # The 'parent' option is used to prevent circular references when
         # adding nodes to the collection.
         constructor: (models, options) ->

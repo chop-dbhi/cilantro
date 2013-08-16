@@ -25,9 +25,7 @@ define [
 
             # Any time the node changes, check if it is dirty
             @on 'change', =>
-                delete @dirty
-                if @_isDirty()
-                    @dirty = true
+                @dirty = @_isDirty()
 
         # Convenience methods for accessing the
         _working: (options) ->
@@ -162,7 +160,9 @@ define [
         isDirty: (options) ->
             @dirty is true
 
-        # Check if the node for a given ident is active and enabled
+        # Check if the node for a given ident is active and enabled. If
+        # `enabled` is not defined, it is assumed to be true hence the
+        # condition `isnt false`.
         isEnabled: (options) ->
             @get('enabled') isnt false
 

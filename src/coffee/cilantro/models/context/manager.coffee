@@ -59,7 +59,6 @@ define [
         # Traverses the working tree and extracts all applied nodes and
         # falls back to the upstream contents.
         _toJSON: (node, options) ->
-
             # Node marked for removal, return nothing to be skipped
             if node.removed then return
 
