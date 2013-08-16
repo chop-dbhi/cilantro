@@ -27,6 +27,7 @@ define [
         else if type is 'datetime'
             controls.DateControl
 
+
     class LoadingControls extends base.LoadView
         message: 'Loading and rendering controls...'
 
@@ -74,7 +75,9 @@ define [
 
         constructor: ->
             super
-            @context = @options.context
+            @context = @options.context.define
+                concept: @options.context.get('concept')
+                field: @model.id
 
         regions:
             info: '.info-region'
@@ -94,6 +97,7 @@ define [
             # be added to.
             @controls.show new FieldControls
                 collection: new c.Backbone.Collection
+                context: @context
 
             # Add the default control
             if @options.showDefaultControl
@@ -104,7 +108,7 @@ define [
             # enumerable condition is a hack since the above control
             # may already have chart-like display...and the hack grows deeper
             # to prevent a chart being added when dealing with dates...
-            if not @model.get('enumerable') and 
+            if not @model.get('enumerable') and
                not (@model.get('simple_type') == 'datetime')
                 if @options.showChart and @model.links.distribution?
                     @addControl charts.FieldChart,
@@ -127,15 +131,9 @@ define [
         itemView: FieldForm
 
         itemViewOptions: (model, index) ->
-            context = @options.context
-
             options =
                 model: model
-                context: context.find
-                    field: model.id
-                    concept: context.get 'concept'
-                ,
-                    create: 'condition'
+                context: @options.context
 
             # This collection is used by a concept, therefore if only one
             # field is present, the concept name and description take

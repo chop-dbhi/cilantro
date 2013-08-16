@@ -5,6 +5,9 @@
 define ->
 
     return [
+        version: '2.0.1'
+        changes: []
+    ,
         version: '2.0.0'
         changes: [
             summary: 'Initial Release'
