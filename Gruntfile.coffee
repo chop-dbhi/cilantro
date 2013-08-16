@@ -196,7 +196,7 @@ module.exports = (grunt) ->
                         variable: 'data'
 
                 modules: [
-                    name: 'cilantro'
+                    name: pkg.name
                 ]
 
                 # Post analysis of built files
@@ -364,14 +364,14 @@ module.exports = (grunt) ->
         run "git tag #{ pkg.version }"
 
     grunt.registerTask 'release-binaries', 'Create a release binary for upload', ->
-        releaseDirName = "cilantro-#{ pkg.version }"
+        releaseDirName = "#{ pkg.name }-#{ pkg.version }"
 
-        run 'rm -rf cilantro'
-        run 'mkdir -p cilantro'
-        run 'cp -r dist/* cilantro'
-        run "zip -r #{ releaseDirName }.zip cilantro"
-        run "tar -Hzcf #{ releaseDirName }.tar.gz cilantro"
-        run 'rm -rf cilantro'
+        run "rm -rf #{ pkg.name }"
+        run "mkdir -p #{ pkg.name }"
+        run "cp -r dist/* #{ pkg.name }"
+        run "zip -r #{ releaseDirName }.zip #{ pkg.name }"
+        run "tar -Hzcf #{ releaseDirName }.tar.gz #{ pkg.name }"
+        run "rm -rf #{ pkg.name }"
 
     grunt.registerTask 'release-help', 'Prints the post-release steps', ->
         grunt.log.ok 'Push the code and tags: git push origin develop && git push --tags'
