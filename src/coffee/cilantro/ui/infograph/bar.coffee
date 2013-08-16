@@ -145,11 +145,10 @@ define [
             c._.map @collection.where(selected: true), (model) ->
                 model.get('value')
 
-        setValue: (values) ->
-            if not values?.length then return
-            for value in values
-                if (model = @collection.findWhere value: value)
-                    model.set 'selected', true
+        setValue: (values=[]) ->
+            # Toggle the selection based on the presence values
+            @collection.each (model) ->
+                model.set('selected', model.get('value') in values)
             return
 
 

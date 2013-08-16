@@ -4,7 +4,7 @@ define [
 
 
     class CompositeNodeModel extends base.ContextNodeModel
-        nodeType: 'composite'
+        type: 'composite'
 
         validate: (attrs) ->
             if not attrs.composite?

@@ -5,7 +5,7 @@ define [
 
 
     class ConditionNodeModel extends base.ContextNodeModel
-        nodeType: 'condition'
+        type: 'condition'
 
         validate: (attrs) ->
             if not (attrs.operator? and attrs.field? and attrs.value?)

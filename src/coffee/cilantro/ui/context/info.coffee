@@ -9,12 +9,9 @@ define [
     class ContextInfo extends c.Marionette.ItemView
         template: templates.info
 
-        className: 'container-fluid'
-
         ui:
             query: '[data-route=query]'
             results: '[data-route=results]'
-            export: '[data-toggle=export-options]'
 
         initialize: ->
             # Toggle buttons when the route changes
@@ -25,7 +22,6 @@ define [
         # route.
         toggleButtons: =>
             @ui.query.toggle(c.router.isCurrent('results'))
-            @ui.export.toggle(c.router.isCurrent('results'))
             @ui.results.toggle(c.router.isCurrent('query'))
 
         onRender: ->

@@ -1,8 +1,10 @@
 define [
     '../../core'
     '../base'
+    './manager'
     './nodes'
-], (c, base, nodes) ->
+], (c, base, manager, nodes) ->
+
 
     contextNodeModels =
         branch: nodes.BranchNodeModel
@@ -10,95 +12,40 @@ define [
         composite: nodes.CompositeNodeModel
 
 
-    # Returns the node type for attrs or throws an error if none can be
-    # determined
+    # Returns the node type for attrs. If none can be inferred, the default is
+    # the condition type.
     getContextNodeType = (attrs, options) ->
         if attrs instanceof nodes.ContextNodeModel
-            return attrs.nodeType
+            return attrs.type
         for type, model of contextNodeModels
             if not model::validate.call(attrs, attrs, options)
                 return type
-        throw new nodes.ContextNodeError 'Unknown context node type'
+        return 'condition'
 
 
     # Class-level method for create a node instance of the specified type
-    nodes.ContextNodeModel.create = (type, attrs, options) ->
+    nodes.ContextNodeModel.create = (attrs, options) ->
         # No type provided, infer the type and validate
-        if typeof type is 'object'
-            options = attrs
-            attrs = type
-            type = getContextNodeType(attrs, options)
+        type = options.type or getContextNodeType(attrs, options)
         if not (klass = contextNodeModels[type])?
             throw new nodes.ContextNodeError 'Unknown context node type'
         return new klass(attrs, options)
 
 
     class ContextModel extends base.Model
-        rootEventPrefix: 'root'
-
-        constructor: (attrs, options={}) ->
-            @root = new nodes.BranchNodeModel
-
-            # Proxy events from the root node through the context model
-            @listenTo @root, 'all', (event, args...) =>
-                @trigger "#{ @rootEventPrefix }:#{ event }", args...
-
-            options.parse = true
-            super(attrs, options)
+        managerEventPrefix: 'tree'
 
         initialize: ->
+            @manager = new manager.ContextTreeManager(@)
 
-            @on 'request', ->
-                @pending()
-                c.publish c.CONTEXT_SYNCING, @
+            # Proxy events from manager through model
+            @listenTo @manager, 'all', (manager, event, args...) =>
+                @trigger("#{ @managerEventPrefix }:#{ event }", args...)
 
-            @on 'sync', ->
-                @resolve()
-                c.publish c.CONTEXT_SYNCED, @, 'success'
-
-            @on 'error', ->
-                @resolve()
-                c.publish c.CONTEXT_SYNCED, @, 'error'
-
-            @on 'change', ->
-                c.publish c.CONTEXT_CHANGED, @
-
-            c.subscribe c.CONTEXT_PAUSE, (id) =>
-                if @id is id or not id and @isSession()
-                    @pending()
-
-            c.subscribe c.CONTEXT_RESUME, (id) =>
-                if @id is id or not id and @isSession()
-                    @resolve()
-
-            c.subscribe c.CONTEXT_CLEAR, (id) =>
-                if @id is id or not id and @isSession()
-                    @root.stableAttributes = null
-                    @save()
-
-            c.subscribe c.CONTEXT_SAVE, (id) =>
-                if @id is id or not id and @isSession()
-                    @root.save()
-                    @save()
-
-            @resolve()
-
-        parse: (resp) =>
-            if (attrs = resp.json)?
-                copy = c.$.extend(true, {}, attrs)
-
-                # This is for legacy responses where the root node has not
-                # been correctly defined
-                if attrs.concept? or attrs.field?
-                    @root.children.add(attrs)
-                else
-                    @root.set(attrs, remove: false, save: true)
-                delete resp.json
-            super(resp)
 
         toJSON: (options={}) ->
             attrs = super
-            attrs.json = @root.stableAttributes
+            attrs.json = @manager.toJSON()
             return attrs
 
         isSession: ->
@@ -106,16 +53,6 @@ define [
 
         isArchived: ->
             @get 'archived'
-
-        # Root node proxy methods
-        isEnabled: ->
-            @root.isEnabled()
-
-        enable: ->
-            @root.enable()
-
-        disable: ->
-            @root.disable()
 
 
     class ContextCollection extends base.Collection

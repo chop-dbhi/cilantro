@@ -1,64 +1,88 @@
-define(['cilantro','text!/mock/concepts.json'], function (c, mocks) {
-    var concepts = JSON.parse(mocks);
+define(['cilantro','text!/mock/concepts.json', 'text!/mock/contexts.json'], function (c, mockConcepts, mockContexts) {
+
+    var concepts = JSON.parse(mockConcepts),
+        contexts = JSON.parse(mockContexts);
 
     describe('ConceptForm', function () {
-        var form, model;
+        var form, model, context;
 
         beforeEach(function () {
             $('#arena').remove();
             $('body').append('<div id=arena />');
 
             model = new c.models.ConceptModel(concepts[0]);
+            context = new c.models.ContextModel(contexts[0]);
+
             form = new c.ui.ConceptForm({
-                model: model
+                model: model,
+                context: context
             });
         });
 
-        it('should have a model', function () {
-            expect(form.model).toEqual(model);
-        });
-
-        it('should have a fields collection on its model', function(){
-            expect(form.model.fields).toEqual(jasmine.any(c.Backbone.Collection));
-        });
-
         describe('Chart', function() {
-           var async = new AsyncSpec(this);
+            model = new c.models.ConceptModel(concepts[0]);
+            context = new c.models.ContextModel(contexts[0]);
 
-           async.beforeEach(function (done) {
-               c.data.contexts.when(function(){
-                   model = new c.models.ConceptModel(concepts[0]);
-                   form = new c.ui.ConceptForm({
-                       model: model
-                   });
-                   model.fields.fetch().done(function() {
-                       done();
-                   });
-               });
-           });
+            form = new c.ui.ConceptForm({
+                model: model,
+                context: context
+            });
 
-           async.it('maintains size across renderings when removed from dom', function(done){
-                form.render();
-                var el = form.fields.currentView.children.first().$el;
-                $('#arena').html(form.el);
+            /*
+            it('maintains size across renderings when removed from dom', function() {
+                model.fields.fetch();
 
-                setTimeout(function(){
-                    var width1 = $('.highcharts-container', el).css('width');
-                    expect(width1).toBeDefined();
-                    form.close();
+                waitsFor(function() {
+                    return !!model.fields.length;
+                });
+
+                runs(function() {
                     form.render();
+                    var el = form.fields.currentView.children.first().$el;
                     $('#arena').html(form.el);
-                    el = form.fields.currentView.children.first().$el;
 
-                    setTimeout(function(){
-                        var width2 = $('.highcharts-container', el).css('width');
-                        expect(width2).toBeDefined();
-                        expect(width1).toEqual(width2);
-                        form.close();
-                        done();
+                    var t1 = false,
+                        t2 = false,
+                        width1, width2;
+
+                    waitsFor(function() {
+                        return t1;
+                    });
+
+                    setTimeout(function() {
+                        t1 = true;
+
+                        runs(function() {
+                            width1 = $('.highcharts-container', el).css('width');
+
+                            expect(width1).toBeDefined();
+                            form.close();
+                            form.render();
+                            $('#arena').html(form.el);
+                            el = form.fields.currentView.children.first().$el;
+                        });
+
+                        waitsFor(function() {
+                            return t2;
+                        });
+
+                        setTimeout(function(){
+                            t2 = true;
+
+                            runs(function() {
+                                width2 = $('.highcharts-container', el).css('width');
+                                expect(width2).toBeDefined();
+                                expect(width1).toEqual(width2);
+                                form.close();
+                            });
+
+                        }, 1000);
+
                     }, 1000);
-                }, 1000);
-           });
+                });
+
+            });
+            */
         });
     });
 
