@@ -1,22 +1,16 @@
 define [
     'jquery',
     'mediator'
+    './utils'
     './session/channels'
-], ($, mediator, channels) ->
-
-    # Utility for parsing links
-    linkParser = (href) ->
-        parser = document.createElement('a')
-        parser.href = href
-        return parser
-
+], ($, mediator, utils, channels) ->
 
     # Get a URL by name for the current session relative to some hostname
     getSessionUrl = (session, key) ->
         if not session? then return
         if not (link = session.urls[key]) then return
-        current = linkParser(session.root)
-        target = linkParser(link.href)
+        current = utils.linkParser(session.root)
+        target = utils.linkParser(link.href)
         current.pathname = target.pathname
         return current.href
 
