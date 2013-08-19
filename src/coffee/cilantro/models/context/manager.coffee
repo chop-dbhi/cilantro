@@ -11,7 +11,7 @@ define [
     # Light wrapper for fixing attrs for the top-level branch node. If `attrs`
     # has ID fields, it is added as a child to the branch. This is primarily
     # to fix legacy data that did not conform to this structure.
-    _fix = (node, attrs={}, options) ->
+    _fix = (node, attrs, options) ->
         if attrs.concept? or attrs.field?
             node.children.add(attrs, options)
         else
@@ -102,6 +102,13 @@ define [
         # the working tree since this would remove local state that controls
         # may be relying on.
         update: (attrs) ->
+            # Ensure the active and working trees are not empty, otherwise
+            # change events do not fire.
+            attrs = c._.extend
+                children: []
+                type: 'and'
+            , attrs
+
             # Update `upstream` tree with server response
             _fix @upstream, attrs,
                 manager: @
