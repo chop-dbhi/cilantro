@@ -1,5 +1,5 @@
 /*
- * promiser.js - 0.2.1
+ * promiser.js - 0.2.2
  * (c) 2013 Byron Ruth
  * promiser.js may be freely distributed under the BSD license
  */
@@ -208,8 +208,13 @@
         },
 
         reset: function(name) {
-          this.unmanage(name);
-          return this;
+            if (name == null) {
+                this._watchers = {};
+                this._deferreds = {};
+            } else {
+                this.unmanage(name);
+            }
+            return this;
         },
 
         manage: function(name, deferred) {
