@@ -303,22 +303,21 @@ define [
             @exportProgress.show new exporter.ExportProgressCollection
                 collection: c.data.exporters
 
-            c.data.contexts.ready =>
+            c.promiser.when 'contexts', =>
                 @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
 
                 @context.currentView.$el.stacked
                     fluid: '.tree-region'
 
-            c.data.concepts.ready =>
-                c.data.views.ready =>
-                    @table.show new tables.Table
-                        view: c.data.views.getSession()
-                        collection: c.data.results
+            c.promiser.when 'concepts', 'views', =>
+                @table.show new tables.Table
+                    view: c.data.views.getSession()
+                    collection: c.data.results
 
-                    @columns.show new concept.ConceptColumns
-                        view: c.data.views.getSession()
-                        collection: c.data.concepts.viewable
+                @columns.show new concept.ConceptColumns
+                    view: c.data.views.getSession()
+                    collection: c.data.concepts.viewable
 
             # Record the vertical offset of the masthead nav bar if we
             # haven't done so already. This is used in scroll calculations.

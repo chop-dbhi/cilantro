@@ -34,14 +34,14 @@ define [
             @context.show new base.LoadView
                 message: 'Loading session context...'
 
-            c.data.concepts.ready =>
+            c.promiser.when 'concepts', =>
                 @concepts.show new concept.ConceptPanel
                     collection: c.data.concepts.queryable
 
                 @concepts.currentView.$el.stacked
                     fluid: '.index-region'
 
-            c.data.contexts.ready =>
+            c.promiser.when 'contexts', =>
                 @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
 

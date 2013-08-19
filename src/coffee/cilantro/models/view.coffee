@@ -128,6 +128,9 @@ define [
                     @resolve()
             c.subscribe c.SESSION_CLOSED, => @reset()
 
+            @on 'reset', ->
+                c.promiser.resolve('views')
+
         getSession: ->
             (@filter (model) -> model.get 'session')[0]
 
