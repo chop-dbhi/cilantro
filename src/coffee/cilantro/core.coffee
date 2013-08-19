@@ -6,13 +6,14 @@ define [
     './channels'
     './utils'
     './session'
+    'promiser'
 
     # Core plugins that extend various libraries such as Backbone and jQuery.
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
     'plugins/backbone-deferrable'
-], ($, _, Backbone, mediator, channels, utils, session) ->
+], ($, _, Backbone, mediator, channels, utils, session, promiser) ->
 
     # Relies on the jquery-ajax-queue plugin to supply this method.
     # This ensures data is not silently lost
@@ -99,7 +100,7 @@ define [
 
     channels = _.extend {}, channels, session.channels
 
-    props = { $, _, Backbone, utils }
+    props = { $, _, Backbone, utils, promiser }
 
     # Construct the base object which is composed core libraries, the
     # mediator methods, and the app-level config
