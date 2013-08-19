@@ -1,6 +1,7 @@
 define [
     'underscore'
     './utils/numbers'
+    './utils/url'
 ], (_, mods...) ->
 
     # Convenience method for getting a value using the dot-notion for
