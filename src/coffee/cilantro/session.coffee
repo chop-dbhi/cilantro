@@ -2,8 +2,14 @@ define [
     'jquery',
     'mediator'
     './utils'
-    './session/channels'
-], ($, mediator, utils, channels) ->
+], ($, mediator, utils) ->
+
+    channels =
+        SESSION_OPENING: 'session.opening'
+        SESSION_ERROR: 'session.error'
+        SESSION_UNAUTHORIZED: 'session.unauthorized'
+        SESSION_OPENED: 'session.opened'
+        SESSION_CLOSED: 'session.closed'
 
     # Get a URL by name for the current session relative to some hostname
     getSessionUrl = (session, key) ->
@@ -38,8 +44,10 @@ define [
             type: 'GET'
             data: data
             dataType: 'json'
+
             beforeSend: ->
                 mediator.publish channels.SESSION_OPENING
+
             success: (resp) ->
                 _.extend sessionData,
                     root: url
@@ -48,6 +56,7 @@ define [
                     urls: resp._links
                 process(sessionData)
                 mediator.publish channels.SESSION_OPENED
+
             error: (xhr, status, error) ->
                 channel = switch xhr.statusCode
                     when 401, 403

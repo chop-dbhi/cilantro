@@ -29,7 +29,7 @@ define [
         results: new models.Results
         exporters: new models.ExporterCollection
 
-    if c.getOption('autoload')
+    if c.config.get('autoload')
         c.openSession()
 
     return (@cilantro = c)

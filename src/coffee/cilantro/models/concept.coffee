@@ -37,7 +37,7 @@ define [
             c.getSessionUrl('concepts')
 
         search: (query, handler) ->
-            c.ajax
+            c.$.ajax
                 url: c._.result @, 'url'
                 data: query: query, brief: 1
                 dataType: 'json'

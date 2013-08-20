@@ -84,7 +84,7 @@ define [
         ensureSession: ->
             if not @hasSession()
                 defaults = session: true
-                defaults.json = c.getOption('defaults.context')
+                defaults.json = c.config.get('defaults.context')
                 @create defaults
 
 

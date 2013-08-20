@@ -75,7 +75,7 @@ define [
                 return
 
             # Determine if this is registered as a custom concept
-            customForm = c.getOption("concepts.forms.#{ model.id }")
+            customForm = c.config.get("concepts.forms.#{ model.id }")
 
             options = model: model
 
