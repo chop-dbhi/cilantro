@@ -22,7 +22,7 @@ define [
         tagName: 'tr'
 
         render: ->
-            @$el.html 'Loading...'
+            @$el.html 'No data to display...'
             return @
 
 
