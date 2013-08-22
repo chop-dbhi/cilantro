@@ -1,9 +1,9 @@
 define(['cilantro'], function(c) {
 
     describe('Config get option', function() {
-      
+
         beforeEach(function() {
-            c.config = {
+            c.config.set({
                 url: 'http://localhost:8000/api/',
                 defaults: {
                     view: {
@@ -11,25 +11,25 @@ define(['cilantro'], function(c) {
                     },
                     context: {}
                 }
-            };
-        });
-        
+            });
+        }, true);
+
         it('should return the base url', function() {
-            expect(c.getOption('url')).toBe('http://localhost:8000/api/');
+            expect(c.config.get('url')).toBe('http://localhost:8000/api/');
         });
 
         it('should get a nested option', function() {
-            expect(c.getOption('defaults.view.ordering.0')).toBe(1);
+            expect(c.config.get('defaults.view.ordering.0')).toBe(1);
         });
 
         it('should return undefined for missing options', function() {
-            expect(c.getOption('foo.bar.baz')).toBeUndefined();
+            expect(c.config.get('foo.bar.baz')).toBeUndefined();
         });
     });
 
 
     describe('Config set option', function() {
-        c.config = {
+        c.config.set({
             url: 'http://localhost:8000/api/',
             defaults: {
                 view: {
@@ -37,16 +37,16 @@ define(['cilantro'], function(c) {
                 },
                 context: {}
             }
-        };
-        
+        }, true);
+
         it('should set an existing (nested) option', function() {
-            c.setOption('defaults.context.type', 'or')
-            expect(c.getOption('defaults.context.type')).toBe('or');
+            c.config.set('defaults.context.type', 'or')
+            expect(c.config.get('defaults.context.type')).toBe('or');
         });
 
         it('should set a non-existing option (and create objects along the way)', function() {
-            c.setOption('foo.bar.baz', 1)
-            expect(c.getOption('foo.bar.baz')).toBe(1);
+            c.config.set('foo.bar.baz', 1)
+            expect(c.config.get('foo.bar.baz')).toBe(1);
         });
 
     });

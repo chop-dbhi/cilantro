@@ -18,7 +18,7 @@ define(['cilantro'], function(c) {
         beforeEach(function() {
             c.closeSession();
             events = [];
-            c.config = {};
+            c.config.set({}, true);
         });
 
         it('should publish events on open', function() {

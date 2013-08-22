@@ -4,7 +4,7 @@ define [
 ], ($, utils) ->
 
 
-    defaultConfig =
+    defaultOptions =
 
         # Run in debug mode for additional logging and turn off other
         # various behaviors that impede development.
@@ -22,16 +22,7 @@ define [
         autoload: false
 
         # An array of the default routes that are registered on load.
-        routes: ->
-            [
-                id: 'query',
-                route: 'query/',
-                view: new c.ui.QueryWorkflow
-            ,
-                id: 'results',
-                route: 'results/',
-                view: new c.ui.ResultsWorkflow
-            ]
+        routes: null
 
         # A selector that represents the target element views will be
         # rendered in.
@@ -52,15 +43,17 @@ define [
             forms: null
 
 
-    # Deep extend the configuration object attached to the window
-    config = $.extend true, {}, defaultConfig, @cilantro
+    class Config
+        defaults: defaultOptions
 
-    config.get = (key) ->
-        utils.getDotProp(config, key)
+        constructor: (options...) ->
+            @options = $.extend true, {}, @defaults, options...
 
-    config.set = (key, value) ->
-        utils.setDotProp(config, key, value)
+        get: (key) ->
+            utils.getDotProp(@options, key)
 
-    config.defaults = defaultConfig
+        set: (key, value) ->
+            utils.setDotProp(@options, key, value)
 
-    return config
+
+    return new Config(@cilantro)

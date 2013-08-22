@@ -1,8 +1,8 @@
 define [
-    'underscore'
+    'jquery'
     './utils/numbers'
     './utils/url'
-], (_, mods...) ->
+], ($, mods...) ->
 
     # Convenience method for getting a value using the dot-notion for
     # accessing nested structures.
@@ -16,6 +16,13 @@ define [
     # Convenience method for setting a value using the dot-notion for
     # accessing nested structures.
     setDotProp = (obj, key, value) ->
+        if typeof key is 'object'
+            # Second argument is a boolean to whether or not to replace
+            # the options
+            if value is true
+                return $.extend(true, {}, key)
+            return $.extend(true, obj, key)
+
         toks = key.split('.')
         last = toks.pop()
         for tok in toks
@@ -25,4 +32,4 @@ define [
         obj[last] = value
         return
 
-    _.extend {getDotProp, setDotProp}, mods...
+    $.extend {getDotProp, setDotProp}, mods...
