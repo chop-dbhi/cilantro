@@ -42,6 +42,9 @@ define [
             @listenTo @manager, 'all', (manager, event, args...) =>
                 @trigger("#{ @managerEventPrefix }:#{ event }", args...)
 
+            @on 'sync', ->
+                c.publish c.CONTEXT_SYNCED, @, 'success'
+
 
         toJSON: (options={}) ->
             attrs = super
