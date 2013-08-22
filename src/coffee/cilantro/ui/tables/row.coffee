@@ -1,7 +1,8 @@
 define [
     '../core'
+    '../base'
     './cell'
-], (c, cell) ->
+], (c, base, cell) ->
 
 
     class Row extends c.Marionette.CollectionView
@@ -16,14 +17,10 @@ define [
                 model: model
 
 
-    class EmptyRow extends c.Backbone.View
-        className: 'empty'
+    class EmptyRow extends base.LoadView
+        align: 'left'
 
         tagName: 'tr'
-
-        render: ->
-            @$el.html 'No data to display...'
-            return @
 
 
     { Row, EmptyRow }
