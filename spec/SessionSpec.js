@@ -16,32 +16,29 @@ define(['cilantro'], function(c) {
         });
 
         beforeEach(function() {
-            c.closeSession();
+            c.session.clear();
             events = [];
             c.config.set({}, true);
         });
 
-        it('should publish events on open', function() {
-            expect(c.getCurrentSession()).toBeUndefined();
+        it('should publish events on open and close', function() {
+            expect(c.session.url()).toBeUndefined();
 
             runs(function() {
-                c.openSession('/mock/root.json');
+                c.session.open('/mock/root.json');
+                expect(c.session.sessions['/mock/root.json']).toBeDefined();
             });
 
             waitsFor(function() {
-                return !!c.getCurrentSession();
-            }, 'The server responded', 200);
+                return !!c.session.current;
+            }, 'The session is loaded', 200);
 
             runs(function() {
-                expect(events).toEqual([c.SESSION_OPENING, c.SESSION_OPENED]);
-                expect(c.getCurrentSession()).toBe('/mock/root.json');
+                expect(c.session.url()).toBe('/mock/root.json');
+                c.session.close();
+                expect(c.session.current).toBeUndefined();
+                expect(events).toEqual([c.SESSION_OPENING, c.SESSION_OPENED, c.SESSION_CLOSED]);
             });
-        });
-
-        it('should publish events on close', function() {
-            c.closeSession();
-            expect(c.getCurrentSession()).toBeUndefined();
-            expect(events).toEqual([c.SESSION_CLOSED]);
         });
     });
 

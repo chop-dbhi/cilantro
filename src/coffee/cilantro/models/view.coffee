@@ -118,7 +118,7 @@ define [
         model: ViewModel
 
         url: ->
-            c.getSessionUrl('views')
+            c.session.url('views')
 
         initialize: ->
             super

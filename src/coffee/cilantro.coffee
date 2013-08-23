@@ -30,6 +30,6 @@ define [
         exporters: new models.ExporterCollection
 
     if c.config.get('autoload')
-        c.openSession()
+        c.session.open(c.config.get('url'), c.config.get('credentials'))
 
     return (@cilantro = c)

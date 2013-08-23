@@ -15,7 +15,7 @@ define [
         minSerranoVersionProgressEnabled: [2, 0, 16]
 
         url: ->
-            c.getSessionUrl('exporter')
+            c.session.url('exporter')
 
         initialize: ->
             super

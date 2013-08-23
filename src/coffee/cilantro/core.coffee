@@ -17,48 +17,33 @@ define [
     'plugins/backbone-deferrable'
 ], ($, _, Backbone, mediator, promiser, config, channels, utils, session) ->
 
-    currentSession = null
-
-    c = config: config
+    # Initialize configuration and session manager
+    c =
+        config: new config.Config(@cilantro)
+        session: new session.SessionManager
+        utils: utils
+        promiser: promiser
 
     methods =
         # DEPRECATED [2.0.2, 2.1.0]: Use c.config.get()
         getOption: (key) ->
-            config.get(key)
+            c.config.get(key)
 
         # DEPRECATED [2.0.2, 2.1.0]: Use c.config.set()
         setOption: (key, value) ->
-            config.set(key, value)
-
-        openSession: (url, credentials) ->
-            url ?= @config.get('url')
-            credentials ?= @config.get('credentials')
-            if not url? then throw new Error('Session cannot be opened, no URL defined')
-            session.openSession url, credentials, (sessionData) ->
-                currentSession = _.clone sessionData
-
-        closeSession: ->
-            session.closeSession ->
-                currentSession = null
-
-        getCurrentSession: ->
-            currentSession?.root
-
-        getSessionUrl: (name) ->
-            session.getSessionUrl(currentSession, name)
+            c.config.set(key, value)
 
         getSerranoVersion: ->
             # If there is no version defined, return the absolute minimum
-            if not currentSession?.version?
+            if not c.session.current
                 return [0, 0, 0]
 
             # Remove anything after the release level
-            versionString =
-                String(currentSession.version).replace(/[abf].*$/g, "")
+            versionString = c.session.current.data.version.replace(/[abf].*$/g, '')
 
             # Try to split the version string into major, minor, and micro
             # version numbers
-            versionFields = versionString.split(".")
+            versionFields = versionString.split('.')
 
             # If we don't have values for all of major, minor, and micro
             # version numbers then return the minimum version.
@@ -90,8 +75,8 @@ define [
 
     channels = _.extend {}, channels, session.channels
 
-    props = { $, _, Backbone, utils, config, promiser }
+    props = { $, _, Backbone }
 
     # Construct the base object which is composed core libraries, the
-    # mediator methods, and the app-level config
+    # mediator methods, session manager, and the config object
     _.extend c, mediator, channels, props, methods

@@ -34,7 +34,7 @@ define [
         model: ConceptModel
 
         url: ->
-            c.getSessionUrl('concepts')
+            c.session.url('concepts')
 
         search: (query, handler) ->
             c.$.ajax

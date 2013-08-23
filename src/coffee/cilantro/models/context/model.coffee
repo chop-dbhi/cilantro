@@ -62,7 +62,7 @@ define [
         model: ContextModel
 
         url: ->
-            c.getSessionUrl('contexts')
+            c.session.url('contexts')
 
         initialize: ->
             super

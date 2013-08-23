@@ -57,7 +57,7 @@ define [
         model: FieldModel
 
         url: ->
-            c.getSessionUrl('fields')
+            c.session.url('fields')
 
         search: (query, handler) ->
             c.Backbone.ajax

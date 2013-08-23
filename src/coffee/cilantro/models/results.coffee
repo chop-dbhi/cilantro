@@ -18,7 +18,7 @@ define [
     # to the frame size.
     class Results extends structs.FrameArray
         url: ->
-            c.getSessionUrl('preview')
+            c.session.url('preview')
 
         initialize: ->
             super

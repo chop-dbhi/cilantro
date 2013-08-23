@@ -44,10 +44,8 @@ define [
 
 
     class Config
-        defaults: defaultOptions
-
         constructor: (options...) ->
-            @options = $.extend true, {}, @defaults, options...
+            @options = $.extend true, {}, defaultOptions, options...
 
         get: (key) ->
             utils.getDotProp(@options, key)
@@ -56,4 +54,4 @@ define [
             utils.setDotProp(@options, key, value)
 
 
-    return new Config(@cilantro)
+    { Config, defaultOptions }
