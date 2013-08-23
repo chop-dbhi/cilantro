@@ -4,10 +4,10 @@ define [
     '../../button'
     'tpl!templates/controls/date-range-input.html'
 ], (c, controls, button, templates...) ->
-    
+
     templates = c._.object ['date'], templates
 
-    class DateControl extends controls.Control 
+    class DateControl extends controls.Control
         template: templates.date
 
         events: ->
@@ -37,7 +37,7 @@ define [
             @$('.help-block').hide()
             @$('.range-from').datepicker({'autoclose': true})
             @$('.range-to').datepicker({'autoclose': true})
-            
+
             @set(@context)
 
         toggleHelpText: (event) ->
@@ -63,7 +63,7 @@ define [
                 operator = if @isBetweenSelected() then 'lte' else 'gte'
             else
                 operator = if @isBetweenSelected() then 'range' else '-range'
-          
+
             return operator
 
         getValue: ->
@@ -72,9 +72,9 @@ define [
 
             to_text = @$('.range-to').val()
             to_date = @$('.range-to').data('datepicker').getFormattedDate()
-            
+
             value = []
-            
+
             if from_text != "" and to_text != ""
                 value = [from_date, to_date]
             else if from_text != ""
@@ -83,8 +83,8 @@ define [
                 value = to_date
             # If both fields are emtpy, return null to invalidate this range
             else
-                value = null 
-             
+                value = null
+
             return value
 
         setOperator: (operator) ->
