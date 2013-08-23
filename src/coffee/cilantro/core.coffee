@@ -14,7 +14,6 @@ define [
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
-    'plugins/backbone-deferrable'
 ], ($, _, Backbone, mediator, promiser, config, channels, utils, session) ->
 
     # Initialize configuration and session manager

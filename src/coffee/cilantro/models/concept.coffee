@@ -51,7 +51,6 @@ define [
             super
 
         initialize: ->
-            super
             c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
 
@@ -62,8 +61,6 @@ define [
                 @viewable.reset @filter (m) ->
                     !!m.get('viewable') or !!m.get('formatter_name')
                 c.promiser.resolve('concepts')
-
-            @on 'reset', @resolve
 
 
     { ConceptModel, ConceptCollection }

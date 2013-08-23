@@ -28,36 +28,21 @@ define [
             super
 
         initialize: ->
-            super
-
             @on 'request', ->
-                @pending()
                 c.publish c.VIEW_SYNCING, @
 
             @on 'sync', ->
-                @resolve()
                 c.publish c.VIEW_SYNCED, @, 'success'
 
             @on 'error', ->
-                @resolve()
                 c.publish c.VIEW_SYNCED, @, 'error'
 
             @on 'change', ->
                 c.publish c.VIEW_CHANGED, @
 
-            c.subscribe c.VIEW_PAUSE, (id) =>
-                if @id is id or not id and @isSession()
-                    @pending()
-
-            c.subscribe c.VIEW_RESUME, (id) =>
-                if @id is id or not id and @isSession()
-                    @resolve()
-
             c.subscribe c.VIEW_SAVE, (id) =>
                 if @id is id or not id and @isSession()
                     @save()
-
-            @resolve()
 
         isSession: ->
             @get 'session'
@@ -125,7 +110,6 @@ define [
             c.subscribe c.SESSION_OPENED, =>
                 @fetch(reset: true).done =>
                     @ensureSession()
-                    @resolve()
             c.subscribe c.SESSION_CLOSED, => @reset()
 
             @on 'reset', ->

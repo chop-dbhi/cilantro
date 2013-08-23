@@ -10,10 +10,10 @@ define [
         comparator: 'page_num'
 
         refresh: ->
-            if not @isPending()
-                @pending()
+            if not @pending
+                @pending = true
                 @fetch(reset: true).done =>
-                    @resolve()
+                    @pending = false
                     @setCurrentPage(@models[0].id)
 
         # Parses the initial fetch which is a single page, resets if necessary
@@ -68,10 +68,11 @@ define [
             if not @hasPage(num) then return
 
             if not (model = @get(num)) and options.load isnt false
-                (model = new @model(page_num: num)).pending()
+                model = new @model(page_num: num)
+                model.pending = true
                 @add(model)
                 model.fetch().done =>
-                    model.resolve()
+                    delete model.pending
 
             if model and options.active isnt false
                 @setCurrentPage(num)
@@ -100,7 +101,7 @@ define [
         # responded yet
         pageIsLoading: (num=@currentPageNum) ->
             if (page = @getPage(num, active: false, load: false))
-                return page.isPending()
+                return !!page.pending
 
         getPageCount: ->
             return @numPages
@@ -126,12 +127,6 @@ define [
     # Paginator collection for managing it's pages
     class Paginator extends c.Backbone.Collection
         model: Page
-
-        initialize: ->
-            super
-            # Initially resolve to trigger pending on refresh
-            # TODO this logic is odd and should be changed
-            @resolve()
 
 
     c._.extend Paginator::, PaginatorMixin

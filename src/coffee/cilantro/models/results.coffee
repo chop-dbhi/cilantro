@@ -21,10 +21,6 @@ define [
             c.session.url('preview')
 
         initialize: ->
-            super
-            # Initially resolve to trigger pending on refresh
-            # TODO this logic is odd and should be changed
-            @resolve()
             c.subscribe c.SESSION_OPENED, @refresh, @
             c.subscribe c.SESSION_CLOSED, @reset, @
             c.subscribe c.CONTEXT_SYNCED, @refresh, @

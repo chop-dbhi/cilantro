@@ -65,11 +65,9 @@ define [
             c.session.url('contexts')
 
         initialize: ->
-            super
             c.subscribe c.SESSION_OPENED, =>
                 @fetch(reset: true).done =>
                     @ensureSession()
-                    @resolve()
             c.subscribe c.SESSION_CLOSED, => @reset()
 
             @on 'reset', ->
