@@ -44,7 +44,9 @@ define [
             return itemView
 
         itemViewOptions: (model, index) ->
-            model.attributes
+            attrs = model.toJSON()
+            attrs.index = index
+            return attrs
 
         buildItemView: (model, itemView, options) ->
             new itemView options
@@ -67,7 +69,14 @@ define [
             else
                 templates.form
 
+        infoView: info.FieldInfo
+
+        statsView: stats.FieldStats
+
+        controlsView: FieldControls
+
         options:
+            nodeType: 'condition'
             showInfo: true
             showChart: false
             showDefaultControl: true
@@ -78,6 +87,7 @@ define [
             @context = @options.context.define
                 concept: @options.context.get('concept')
                 field: @model.id
+            , type: @options.nodeType
 
         regions:
             info: '.info-region'
@@ -86,16 +96,16 @@ define [
 
         onRender: ->
             if @options.showInfo
-                @info.show new info.FieldInfo
+                @info.show new @infoView
                     model: @model
 
             if @model.stats?
-                @stats.show new stats.FieldStats
+                @stats.show new @statsView
                     model: @model
 
             # Initialize empty collection view in which controls can
             # be added to.
-            @controls.show new FieldControls
+            @controls.show new @controlsView
                 collection: new c.Backbone.Collection
                 context: @context
 
@@ -152,4 +162,4 @@ define [
             return options
 
 
-    { FieldForm, FieldFormCollection }
+    { FieldControls, FieldForm, FieldFormCollection }

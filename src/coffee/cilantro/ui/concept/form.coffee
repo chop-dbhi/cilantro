@@ -14,6 +14,10 @@ define [
 
         template: templates.form
 
+        infoView: info.ConceptInfo
+
+        fieldCollectionView: field.FieldFormCollection
+
         constructor: (options={}) ->
             if not options.context?
                 session = c.data.contexts.getSession()
@@ -64,10 +68,10 @@ define [
             return
 
         onRender: ->
-            @info.show new info.ConceptInfo
+            @info.show new @infoView
                 model: @model
 
-            @fields.show new field.FieldFormCollection
+            @fields.show new @fieldCollectionView
                 context: @context
                 collection: @model.fields
                 hideSingleFieldInfo: true
