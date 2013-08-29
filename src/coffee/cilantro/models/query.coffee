@@ -15,7 +15,7 @@ define [
         initialize: ->
             super
             c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
-            s.subscribe c.SESSION_CLOSE, => @reset()
+            c.subscribe c.SESSION_CLOSE, => @reset()
 
 
     { QueryModel, QueryCollection }
