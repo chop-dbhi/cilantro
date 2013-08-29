@@ -7,6 +7,7 @@ define [
     './models/paginator'
     './models/results'
     './models/exporter'
+    './models/query'
     './models/value'
 ], (c, mods...) ->
 

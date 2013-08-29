@@ -9,7 +9,7 @@ define [
 
     class ExporterCollection extends base.Collection
         model: ExporterModel
-    
+
         # Versions greater than or equal to this version are considered to
         # support notification on completion.
         minSerranoVersionProgressEnabled: [2, 0, 16]
