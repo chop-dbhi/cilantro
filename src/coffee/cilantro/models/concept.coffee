@@ -57,7 +57,7 @@ define [
 
             # Update the sub-collections with the specific sets of models
             @on 'reset', ->
-                @queryable.reset @filter (m) -> !!m.get('queryview')
+                @queryable.reset @filter (m) -> !!m.get('queryable')
                 @viewable.reset @filter (m) -> !!m.get('formatter_name')
 
                 c.promiser.resolve('concepts')
