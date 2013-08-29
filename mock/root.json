@@ -22,7 +22,8 @@
         },
         "shared_queries": {
             "href": "/mock/shared_queries.json",
-            "rel": "dataqueries",
+            "rel": "dataqueries"
+        },
         "self": {
             "href": "/mock/root.json",
             "rel": "self"
