@@ -28,7 +28,7 @@ define [
         views: new models.ViewCollection
         results: new models.Results
         exporters: new models.ExporterCollection
-        shared_queries: new models.QueryCollection
+        shared_queries: new models.SharedQueryCollection
 
     if c.config.get('autoload')
         c.session.open(c.config.get('url'), c.config.get('credentials'))

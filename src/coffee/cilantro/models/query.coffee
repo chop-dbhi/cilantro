@@ -10,7 +10,7 @@ define [
         model: QueryModel
 
         url: ->
-            c.session.url('shared_queries')
+            c.session.url('queries')
 
         initialize: ->
             super
@@ -18,4 +18,9 @@ define [
             c.subscribe c.SESSION_CLOSE, => @reset()
 
 
-    { QueryModel, QueryCollection }
+    class SharedQueryCollection extends QueryCollection
+        url: ->
+            c.session.url('shared_queries')
+
+
+    { QueryModel, QueryCollection, SharedQueryCollection }
