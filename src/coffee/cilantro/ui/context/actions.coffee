@@ -20,9 +20,11 @@ define [
             'change:count': 'renderCount'
 
         serializeData: ->
-            attrs = c._.clone(@model.attributes)
-            delete attrs.json
-            attrs.count = c.utils.prettyNumber(attrs.count)
+            attrs = {}
+            if @model?
+                attrs = c._.clone(@model.attributes)
+                delete attrs.json
+                attrs.count = c.utils.prettyNumber(attrs.count)
             return attrs
 
         renderCount: (model, value, options) ->
