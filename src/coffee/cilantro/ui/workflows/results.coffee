@@ -49,6 +49,7 @@ define [
 
         ui:
             columns: '.columns-modal'
+            createReport: '.create-report-modal'
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
             navbar: '.results-workflow-navbar'
@@ -61,6 +62,7 @@ define [
             'click [data-toggle=export-options]': 'showExportOptions'
             'click [data-toggle=export-progress]': 'showExportProgress'
             'click #pages-text-ranges': 'selectPagesOption'
+            'click [data-toggle=create-report]': 'showCreateReport'
 
         regions:
             count: '.count-region'
@@ -345,6 +347,9 @@ define [
 
         showColumns: ->
             @ui.columns.modal('show')
+
+        showCreateReport: ->
+            @ui.createReport.modal('show')
 
         cancelColumnChanges: ->
             c._.delay =>
