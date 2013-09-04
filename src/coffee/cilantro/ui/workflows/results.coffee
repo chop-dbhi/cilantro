@@ -11,9 +11,10 @@ define [
     '../context'
     '../concept'
     '../exporter'
+    '../report'
     'tpl!templates/count.html'
     'tpl!templates/workflows/results.html'
-], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, templates...) ->
+], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, report, templates...) ->
 
     templates = _.object ['count', 'results'], templates
 
@@ -85,6 +86,7 @@ define [
             $(window).resize @onWindowResize
 
             @monitors = {}
+            @createReportModal = new report.ModalRegion({el:'.create-report-modal'})
 
             c.subscribe c.SESSION_OPENED, ->
                 if not c.isSupported()
@@ -412,8 +414,8 @@ define [
         showColumns: ->
             @ui.columns.modal('show')
 
-        showCreateReport: ->
-            @ui.createReport.modal('show')
+        showCreateReport: =>
+            @createReportModal.show(new report.ReportDialog())
 
         cancelColumnChanges: ->
             _.delay =>
