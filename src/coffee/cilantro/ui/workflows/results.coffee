@@ -415,7 +415,8 @@ define [
             @ui.columns.modal('show')
 
         showCreateReport: =>
-            @createReportModal.show(new report.ReportDialog())
+            @createReportModal.show new report.ReportDialog(
+                {model: new c.models.QueryModel})
 
         cancelColumnChanges: ->
             _.delay =>
