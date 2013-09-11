@@ -14,6 +14,9 @@ define [
         # is called.
         url: null
 
+        # The root URL to the application. If falsy, default is '/'
+        root: null
+
         # The default set of credentials to use when openSession is called.
         credentials: null
 

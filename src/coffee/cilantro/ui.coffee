@@ -15,9 +15,10 @@ define [
 ], (c, router, mods...) ->
 
 
-    # TODO: still hideous
+    # Define the primary router with the main element and app root
     c.router = new router.Router
         el: c.config.get('ui.main')
+        root: c.config.get('root')
 
 
     # Register pre-define routes

@@ -7,6 +7,7 @@ define [
     class Router extends Backbone.Router
         options:
             el: 'body'
+            root: null
 
         initialize: (options) ->
             @options = _.extend({}, _.result(@, 'options'), options)
@@ -135,5 +136,11 @@ define [
                     @_routes[options.route].splice(idx, 1)
             return
 
+        # Shortcut for starting the Backbone.history
+        start: ->
+            root = @options.root or '/'
+            if root.charAt(root.length-1) isnt '/'
+                root = root + '/'
+            Backbone.history.start(root: root, pushState: true)
 
     { Router }
