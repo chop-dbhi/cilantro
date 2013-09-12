@@ -8,14 +8,6 @@ define [
     templates = c._.object ['panel'], templates
 
 
-    class ConceptSearch extends search.ConceptSearch
-        events:
-            'typeahead:autocompleted input': 'autocomplete'
-
-        autocomplete: (event, datum) ->
-            c.publish c.CONCEPT_FOCUS, datum.id
-
-
     # Takes a collection of c.models.ConceptModel objects
     class ConceptPanel extends c.Marionette.Layout
         className: 'concept-panel'
@@ -37,8 +29,9 @@ define [
             # When a search occurs, the index is filtered relative to the
             # response which contains a listing of IDs that the search
             # has matched.
-            @search.show new ConceptSearch
+            @search.show new search.ConceptSearch
                 collection: @collection
+
                 handler: (query, resp) =>
                     @index.currentView.filter(query, resp)
 
