@@ -16,6 +16,8 @@ define [
         views: new models.ViewCollection
         results: new models.Results
         exporters: new models.ExporterCollection
+
+    if c.isSupported('2.1.0')
         shared_queries: new models.SharedQueryCollection
 
     if c.config.get('autoload')

@@ -50,6 +50,7 @@ define [
         ui:
             columns: '.columns-modal'
             createReport: '.create-report-modal'
+            createReportToggle: '[data-toggle=create-report]'
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
             navbar: '.results-workflow-navbar'
@@ -281,12 +282,16 @@ define [
                 if not c.data.exporters.notifiesOnComplete()
                     delay = @requestTimeout
                 for i in [0..selectedTypes.length-1] by 1
-                    @changeExportStatus(
-                        $(selectedTypes[i]).attr('title'), "pending")
+                    @changeExportStatus($(selectedTypes[i]).attr('title'), "pending")
 
                     setTimeout(@startExport, i * delay, selectedTypes[i], pagesSuffix)
 
         onRender: ->
+            # Remove unsupported features from view
+            if not c.isSupported('2.1.0')
+                @ui.createReportToggle.remove()
+                @ui.createReport.remove()
+
             @paginator.show new paginator.Paginator
                 model: c.data.results
 
