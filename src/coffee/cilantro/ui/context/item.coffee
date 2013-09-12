@@ -5,12 +5,14 @@ define [
 
     templates = c._.object ['item'], templates
 
-    flattenLanguage = (attrs, items=[]) ->
+    # Returns a flat list of values for `key` that is built by recursing
+    # over the `attrs.children` if present.
+    flattenAttr = (attrs, key, items=[]) ->
+        if attrs[key]?
+            items.push(attrs[key])
         if attrs.children?
             for child in attrs.children
-                flattenLanguage(child, items)
-        else if attrs.language?
-            items.push(attrs.language)
+                flattenAttr(child, key, items)
         return items
 
 
@@ -74,7 +76,7 @@ define [
                 @renderDisabled()
 
         renderLanguage: (node) ->
-            text = flattenLanguage(@model.toJSON()).join(', ')
+            text = flattenAttr(@model.toJSON(), 'language').join(', ')
             @ui.language.html(text)
 
         showLoading: ->
