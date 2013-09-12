@@ -151,6 +151,7 @@ define [
         isNew: (options) ->
             not @_upstream(options)
 
+        # Checks if this node is new or is different from upstream
         _isDirty: (options) ->
             if not (node = @_upstream(options))
                 return true

@@ -107,7 +107,7 @@ define [
 
         isNew: (options) ->
             if super then return true
-            return @_recurse('isNew', true, options)
+            return @_recurse('isNew', false, options)
 
         isEnabled: (options) ->
             if super then return true
