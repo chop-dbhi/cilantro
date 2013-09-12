@@ -116,16 +116,25 @@ define [
 
         template: templates.layout
 
+        searchPaginator: SearchPaginator
+
         regions:
             search: '.search-region'
             paginator: '.paginator-region'
             browse: '.browse-region'
             values: '.values-region'
 
+        regionViews:
+            search: ValueSearch
+            paginator: paginator.Paginator
+            browse: SearchPageRoll
+            values: values.ValueList
+
         initialize: (options) ->
             super(options)
             # Initialize a new collection of values for use by the
-            # two regions.
+            # two regions. This is shared between the source data
+            # and the selected values for toggling state changes.
             if not @collection
                 @collection = new models.Values
                 @collection.url = =>
@@ -134,26 +143,26 @@ define [
             # Trigger a change event on all collection events
             @collection.on 'all', @change, @
 
-            @valuesPaginator = new SearchPaginator null,
+            @valuesPaginator = new @searchPaginator null,
                 field: @model
 
             @valuesPaginator.refresh()
 
         onRender: ->
-            @search.show new ValueSearch
+            @search.show new @regionViews.search
                 model: @model
                 paginator: @valuesPaginator
                 placeholder: "Search #{ @model.get('plural_name') }..."
 
-            @browse.show new SearchPageRoll
+            @browse.show new @regionViews.browse
                 collection: @valuesPaginator
                 values: @collection
 
-            @paginator.show new paginator.Paginator
+            @paginator.show new @regionViews.paginator
                 className: 'paginator mini'
                 model: @valuesPaginator
 
-            @values.show new values.ValueList
+            @values.show new @regionViews.values
                 collection: @collection
 
             # TODO move this elsewhere, look in cilantro/ui/controls/base
@@ -175,4 +184,4 @@ define [
             @collection.set(value, merge: false)
 
 
-    { FieldValueSearch }
+    { FieldValueSearch, ValueSearch, SearchItem, SearchPage, SearchPageRoll }
