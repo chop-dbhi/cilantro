@@ -56,6 +56,8 @@ define [
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
             navbar: '.results-workflow-navbar'
+            contextContainer: '.context-container'
+            resultsContainer: '.results-container'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
@@ -96,11 +98,19 @@ define [
                 if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
                     # Remove the results navbar from the top
                     @ui.navbar.removeClass('navbar-fixed-top')
+
+                    # Restore the context panel
+                    @ui.contextContainer.css('display', 'block')
+                    @ui.resultsContainer.addClass('span9')
             else
                 if scrollPos >= (@navbarVerticalOffset - @topNavbarHeight)
                     # Move the results navbar to the top
                     @ui.navbar.css('top', @topNavbarHeight)
                     @ui.navbar.addClass('navbar-fixed-top')
+
+                    # Hide the context panel
+                    @ui.contextContainer.css('display', 'none')
+                    @ui.resultsContainer.removeClass('span9')
 
         selectPagesOption: ->
             $('#pages-radio-all').prop('checked', false)
