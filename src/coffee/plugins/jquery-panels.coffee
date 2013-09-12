@@ -29,8 +29,13 @@ define ['jquery'], ($) ->
       </div>
     ###
 
-    Panel = (element) ->
+    Panel = (element, options) ->
         @element = $(element)
+        @options = $.extend {},
+            side: 'left'
+            closed: false
+        , options
+
         # Total width of panel
         @slideWidth = @element.width()
 
@@ -42,16 +47,17 @@ define ['jquery'], ($) ->
 
         @state = 1
 
-        if @element.hasClass('panel-right')
+        if @options.side is 'right' or @element.hasClass('panel-right')
+            @element.addClass('panel-right')
             @side = 'right'
         else
             @side = 'left'
 
         # Hide without animation
-        if @element.hasClass 'closed'
+        if @options.closed is true or @element.hasClass 'closed'
             @state = 0
             (css = {})[@side] = -@slideWidth
-            @element.css(css).show()
+            @element.addClass('closed').css(css).show()
 
         return @
 
@@ -63,7 +69,7 @@ define ['jquery'], ($) ->
                 @state = 1
                 (attrs = {})[@side] = 0
                 @element.animate(attrs, 300).removeClass('closed')
-            
+
         close: ->
             if @state
                 @state = 0
@@ -75,24 +81,26 @@ define ['jquery'], ($) ->
 
     $.fn.panel = (option) ->
         @each ->
-            $this = $ @
-            data = $this.data('panel')
-            $this.data 'panel', (data = new Panel(@)) unless data
-            data[option]() if typeof option is 'string'
+            $this = $(@)
+            if not (data = $this.data('panel'))
+                if typeof option is 'object' then options = option
+                $this.data('panel', (data = new Panel(@, options)))
+            if typeof option is 'string'
+                data[option]()
 
     $.fn.panel.Constructor = Panel
 
 
     $ ->
-            # Bootstrap pre-rendered DOM elements
-            $('.panel').panel()
+        # Bootstrap pre-rendered DOM elements
+        $('.panel').panel()
 
-            $('[data-toggle*=panel]').each ->
-                (toggle = $(this)).on 'click', ->
-                    # If this data-toggle specifies a target, use that, otherwise assume
-                    # it is a .panel-toggle within the panel itself.
-                    if toggle.data 'target'
-                        panel = $ toggle.data('target')
-                    else
-                        panel = toggle.parent()
-                    panel.panel 'toggle'
+        $('[data-toggle*=panel]').each ->
+            (toggle = $(this)).on 'click', ->
+                # If this data-toggle specifies a target, use that, otherwise assume
+                # it is a .panel-toggle within the panel itself.
+                if toggle.data 'target'
+                    panel = $ toggle.data('target')
+                else
+                    panel = toggle.parent()
+                panel.panel 'toggle'

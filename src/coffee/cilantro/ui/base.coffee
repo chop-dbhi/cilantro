@@ -1,6 +1,9 @@
 define [
     './core'
-], (c) ->
+    'tpl!templates/panel.html'
+], (c, templates...) ->
+
+    templates = c._.object ['panel'], templates
 
     # Simple set of views for representing various states.
     #
@@ -64,4 +67,27 @@ define [
         message: 'Loading...'
 
 
-    { EmptyView, ErrorView, LoadView }
+
+    class Panel extends c.Marionette.Layout
+        className: 'panel'
+
+        template: templates.panel
+
+        options:
+            content: null
+            position: 'left'
+            closed: false
+
+        regions:
+            toggle: '.panel-toggle'
+            content: '.panel-content'
+
+        initialize: ->
+            @$el.panel(@options)
+
+        onRender: ->
+            if @options.content
+                @content.show(@options.content)
+
+
+    { EmptyView, ErrorView, LoadView, Panel }
