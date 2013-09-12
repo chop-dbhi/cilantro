@@ -18,22 +18,21 @@ define [
 
         # Parses the initial fetch which is a single page, resets if necessary
         parse: (resp, options) ->
-            if @perPage isnt resp.per_page
-                if not options.reset
-                    # TODO Smartly shuffle pages when only the size changes.
-                    # The data is not invalid, just broken up differently
-                    @reset(null, silent: true)
-                @currentPageNum = null
-                @perPage = resp.per_page
-                @trigger('change:pagesize', @, @perPage)
+            if not options.reset
+                # TODO Smartly shuffle pages when only the size changes.
+                # The data is not invalid, just broken up differently
+                @reset(null, silent: true)
 
-            if @numPages isnt resp.num_pages
-                @numPages = resp.num_pages
-                @trigger('change:pagecount', @, @numPages)
+            @currentPageNum = null
 
-            if @objectCount isnt resp.object_count
-                @objectCount = resp.object_count
-                @trigger('change:objectcount', @, @objectCount)
+            @perPage = resp.per_page
+            @trigger('change:pagesize', @, @perPage)
+
+            @numPages = resp.num_pages
+            @trigger('change:pagecount', @, @numPages)
+
+            @objectCount = resp.object_count
+            @trigger('change:objectcount', @, @objectCount)
 
             return [resp]
 

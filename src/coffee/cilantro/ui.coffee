@@ -12,6 +12,7 @@ define [
     './ui/exporter'
     './ui/tables'
     './ui/workflows'
+    './ui/paginator'
 ], (c, router, mods...) ->
 
 
