@@ -43,6 +43,10 @@ define [
             'sync': 'doneLoading'
             'error': 'doneLoading'
 
+        initialize: ->
+            @listenTo(@model, 'request', @showLoading, @)
+            @listenTo(@model, 'sync', @doneLoading, @)
+
         onRender: ->
             @info.show new info.ContextInfo
                 model: @model
