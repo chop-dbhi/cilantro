@@ -68,6 +68,7 @@ define [
             'click [data-toggle=export-progress]': 'showExportProgress'
             'click #pages-text-ranges': 'selectPagesOption'
             'click [data-toggle=create-report]': 'showCreateReport'
+            'click #toggle-context-panel-button': 'toggleContextPanel'
 
         regions:
             count: '.count-region'
@@ -87,6 +88,18 @@ define [
                 if not c.isSupported()
                     $('.serrano-version-warning').show()
 
+        toggleContextPanel: =>
+            if @ui.contextContainer.css('display') == 'none'
+                # Restore the context panel
+                @ui.contextContainer.css('display', 'block')
+                @ui.resultsContainer.addClass('span9')
+                @$('#toggle-context-panel-button').html('Hide Filters...')
+            else
+                # Hide the context panel
+                @ui.contextContainer.css('display', 'none')
+                @ui.resultsContainer.removeClass('span9')
+                @$('#toggle-context-panel-button').html('Show Filters...')
+
         onPageScroll: =>
             # If the view isn't rendered yet, then don't bother
             if not @isClosed? or @isClosed
@@ -98,19 +111,13 @@ define [
                 if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
                     # Remove the results navbar from the top
                     @ui.navbar.removeClass('navbar-fixed-top')
-
-                    # Restore the context panel
-                    @ui.contextContainer.css('display', 'block')
-                    @ui.resultsContainer.addClass('span9')
+                    @toggleContextPanel()
             else
                 if scrollPos >= (@navbarVerticalOffset - @topNavbarHeight)
                     # Move the results navbar to the top
                     @ui.navbar.css('top', @topNavbarHeight)
                     @ui.navbar.addClass('navbar-fixed-top')
-
-                    # Hide the context panel
-                    @ui.contextContainer.css('display', 'none')
-                    @ui.resultsContainer.removeClass('span9')
+                    @toggleContextPanel()
 
         selectPagesOption: ->
             $('#pages-radio-all').prop('checked', false)
