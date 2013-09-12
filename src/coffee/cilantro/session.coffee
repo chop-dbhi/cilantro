@@ -70,12 +70,14 @@ define [
         # request has completed.
         open: ->
             deferred = $.Deferred()
-            if @data?
+            if @loaded()
                 deferred.resolve(@data)
             else
                 openSession @rootUrl, @credentials, deferred.done (data) =>
                     @data = data
             return deferred
+
+        loaded: -> @data?
 
         # Close the session (currently a no-op)
         close: ->
@@ -101,7 +103,7 @@ define [
             if @current isnt session
                 @close()
                 @current = session
-            mediator.publish(channels.SESSION_OPENED, name)
+            mediator.publish(channels.SESSION_OPENED, session.name)
 
         # Opens a session. A name can be supplied for referencing the session
         # rather than by URL. The session will be initialized and registered

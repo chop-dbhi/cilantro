@@ -45,30 +45,31 @@ define [
 
                 options._view = options.view
 
-            @_render(options)
-            @_loaded.push(options.id)
-
-        _render: (options) =>
-            view = options._view
-
             # XXX: this is hack until #229 is resolved. Views can be rendered
             # prior to the session being initialized so the API version is not
             # yet know. Since views depend on the API version to toggle certain
             # features, rendering must wait.
-            c.session.current.open().done =>
-                if not view._rendered
-                    view._rendered = true
-                    if options.el isnt false
-                        if options.el?
-                            target = c.Backbone.$(options.el, @options.el)
-                        else
-                            target = c.Backbone.$(@options.el)
-                        target.append(view.el)
+            if c.session.current?
+                c.session.current.open().done =>
+                    @_render(options)
+            else
+                @_render(options)
+            @_loaded.push(options.id)
 
-                        view.render?()
+        _render: (options) =>
+            view = options._view
+            if not view._rendered
+                view._rendered = true
+                if options.el isnt false
+                    if options.el?
+                        target = c.Backbone.$(options.el, @options.el)
+                    else
+                        target = c.Backbone.$(@options.el)
+                    target.append(view.el)
+                    view.render?()
 
-                view.$el.show()
-                view.trigger?('router:load', @, c.Backbone.history.fragment)
+            view.$el.show()
+            view.trigger?('router:load', @, c.Backbone.history.fragment)
             return
 
         _register: (options) ->

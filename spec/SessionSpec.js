@@ -30,7 +30,7 @@ define(['cilantro'], function(c) {
             });
 
             waitsFor(function() {
-                return !!c.session.current;
+                return c.session.current.loaded();
             }, 'The session is loaded', 200);
 
             runs(function() {
