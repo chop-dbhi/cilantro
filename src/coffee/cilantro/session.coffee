@@ -65,9 +65,9 @@ define [
     class Session
         constructor: (@name, @rootUrl, @crendentials) ->
 
-        # Returns a deferred which will resolv immediately if the session
+        # Returns a deferred which will resolve immediately if the session
         # exists. Otherwise, it will be resolved (or failed) when once the
-        # requests have completed.
+        # request has completed.
         open: ->
             deferred = $.Deferred()
             if @data?
@@ -97,8 +97,10 @@ define [
 
         # Handles
         _activate: (session) ->
-            @close()
-            @current = session
+            # Handle the initial case
+            if @current isnt session
+                @close()
+                @current = session
             mediator.publish(channels.SESSION_OPENED, name)
 
         # Opens a session. A name can be supplied for referencing the session
@@ -116,6 +118,10 @@ define [
 
             # Register session and mark is at the pending session
             @pending = @sessions[name] = session
+
+            # If this is the initial session, also set it as the current
+            # session.
+            if not @current then @current = session
 
             # Publish the session is opening by the name supplied
             mediator.publish channels.SESSION_OPENING, name

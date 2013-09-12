@@ -15,8 +15,8 @@ define [
         template: templates.query
 
         initialize: ->
-            c.subscribe c.SESSION_OPENED, () ->
-                if c.isSerranoOutdated()
+            c.subscribe c.SESSION_OPENED, ->
+                if not c.isSupported()
                     $('.serrano-version-warning').show()
 
         regions:

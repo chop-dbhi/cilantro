@@ -12,7 +12,7 @@ define [
 
         # Versions greater than or equal to this version are considered to
         # support notification on completion.
-        minSerranoVersionProgressEnabled: [2, 0, 16]
+        minSerranoVersionProgressFeature: '2.0.16'
 
         url: ->
             c.session.url('exporter')
@@ -22,15 +22,8 @@ define [
             c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
             c.subscribe c.SESSION_CLOSED, => @reset()
 
-        notifiesOnComplete: () ->
-            serranoVersion = c.getSerranoVersion()
-            versionHasProgressFeature = true
-
-            for i in [0..2] by 1
-                if serranoVersion[i] < @minSerranoVersionProgressEnabled[i]
-                    versionHasProgressFeature = false
-
-            return versionHasProgressFeature
+        notifiesOnComplete: ->
+            c.isSupported(@minSerranoVersionProgressFeature)
 
         parse: (attrs) ->
             if attrs? and attrs._links?

@@ -2,6 +2,7 @@ define [
     'jquery'
     './utils/numbers'
     './utils/url'
+    './utils/version'
 ], ($, mods...) ->
 
     # Convenience method for getting a value using the dot-notion for
@@ -32,4 +33,4 @@ define [
         obj[last] = value
         return
 
-    $.extend {getDotProp, setDotProp}, mods...
+    $.extend { getDotProp, setDotProp }, mods...

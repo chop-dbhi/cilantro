@@ -8,74 +8,65 @@ define [
     './channels'
     './utils'
     './session'
+    './changelog'
     './setup'
 
     # Core plugins that extend various libraries such as Backbone and jQuery.
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
-], ($, _, Backbone, mediator, promiser, config, channels, utils, session) ->
+], ($, _, Backbone, mediator, promiser, config, channels, utils, session, changelog) ->
 
-    # Initialize configuration and session manager
     c =
-        config: new config.Config(@cilantro)
+        # Version of cilantro
+        version: changelog[0].version
+
+        # Defines the minimum version and maximum version Serrano that this version
+        # of Cilantro is 100% compatible with. While Cilantro will attempt to run
+        # normally despite the version number received from the server, the user
+        # will be warned if no version number is found or if it is less than this
+        # minimum to prepare them in the case of missing or broken functionality.
+        minSerranoVersion: '2.0.18'
+        maxSerranoVersion: '2.1.0'
+
+        # Initialize the session manager and default configuration
         session: new session.SessionManager
+        config: new config.Config(@cilantro)
+
+        # Attach commonly used utilities and promiser object
         utils: utils
         promiser: promiser
 
-    methods =
         # DEPRECATED [2.0.2, 2.1.0]: Use c.config.get()
         getOption: (key) ->
-            c.config.get(key)
+            @config.get(key)
 
         # DEPRECATED [2.0.2, 2.1.0]: Use c.config.set()
         setOption: (key, value) ->
-            c.config.set(key, value)
+            @config.set(key, value)
 
+        # Returns the current session's Serrano version. If there is no
+        # active session or version defined, the absolute minimum is returned.
         getSerranoVersion: ->
-            # If there is no version defined, return the absolute minimum
-            if not c.session.current
-                return [0, 0, 0]
+            version = @session.current?.data.version
+            return @utils.cleanVersionString(version)
 
-            # Remove anything after the release level
-            versionString = c.session.current.data.version.replace(/[abf].*$/g, '')
+        # Returns a boolean as to whether the current Serrano version is
+        # supported relative to the min and max. An explicit minimum version
+        # can be passed which is useful when a feature is added that requires
+        # a version greater than the minimum version Cilantro supports.
+        isSupported: (minVersion, maxVersion) ->
+            minVersion ?= @minSerranoVersion
+            maxVersion ?= @maxSerranoVersion
+            version = @getSerranoVersion()
+            return utils.versionInRange(version, minVersion, maxVersion)
 
-            # Try to split the version string into major, minor, and micro
-            # version numbers
-            versionFields = versionString.split('.')
 
-            # If we don't have values for all of major, minor, and micro
-            # version numbers then return the minimum version.
-            if versionFields.length != 3
-                return [0, 0, 0]
-
-            return [parseInt(versionFields[0], 10),
-                    parseInt(versionFields[1], 10),
-                    parseInt(versionFields[2], 10)]
-
-        isSerranoOutdated: ->
-            serranoVersion = @getSerranoVersion()
-
-            # If the major version numbers of the minimum and actual versions
-            # are not identical then we can use the major version alone as the
-            # basis for the "outdatedness".
-            if serranoVersion[0] == c.minimumSerranoVersion[0]
-                # If the minor version numbers of the minimum and actual
-                # versions are not identical then we can simply use the minor
-                # version as the basis for the "outdatedness".
-                if serranoVersion[1] == c.minimumSerranoVersion[1]
-                    # At this point the major and micro versions are equal so
-                    # just evaluate based on the micro version
-                    return serranoVersion[2] < c.minimumSerranoVersion[2]
-                else
-                    return serranoVersion[1] < c.minimumSerranoVersion[1]
-            else
-                return serranoVersion[0] < c.minimumSerranoVersion[0]
-
+    # Mediator channel topics for communication across the application
     channels = _.extend {}, channels, session.channels
 
     props = { $, _, Backbone }
 
     # Construct the base object which is composed core libraries, the
     # mediator methods, session manager, and the config object
-    _.extend c, mediator, channels, props, methods
+    _.extend c, mediator, channels, props
