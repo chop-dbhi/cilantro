@@ -1,14 +1,20 @@
 define [
     '../core'
+    '../base'
     '../welcome'
     '../field'
     '../charts'
     './form'
     './info'
     'tpl!templates/concept/workspace.html'
-], (c, welcome, field, charts, form, info, templates...) ->
+    'tpl!templates/concept/error.html'
+], (c, base, welcome, field, charts, form, info, templates...) ->
 
-    templates = c._.object ['workspace'], templates
+    templates = c._.object ['workspace', 'error'], templates
+
+
+    class ConceptError extends base.ErrorView
+        template: templates.error
 
 
     class ConceptWorkspaceHistoryItem extends info.ConceptInfo
@@ -38,6 +44,8 @@ define [
         template: templates.workspace
 
         itemView: form.ConceptForm
+
+        errorView: ConceptError
 
         ui:
             tabs: '.nav-tabs'
@@ -79,19 +87,31 @@ define [
 
             options = model: model
 
+            # Load external module, catch error if it doesn't exist
             if customForm?
                 require [customForm.module], (CustomForm) =>
                     options = c._.extend {}, customForm.options, options
                     @createView(CustomForm, options)
+                , (err) =>
+                    @setErrorView(model, err)
             else
-                    @createView(@itemView, options)
+                @createView(@itemView, options)
 
         createView: (itemViewClass, options) =>
-            view = new itemViewClass(options)
-            @history.currentView.collection.add(options.model)
-            @setCurrentView(view)
+            try
+                view = new itemViewClass(options)
+                @history.currentView.collection.add(options.model)
+                @setView(view)
+            catch err
+                @setErrorView(options.model, err)
 
-        setCurrentView: (view) ->
+        setErrorView: (model, error) ->
+            c.log.debug(error.message)
+            view = new @errorView(model: model)
+            @currentView = view
+            @main.show(view)
+
+        setView: (view) ->
             if not @currentView?
                 @ui.tabs.fadeIn()
 
