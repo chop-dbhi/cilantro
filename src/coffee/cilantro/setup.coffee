@@ -6,5 +6,5 @@ define [
     # This ensures data is not silently lost
     $(window).on 'beforeunload', ->
        if $.hasPendingRequest()
-           return "Wow, you're quick! Your data is being saved.
-               It will only take a moment."
+           return "Wow, you're quick! Your data is being saved. " +
+                "It will only take a moment."
