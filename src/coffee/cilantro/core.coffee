@@ -4,6 +4,7 @@ define [
     'backbone'
     'mediator'
     'promiser'
+    'loglevel'
     './config'
     './channels'
     './utils'
@@ -15,7 +16,7 @@ define [
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
-], ($, _, Backbone, mediator, promiser, config, channels, utils, session, changelog) ->
+], ($, _, Backbone, mediator, promiser, loglevel, config, channels, utils, session, changelog) ->
 
     c =
         # Version of cilantro
@@ -29,6 +30,9 @@ define [
         minSerranoVersion: '2.0.18'
         maxSerranoVersion: '2.1.0'
 
+        # Attach logging component for easy reference
+        log: loglevel
+
         # Initialize the session manager and default configuration
         session: new session.SessionManager
         config: new config.Config(@cilantro)
@@ -37,11 +41,11 @@ define [
         utils: utils
         promiser: promiser
 
-        # DEPRECATED [2.0.2, 2.1.0]: Use c.config.get()
+        # [DEPRECATED: 2.1.0] Use c.config.get()
         getOption: (key) ->
             @config.get(key)
 
-        # DEPRECATED [2.0.2, 2.1.0]: Use c.config.set()
+        # [DEPRECATED: 2.1.0] Use c.config.set()
         setOption: (key, value) ->
             @config.set(key, value)
 
@@ -61,10 +65,15 @@ define [
             version = @getSerranoVersion()
             return utils.versionInRange(version, minVersion, maxVersion)
 
+    # Set log level to debug
+    if c.config.get('debug')
+        c.log.setLevel('debug')
 
     # Mediator channel topics for communication across the application
     channels = _.extend {}, channels, session.channels
 
+    # Additional properties to attach
+    # [DEPRECATED: 2.1.0] Require core libraries directly
     props = { $, _, Backbone }
 
     # Construct the base object which is composed core libraries, the
