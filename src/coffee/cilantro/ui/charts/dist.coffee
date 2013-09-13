@@ -63,6 +63,9 @@ define [
                 @ui.chart.width(@options.parentView.$el.width())
 
             @model.distribution (resp) =>
+                # Do not attempt to render if the view has been closed in
+                # the meantime
+                if @isClosed then return
                 options = @getChartOptions(resp)
                 if resp.size
                     @renderChart(options)
