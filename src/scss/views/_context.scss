@@ -13,6 +13,17 @@
         }
     }
 
+    &.loading {
+        .actions-region {
+            .count-label {
+                color: #aaa;
+            }
+            .icon-spinner {
+                display: inline;
+            }
+        }
+    }
+
     .tree-region .disabled {
         .language {
             color: #ccc;

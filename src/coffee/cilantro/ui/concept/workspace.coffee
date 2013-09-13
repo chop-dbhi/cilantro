@@ -93,7 +93,7 @@ define [
                     options = c._.extend {}, customForm.options, options
                     @createView(CustomForm, options)
                 , (err) =>
-                    @setErrorView(model, err)
+                    @showErrorView(model)
             else
                 @createView(@itemView, options)
 
@@ -103,10 +103,10 @@ define [
                 @history.currentView.collection.add(options.model)
                 @setView(view)
             catch err
-                @setErrorView(options.model, err)
+                @showErrorView(options.model)
+                if c.config.get('debug') then throw err
 
-        setErrorView: (model, error) ->
-            c.log.debug(error.message)
+        showErrorView: (model) ->
             view = new @errorView(model: model)
             @currentView = view
             @main.show(view)

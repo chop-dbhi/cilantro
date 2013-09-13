@@ -1,19 +1,30 @@
 define [
     '../core'
+    '../base'
     './core'
     './utils'
     'tpl!templates/charts/chart.html'
-], (c, charts, utils, templates...) ->
+], (c, base, charts, utils, templates...) ->
 
     templates = c._.object ['chart'], templates
 
+    class ChartLoading extends base.LoadView
+        message: 'Chart loading...'
+
+
     class FieldChart extends charts.Chart
         template: templates.chart
+
+        loadView: ChartLoading
 
         ui:
             chart: '.chart'
             heading: '.heading'
             status : '.heading .status'
+
+        showLoadView: ->
+            (view = new @loadView).render()
+            @ui.chart.html(view.el)
 
         chartClick: (event) =>
             category = event.point.category ? event.point.name
@@ -62,6 +73,7 @@ define [
             if @options.parentView?
                 @ui.chart.width(@options.parentView.$el.width())
 
+            @showLoadView()
             @model.distribution (resp) =>
                 # Do not attempt to render if the view has been closed in
                 # the meantime

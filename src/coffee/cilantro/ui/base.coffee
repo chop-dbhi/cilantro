@@ -1,9 +1,10 @@
 define [
     './core'
+    'tpl!templates/base/error-overlay.html'
     'tpl!templates/panel.html'
 ], (c, templates...) ->
 
-    templates = c._.object ['panel'], templates
+    templates = c._.object ['errorOverlay', 'panel'], templates
 
     # Simple set of views for representing various states.
     #
@@ -39,7 +40,6 @@ define [
                     @template = ->
                         html.join ' '
 
-        initialize: ->
             if @align then @$el.css('text-align', @align)
 
 
@@ -59,13 +59,23 @@ define [
         message: 'Something went awry..'
 
 
+    class ErrorOverlayView extends ErrorView
+        className: 'error-overlay-view'
+
+        template: templates.errorOverlay
+
+        onRender: ->
+            $(@options.target)
+                .css('position', 'relative')
+                .append(@$el)
+
+
     class LoadView extends StateView
         className: 'load-view'
 
         icon: '<i class="icon-spinner icon-spin"></i>'
 
         message: 'Loading...'
-
 
 
     class Panel extends c.Marionette.Layout
@@ -90,4 +100,4 @@ define [
                 @content.show(@options.content)
 
 
-    { EmptyView, ErrorView, LoadView, Panel }
+    { EmptyView, ErrorView, ErrorOverlayView, LoadView, Panel }

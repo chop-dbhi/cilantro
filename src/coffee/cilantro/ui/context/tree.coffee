@@ -33,35 +33,43 @@ define [
 
         template: templates.context
 
-        regions:
-            actions: '.actions-region'
-            tree: '.tree-region'
-            info: '.info-region'
+        errorView: base.ErrorOverlayView
 
         modelEvents:
-            'request': 'showLoading'
-            'sync': 'doneLoading'
-            'error': 'doneLoading'
+            request: 'showLoadView'
+            sync: 'hideLoadView'
+            error: 'showErrorView'
 
-        initialize: ->
-            @listenTo(@model, 'request', @showLoading, @)
-            @listenTo(@model, 'sync', @doneLoading, @)
+        regions:
+            info: '.info-region'
+            tree: '.tree-region'
+            actions: '.actions-region'
+
+        regionViews:
+            info: info.ContextInfo
+            tree: ContextTree
+            actions: actions.ContextActions
+
+        showLoadView: ->
+            @$el.addClass('loading')
+
+        hideLoadView: ->
+            @$el.removeClass('loading')
+
+        showErrorView: ->
+            # Show an overlay for the whole tree region
+            (new @errorView(target: @$el)).render()
 
         onRender: ->
-            @info.show new info.ContextInfo
+            @info.show new @regionViews.info
                 model: @model
 
-            @actions.show new actions.ContextActions
+            @actions.show new @regionViews.actions
                 model: @model
 
-            @tree.show new ContextTree
+            @tree.show new @regionViews.tree
                 model: @model
                 collection: @model.manager.upstream.children
 
-        showLoading: ->
-            @$el.addClass 'loading'
-
-        doneLoading: ->
-            @$el.removeClass 'loading'
 
     { ContextPanel }

@@ -19,8 +19,6 @@ define [
     class FieldStatsValues extends c.Marionette.CollectionView
         tagName: 'ul'
 
-        emptyView: base.EmptyView
-
         itemView: FieldStatValue
 
 

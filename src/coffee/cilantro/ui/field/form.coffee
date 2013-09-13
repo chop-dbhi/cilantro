@@ -28,6 +28,9 @@ define [
             controls.DateControl
 
 
+    class LoadingFields extends base.LoadView
+        message: 'Loading fields...'
+
     class LoadingControls extends base.LoadView
         message: 'Loading and rendering controls...'
 
@@ -69,12 +72,6 @@ define [
             else
                 templates.form
 
-        infoView: info.FieldInfo
-
-        statsView: stats.FieldStats
-
-        controlsView: FieldControls
-
         options:
             nodeType: 'condition'
             showInfo: true
@@ -94,18 +91,23 @@ define [
             stats: '.stats-region'
             controls: '.controls-region'
 
+        regionViews:
+            info: info.FieldInfo
+            stats: stats.FieldStats
+            controls: FieldControls
+
         onRender: ->
             if @options.showInfo
-                @info.show new @infoView
+                @info.show new @regionViews.info
                     model: @model
 
             if @model.stats?
-                @stats.show new @statsView
+                @stats.show new @regionViews.stats
                     model: @model
 
             # Initialize empty collection view in which controls can
             # be added to.
-            @controls.show new @controlsView
+            @controls.show new @regionViews.controls
                 collection: new c.Backbone.Collection
                 context: @context
 
@@ -140,6 +142,8 @@ define [
     class FieldFormCollection extends c.Marionette.CollectionView
         itemView: FieldForm
 
+        emptyView: LoadingFields
+
         itemViewOptions: (model, index) ->
             options =
                 model: model
@@ -153,7 +157,7 @@ define [
 
             # Only check if another is not already rendered
             if not @fieldChartIndex?
-                if model.links.distribution?
+                if model.links?.distribution?
                     @fieldChartIndex = index
                     options.showChart = true
             else

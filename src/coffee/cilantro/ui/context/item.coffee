@@ -23,23 +23,25 @@ define [
 
         events:
             'click .language': 'clickShow'
-            'click .actions .state input': 'stopPropagation'
-            'click .actions .state': 'clickState'
             'click .actions .remove': 'clickRemove'
+            'click .actions .state': 'clickState'
+            'change .actions .state input': 'clickState'
+            # Prevent the click event from input to bubble up to parent button
+            'click .actions .state input': 'stopPropagation'
 
         ui:
-            loader: '.actions .loader'
+            loader: '.actions .icon-spinner'
             actions: '.actions button'
             state: '.actions .state'
             check: '.actions .state input'
             language: '.language'
 
         modelEvents:
-            'change': 'renderLanguage'
+            request: 'showLoadView'
+            sync: 'hideLoadView'
+            error: 'hideLoadView'
+            change: 'renderLanguage'
             'change:enabled': 'renderState'
-            'request': 'showLoading'
-            'sync': 'doneLoading'
-            'error': 'doneLoading'
 
         stopPropagation: (event) ->
             event.stopPropagation()
@@ -79,12 +81,11 @@ define [
             text = flattenAttr(@model.toJSON(), 'language').join(', ')
             @ui.language.html(text)
 
-        showLoading: ->
+        showLoadView: ->
             @ui.loader.show()
             @ui.actions.hide()
 
-        # Ensure the view has not been closed
-        doneLoading: ->
+        hideLoadView: ->
             @ui.loader.hide()
             @ui.actions.show()
 
