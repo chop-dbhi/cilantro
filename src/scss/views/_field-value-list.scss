@@ -1,5 +1,6 @@
 @mixin value-item {
     .value-item {
+        min-height: 20px;
         position: relative;
         padding: 3px 7px;
         background-color: #f3f3f3;
