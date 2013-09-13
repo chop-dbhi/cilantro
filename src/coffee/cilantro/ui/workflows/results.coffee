@@ -95,11 +95,11 @@ define [
             @areFiltersHidden = false
 
         toggleContextPanelButtonClicked: =>
-            @areFiltersManuallyHidden = not @areFiltersManuallyHidden
-
             if @areFiltersHidden
+                @areFiltersManuallyHidden = false
                 @showContextPanel()
             else
+                @areFiltersManuallyHidden = true
                 @hideContextPanel()
 
         showContextPanel: =>
@@ -125,6 +125,7 @@ define [
                 if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
                     # Remove the results navbar from the top
                     @ui.navbar.removeClass('navbar-fixed-top')
+                    @ui.contextContainer.css('margin-top', 0)
 
                     if not @areFiltersManuallyHidden
                         @showContextPanel()
@@ -133,6 +134,8 @@ define [
                     # Move the results navbar to the top
                     @ui.navbar.css('top', @topNavbarHeight)
                     @ui.navbar.addClass('navbar-fixed-top')
+                    @ui.contextContainer.css('margin-top',
+                        @navbarVerticalOffset + 10)
 
                     if not @areFiltersManuallyHidden
                         @hideContextPanel()
