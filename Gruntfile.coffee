@@ -51,6 +51,15 @@ module.exports = (grunt) ->
                 tasks: ['coffee:local']
                 files: ['<%= srcDir %>/coffee/**/*']
 
+            js:
+                tasks: ['copy:local']
+                files: [
+                    '<%= srcDir %>/js/**/*'
+                    '<%= srcDir %>/css/**/*'
+                    '<%= srcDir %>/font/**/*'
+                    '<%= srcDir %>/img/**/*'
+                ]
+
             tests:
                 tasks: ['jasmine:local:build']
                 files: ['<%= specDir %>/**/*']
@@ -75,7 +84,6 @@ module.exports = (grunt) ->
                 src: '**/*.coffee'
                 rename: (dest, src) ->
                     dest + '/' + src.replace('.coffee', '.js')
-
 
             # Compiles files to the 'build' directory for distribution
             build:
