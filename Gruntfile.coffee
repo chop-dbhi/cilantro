@@ -189,7 +189,6 @@ module.exports = (grunt) ->
                 throwWhen:
                     optimize: true
 
-
                 # RequireJS plugin configs
                 config:
                     tpl:
@@ -358,6 +357,31 @@ module.exports = (grunt) ->
         'jasmine:local'
     ]
 
+    changeVersion = (fname, version) ->
+        contents = grunt.file.readJSON(fname)
+        current = contents.version
+        contents.version = version
+        grunt.file.write(fname, JSON.stringify(contents, null, 2))
+        grunt.log.ok "#{ fname }: #{ current } => #{ version }"
+
+    # Uses package.json as the canonical version
+    grunt.registerTask 'bump-final', 'Updates the version to final', ->
+        svutil = require('semver-utils')
+        current = pkg.version
+        version = svutil.parse(pkg.version)
+
+        # Ensure it is able to be bumped
+        if version.release isnt 'beta'
+            grunt.fatal("Version #{ current } not beta. Is this ready for release?")
+
+        # Remove release and build strings
+        version.release = ''
+        version.build = ''
+
+        version = svutil.stringify(version)
+        for fname in ['package.json', 'bower.json']
+            changeVersion(fname, version)
+
     grunt.registerTask 'tag-release', 'Create a release on master', ->
         run 'git add .'
         run "git commit -m '#{ pkg.version } Release'"
@@ -378,6 +402,7 @@ module.exports = (grunt) ->
         grunt.log.ok "Go to #{ pkg.homepage }/releases to update the release descriptions and upload the binaries"
 
     grunt.registerTask 'release', 'Builds the distribution files, creates the release binaries, and creates a Git tag', [
+        'bump-final'
         'dist'
         'release-binaries'
         'tag-release'

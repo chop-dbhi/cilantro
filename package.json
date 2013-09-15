@@ -45,6 +45,7 @@
     "grunt-template-jasmine-requirejs": "~0.1.2",
     "grunt-symlink": "~0.4.0",
     "rjs-build-analysis": "0.0.3",
-    "shelljs": "~0.1.4"
+    "shelljs": "~0.1.4",
+    "semver-utils": "~1.1.0"
   }
 }

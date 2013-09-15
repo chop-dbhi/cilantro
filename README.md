@@ -28,16 +28,19 @@ grunt work
 ### Testing
 
 ```bash
-# Run the tests
 grunt test
 ```
 
 ### Distribution
 
-Distribution builds should only be performed on the `develop` branch.
+Distribution builds should only be created off the `develop` branch. This:
+
+- Bumps the version to the final, e.g. `2.0.3-beta` to `2.0.3`
+- Tags a release
+- Freshly compiles and optimizes code
+- Creates zip and tarball binaries
+- Prints instructions to push and upload it to GitHub
 
 ```bash
-# Tags a release, freshly compiles and optimizes code, creates zip and
-# tarball binaries and prints instructions to upload it to GitHub
 grunt release
 ```
