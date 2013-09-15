@@ -1,8 +1,9 @@
 define [
+    'underscore'
     '../core'
     '../structs'
     './paginator'
-], (c, structs, paginator) ->
+], (_, c, structs, paginator) ->
 
 
     class ResultsPage extends structs.Frame
@@ -30,7 +31,7 @@ define [
             options.cache ?= false
             super(options)
 
-    c._.extend Results::, paginator.PaginatorMixin
+    _.extend Results::, paginator.PaginatorMixin
 
     # Set the custom model for this Paginator
     Results::model = ResultsPage

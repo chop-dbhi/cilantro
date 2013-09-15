@@ -1,11 +1,12 @@
 define [
-    './core'
-], (c) ->
+    'backbone'
+    'marionette'
+], (Backbone, Marionette) ->
 
     getTitle = (exporterModel) ->
         title = exporterModel.get('title')
 
-        # If the title isn't there, do our best to get something meaningful 
+        # If the title isn't there, do our best to get something meaningful
         # from the href attribute.
         if not title?
             href = exporterModel.get('href')
@@ -13,12 +14,12 @@ define [
             if href?
                 if href[href.length - 1] == "/"
                     fields = href.substring(0, href.length-1).split("/")
-                else 
+                else
                     fields = href.split("/")
 
                 if fields? and fields.length > 0
                     title = fields[fields.length - 1].toUpperCase()
-                
+
                 # If we couldn't get the title from the href then use the whole
                 # href property to try to give some context to the title.
                 else
@@ -31,9 +32,9 @@ define [
         return title
 
 
-    class ExportType extends c.Backbone.View
+    class ExportType extends Backbone.View
         tagName: 'label'
-        
+
         className: 'checkbox'
 
         render: ->
@@ -44,7 +45,7 @@ define [
             return @
 
 
-    class EmptyExportType extends c.Backbone.View
+    class EmptyExportType extends Backbone.View
         className: 'empty'
 
         render: ->
@@ -52,7 +53,7 @@ define [
             return @
 
 
-    class ExportProgress extends c.Backbone.View
+    class ExportProgress extends Backbone.View
         tagName: 'div'
 
         initialize: ->
@@ -62,20 +63,20 @@ define [
             success = "<span class='label label-success hide'>Done</span>"
             error = "<span class='label label-important hide'>Error</span>"
             loading = "<div class='progress progress-striped active hide'><div class='bar' style='width: 100%;'></div></div>"
-            pending = "<div class=pending-container><span class=pending-spinner></span> Pending...</div>" 
+            pending = "<div class=pending-container><span class=pending-spinner></span> Pending...</div>"
 
             @$el.html("<div class=span2>#{ getTitle(@model) }:</div><div class=span10>#{ success }#{ error }#{ loading }#{ pending }</div>")
 
 
-    class ExportTypeCollection extends c.Marionette.CollectionView
+    class ExportTypeCollection extends Marionette.CollectionView
         tagName: 'div'
 
         itemView: ExportType
 
         emptyView: EmptyExportType
 
-    
-    class ExportProgressCollection extends c.Marionette.CollectionView
+
+    class ExportProgressCollection extends Marionette.CollectionView
         tagName: 'div'
 
         className: 'export-status-container'

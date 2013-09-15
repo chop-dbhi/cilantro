@@ -1,12 +1,13 @@
 define [
-    './core'
+    'underscore'
+    'marionette'
     'tpl!templates/welcome.html'
-], (c, templates...) ->
+], (_, Marionette, templates...) ->
 
-    templates = c._.object ['welcome'], templates
+    templates = _.object ['welcome'], templates
 
 
-    class Welcome extends c.Marionette.ItemView
+    class Welcome extends Marionette.ItemView
         className: 'welcome'
 
         template: templates.welcome

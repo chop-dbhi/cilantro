@@ -1,8 +1,8 @@
 define [
-    '../core'
-], (c) ->
+    'backbone'
+], (Backbone) ->
 
-    class Model extends c.Backbone.Model
+    class Model extends Backbone.Model
         url: ->
             if @isNew() then super else @links.self
 
@@ -18,7 +18,7 @@ define [
             return attrs
 
 
-    class Collection extends c.Backbone.Collection
+    class Collection extends Backbone.Collection
         model: Model
 
         url: ->

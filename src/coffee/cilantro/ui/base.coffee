@@ -1,10 +1,11 @@
 define [
-    './core'
+    'underscore'
+    'marionette'
     'tpl!templates/base/error-overlay.html'
     'tpl!templates/panel.html'
-], (c, templates...) ->
+], (_, Marionette, templates...) ->
 
-    templates = c._.object ['errorOverlay', 'panel'], templates
+    templates = _.object ['errorOverlay', 'panel'], templates
 
     # Simple set of views for representing various states.
     #
@@ -20,7 +21,7 @@ define [
     # `align` corresponds to the text alignment. Options are 'left', 'right'
     # and 'center'.
 
-    class StateView extends c.Marionette.ItemView
+    class StateView extends Marionette.ItemView
         align: 'center'
 
         constructor: ->
@@ -78,7 +79,7 @@ define [
         message: 'Loading...'
 
 
-    class Panel extends c.Marionette.Layout
+    class Panel extends Marionette.Layout
         className: 'panel'
 
         template: templates.panel

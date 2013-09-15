@@ -1,8 +1,10 @@
 define [
-  '../core'
-  './base'
-  './stats'
-], (c, base, stats) ->
+    'underscore'
+    'backbone'
+    '../core'
+    './base'
+    './stats'
+], (_, Backbone, c, base, stats) ->
 
 
     class FieldModel extends base.Model
@@ -21,7 +23,7 @@ define [
             if cache and @_cache.distribution?
                 handler(@_cache.distribution)
             else
-                c.Backbone.ajax
+                Backbone.ajax
                     url: @links.distribution
                     dataType: 'json'
                     success: (resp) =>
@@ -43,7 +45,7 @@ define [
             if cache and @_cache.values?
                 handler(@_cache.values)
             else
-                c.Backbone.ajax
+                Backbone.ajax
                     url: @links.values
                     data: query: query
                     dataType: 'json'
@@ -60,8 +62,8 @@ define [
             c.session.url('fields')
 
         search: (query, handler) ->
-            c.Backbone.ajax
-                url: c._.result @, 'url'
+            Backbone.ajax
+                url: _.result @, 'url'
                 data: query: query
                 dataType: 'json'
                 success: (resp) -> handler(resp)

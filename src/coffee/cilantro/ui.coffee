@@ -1,5 +1,8 @@
 # This extends cilantro and attached libraries with UI-related components
 define [
+    'jquery'
+    'underscore'
+    'backbone'
     './core'
     './router'
     './ui/base'
@@ -13,7 +16,7 @@ define [
     './ui/tables'
     './ui/workflows'
     './ui/paginator'
-], (c, router, mods...) ->
+], ($, _, Backbone, c, router, mods...) ->
 
 
     # Define the primary router with the main element and app root
@@ -53,11 +56,11 @@ define [
 
     # Route by ID specified by the data-route attribute.
     $(document).on 'click', '[data-route]', (event) ->
-        route = c.$(@).attr('data-route')
+        route = $(@).attr('data-route')
 
         if c.router.isNavigable(route)
             event.preventDefault()
             c.router.navigate(route, trigger: true)
 
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

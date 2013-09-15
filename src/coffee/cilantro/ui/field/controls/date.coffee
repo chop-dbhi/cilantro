@@ -1,11 +1,11 @@
 define [
-    '../../core'
+    'underscore'
     '../../controls'
     '../../button'
     'tpl!templates/controls/date-range-input.html'
-], (c, controls, button, templates...) ->
+], (_, controls, button, templates...) ->
 
-    templates = c._.object ['date'], templates
+    templates = _.object ['date'], templates
 
     class DateControl extends controls.Control
         template: templates.date

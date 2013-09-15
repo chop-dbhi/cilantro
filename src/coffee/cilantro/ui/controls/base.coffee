@@ -1,6 +1,8 @@
 define [
-    '../core'
-], (c) ->
+    'underscore'
+    'backbone'
+    'marionette'
+], (_, Backbone, Marionette) ->
 
 
     class ControlError extends Error
@@ -39,13 +41,13 @@ define [
     # Mixin for view prototypes. This can be applied using `_.extend`
     # (override) or `_.defaults` (supplement) on the prototype, e.g.
     #
-    #    c._.defaults MyView::, ControlViewMixin
+    #    _.defaults MyView::, ControlViewMixin
     #
     # The constructor on the view itself should call the `mergeOptions`
     # passing the options followed by the `bindContext` method passing
     # in @context object passed in.
     #
-    #   class MyView extends c.Backbone.View
+    #   class MyView extends Backbone.View
     #       constructor: ->
     #           super
     #           @mergeOptions(@options)
@@ -69,11 +71,11 @@ define [
         # Merge options into local references
         mergeOptions: (options) ->
             for optionKey in controlOptions
-                if (option = c._.result(options, optionKey))?
-                    if c._.isArray(option)
+                if (option = _.result(options, optionKey))?
+                    if _.isArray(option)
                         @[optionKey] = option
-                    else if c._.isObject(option)
-                        @[optionKey] = c._.extend {}, @[optionKey], option
+                    else if _.isObject(option)
+                        @[optionKey] = _.extend {}, @[optionKey], option
                     else
                         @[optionKey] = option
             return
@@ -121,7 +123,7 @@ define [
 
         set: (key, value, options) ->
             if key? and typeof key is 'object'
-                if key instanceof c.Backbone.Model
+                if key instanceof Backbone.Model
                     attrs = key.toJSON()
                 else
                     attrs = key
@@ -163,7 +165,7 @@ define [
 
 
     # Control interface, this should not be used directly
-    class Control extends c.Marionette.Layout
+    class Control extends Marionette.Layout
         className: 'control'
 
         regions:
@@ -194,11 +196,11 @@ define [
             @bindContext(@options.context)
 
         onRender: ->
-            for key, klass of c._.result @, 'regionViews'
+            for key, klass of _.result @, 'regionViews'
                 inputAttrs = {}
                 inputAttrs[@dataAttrs[key]] = ''
 
-                options = c._.extend {}, c._.result(@regionOptions, key),
+                options = _.extend {}, _.result(@regionOptions, key),
                     inputAttrs: inputAttrs
                     model: @model
 
@@ -207,7 +209,7 @@ define [
             @set(@context)
 
 
-    c._.defaults Control::, ControlViewMixin
+    _.defaults Control::, ControlViewMixin
 
 
     { Control, ControlViewMixin }

@@ -1,10 +1,11 @@
 define [
-    './core'
+    'underscore'
+    'marionette'
     './base'
     'tpl!templates/paginator.html'
-], (c, base, templates...) ->
+], (_, Marionette, base, templates...) ->
 
-    templates = c._.object ['links'], templates
+    templates = _.object ['links'], templates
 
 
     class EmptyPage extends base.EmptyView
@@ -20,7 +21,7 @@ define [
     #
     # The model is assumed to implement the 'paginator protocol', see
     # cilantro/models/paginator
-    class Paginator extends c.Marionette.ItemView
+    class Paginator extends Marionette.ItemView
         template: templates.links
 
         requestDelay: 250
@@ -46,7 +47,7 @@ define [
             'click [data-page=last]': 'requestChangePage'
 
         initialize: ->
-            @_changePage = c._.debounce(@changePage, @requestDelay)
+            @_changePage = _.debounce(@changePage, @requestDelay)
 
         onRender: ->
             if not @model.pageIsLoading()
@@ -76,17 +77,17 @@ define [
 
 
     # Page for containing model-based data
-    class Page extends c.Marionette.ItemView
+    class Page extends Marionette.ItemView
 
 
     # Page for containing collection-based data
-    class ListingPage extends c.Marionette.CollectionView
+    class ListingPage extends Marionette.CollectionView
         itemView: Page
 
         emptyPage: EmptyPage
 
         itemViewOptions: (item, index) ->
-            c._.defaults
+            _.defaults
                 model: item
                 index: index
             , @options
@@ -104,7 +105,7 @@ define [
     # If list is true, the `listViewOptions` will be called to produce the
     # view options for the collection view. By default the item passed in
     # is assumed to have an `items` collection on it that will be used.
-    class PageRoll extends c.Marionette.CollectionView
+    class PageRoll extends Marionette.CollectionView
         options:
             list: true
 
@@ -126,8 +127,8 @@ define [
         itemViewOptions: (item, index) ->
             options = model: item, index: index
             if @options.list
-                c._.extend options, @listViewOptions(item, index)
-            c._.defaults options, @options
+                _.extend options, @listViewOptions(item, index)
+            _.defaults options, @options
 
         collectionEvents:
             'change:currentpage': 'showCurentPage'

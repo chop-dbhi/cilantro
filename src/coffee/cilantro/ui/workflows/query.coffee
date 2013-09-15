@@ -1,15 +1,17 @@
 define [
+    'underscore'
+    'marionette'
     '../core'
     '../base'
     '../concept'
     '../context'
     'tpl!templates/workflows/query.html'
-], (c, base, concept, context, templates...) ->
+], (_, Marionette, c, base, concept, context, templates...) ->
 
-    templates = c._.object ['query'], templates
+    templates = _.object ['query'], templates
 
 
-    class QueryWorkflow extends c.Marionette.Layout
+    class QueryWorkflow extends Marionette.Layout
         className: 'query-workflow'
 
         template: templates.query

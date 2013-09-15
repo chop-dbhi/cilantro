@@ -1,8 +1,11 @@
 define [
-  '../core'
-  './base'
-  './field'
-], (c, base, field) ->
+    'jquery'
+    'underscore'
+    'backbone'
+    '../core'
+    './base'
+    './field'
+], ($, _, Backbone, c, base, field) ->
 
 
     class ConceptModel extends base.Model
@@ -37,8 +40,8 @@ define [
             c.session.url('concepts')
 
         search: (query, handler) ->
-            c.$.ajax
-                url: c._.result @, 'url'
+            $.ajax
+                url: _.result @, 'url'
                 data: query: query, brief: 1
                 dataType: 'json'
                 success: (resp) -> handler(resp)

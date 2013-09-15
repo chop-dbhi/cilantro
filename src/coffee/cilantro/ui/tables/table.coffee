@@ -1,14 +1,15 @@
 define [
-    '../core'
+    'underscore'
+    'marionette'
     './body'
     './header'
     './footer'
-], (c, body, header, footer) ->
+], (_, Marionette, body, header, footer) ->
 
 
     # Renders a table with the thead and tfoot elements and one or more
     # tbody elements each representing a frame of data in the collection.
-    class Table extends c.Marionette.CollectionView
+    class Table extends Marionette.CollectionView
         tagName: 'table'
 
         className: 'table table-striped'
@@ -16,7 +17,7 @@ define [
         itemView: body.Body
 
         itemViewOptions: (item, index) ->
-            c._.defaults
+            _.defaults
                 collection: item.series
             , @options
 
@@ -24,11 +25,11 @@ define [
             'change:currentpage': 'showCurentPage'
 
         initialize: ->
-            @header = new header.Header c._.defaults
+            @header = new header.Header _.defaults
                 collection: @collection.indexes
             , @options
 
-            @footer = new footer.Footer c._.defaults
+            @footer = new footer.Footer _.defaults
                 collection: @collection.indexes
             , @options
 

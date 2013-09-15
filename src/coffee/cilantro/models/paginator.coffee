@@ -1,7 +1,8 @@
 define [
     '../core'
-], (c) ->
-
+    'underscore'
+    'backbone'
+], (c, _, Backbone) ->
 
     # Paginator mixin for collections. The model class is assumed to have
     # an `idAttribute` of 'page'
@@ -116,7 +117,7 @@ define [
 
     # Provides the facility for fetching it's own clice of content based on
     # the collection it's contained in.
-    class Page extends c.Backbone.Model
+    class Page extends Backbone.Model
         idAttribute: 'page_num'
 
         url: ->
@@ -124,11 +125,11 @@ define [
 
 
     # Paginator collection for managing it's pages
-    class Paginator extends c.Backbone.Collection
+    class Paginator extends Backbone.Collection
         model: Page
 
 
-    c._.extend Paginator::, PaginatorMixin
+    _.extend Paginator::, PaginatorMixin
 
 
     { PaginatorMixin, Page, Paginator }

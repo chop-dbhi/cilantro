@@ -1,5 +1,5 @@
 define [
-    './core'
+    'underscore'
     './concept/info'
     './concept/search'
     './concept/index'
@@ -7,6 +7,6 @@ define [
     './concept/form'
     './concept/workspace'
     './concept/columns'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

@@ -1,21 +1,22 @@
 define [
-    './core'
+    'underscore'
+    'marionette'
     './base'
     'tpl!templates/accordian/group.html'
     'tpl!templates/accordian/section.html'
     'tpl!templates/accordian/item.html'
-], (c, base, templates...) ->
+], (_, Marionette, base, templates...) ->
 
-    templates = c._.object ['group', 'section', 'item'], templates
+    templates = _.object ['group', 'section', 'item'], templates
 
 
-    class Item extends c.Marionette.ItemView
+    class Item extends Marionette.ItemView
         tagName: 'li'
 
         template: templates.item
 
 
-    class Section extends c.Marionette.CompositeView
+    class Section extends Marionette.CompositeView
         className: 'section'
 
         itemView: Item
@@ -35,7 +36,7 @@ define [
             @$el.toggle(not @isEmpty())
 
 
-    class Group extends c.Marionette.CompositeView
+    class Group extends Marionette.CompositeView
         className: 'group'
 
         template: templates.group
@@ -102,7 +103,7 @@ define [
             @ui.icon.text('+')
 
 
-    class Accordian extends c.Marionette.CollectionView
+    class Accordian extends Marionette.CollectionView
         className: 'accordian'
 
         itemView: Group

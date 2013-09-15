@@ -1,9 +1,9 @@
 define [
-    '../core'
+    'underscore'
     './controls/base'
     './controls/date'
     './controls/number'
     './controls/search'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

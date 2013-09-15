@@ -1,7 +1,5 @@
 define [
-    'jquery'
     'underscore'
-    'backbone'
     'mediator'
     'promiser'
     'loglevel'
@@ -16,7 +14,7 @@ define [
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
-], ($, _, Backbone, mediator, promiser, loglevel, config, channels, utils, session, changelog) ->
+], (_, mediator, promiser, loglevel, config, channels, utils, session, changelog) ->
 
     c =
         # Version of cilantro
@@ -72,10 +70,5 @@ define [
     # Mediator channel topics for communication across the application
     channels = _.extend {}, channels, session.channels
 
-    # Additional properties to attach
-    # [DEPRECATED: 2.1.0] Require core libraries directly
-    props = { $, _, Backbone }
-
-    # Construct the base object which is composed core libraries, the
-    # mediator methods, session manager, and the config object
-    _.extend c, mediator, channels, props
+    # Mixin various components
+    _.extend c, mediator, channels

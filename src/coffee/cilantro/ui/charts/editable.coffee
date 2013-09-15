@@ -1,21 +1,22 @@
 define [
-    '../core'
+    'jquery'
+    'underscore'
     './dist'
     './axis'
     'tpl!templates/charts/editable-chart.html'
-], (c, dist, axis, templates...) ->
+], ($, _, dist, axis, templates...) ->
 
-    templates = c._.object ['editable'], templates
+    templates = _.object ['editable'], templates
 
 
     class EditableFieldChart extends dist.FieldChart
         template: templates.editable
-    
-        events: c._.extend
+
+        events: _.extend
             'click .fullsize': 'toggleExpanded'
         , dist.FieldChart::events
 
-        ui: c._.extend
+        ui: _.extend
             toolbar: '.btn-toolbar'
             fullsizeToggle: '.fullsize'
             form: '.editable'

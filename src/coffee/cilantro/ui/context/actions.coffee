@@ -1,13 +1,15 @@
 define [
+    'underscore'
+    'marionette'
     '../core'
     'tpl!templates/context/actions.html'
-], (c, templates...) ->
+], (_, Marionette, c, templates...) ->
 
-    templates = c._.object ['actions'], templates
+    templates = _.object ['actions'], templates
 
 
     # Provides a set of actions for manipulating a ContextModel object
-    class ContextActions extends c.Marionette.ItemView
+    class ContextActions extends Marionette.ItemView
         template: templates.actions
 
         ui:
@@ -22,7 +24,7 @@ define [
         serializeData: ->
             attrs = {}
             if @model?
-                attrs = c._.clone(@model.attributes)
+                attrs = _.clone(@model.attributes)
                 delete attrs.json
                 attrs.count = c.utils.prettyNumber(attrs.count)
             return attrs

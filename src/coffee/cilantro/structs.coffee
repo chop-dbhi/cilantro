@@ -1,10 +1,11 @@
 define [
-    './core'
+    'underscore'
+    'backbone'
     './models/base'
-], (c, base) ->
+], (_, Backbone, base) ->
 
 
-    class Index extends c.Backbone.Model
+    class Index extends Backbone.Model
         defaults:
             visible: true
 
@@ -16,11 +17,11 @@ define [
 
 
 
-    class Indexes extends c.Backbone.Collection
+    class Indexes extends Backbone.Collection
         model: Index
 
 
-    class Datum extends c.Backbone.Model
+    class Datum extends Backbone.Model
         constructor: (attrs, index, options) ->
             if not (index instanceof Index)
                 index = new Index index
@@ -33,7 +34,7 @@ define [
 
 
     # Internal container for the Series. It is a collection of Datum objects.
-    class _DatumArray extends c.Backbone.Collection
+    class _DatumArray extends Backbone.Collection
         constructor: (attrs, indexes, options) ->
             @indexes = indexes
             super(attrs, options)
@@ -41,7 +42,7 @@ define [
         model: (value, options) =>
             # Collections length are not updated immediately, so this uses
             # the internal hash to determine the next index
-            index = @indexes.at(c._.keys(@_byId).length)
+            index = @indexes.at(_.keys(@_byId).length)
 
             new Datum
                 value: value
@@ -49,13 +50,13 @@ define [
                 index
 
 
-    class Series extends c.Backbone.Model
+    class Series extends Backbone.Model
         constructor: (attrs, indexes, options={}) ->
             if not (indexes instanceof Indexes)
                 indexes = new Indexes indexes
             @indexes = indexes
 
-            if c._.isArray(attrs)
+            if _.isArray(attrs)
                 data = attrs
                 attrs = null
             else
@@ -83,7 +84,7 @@ define [
             @indexes.length
 
     # Internal container for the Frame. It is a collection of Series objects.
-    class _SeriesArray extends c.Backbone.Collection
+    class _SeriesArray extends Backbone.Collection
         constructor: (attrs, indexes, options) ->
             @indexes = indexes
             super(attrs, options)
@@ -98,7 +99,7 @@ define [
                 indexes = new Indexes indexes
             @indexes = indexes
 
-            if c._.isArray(attrs)
+            if _.isArray(attrs)
                 data = attrs
                 attrs = null
             else

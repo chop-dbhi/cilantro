@@ -1,12 +1,13 @@
 define [
-    '../core'
-], (c) ->
+    'underscore'
+    'highcharts'
+], (_, Highcharts) ->
 
     # MAX_RADIUS = 10
     # MIN_RADIUS = 3
 
     getColor = (idx) ->
-        colors = c.Highcharts.getOptions().colors
+        colors = Highcharts.getOptions().colors
         return colors[idx % colors.length]
 
 
@@ -139,13 +140,13 @@ define [
                     if p.sentinel then continue
                     norm = Math.min(Math.max(parseInt(parseFloat(p.count, 10) / avg * 5) / 10, 0.05), 1)
 #                    radius = Math.min(Math.max(MIN_RADIUS, parseFloat(p.count, 10) / avg * 5), MAX_RADIUS)
-                    color = c.Highcharts.Color(getColor seriesNo).setOpacity(norm)
+                    color = Highcharts.Color(getColor seriesNo).setOpacity(norm)
                     p.marker = fillColor: color.get()
                     if xEnum
                         p.marker.radius = 7
             seriesNo++
 
-        # TODO: This is really ugly, clean up the code that creates and 
+        # TODO: This is really ugly, clean up the code that creates and
         # returns the formatter.
         if chartType is 'scatter' and xEnum
             # Multiple series
@@ -159,18 +160,18 @@ define [
             # Multiple series
             if seriesList[1]
                 formatterFunc = ->
-                    return "<h5>#{ @series.name }</h5><br /><b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
+                    return "<h5>#{ @series.name }</h5><br /><b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ Highcharts.numberFormat parseFloat @y }"
             else
                 formatterFunc = ->
-                    return "<b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
+                    return "<b>#{ xName }:</b> #{ @series.xAxis.categories[@point.x] }<br /><b>#{ yName }:</b> #{ Highcharts.numberFormat parseFloat @y }"
         else
             # Multiple series
             if seriesList[1]
                 formatterFunc = ->
-                    return "<h5>#{ @series.name }</h5><br /><b>#{ xName }:</b> #{ c.Highcharts.numberFormat parseFloat @x }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
+                    return "<h5>#{ @series.name }</h5><br /><b>#{ xName }:</b> #{ Highcharts.numberFormat parseFloat @x }<br /><b>#{ yName }:</b> #{ Highcharts.numberFormat parseFloat @y }"
             else
                 formatterFunc = ->
-                    return "<b>#{ xName }:</b> #{ c.Highcharts.numberFormat parseFloat @x }<br /><b>#{ yName }:</b> #{ c.Highcharts.numberFormat parseFloat @y }"
+                    return "<b>#{ xName }:</b> #{ Highcharts.numberFormat parseFloat @x }<br /><b>#{ yName }:</b> #{ Highcharts.numberFormat parseFloat @y }"
 
         options = {
             clustered: clustered
@@ -211,7 +212,7 @@ define [
         points = []
 
         for datum in data
-            point = c._.clone datum
+            point = _.clone datum
             point.x = datum.values[0]
             if datum.values[1]?
                 point.y = datum.values[1]
@@ -219,7 +220,7 @@ define [
                 point.y = datum.count
             points.push point
 
-        return data: c._.sortBy points, 'x'
+        return data: _.sortBy points, 'x'
 
 
     { processResponse, getSeries }

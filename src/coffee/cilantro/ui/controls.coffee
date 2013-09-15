@@ -1,7 +1,7 @@
 define [
-    './core'
+    'underscore'
     './controls/base'
     './controls/input'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

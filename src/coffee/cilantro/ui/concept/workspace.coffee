@@ -1,4 +1,7 @@
 define [
+    'underscore'
+    'backbone'
+    'marionette'
     '../core'
     '../base'
     '../welcome'
@@ -8,9 +11,9 @@ define [
     './info'
     'tpl!templates/concept/workspace.html'
     'tpl!templates/concept/error.html'
-], (c, base, welcome, field, charts, form, info, templates...) ->
+], (_, Backbone, Marionette, c, base, welcome, field, charts, form, info, templates...) ->
 
-    templates = c._.object ['workspace', 'error'], templates
+    templates = _.object ['workspace', 'error'], templates
 
 
     class ConceptError extends base.ErrorView
@@ -27,7 +30,7 @@ define [
             @publish c.CONCEPT_FOCUS, @model.id
 
 
-    class ConceptWorkspaceHistory extends c.Marionette.CollectionView
+    class ConceptWorkspaceHistory extends Marionette.CollectionView
         className: 'concept-workspace-history'
 
         itemView: ConceptWorkspaceHistoryItem
@@ -38,7 +41,7 @@ define [
 
     # Some of the class properties here are mimicked after CollectionView
     # since is managing the concept form views
-    class ConceptWorkspace extends c.Marionette.Layout
+    class ConceptWorkspace extends Marionette.Layout
         className: 'concept-workspace'
 
         template: templates.workspace
@@ -72,7 +75,7 @@ define [
             if @options.emptyView?
                 @emptyView = @options.emptyView
 
-            @subscribe c.CONCEPT_FOCUS, @showItem
+            c.subscribe c.CONCEPT_FOCUS, @showItem
 
         showItem: (model) =>
             @ui.mainTab.tab('show')
@@ -90,7 +93,7 @@ define [
             # Load external module, catch error if it doesn't exist
             if customForm?
                 require [customForm.module], (CustomForm) =>
-                    options = c._.extend {}, customForm.options, options
+                    options = _.extend {}, customForm.options, options
                     @createView(CustomForm, options)
                 , (err) =>
                     @showErrorView(model)
@@ -125,7 +128,7 @@ define [
         onRender: ->
             @main.show new @regionViews.main
             @history.show new @regionViews.history
-                collection: new c.Backbone.Collection
+                collection: new Backbone.Collection
 
 
     { ConceptWorkspace }

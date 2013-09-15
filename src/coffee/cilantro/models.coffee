@@ -1,5 +1,5 @@
 define [
-    './core'
+    'underscore'
     './models/field'
     './models/concept'
     './models/context'
@@ -9,6 +9,6 @@ define [
     './models/exporter'
     './models/query'
     './models/value'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

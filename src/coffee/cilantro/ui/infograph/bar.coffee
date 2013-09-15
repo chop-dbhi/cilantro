@@ -1,16 +1,18 @@
 define [
-    '../core'
+    'underscore'
+    'backbone'
+    'marionette'
     '../controls'
     '../button'
     'tpl!templates/infograph/bar.html'
     'tpl!templates/infograph/bar-chart-toolbar.html'
     'tpl!templates/infograph/bar-chart.html'
-], (c, controls, button, templates...) ->
+], (_, Backbone, Marionette, controls, button, templates...) ->
 
-    templates = c._.object ['bar', 'toolbar', 'chart'], templates
+    templates = _.object ['bar', 'toolbar', 'chart'], templates
 
 
-    class BarModel extends c.Backbone.Model
+    class BarModel extends Backbone.Model
         parse: (attrs) ->
             attrs.value = attrs.values[0]
             return attrs
@@ -19,12 +21,12 @@ define [
     sortModelAttr = (attr) ->
         (model) ->
             value = model.get(attr)
-            if c._.isString(value)
+            if _.isString(value)
                 value = value.toLowerCase()
             return value
 
 
-    class BarCollection extends c.Backbone.Collection
+    class BarCollection extends Backbone.Collection
         model: BarModel
 
         comparator: (model) ->
@@ -39,7 +41,7 @@ define [
             return
 
 
-    class Bar extends c.Marionette.ItemView
+    class Bar extends Marionette.ItemView
         className: 'info-bar'
 
         template: templates.bar
@@ -95,7 +97,7 @@ define [
 
     # Renders a series of bars for each value. This contains the value,
     # count and percentage for the value.
-    class Bars extends c.Marionette.CollectionView
+    class Bars extends Marionette.CollectionView
         className: 'info-bar-chart'
 
         itemView: Bar
@@ -142,7 +144,7 @@ define [
         getOperator: -> 'in'
 
         getValue: ->
-            c._.map @collection.where(selected: true), (model) ->
+            _.map @collection.where(selected: true), (model) ->
                 model.get('value')
 
         setValue: (values=[]) ->
@@ -152,10 +154,10 @@ define [
             return
 
 
-    c._.defaults Bars::, controls.ControlViewMixin
+    _.defaults Bars::, controls.ControlViewMixin
 
 
-    class BarChartToolbar extends c.Marionette.ItemView
+    class BarChartToolbar extends Marionette.ItemView
         className: 'navbar navbar-toolbar'
 
         template: templates.toolbar

@@ -1,12 +1,14 @@
 define [
-    './core'
+    'jquery'
+    'underscore'
+    'marionette'
     './base'
     '../models'
     'tpl!templates/values/list.html'
     'tpl!templates/values/item.html'
-], (c, base, models, templates...) ->
+], ($, _, Marionette, base, models, templates...) ->
 
-    templates = c._.object ['list', 'item'], templates
+    templates = _.object ['list', 'item'], templates
 
 
     class EmptyItem extends base.EmptyView
@@ -15,7 +17,7 @@ define [
         message: 'Search or browse values on the left or click "Edit List" above to paste in a list of values. (Hint: you can copy and paste in a column from Excel)'
 
 
-    class ValueItem extends c.Marionette.ItemView
+    class ValueItem extends Marionette.ItemView
         template: templates.item
 
         className: 'value-item'
@@ -60,7 +62,7 @@ define [
     # for pasting in a list of values.
     #
     # This expects a collection such as cilantro/models/value#Values
-    class ValueList extends c.Marionette.CompositeView
+    class ValueList extends Marionette.CompositeView
         className: 'value-list'
 
         template: templates.list
@@ -120,7 +122,7 @@ define [
         # based on the value
         parseText: ->
             models = []
-            values = c.$.trim(@ui.textarea.val()).split('\n')
+            values = $.trim(@ui.textarea.val()).split('\n')
             # We can only make use of the value as label at this point
             # since resolving the label may require an server lookups.
             # This is harmless since _this_ is what the user entered.

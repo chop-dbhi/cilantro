@@ -1,15 +1,16 @@
 define [
-    '../core'
+    'underscore'
+    'marionette'
     './index'
     './search'
     'tpl!templates/concept/panel.html'
-], (c, index, search, templates...) ->
+], (_, Marionette, index, search, templates...) ->
 
-    templates = c._.object ['panel'], templates
+    templates = _.object ['panel'], templates
 
 
     # Takes a collection of c.models.ConceptModel objects
-    class ConceptPanel extends c.Marionette.Layout
+    class ConceptPanel extends Marionette.Layout
         className: 'concept-panel'
 
         template: templates.panel
@@ -36,7 +37,7 @@ define [
                     @index.currentView.filter(query, resp)
 
             # Defer focus of concept search until end of event loop
-            c._.defer =>
+            _.defer =>
                 @search.currentView.ui.input.focus()
 
 

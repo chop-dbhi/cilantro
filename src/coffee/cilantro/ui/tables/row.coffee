@@ -1,11 +1,12 @@
 define [
-    '../core'
+    'underscore'
+    'marionette'
     '../base'
     './cell'
-], (c, base, cell) ->
+], (_, Marionette, base, cell) ->
 
 
-    class Row extends c.Marionette.CollectionView
+    class Row extends Marionette.CollectionView
         tagName: 'tr'
 
         template: ->
@@ -13,7 +14,7 @@ define [
         itemView: cell.Cell
 
         itemViewOptions: (model, index) =>
-            c._.extend {}, @options,
+            _.extend {}, @options,
                 model: model
 
 

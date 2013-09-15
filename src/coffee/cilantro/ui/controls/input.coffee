@@ -1,5 +1,6 @@
 define [
-    '../core'
+    'underscore'
+    'marionette'
     'tpl!templates/controls/text-input.html'
     'tpl!templates/controls/static-input.html'
     'tpl!templates/controls/boolean-input.html'
@@ -7,12 +8,12 @@ define [
     'tpl!templates/controls/typeahead-input.html'
     'tpl!templates/controls/range-input.html'
     'tpl!templates/controls/operator-input.html'
-], (c, templates...) ->
+], (_, Marionette, templates...) ->
 
-    templates = c._.object ['text', 'static', 'boolean', 'select', 'typeahead', 'range', 'operator'], templates
+    templates = _.object ['text', 'static', 'boolean', 'select', 'typeahead', 'range', 'operator'], templates
 
 
-    class Input extends c.Marionette.ItemView
+    class Input extends Marionette.ItemView
         template: templates.text
 
         className: 'control-input'

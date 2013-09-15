@@ -1,8 +1,9 @@
 define [
+    'backbone'
     '../core'
     '../base'
     '../accordian'
-], (c, base, accordian) ->
+], (Backbone, c, base, accordian) ->
 
 
     class ConceptItem extends accordian.Item
@@ -10,7 +11,7 @@ define [
             'click a': 'click'
 
         initialize: ->
-            @subscribe c.CONCEPT_FOCUS, @toggleFocus
+            c.subscribe c.CONCEPT_FOCUS, @toggleFocus
 
         click: (event) ->
             event.preventDefault()
@@ -82,7 +83,7 @@ define [
 
         resetGroups: ->
             if not @groups?
-                @groups = new c.Backbone.Collection null,
+                @groups = new Backbone.Collection null,
                     comparator: 'order'
             else
                 @groups.reset()
@@ -99,15 +100,15 @@ define [
 
             # Get the top-level group for the model
             if not (group = @groups.get(groupAttrs.id))
-                group = new c.Backbone.Model groupAttrs
-                group.sections = new c.Backbone.Collection null,
+                group = new Backbone.Model groupAttrs
+                group.sections = new Backbone.Collection null,
                     comparator: 'order'
                 @groups.add(group)
 
             # Get the section (sub-group) for the model
             if not (section = group.sections.get(sectionAttrs.id))
-                section = new c.Backbone.Model sectionAttrs
-                section.items = new c.Backbone.Collection null,
+                section = new Backbone.Model sectionAttrs
+                section.items = new Backbone.Collection null,
                     comparator: 'order'
                 group.sections.add(section)
 

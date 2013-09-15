@@ -1,13 +1,15 @@
 define [
-    './core'
+    'underscore'
+    'backbone'
+    'marionette'
     'tpl!templates/button/select.html'
     'tpl!templates/button/select-option.html'
-], (c, templates...) ->
+], (_, Backbone, Marionette, templates...) ->
 
-    templates = c._.object ['select', 'option'], templates
+    templates = _.object ['select', 'option'], templates
 
 
-    class ButtonSelectEmptyOption extends c.Marionette.ItemView
+    class ButtonSelectEmptyOption extends Marionette.ItemView
         className: 'disabled'
 
         tagName: 'li'
@@ -24,7 +26,7 @@ define [
             label: 'No options are available'
 
 
-    class ButtonSelectOption extends c.Marionette.ItemView
+    class ButtonSelectOption extends Marionette.ItemView
         tagName: 'li'
 
         template: templates.option
@@ -40,7 +42,7 @@ define [
             @model.set('selected', true)
 
 
-    class ButtonSelect extends c.Marionette.CompositeView
+    class ButtonSelect extends Marionette.CompositeView
         className: 'btn-group btn-select'
 
         template: templates.select
@@ -63,11 +65,11 @@ define [
             'change:selected': 'updateSelection'
 
         constructor: (options={}) ->
-            if not (options.collection instanceof c.Backbone.Collection)
+            if not (options.collection instanceof Backbone.Collection)
                 # Convert from flat list of values into objects
                 if (choices = options.collection)? and typeof choices[0] isnt 'object'
                     choices = (value: value, label: value for value in choices)
-                options.collection = new c.Backbone.Collection choices
+                options.collection = new Backbone.Collection choices
             super(options)
 
         setSelection: (value) ->

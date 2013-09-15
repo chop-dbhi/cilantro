@@ -1,6 +1,6 @@
 define [
-    './core'
+    'underscore'
     './infograph/bar'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

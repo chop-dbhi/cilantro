@@ -1,11 +1,11 @@
 define [
-    '../../core'
-    '../../controls'
+    'underscore'
     'inputio'
+    '../../controls'
     'tpl!templates/field/controls/base.html'
-], (c, controls, InputIO, templates...) ->
+], (_, InputIO, controls, templates...) ->
 
-    templates = c._.object ['control'], templates
+    templates = _.object ['control'], templates
 
     FORM_ELEMENTS = 'input,select,textarea'
 

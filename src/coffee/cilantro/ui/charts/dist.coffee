@@ -1,12 +1,13 @@
 define [
-    '../core'
+    'jquery'
+    'underscore'
     '../base'
     './core'
     './utils'
     'tpl!templates/charts/chart.html'
-], (c, base, charts, utils, templates...) ->
+], ($, _, base, charts, utils, templates...) ->
 
-    templates = c._.object ['chart'], templates
+    templates = _.object ['chart'], templates
 
     class ChartLoading extends base.LoadView
         message: 'Chart loading...'
@@ -85,7 +86,7 @@ define [
                     @showEmptyView(options)
 
         setValue: (value) =>
-            if not c._.isArray(value) then value = []
+            if not _.isArray(value) then value = []
             points = @chart.series[0].points
             point.select(point.name ? point.category in value, true) for point in points
 

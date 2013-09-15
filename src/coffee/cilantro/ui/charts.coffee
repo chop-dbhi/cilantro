@@ -1,8 +1,8 @@
 define [
-    './core'
+    'underscore'
     './charts/dist'
     './charts/axis'
     './charts/editable'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

@@ -1,7 +1,7 @@
 define [
-    '../core'
+    'underscore'
     './context/nodes'
     './context/model'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

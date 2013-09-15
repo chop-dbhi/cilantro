@@ -1,13 +1,13 @@
 define [
-    '../core'
-], (c) ->
+    'backbone'
+], (Backbone) ->
 
 
-    class Cell extends c.Backbone.View
+    class Cell extends Backbone.View
         tagName: 'td'
 
         initialize: ->
-            @listenTo @model.index, 'change:visible', @toggleVisible
+            @listenTo(@model.index, 'change:visible', @toggleVisible, @)
 
         render: ->
             @toggleVisible()

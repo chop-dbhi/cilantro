@@ -1,12 +1,13 @@
 define [
-    './core'
+    'underscore'
+    'marionette'
     'tpl!templates/search.html'
-], (c, templates...) ->
+], (_, Marionette, templates...) ->
 
-    templates = c._.object ['search'], templates
+    templates = _.object ['search'], templates
 
 
-    class Search extends c.Marionette.ItemView
+    class Search extends Marionette.ItemView
         className: 'search'
 
         template: templates.search
@@ -17,7 +18,7 @@ define [
         onRender: ->
             if @options.placeholder
                 @ui.input.attr('placeholder', @options.placeholder)
-            c._.defer => @ui.input.focus()
+            _.defer => @ui.input.focus()
 
 
     { Search }

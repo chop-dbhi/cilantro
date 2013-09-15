@@ -1,16 +1,17 @@
 define [
-    '../../../core'
+    'underscore'
+    'backbone'
     './base'
-], (c, base) ->
+], (_, Backbone, base) ->
 
 
     class ContextNodeError extends Error
 
 
-    class ContextNodeModel extends c.Backbone.Model
+    class ContextNodeModel extends Backbone.Model
 
         constructor: (attrs, options={}) ->
-            options = c._.extend
+            options = _.extend
                 identKeys: ['concept', 'field']
             , options
 
@@ -60,7 +61,7 @@ define [
         # of attributes the target node must match in order to be returned.
         # Takes an option `create` which specifies a valid node type.
         find: (ident, options={}) ->
-            if c._.isEmpty(ident)
+            if _.isEmpty(ident)
                 return false
 
             # Check against each key in the ident for a match on attrs
@@ -90,7 +91,7 @@ define [
             if @type is 'branch'
                 passed = true
                 for child in @children.models
-                    if child.apply(c._.extend({}, options, silent: true)) is false
+                    if child.apply(_.extend({}, options, silent: true)) is false
                         passed = false
 
                 # If the branch contains a single child that does not pass
@@ -155,7 +156,7 @@ define [
         _isDirty: (options) ->
             if not (node = @_upstream(options))
                 return true
-            return not c._.isEqual(node.toJSON(), @toJSON())
+            return not _.isEqual(node.toJSON(), @toJSON())
 
         # Check if this node is dirty
         isDirty: (options) ->

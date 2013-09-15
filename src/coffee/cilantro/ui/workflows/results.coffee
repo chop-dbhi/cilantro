@@ -1,4 +1,6 @@
 define [
+    'underscore'
+    'marionette'
     '../core'
     '../base'
     '../paginator'
@@ -11,12 +13,12 @@ define [
     '../exporter'
     'tpl!templates/count.html'
     'tpl!templates/workflows/results.html'
-], (c, base, paginator, numbers, structs, models, tables, context, concept, exporter, templates...) ->
+], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, templates...) ->
 
-    templates = c._.object ['count', 'results'], templates
+    templates = _.object ['count', 'results'], templates
 
 
-    class ResultCount extends c.Marionette.ItemView
+    class ResultCount extends Marionette.ItemView
         tagName: 'span'
 
         className: 'result-count'
@@ -35,7 +37,7 @@ define [
             @ui.label.text('records')
 
 
-    class ResultsWorkflow extends c.Marionette.Layout
+    class ResultsWorkflow extends Marionette.Layout
         className: 'results-workflow'
 
         template: templates.results
@@ -357,7 +359,7 @@ define [
             @ui.createReport.modal('show')
 
         cancelColumnChanges: ->
-            c._.delay =>
+            _.delay =>
                 @columns.currentView.updateView(c.data.views.getSession())
             , 25
 

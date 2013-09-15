@@ -1,9 +1,12 @@
 define [
-    '../core'
+    'jquery'
+    'underscore'
+    'backbone'
+    'highcharts'
     '../base'
     '../controls'
     './options'
-], (c, base, controls, chartOptions) ->
+], ($, _, Backbone, Highcharts, base, controls, chartOptions) ->
 
 
     # Highcharts options are very nested.. this makes the common ones more
@@ -37,7 +40,7 @@ define [
         chartOptions: chartOptions.defaults
 
         initialize: (options) ->
-            chartOptions = c._.extend {}, options.chart
+            chartOptions = _.extend {}, options.chart
 
             if chartOptions?
                 # Map convenience options to the real ones
@@ -75,16 +78,16 @@ define [
 
         onChartLoaded: ->
             $('.load-view').remove()
-            
+
         renderChart: (options) ->
-            view = new @loadView 
+            view = new @loadView
                 message: 'Loading chart'
             @$el.append(view.render().el)
 
             options.chart['events'] = {
                 load: @onChartLoaded
             }
-            
+
             if @chart then @chart.destroy?()
             @chart = new Highcharts.Chart(options)
             @set(@context)
@@ -139,6 +142,6 @@ define [
     charts = { Chart, AreaChart, AreaSplineChart, BarChart, ColumnChart,
         LineChart, PieChart, ScatterChart, SplineChart, Sparkline }
 
-    c._.extend Backbone, charts
+    _.extend Backbone, charts
 
     return charts

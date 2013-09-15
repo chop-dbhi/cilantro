@@ -1,5 +1,6 @@
 define [
-    '../../core'
+    'underscore'
+    'marionette'
     '../../../models'
     '../../controls'
     '../../paginator'
@@ -8,9 +9,9 @@ define [
     'tpl!templates/search.html'
     'tpl!templates/field/controls/multi-value-item.html'
     'tpl!templates/field/controls/multi-value-search.html'
-], (c, models, controls, paginator, values, search, templates...) ->
+], (_, Marionette, models, controls, paginator, values, search, templates...) ->
 
-    templates = c._.object ['search', 'item', 'layout'], templates
+    templates = _.object ['search', 'item', 'layout'], templates
 
 
     # Single page of values
@@ -37,7 +38,7 @@ define [
 
         url: ->
             url = @field.links.values
-            if @urlParams? then url = "#{ url }?#{ c.$.param(@urlParams) }"
+            if @urlParams? then url = "#{ url }?#{ $.param(@urlParams) }"
             return url
 
 
@@ -56,7 +57,7 @@ define [
         initialize: ->
             super
             @paginator = @options.paginator
-            @search = c._.debounce(@search, 300)
+            @search = _.debounce(@search, 300)
 
         search: (event) ->
             value = @ui.input.val()
@@ -68,7 +69,7 @@ define [
 
 
     # Single search result item
-    class SearchItem extends c.Marionette.ItemView
+    class SearchItem extends Marionette.ItemView
         className: 'value-item'
 
         template: templates.item
@@ -88,7 +89,7 @@ define [
 
         addItem: ->
             # Mark as valid since it was derived from a controlled list
-            attrs = c._.extend @model.toJSON(), valid: true
+            attrs = _.extend @model.toJSON(), valid: true
             @values.add(attrs)
 
         setState: ->

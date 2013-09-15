@@ -1,13 +1,15 @@
 define [
+    'underscore'
+    'backbone'
     '../core'
     './base'
-], (c, base) ->
+], (_, Backbone, c, base) ->
 
 
-    class Facet extends c.Backbone.Model
+    class Facet extends Backbone.Model
 
 
-    class Facets extends c.Backbone.Collection
+    class Facets extends Backbone.Collection
         model: Facet
 
         get: (obj) ->
@@ -64,7 +66,7 @@ define [
 
         jsonToFacets: (json) ->
             # Implies this is an array of object, set directly
-            if c._.isArray(json)
+            if _.isArray(json)
                 @facets.set(json)
                 return
 

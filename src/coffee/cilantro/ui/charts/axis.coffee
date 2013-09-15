@@ -1,9 +1,9 @@
 define [
-    '../core'
-], (c) ->
+    'marionette'
+], (Marionette) ->
 
     # Represents a list of possible fields for use with a distribution chart
-    class FieldAxis extends c.Marionette.ItemView
+    class FieldAxis extends Marionette.ItemView
         tagName: 'select'
 
         options:

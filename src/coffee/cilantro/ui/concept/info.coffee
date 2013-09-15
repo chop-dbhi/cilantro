@@ -1,12 +1,13 @@
 define [
-    '../core'
+    'underscore'
+    'marionette'
     'tpl!templates/concept/info.html'
-], (c, templates...) ->
+], (_, Marionette, templates...) ->
 
-    templates = c._.object ['info'], templates
+    templates = _.object ['info'], templates
 
 
-    class ConceptInfo extends c.Marionette.ItemView
+    class ConceptInfo extends Marionette.ItemView
         className: 'concept-info'
 
         template: templates.info

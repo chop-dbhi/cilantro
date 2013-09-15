@@ -1,11 +1,12 @@
 define [
-    '../../core'
+    'underscore'
+    'backbone'
     './nodes'
-], (c, nodes) ->
+], (_, Backbone, nodes) ->
 
     class Events
 
-    c._.extend Events::, c.Backbone.Events
+    _.extend Events::, Backbone.Events
 
 
     # Light wrapper for fixing attrs for the top-level branch node. If `attrs`
@@ -30,7 +31,7 @@ define [
             'change:enabled': 'save'
 
         constructor: (@model, options) ->
-            @options = c._.extend({}, @options, options)
+            @options = _.extend({}, @options, options)
 
             # Define the working and upstream trees
             @working = new nodes.BranchNodeModel null,
@@ -76,7 +77,7 @@ define [
                 # later if more complex tree layouts are used.
                 return @_toJSON(node, options)
 
-            attrs = c._.clone(node.attributes)
+            attrs = _.clone(node.attributes)
 
             if node.type is 'branch'
                 children = []
@@ -104,7 +105,7 @@ define [
         update: (attrs) ->
             # Ensure the active and working trees are not empty, otherwise
             # change events do not fire.
-            attrs = c._.extend
+            attrs = _.extend
                 children: []
                 type: 'and'
             , attrs
@@ -135,11 +136,11 @@ define [
         # Define a node in the tree. Takes an option `type` which specifies
         # the node type to create.
         define: (attrs, path, options) ->
-            if not c._.isArray(path)
+            if not _.isArray(path)
                 options = path
                 path = []
 
-            options = c._.extend
+            options = _.extend
                 identKeys: @options.identKeys
             , options
 
@@ -157,7 +158,7 @@ define [
 
             # Get the identity of this node and add it to the parent
             parent.children.add(attrs, options)
-            return @find(c._.pick(attrs, options.identKeys))
+            return @find(_.pick(attrs, options.identKeys))
 
         # Save the model on behalf of a node.
         # TODO this assumes only a single node has been changed. If multiple
@@ -165,7 +166,7 @@ define [
         # have it's events triggered.
         save: (node, options) ->
             # Trigger 'request' on node
-            options = c._.extend {}, options,
+            options = _.extend {}, options,
                 beforeSend: (xhr) =>
                     node.trigger('request', node, xhr, options)
 

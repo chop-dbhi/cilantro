@@ -1,7 +1,7 @@
 define [
-    '../core'
+    'underscore'
     '../search'
-], (c, search)->
+], (_, search)->
 
 
     class ConceptSearch extends search.Search
@@ -12,7 +12,7 @@ define [
 
         onRender: ->
             super
-            @ui.input.on 'keyup', c._.debounce =>
+            @ui.input.on 'keyup', _.debounce =>
                 query = @ui.input.val()
                 if query
                     @collection.search query, (resp) =>

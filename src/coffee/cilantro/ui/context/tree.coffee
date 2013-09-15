@@ -1,5 +1,6 @@
 define [
-    '../core'
+    'underscore'
+    'marionette'
     '../base'
     './item'
     './info'
@@ -7,16 +8,16 @@ define [
     'tpl!templates/context.html'
     'tpl!templates/context/empty.html'
     'tpl!templates/context/tree.html'
-], (c, base, item, info, actions, templates...) ->
+], (_, Marionette, base, item, info, actions, templates...) ->
 
-    templates = c._.object ['context', 'empty', 'tree'], templates
+    templates = _.object ['context', 'empty', 'tree'], templates
 
 
     class ContextEmptyTree extends base.EmptyView
         template: templates.empty
 
 
-    class ContextTree extends c.Marionette.CompositeView
+    class ContextTree extends Marionette.CompositeView
         className: 'context-tree'
 
         template: templates.tree
@@ -28,7 +29,7 @@ define [
         emptyView: ContextEmptyTree
 
 
-    class ContextPanel extends c.Marionette.Layout
+    class ContextPanel extends Marionette.Layout
         className: 'context'
 
         template: templates.context

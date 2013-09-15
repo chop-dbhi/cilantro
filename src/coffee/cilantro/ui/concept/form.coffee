@@ -1,15 +1,17 @@
 define [
+    'underscore'
+    'marionette'
     '../../core'
     '../field'
     '../charts'
     './info'
     'tpl!templates/concept/form.html'
-], (c, field, charts, info, templates...) ->
+], (_, Marionette, c, field, charts, info, templates...) ->
 
-    templates = c._.object ['form'], templates
+    templates = _.object ['form'], templates
 
 
-    class ConceptForm extends c.Marionette.Layout
+    class ConceptForm extends Marionette.Layout
         className: 'concept-form'
 
         template: templates.form

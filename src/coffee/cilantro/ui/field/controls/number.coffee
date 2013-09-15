@@ -1,11 +1,11 @@
 define [
-    '../../core'
+    'underscore'
     '../../controls'
     '../../button'
     'tpl!templates/controls/number-range-input.html'
-], (c, controls, button, templates...) ->
+], (_, controls, button, templates...) ->
 
-    templates = c._.object ['number'], templates
+    templates = _.object ['number'], templates
 
     class NumberControl extends controls.Control
         template: templates.number

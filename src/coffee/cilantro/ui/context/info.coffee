@@ -1,12 +1,14 @@
 define [
+    'underscore'
+    'marionette'
     '../core'
     'tpl!templates/context/info.html'
-], (c, templates...) ->
+], (_, Marionette, c, templates...) ->
 
-    templates = c._.object ['info'], templates
+    templates = _.object ['info'], templates
 
 
-    class ContextInfo extends c.Marionette.ItemView
+    class ContextInfo extends Marionette.ItemView
         template: templates.info
 
         ui:

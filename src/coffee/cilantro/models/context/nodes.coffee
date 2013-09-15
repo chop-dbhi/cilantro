@@ -1,9 +1,9 @@
 define [
-    '../../core'
+    'underscore'
     './nodes/base'
     './nodes/condition'
     './nodes/branch'
     './nodes/composite'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

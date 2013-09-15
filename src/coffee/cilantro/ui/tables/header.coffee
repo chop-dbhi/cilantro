@@ -1,10 +1,10 @@
 define [
-    '../core'
-    './row'
     'underscore'
-], (c, row, _) ->
+    'backbone'
+    './row'
+], (_, Backbone, row) ->
 
-    class HeaderCell extends c.Backbone.View
+    class HeaderCell extends Backbone.View
         tagName: 'th'
 
         constructor: (options) ->
@@ -15,10 +15,10 @@ define [
             super(options)
 
         onClick: ->
-            _.each(@view.facets.models, (f) ->     
+            _.each(@view.facets.models, (f) ->
                 if f.get('concept') == @model.id
                     direction = f.get('sort')
-                    
+
                     if direction?
                         if direction.toLowerCase() == "asc"
                             f.set('sort', "desc")
@@ -42,23 +42,23 @@ define [
         events:
             "click": "onClick"
 
-        # Finds and returns the sort icon html associatied with the sort 
+        # Finds and returns the sort icon html associatied with the sort
         # direction of the Facet being represented by this header cell.
         getSortIconHtml: ->
             model = _.find(
-                @view.facets.models, 
+                @view.facets.models,
                 (m) -> m.get('concept') == @model.id,
-                this) 
-            
-            # If there are no view facets for the this header cell's model 
+                this)
+
+            # If there are no view facets for the this header cell's model
             # then the this really shouldn't be displaying anyway so return
-            # the empty string. We really should not ever get into this 
+            # the empty string. We really should not ever get into this
             # situation since the facets should be driving the columns but
             # this check prevents TypeErrors just in case.
             if not model?
                 return ""
 
-            direction = (model.get('sort') || "").toLowerCase() 
+            direction = (model.get('sort') || "").toLowerCase()
 
             if direction == "asc"
                 iconClass = "icon-sort-up"
@@ -68,15 +68,16 @@ define [
                 iconClass = "icon-sort"
 
             "<i class=#{ iconClass }></i>"
+
         render: ->
             @toggleVisible()
-            
-            iconHtml = @getSortIconHtml() 
+
+            iconHtml = @getSortIconHtml()
 
             # TODO: Could we use a template here instead and then just modify
             # the class on the icon in the template?
             @$el.html("<span>" + @model.get('name') + iconHtml)
-            
+
             return @
 
         toggleVisible: ->
@@ -87,11 +88,11 @@ define [
         itemView: HeaderCell
 
 
-    class Header extends c.Backbone.View
+    class Header extends Backbone.View
         tagName: 'thead'
 
         render: ->
-            row = new HeaderRow c._.extend {}, @options,
+            row = new HeaderRow _.extend {}, @options,
                 collection: @collection
             @$el.html(row.el)
             row.render()

@@ -1,5 +1,7 @@
 define [
-    '../core'
+    'underscore'
+    'backbone'
+    'marionette'
     '../base'
     './info'
     './stats'
@@ -8,9 +10,9 @@ define [
     '../charts'
     'tpl!templates/field/form.html'
     'tpl!templates/field/form-condensed.html'
-], (c, base, info, stats, controls, infograph, charts, templates...) ->
+], (_, Backbone, Marionette, base, info, stats, controls, infograph, charts, templates...) ->
 
-    templates = c._.object ['form', 'condensed'], templates
+    templates = _.object ['form', 'condensed'], templates
 
 
     getControlView = (model) ->
@@ -35,7 +37,7 @@ define [
         message: 'Loading and rendering controls...'
 
 
-    class FieldControls extends c.Marionette.CollectionView
+    class FieldControls extends Marionette.CollectionView
         emptyView: LoadingControls
 
         getItemView: (model) ->
@@ -59,11 +61,11 @@ define [
     # used by FieldForm for adding new controls to the UI. A new instance
     # is created by specifying the `viewClass`. Any additional options will
     # be passed into the constructor of the view when initialized.
-    class FieldControlOptions extends c.Backbone.Model
+    class FieldControlOptions extends Backbone.Model
 
 
     # Contained within the ConceptForm containing views for a single FieldModel
-    class FieldForm extends c.Marionette.Layout
+    class FieldForm extends Marionette.Layout
         className: 'field-form'
 
         getTemplate: ->
@@ -108,7 +110,7 @@ define [
             # Initialize empty collection view in which controls can
             # be added to.
             @controls.show new @regionViews.controls
-                collection: new c.Backbone.Collection
+                collection: new Backbone.Collection
                 context: @context
 
             # Add the default control
@@ -131,7 +133,7 @@ define [
                 @$el.addClass('condensed')
 
         addControl: (itemView, options) ->
-            model = new FieldControlOptions c._.defaults
+            model = new FieldControlOptions _.defaults
                 model: @model
                 context: @context
                 itemView: itemView
@@ -139,7 +141,7 @@ define [
             @controls.currentView.collection.add(model)
 
 
-    class FieldFormCollection extends c.Marionette.CollectionView
+    class FieldFormCollection extends Marionette.CollectionView
         itemView: FieldForm
 
         emptyView: LoadingFields

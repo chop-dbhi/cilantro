@@ -1,13 +1,14 @@
 define [
-    '../core'
+    'underscore'
+    'backbone'
     '../structs'
-], (c, structs) ->
+], (_, structs) ->
 
 
     # Represents a value as defined in a query condition. For a given list of
     # values, a value can not be specified twice, so it is treated
     # as the `id`.
-    class Value extends c.Backbone.Model
+    class Value extends Backbone.Model
         idAttribute: 'value'
 
         defaults:
@@ -31,14 +32,14 @@ define [
 
     # Collection of selected values, fetch is disabled, create performs no
     # server-side request.
-    class Values extends c.Backbone.Collection
+    class Values extends Backbone.Collection
         model: Value
 
         comparator: 'label'
 
         initialize: ->
             super
-            @check = c._.debounce(@check, 300)
+            @check = _.debounce(@check, 300)
             @on 'add', @check
 
         fetch: ->
@@ -50,10 +51,10 @@ define [
             models = @where(valid: null, pending: false)
 
             # Mark the models as pending to prevent redundant validation
-            c._.each models, (model) ->
+            _.each models, (model) ->
                 model.set('pending', true)
 
-            c.$.ajax
+            Backbone.ajax
                 url: @url()
                 type: 'POST'
                 data: JSON.stringify(models)
@@ -70,7 +71,7 @@ define [
                     # Mark the models as not pending when the request
                     # has completed regardless if the request succeeded
                     # or failed.
-                    c._.each models, (model) ->
+                    _.each models, (model) ->
                         model.set('pending', false)
 
 

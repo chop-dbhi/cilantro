@@ -1,7 +1,7 @@
 define [
-    './core'
+    'underscore'
     './workflows/query'
     './workflows/results'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

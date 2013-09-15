@@ -1,10 +1,10 @@
 define [
-    '../core'
+    'marionette'
     './row'
-], (c, row) ->
+], (Marionette, row) ->
 
 
-    class Footer extends c.Marionette.ItemView
+    class Footer extends Marionette.ItemView
         tagName: 'tfoot'
 
         template: ->

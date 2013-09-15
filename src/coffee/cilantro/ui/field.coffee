@@ -1,9 +1,9 @@
 define [
-    './core'
+    'underscore'
     './field/info'
     './field/form'
     './field/controls'
     './field/stats'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...

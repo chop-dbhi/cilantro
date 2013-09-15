@@ -1,4 +1,6 @@
 define [
+    'underscore'
+    'marionette'
     '../core'
     './search'
     './index'
@@ -7,9 +9,9 @@ define [
     'tpl!templates/concept/columns-available-section.html'
     'tpl!templates/concept/columns-available-group.html'
     'tpl!templates/concept/columns-selected.html'
-], (c, search, index, templates...) ->
+], (_, Marionette, c, search, index, templates...) ->
 
-    templates = c._.object ['columns', 'available', 'section', 'group', 'selected'], templates
+    templates = _.object ['columns', 'available', 'section', 'group', 'selected'], templates
 
 
     class AvailableItem extends index.ConceptItem
@@ -77,7 +79,7 @@ define [
         className: 'available-columns accordian'
 
 
-    class SelectedItem extends c.Marionette.ItemView
+    class SelectedItem extends Marionette.ItemView
         tagName: 'li'
 
         template: templates.selected
@@ -104,7 +106,7 @@ define [
             collection.add(@model, at: index, silent: true)
 
 
-    class SelectedColumns extends c.Marionette.CollectionView
+    class SelectedColumns extends Marionette.CollectionView
         tagName: 'ul'
 
         className: 'selected-columns'
@@ -127,7 +129,7 @@ define [
             ui.item.trigger(event, ui.item.index())
 
 
-    class ConceptColumns extends c.Marionette.Layout
+    class ConceptColumns extends Marionette.Layout
         className: 'concept-columns'
 
         template: templates.columns

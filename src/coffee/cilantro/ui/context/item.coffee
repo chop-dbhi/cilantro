@@ -1,9 +1,11 @@
 define [
+    'underscore'
+    'marionette'
     '../core'
     'tpl!templates/context/item.html'
-], (c, templates...) ->
+], (_, Marionette, c, templates...) ->
 
-    templates = c._.object ['item'], templates
+    templates = _.object ['item'], templates
 
     # Returns a flat list of values for `key` that is built by recursing
     # over the `attrs.children` if present.
@@ -16,7 +18,7 @@ define [
         return items
 
 
-    class ContextItem extends c.Marionette.ItemView
+    class ContextItem extends Marionette.ItemView
         className: 'context-item'
 
         template: templates.item

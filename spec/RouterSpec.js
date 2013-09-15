@@ -1,4 +1,4 @@
-define(['cilantro'], function(c) {
+define(['jquery', 'underscore', 'backbone', 'cilantro'], function($, _, Backbone, c) {
 
     var routes;
 
@@ -8,7 +8,7 @@ define(['cilantro'], function(c) {
             routes = [{
                 id: 1,
                 route: 'foo/',
-                view: new c.Backbone.View,
+                view: new Backbone.View,
                 el: '#region1'
             }, {
                 id: 2,
@@ -18,7 +18,7 @@ define(['cilantro'], function(c) {
             }, {
                 id: 3,
                 route: 'foo/',
-                view: new c.Backbone.View,
+                view: new Backbone.View,
                 el: '#region3'
             }, {
                 id: 4,
@@ -27,24 +27,24 @@ define(['cilantro'], function(c) {
                 el: '#region3'
             }];
 
-            c.$('#region1, #region2, #region3').remove();
+            $('#region1, #region2, #region3').remove();
 
-            c.$('body')
+            $('body')
                 .append('<div id=region1 />')
                 .append('<div id=region2 />')
                 .append('<div id=region3 />');
 
             c.router.options.el = 'body';
             c.router.register(routes);
-            c.Backbone.history.start({pushState: false, hashChange: true});
+            Backbone.history.start({pushState: false, hashChange: true});
         });
 
         afterEach(function() {
-            c.Backbone.history.navigate();
-            c.Backbone.history.stop();
-            c.Backbone.history.handlers = [];
+            Backbone.history.navigate();
+            Backbone.history.stop();
+            Backbone.history.handlers = [];
 
-            c._.each(c._.keys(c.router._registered), function(id) {
+            _.each(_.keys(c.router._registered), function(id) {
                 c.router.unregister(id);
             });
             c.router._handlers = {};
@@ -53,10 +53,10 @@ define(['cilantro'], function(c) {
         describe('Register', function() {
 
             it('should register', function() {
-                expect(c._.keys(c.router._registered).length).toEqual(4);
+                expect(_.keys(c.router._registered).length).toEqual(4);
                 expect(c.router._loaded.length).toEqual(0);
-                expect(c._.keys(c.router._handlers).length).toEqual(2);
-                expect(c._.keys(c.router._routes).length).toEqual(2);
+                expect(_.keys(c.router._handlers).length).toEqual(2);
+                expect(_.keys(c.router._routes).length).toEqual(2);
             });
 
             it('should load non-route routes on register', function() {
@@ -64,10 +64,10 @@ define(['cilantro'], function(c) {
                     id: 5,
                     view: new Backbone.View
                 });
-                expect(c._.keys(c.router._registered).length).toEqual(5);
+                expect(_.keys(c.router._registered).length).toEqual(5);
                 expect(c.router._loaded.length).toEqual(1);
-                expect(c._.keys(c.router._handlers).length).toEqual(2);
-                expect(c._.keys(c.router._routes).length).toEqual(2);
+                expect(_.keys(c.router._handlers).length).toEqual(2);
+                expect(_.keys(c.router._routes).length).toEqual(2);
             });
         });
 
@@ -76,7 +76,7 @@ define(['cilantro'], function(c) {
             it('should unregister', function() {
                 c.router.unregister(routes[0].id);
 
-                expect(c._.keys(c.router._registered).length).toEqual(3);
+                expect(_.keys(c.router._registered).length).toEqual(3);
                 expect(c.router._loaded.length).toEqual(0);
             });
 
@@ -86,12 +86,12 @@ define(['cilantro'], function(c) {
                     view: new Backbone.View
                 });
 
-                expect(c._.keys(c.router._registered).length).toEqual(5);
+                expect(_.keys(c.router._registered).length).toEqual(5);
                 expect(c.router._loaded.length).toEqual(1);
 
                 c.router.unregister(5);
 
-                expect(c._.keys(c.router._registered).length).toEqual(4);
+                expect(_.keys(c.router._registered).length).toEqual(4);
                 expect(c.router._loaded.length).toEqual(0);
             });
 
@@ -100,7 +100,7 @@ define(['cilantro'], function(c) {
         describe('Routing', function() {
 
             it('should load views', function() {
-                expect(c.Backbone.history.navigate('foo/', {trigger: true})).toBe(true);
+                expect(Backbone.history.navigate('foo/', {trigger: true})).toBe(true);
 
                 // First two are loaded immediately since they are local views
                 expect(c.router._loaded.length).toEqual(2);
@@ -116,13 +116,13 @@ define(['cilantro'], function(c) {
             });
 
             it('should unload loaded modules', function() {
-                expect(c.Backbone.history.navigate('bar/', {trigger: true})).toBe(true);
+                expect(Backbone.history.navigate('bar/', {trigger: true})).toBe(true);
                 expect(c.router._loaded.length).toEqual(1);
 
                 children = $('#region3').children();
                 expect(children.length).toEqual(1);
 
-                expect(c.Backbone.history.navigate('foo/', {trigger: true})).toBe(true);
+                expect(Backbone.history.navigate('foo/', {trigger: true})).toBe(true);
 
                 // New element is added, but only the new one is visible
                 children = $('#region3').children();
@@ -152,13 +152,13 @@ define(['cilantro'], function(c) {
                 });
 
                 it('should trigger the load event', function() {
-                    c.Backbone.history.navigate('foo/', {trigger: true});
+                    Backbone.history.navigate('foo/', {trigger: true});
                     expect(loaded).toBe(true);
                 });
 
                 it('should trigger the unload event', function() {
-                    c.Backbone.history.navigate('foo/', {trigger: true});
-                    c.Backbone.history.navigate('bar/', {trigger: true});
+                    Backbone.history.navigate('foo/', {trigger: true});
+                    Backbone.history.navigate('bar/', {trigger: true});
                     expect(loaded).toBe(false);
                 });
             });

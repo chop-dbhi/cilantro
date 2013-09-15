@@ -1,6 +1,8 @@
 define [
+    'underscore'
+    'backbone'
     '../core'
-], (c) ->
+], (_, Backbone, c) ->
 
     # Prettifies a key for display
     prettyKey = (key) ->
@@ -9,13 +11,13 @@ define [
 
     # Prettifies a value for display
     prettyValue = (value) ->
-        if c._.isNumber(value) then c.utils.prettyNumber(value) else value
+        if _.isNumber(value) then c.utils.prettyNumber(value) else value
 
 
-    class StatModel extends c.Backbone.Model
+    class StatModel extends Backbone.Model
 
 
-    class StatCollection extends c.Backbone.Collection
+    class StatCollection extends Backbone.Collection
         model: StatModel
 
         parse: (attrs) ->

@@ -1,11 +1,12 @@
 define [
-    '../../../core'
+    'underscore'
+    'backbone'
     './base'
-], (c, base) ->
+], (_, Backbone, base) ->
 
 
     # Collection for representing a branch's child nodes
-    class ContextNodeCollection extends c.Backbone.Collection
+    class ContextNodeCollection extends Backbone.Collection
         # The 'parent' option is used to prevent circular references when
         # adding nodes to the collection.
         constructor: (models, options) ->
@@ -24,7 +25,7 @@ define [
             if attrs instanceof base.ContextNodeModel
                 attrs = attrs.identity()
             else
-                attrs = c._.pick(attrs, @parent.identKeys)
+                attrs = _.pick(attrs, @parent.identKeys)
             @find(attrs)
 
         # Perform the normal set operation, but ensuring the parent node is
@@ -33,7 +34,7 @@ define [
             if not models?
                 return super(null, options)
 
-            if not c._.isArray(models)
+            if not _.isArray(models)
                 models = [models]
 
             for model in models
@@ -86,7 +87,7 @@ define [
             return attrs
 
         _recurse: (method, flag=true, options) ->
-            options = c._.extend
+            options = _.extend
                 deep: false
             , options
 
@@ -128,13 +129,13 @@ define [
 
         # Define a node within this branch via the manager
         define: (attrs, options) ->
-            options = c._.extend
+            options = _.extend
                 manager: @manager
                 identKeys: @identKeys
             , options
 
             @children.add(attrs, options)
-            return @find(c._.pick(attrs, options.identKeys))
+            return @find(_.pick(attrs, options.identKeys))
 
         # Find itself or recurse into the children
         find: (ident, options) ->

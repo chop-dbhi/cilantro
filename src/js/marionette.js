@@ -1,4 +1,4 @@
- define(['../underscore', '../backbone'], function(_, Backbone) {
+ define(['underscore', 'backbone'], function(_, Backbone) {
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
 // v1.0.3
