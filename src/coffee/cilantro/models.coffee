@@ -1,5 +1,6 @@
 define [
     'underscore'
+    './models/base'
     './models/field'
     './models/concept'
     './models/context'
