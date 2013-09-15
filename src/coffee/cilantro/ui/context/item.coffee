@@ -51,7 +51,7 @@ define [
         # Navigate to query page when a concept is triggered
         clickShow: (event) ->
             c.router.navigate('query', trigger: true)
-            c.publish(c.CONCEPT_FOCUS, @model.get('concept'))
+            c.trigger(c.CONCEPT_FOCUS, @model.get('concept'))
 
         clickRemove: (event) ->
             @model.remove()

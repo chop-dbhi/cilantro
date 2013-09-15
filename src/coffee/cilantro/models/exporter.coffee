@@ -19,8 +19,8 @@ define [
 
         initialize: ->
             super
-            c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
-            c.subscribe c.SESSION_CLOSED, => @reset()
+            c.on c.SESSION_OPENED, => @fetch(reset: true)
+            c.on c.SESSION_CLOSED, => @reset()
 
         notifiesOnComplete: ->
             c.isSupported(@minSerranoVersionProgressFeature)

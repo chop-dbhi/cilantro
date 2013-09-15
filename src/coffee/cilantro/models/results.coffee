@@ -22,10 +22,10 @@ define [
             c.session.url('preview')
 
         initialize: ->
-            c.subscribe c.SESSION_OPENED, @refresh, @
-            c.subscribe c.SESSION_CLOSED, @reset, @
-            c.subscribe c.CONTEXT_SYNCED, @refresh, @
-            c.subscribe c.VIEW_SYNCED, @refresh, @
+            c.on c.SESSION_OPENED, @refresh, @
+            c.on c.SESSION_CLOSED, @reset, @
+            c.on c.CONTEXT_SYNCED, @refresh, @
+            c.on c.VIEW_SYNCED, @refresh, @
 
         fetch: (options={}) ->
             options.cache ?= false

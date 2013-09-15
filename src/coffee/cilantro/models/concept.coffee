@@ -18,7 +18,7 @@ define [
             super
 
             # Fetch the field data the first time a concept receives focus
-            c.subscribe c.CONCEPT_FOCUS, (id) =>
+            c.on c.CONCEPT_FOCUS, (id) =>
                 if @id isnt id then return
                 if not @fields.length then @fields.fetch(reset:true)
 
@@ -54,8 +54,8 @@ define [
             super
 
         initialize: ->
-            c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
-            c.subscribe c.SESSION_CLOSED, => @reset()
+            c.on c.SESSION_OPENED, => @fetch(reset: true)
+            c.on c.SESSION_CLOSED, => @reset()
 
             # Update the sub-collections with the specific sets of models
             @on 'add remove reset', ->

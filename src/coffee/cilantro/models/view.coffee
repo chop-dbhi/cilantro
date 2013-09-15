@@ -31,19 +31,19 @@ define [
 
         initialize: ->
             @on 'request', ->
-                c.publish c.VIEW_SYNCING, @
+                c.trigger c.VIEW_SYNCING, @
 
             @on 'sync', (model, attrs, options={}) ->
                 if options.silent isnt true
-                    c.publish c.VIEW_SYNCED, @, 'success'
+                    c.trigger c.VIEW_SYNCED, @, 'success'
 
             @on 'error', ->
-                c.publish c.VIEW_SYNCED, @, 'error'
+                c.trigger c.VIEW_SYNCED, @, 'error'
 
             @on 'change', ->
-                c.publish c.VIEW_CHANGED, @
+                c.trigger c.VIEW_CHANGED, @
 
-            c.subscribe c.VIEW_SAVE, (id) =>
+            c.on c.VIEW_SAVE, (id) =>
                 if @id is id or not id and @isSession()
                     @save()
 
@@ -110,10 +110,10 @@ define [
 
         initialize: ->
             super
-            c.subscribe c.SESSION_OPENED, =>
+            c.on c.SESSION_OPENED, =>
                 @fetch(reset: true).done =>
                     @ensureSession()
-            c.subscribe c.SESSION_CLOSED, => @reset()
+            c.on c.SESSION_CLOSED, => @reset()
 
             @on 'reset', ->
                 c.promiser.resolve('views')
