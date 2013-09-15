@@ -1,4 +1,4 @@
-define(['../jquery'], function(jQuery) {
+define(['jquery'], function(jQuery) {
 
     var ajax = jQuery.ajax,
         requestQueue = [],
