@@ -10,21 +10,19 @@ define(['jquery'], function(jQuery) {
         if (trigger !== false) trigger = true;
         if (trigger) requestPending = true;
 
-        success = options.success;
-        error = options.error;
-        complete = options.complete;
+        promise
+            .done(options.success)
+            .fail(options.error)
+            .always(options.complete);
 
         params = {
-            complete: function(xhr, status) {
-                if (complete) complete.apply(that, arguments);
+            complete: function() {
                 if (trigger) dequeueRequest();
             },
             success: function() {
-                if (success) success.apply(that, arguments);
                 promise.resolveWith(this, arguments);
             },
             error: function() {
-                if (error) error.apply(this, arguments);
                 promise.rejectWith(this, arguments);
             }
         };
