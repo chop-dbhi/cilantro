@@ -105,16 +105,5 @@ define [
     class ViewCollection extends base.SessionCollection
         model: ViewModel
 
-        url: ->
-            c.session.url('views')
-
-        initialize: ->
-            super
-            c.on c.SESSION_OPENED, => @fetch(reset: true)
-            c.on c.SESSION_CLOSED, => @reset()
-
-            @on 'reset', ->
-                c.promiser.resolve('views')
-
 
     { ViewModel, ViewCollection }

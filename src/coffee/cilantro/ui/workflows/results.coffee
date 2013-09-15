@@ -91,10 +91,6 @@ define [
 
             @monitors = {}
 
-            c.on c.SESSION_OPENED, ->
-                if not c.isSupported()
-                    $('.serrano-version-warning').show()
-
             # Used to tell if filters were hidden by user clicking the button
             @areFiltersManuallyHidden = false
             # Flag indicating the current visibility of the context panel

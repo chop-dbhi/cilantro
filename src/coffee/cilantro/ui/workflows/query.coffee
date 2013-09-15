@@ -16,11 +16,6 @@ define [
 
         template: templates.query
 
-        initialize: ->
-            c.on c.SESSION_OPENED, ->
-                if not c.isSupported()
-                    $('.serrano-version-warning').show()
-
         regions:
             concepts: '.concept-panel-region'
             workspace: '.concept-workspace-region'

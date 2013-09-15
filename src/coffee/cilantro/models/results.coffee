@@ -19,19 +19,12 @@ define [
     # frames, etc. A refresh resets the collection as well as changes
     # to the frame size.
     class Results extends structs.FrameArray
-        url: ->
-            c.session.url('preview')
-
-        initialize: ->
-            c.on c.SESSION_OPENED, @refresh, @
-            c.on c.SESSION_CLOSED, @reset, @
-            c.on c.CONTEXT_SYNCED, @refresh, @
-            c.on c.VIEW_SYNCED, @refresh, @
-
         fetch: (options={}) ->
             options.cache ?= false
             super(options)
 
+
+    # Mix-in paginator functionality for results
     _.extend Results::, paginator.PaginatorMixin
 
     # Set the custom model for this Paginator
