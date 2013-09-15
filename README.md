@@ -41,12 +41,3 @@ Distribution builds should only be performed on the `develop` branch.
 # tarball binaries and prints instructions to upload it to GitHub
 grunt release
 ```
-
-### Contributing
-
-- If you do not have write access to the repo (i.e. not a core contributor), create a fork of Cilantro
-- Branches are used to isolate development and ensure clear and concise intent of the code. Always create a separate branch off `develop` named after the issue number (e.g. issue-123). If there is no issue number, [please create one first](https://github.com/cbmi/cilantro/issues/) before starting your work.
-- If working on existing files, ensure the coding style is kept consistent
-with the code around it. If creating new files or you are unsure of a pattern
-or preference please consult the [style
-guides](https://github.com/cbmi/style-guides/).
