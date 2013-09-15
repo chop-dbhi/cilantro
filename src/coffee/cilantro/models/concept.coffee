@@ -58,7 +58,7 @@ define [
             c.subscribe c.SESSION_CLOSED, => @reset()
 
             # Update the sub-collections with the specific sets of models
-            @on 'reset', ->
+            @on 'add remove reset', ->
                 @queryable.reset @filter (m) ->
                     !!m.get('queryable') or !!m.get('queryview')
                 @viewable.reset @filter (m) ->
