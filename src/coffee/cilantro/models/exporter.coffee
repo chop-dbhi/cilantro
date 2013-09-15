@@ -27,11 +27,8 @@ define [
 
         parse: (attrs) ->
             if attrs? and attrs._links?
-                for key in Object.keys(attrs._links)
-                    # Ignore the exporter endpoint itself
-                    if key != "self"
-                        this.push(new ExporterModel(attrs._links[key]))
-                return this.models
+                # Ignore the exporter endpoint itself
+                return (value for key, value of attrs._links if key isnt "self")
 
 
     { ExporterModel, ExporterCollection }
