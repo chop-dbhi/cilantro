@@ -44,39 +44,32 @@ define [
 
         # Finds and returns the sort icon html associatied with the sort
         # direction of the Facet being represented by this header cell.
-        getSortIconHtml: ->
-            model = _.find(
-                @view.facets.models,
-                (m) -> m.get('concept') == @model.id,
-                this)
+        getSortIconClass: ->
+            model = _.find @view.facets.models, (m) =>
+                @model.id is m.get('concept')
 
             # If there are no view facets for the this header cell's model
             # then the this really shouldn't be displaying anyway so return
             # the empty string. We really should not ever get into this
             # situation since the facets should be driving the columns but
             # this check prevents TypeErrors just in case.
-            if not model?
-                return ""
+            if not model? then return
 
-            direction = (model.get('sort') || "").toLowerCase()
+            direction = (model.get('sort') or '').toLowerCase()
 
-            if direction == "asc"
-                iconClass = "icon-sort-up"
-            else if direction == "desc"
-                iconClass = "icon-sort-down"
-            else
-                iconClass = "icon-sort"
-
-            "<i class=#{ iconClass }></i>"
+            return switch direction
+                when 'asc' then 'icon-sort-up'
+                when 'desc' then 'icon-sort-down'
+                else 'icon-sort'
 
         render: ->
             @toggleVisible()
 
-            iconHtml = @getSortIconHtml()
+            iconClass = @getSortIconClass()
 
             # TODO: Could we use a template here instead and then just modify
             # the class on the icon in the template?
-            @$el.html("<span>" + @model.get('name') + iconHtml)
+            @$el.html("<span>#{ @model.get('name') } <i class=#{ iconClass }></i></span>")
 
             return @
 

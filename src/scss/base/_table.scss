@@ -4,4 +4,30 @@ table thead th {
     &:first-child {
         border-left: 0;
     }
+
+    span {
+        position: relative;
+        display: block;
+
+        // If an icon is present, it is typically denoting the sort order
+        i {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+
+            // Only about 6/13px are visible, margin is used to offset
+            // visible portion
+            &.icon-sort-up {
+                margin-top: -4px;
+            }
+
+            &.icon-sort-down {
+                margin-top: -8px;
+            }
+
+            &.icon-sort {
+                margin-top: -6px;
+            }
+        }
+    }
 }
