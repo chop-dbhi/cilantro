@@ -99,6 +99,9 @@ define [
             @updateContextPanelOffsets()
 
         updateContextPanelOffsets: =>
+            if not @isClosed? or @isClosed
+                return
+
             # Find the bounds of the results workflow to properly fix the
             # position of the context/filter panel.
             @workflowTopOffset = @$el.position().top
