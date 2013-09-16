@@ -82,6 +82,7 @@ define [
 
         initialize: ->
             $(document).on 'scroll', @onPageScroll
+            $(window).resize @onWindowResize
 
             @monitors = {}
 
@@ -93,6 +94,18 @@ define [
             @areFiltersManuallyHidden = false
             # Flag indicating the current visibility of the context panel
             @areFiltersHidden = false
+
+        onWindowResize: =>
+            @updateContextPanelOffsets()
+
+        updateContextPanelOffsets: =>
+            # Find the bounds of the results workflow to properly fix the
+            # position of the context/filter panel.
+            @workflowTopOffset = @$el.position().top
+            @workflowRightOffset = window.innerWidth - (@$el.position().left + @$el.width())
+
+            @ui.contextContainer.css('top', @workflowTopOffset)
+            @ui.contextContainer.css('right', @workflowRightOffset)
 
         toggleContextPanelButtonClicked: =>
             if @areFiltersHidden
@@ -372,12 +385,15 @@ define [
 
             # If there is already something fixed to the top, record the height
             # of it so we can account for it in our scroll calculations later.
-            if not @topNavbarHeight
+            if not @topNavbarHeight?
                 topElement = $('.navbar-fixed-top')
                 if topElement.length
                     @topNavbarHeight = topElement.height()
                 else
                     @topNavbarHeight = 0
+
+            if not @workflowTopOffset?
+                @updateContextPanelOffsets()
 
         showExportOptions: ->
             $('.export-options-modal .alert-block').hide()
