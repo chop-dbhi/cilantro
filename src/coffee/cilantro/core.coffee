@@ -2,7 +2,7 @@ define [
     'underscore'
     'mediator'
     'promiser'
-    'loglevel'
+    './logger'
     './config'
     './channels'
     './utils'
@@ -27,9 +27,6 @@ define [
         # minimum to prepare them in the case of missing or broken functionality.
         minSerranoVersion: '2.0.18'
         maxSerranoVersion: '2.1.0'
-
-        # Attach logging component for easy reference
-        log: loglevel
 
         # Initialize the session manager and default configuration
         session: new session.SessionManager
@@ -65,7 +62,7 @@ define [
 
     # Set log level to debug
     if c.config.get('debug')
-        c.log.setLevel('debug')
+        logger.setLevel('debug')
 
     # Mediator channel topics for communication across the application
     channels = _.extend {}, channels, session.channels
