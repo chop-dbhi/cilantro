@@ -5,8 +5,6 @@ define(['jquery'], function(jQuery) {
         requestPending = false;
 
     function sendRequest(options, promise, trigger) {
-        var complete, error, options, params, success, that = this;
-
         if (trigger !== false) trigger = true;
         if (trigger) requestPending = true;
 
@@ -15,7 +13,7 @@ define(['jquery'], function(jQuery) {
             .fail(options.error)
             .always(options.complete);
 
-        params = {
+        var params = {
             complete: function() {
                 if (trigger) dequeueRequest();
             },
@@ -28,7 +26,7 @@ define(['jquery'], function(jQuery) {
         };
 
         ajax(jQuery.extend({}, options, params));
-    };
+    }
 
     function dequeueRequest() {
         var args, options, promise;
@@ -38,13 +36,13 @@ define(['jquery'], function(jQuery) {
         } else {
             requestPending = false;
         }
-    };
+    }
 
     function queueRequest(options) {
         var promise, type, queue;
-        promise = $.Deferred();
+        promise = jQuery.Deferred();
         type = (options.type || 'get').toLowerCase();
-        queue = options.queue != null ? options.queue : (type === 'get' ? false : true)
+        queue = options.queue !== null ? options.queue : (type === 'get' ? false : true);
 
         if (queue && requestPending) {
             requestQueue.push([options, promise]);
@@ -52,12 +50,12 @@ define(['jquery'], function(jQuery) {
             sendRequest(options, promise, queue);
         }
         return promise;
-    };
+    }
 
     jQuery.ajax = function(options, optional) {
         if (typeof(options) === "string"){
-              optional.url = options;
-              options = optional;
+            optional.url = options;
+            options = optional;
         }
         return queueRequest(options);
     };
