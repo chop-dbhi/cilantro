@@ -138,7 +138,7 @@ define [
                 if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
                     # Remove the results navbar from the top
                     @ui.navbar.removeClass('navbar-fixed-top')
-                    @ui.contextContainer.css('top', 60)
+                    @ui.contextContainer.css('top', @workflowTopOffset)
 
                     if not @areFiltersManuallyHidden
                         @showContextPanel()
@@ -147,7 +147,7 @@ define [
                     # Move the results navbar to the top
                     @ui.navbar.css('top', @topNavbarHeight)
                     @ui.navbar.addClass('navbar-fixed-top')
-                    @ui.contextContainer.css('top', 90)
+                    @ui.contextContainer.css('top', @workflowTopOffset + 35)
 
                     if not @areFiltersManuallyHidden
                         @hideContextPanel()
