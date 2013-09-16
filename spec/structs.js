@@ -1,4 +1,4 @@
-define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
+define(['cilantro/structs', 'text!/mock/data/preview.json'], function(structs, dataJSON) {
 
 
     describe('Structures', function() {
@@ -11,13 +11,13 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
         describe('Frame', function() {
 
             it('should populate local data', function() {
-                var frame = new c.structs.Frame(data);
+                var frame = new structs.Frame(data);
                 expect(frame.indexes.length).toEqual(6);
                 expect(frame.series.length).toEqual(30);
             });
 
             it('should populate remote data on fetch', function() {
-                var frame = new c.structs.Frame(null, null, {
+                var frame = new structs.Frame(null, null, {
                     url: '/mock/data/preview.json'
                 });
 
@@ -36,7 +36,7 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
             });
 
             it('should be able to extract columns', function() {
-                var frame = new c.structs.Frame(data);
+                var frame = new structs.Frame(data);
                 var column = frame.column(2);
                 expect(column.width()).toEqual(1);
                 expect(column.size()).toEqual(30);
@@ -48,7 +48,7 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
             var frame, series;
 
             beforeEach(function() {
-                frame = new c.structs.Frame(data);
+                frame = new structs.Frame(data);
                 series = frame.series.at(0);
             });
 
@@ -72,7 +72,7 @@ define(['cilantro', 'text!/mock/data/preview.json'], function(c, dataJSON) {
             var frame, series, datum;
 
             beforeEach(function() {
-                frame = new c.structs.Frame(data);
+                frame = new structs.Frame(data);
                 series = frame.series.at(0);
                 datum = series.data.at(0);
             });

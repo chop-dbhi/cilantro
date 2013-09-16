@@ -1,10 +1,26 @@
-define(['jquery', 'underscore', 'backbone', 'cilantro'], function($, _, Backbone, c) {
-
-    var routes;
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'cilantro',
+    'cilantro/router'
+], function($, _, Backbone, c, router) {
 
     describe('Router', function() {
+        var r, routes;
 
         beforeEach(function() {
+            $('#region1, #region2, #region3').remove();
+
+            $('body')
+                .append('<div id=region1 />')
+                .append('<div id=region2 />')
+                .append('<div id=region3 />');
+
+            r = new router.Router({
+                main: 'body'
+            });
+
             routes = [{
                 id: 1,
                 route: 'foo/',
@@ -27,72 +43,59 @@ define(['jquery', 'underscore', 'backbone', 'cilantro'], function($, _, Backbone
                 el: '#region3'
             }];
 
-            $('#region1, #region2, #region3').remove();
-
-            $('body')
-                .append('<div id=region1 />')
-                .append('<div id=region2 />')
-                .append('<div id=region3 />');
-
-            c.router.options.el = 'body';
-            c.router.register(routes);
-            Backbone.history.start({pushState: false, hashChange: true});
+            r.register(routes);
+            r.start();
         });
 
         afterEach(function() {
             Backbone.history.navigate();
             Backbone.history.stop();
             Backbone.history.handlers = [];
-
-            _.each(_.keys(c.router._registered), function(id) {
-                c.router.unregister(id);
-            });
-            c.router._handlers = {};
         });
 
         describe('Register', function() {
 
             it('should register', function() {
-                expect(_.keys(c.router._registered).length).toEqual(4);
-                expect(c.router._loaded.length).toEqual(0);
-                expect(_.keys(c.router._handlers).length).toEqual(2);
-                expect(_.keys(c.router._routes).length).toEqual(2);
+                expect(_.keys(r._registered).length).toEqual(4);
+                expect(r._loaded.length).toEqual(0);
+                expect(_.keys(r._handlers).length).toEqual(2);
+                expect(_.keys(r._routes).length).toEqual(2);
             });
 
             it('should load non-route routes on register', function() {
-                c.router.register({
+                r.register({
                     id: 5,
                     view: new Backbone.View
                 });
-                expect(_.keys(c.router._registered).length).toEqual(5);
-                expect(c.router._loaded.length).toEqual(1);
-                expect(_.keys(c.router._handlers).length).toEqual(2);
-                expect(_.keys(c.router._routes).length).toEqual(2);
+                expect(_.keys(r._registered).length).toEqual(5);
+                expect(r._loaded.length).toEqual(1);
+                expect(_.keys(r._handlers).length).toEqual(2);
+                expect(_.keys(r._routes).length).toEqual(2);
             });
         });
 
         describe('Unregister', function() {
 
             it('should unregister', function() {
-                c.router.unregister(routes[0].id);
+                r.unregister(routes[0].id);
 
-                expect(_.keys(c.router._registered).length).toEqual(3);
-                expect(c.router._loaded.length).toEqual(0);
+                expect(_.keys(r._registered).length).toEqual(3);
+                expect(r._loaded.length).toEqual(0);
             });
 
             it('should load non-route routes on register', function() {
-                c.router.register({
+                r.register({
                     id: 5,
                     view: new Backbone.View
                 });
 
-                expect(_.keys(c.router._registered).length).toEqual(5);
-                expect(c.router._loaded.length).toEqual(1);
+                expect(_.keys(r._registered).length).toEqual(5);
+                expect(r._loaded.length).toEqual(1);
 
-                c.router.unregister(5);
+                r.unregister(5);
 
-                expect(_.keys(c.router._registered).length).toEqual(4);
-                expect(c.router._loaded.length).toEqual(0);
+                expect(_.keys(r._registered).length).toEqual(4);
+                expect(r._loaded.length).toEqual(0);
             });
 
         });
@@ -103,7 +106,7 @@ define(['jquery', 'underscore', 'backbone', 'cilantro'], function($, _, Backbone
                 expect(Backbone.history.navigate('foo/', {trigger: true})).toBe(true);
 
                 // First two are loaded immediately since they are local views
-                expect(c.router._loaded.length).toEqual(2);
+                expect(r._loaded.length).toEqual(2);
 
                 // The third route is asynchronous
                 waitsFor(function() {
@@ -111,13 +114,13 @@ define(['jquery', 'underscore', 'backbone', 'cilantro'], function($, _, Backbone
                 }, 200);
 
                 runs(function() {
-                    expect(c.router._loaded.length).toEqual(3);
+                    expect(r._loaded.length).toEqual(3);
                 });
             });
 
             it('should unload loaded modules', function() {
                 expect(Backbone.history.navigate('bar/', {trigger: true})).toBe(true);
-                expect(c.router._loaded.length).toEqual(1);
+                expect(r._loaded.length).toEqual(1);
 
                 children = $('#region3').children();
                 expect(children.length).toEqual(1);
@@ -128,7 +131,7 @@ define(['jquery', 'underscore', 'backbone', 'cilantro'], function($, _, Backbone
                 children = $('#region3').children();
                 expect(children.length).toEqual(2);
                 expect(children.filter(':visible').length).toEqual(1);
-                expect(children.filter(':visible').is(c.router._registered[3]._view.el)).toBe(true);
+                expect(children.filter(':visible').is(r._registered[3]._view.el)).toBe(true);
             });
 
             describe('Events', function() {
