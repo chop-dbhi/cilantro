@@ -48,9 +48,9 @@ define [
         errorView: base.ErrorOverlayView
 
         modelEvents:
-            request: 'showLoadView'
             sync: 'hideLoadView'
             error: 'showErrorView'
+            request: 'showLoadView'
 
         regions:
             info: '.info-region'

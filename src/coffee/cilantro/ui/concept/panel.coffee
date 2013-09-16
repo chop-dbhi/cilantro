@@ -8,7 +8,6 @@ define [
 
     templates = _.object ['panel'], templates
 
-
     # Takes a collection of c.models.ConceptModel objects
     class ConceptPanel extends Marionette.Layout
         className: 'concept-panel'
@@ -37,8 +36,6 @@ define [
                     @index.currentView.filter(query, resp)
 
             # Defer focus of concept search until end of event loop
-            _.defer =>
-                @search.currentView.ui.input.focus()
-
+            _.defer => @search.currentView.ui.input.focus()
 
     { ConceptPanel }

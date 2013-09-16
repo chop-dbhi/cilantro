@@ -1,19 +1,23 @@
+###
+Module that defines the Cilantro object. Most modules in Cilantro depend on
+this core object to be defined for accessing configuration options and assessing
+whether a feature is supported.
+###
+
 define [
     'underscore'
     'backbone'
-    'promiser'
     './logger'
     './config'
     './channels'
     './utils'
     './changelog'
     './setup'
-
     # Core plugins that extend various libraries such as Backbone and jQuery.
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
-], (_, Backbone, promiser, logger, config, channels, utils, changelog) ->
+], (_, Backbone, logger, config, channels, utils, changelog) ->
 
     c =
         # Version of cilantro
@@ -26,20 +30,6 @@ define [
         # minimum to prepare them in the case of missing or broken functionality.
         minSerranoVersion: '2.0.18'
         maxSerranoVersion: '2.1.0'
-
-        config: new config.Config(@cilantro)
-
-        # Attach commonly used utilities and promiser object
-        utils: utils
-        promiser: promiser
-
-        # [DEPRECATED: 2.1.0] Use c.config.get()
-        getOption: (key) ->
-            @config.get(key)
-
-        # [DEPRECATED: 2.1.0] Use c.config.set()
-        setOption: (key, value) ->
-            @config.set(key, value)
 
         # Returns the current session's Serrano version. If there is no
         # active session or version defined, the absolute minimum is returned.
@@ -57,9 +47,19 @@ define [
             version = @getSerranoVersion()
             return utils.versionInRange(version, minVersion, maxVersion)
 
+        # Initialize the session manager and default configuration
+        config: new config.Config(@cilantro)
+
+        # Attach commonly used utilities
+        utils: utils
+
+    # Give the cilantro object events!
+    _.extend c, Backbone.Events, channels
+
     # Set log level to debug
     if c.config.get('debug')
         logger.setLevel('debug')
+        c.on 'all', (event, args...) ->
+            logger.info(event, args...)
 
-    # Given the cilantro object events!
-    _.extend c, Backbone.Events, channels
+    return c
