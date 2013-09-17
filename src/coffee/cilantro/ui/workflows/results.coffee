@@ -123,7 +123,7 @@ define [
             @ui.contextContainer.css('display', 'block')
             @ui.resultsContainer.addClass('span9')
             @$('#toggle-context-panel-button').html('Hide Filters...')
-            @$('.context').stacked('restack')
+            @$('.context').stacked('restack', @$el.height())
 
         hideContextPanel: =>
             @areFiltersHidden = true
