@@ -17,9 +17,6 @@ define [
         events:
             'click [data-save]': 'saveQuery'
 
-        initialize: ->
-            @render()
-
         ui:
             nameGroup: '.query-name-group'
             nameText: '.query-name'
