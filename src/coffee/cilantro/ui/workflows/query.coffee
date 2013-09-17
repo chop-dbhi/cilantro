@@ -10,7 +10,18 @@ define [
 
     templates = _.object ['query'], templates
 
+    ###
+    The QueryWorkflow provides an interface for navigating and viewing
+    concepts that are deemed 'queryable'. This includes browsing the
+    available concepts in the index, viewing details about the
+    concept in the workspace as well as adding or modifying filters,
+    and viewing the list of filters in the context panel.
+    TODO: break out context panel as standalone view
 
+    This view requires the following options:
+    - concepts: a collection of concepts that are deemed queryable
+    - context: the session/active context model
+    ###
     class QueryWorkflow extends Marionette.Layout
         className: 'query-workflow'
 
@@ -21,29 +32,26 @@ define [
             workspace: '.concept-workspace-region'
             context: '.context-panel-region'
 
+        initialize: (options) ->
+            if not (@context = options.context)
+                throw new Error 'context model required'
+            if not (@concepts = options.concepts)
+                throw new Error 'concept collection required'
+
         onRender: ->
             @workspace.show new concept.ConceptWorkspace
 
-            # Deferred loading of views..
-            @concepts.show new base.LoadView
-                message: 'Loading query concepts...'
+            @concepts.show new concept.ConceptPanel
+                collection: @concepts
 
-            @context.show new base.LoadView
-                message: 'Loading session context...'
+            @concepts.currentView.$el.stacked
+                fluid: '.index-region'
 
-            c.promiser.when 'concepts', =>
-                @concepts.show new concept.ConceptPanel
-                    collection: c.data.concepts.queryable
+            @context.show new context.ContextPanel
+                model: @context
 
-                @concepts.currentView.$el.stacked
-                    fluid: '.index-region'
-
-            c.promiser.when 'contexts', =>
-                @context.show new context.ContextPanel
-                    model: c.data.contexts.getSession()
-
-                @context.currentView.$el.stacked
-                    fluid: '.tree-region'
+            @context.currentView.$el.stacked
+                fluid: '.tree-region'
 
 
     { QueryWorkflow }
