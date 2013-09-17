@@ -48,12 +48,12 @@ define [
             })
 
         onShow: =>
-            if @model? and @model.name?
-                @ui.nameText.val(@model.name)
-                @ui.descriptionText.val(@model.description)
-                @ui.emailText.val(@model.emails)
+            if @model?
+                @ui.nameText.val(@model.get('name'))
+                @ui.descriptionText.val(@model.get('description'))
+                @ui.emailText.val(@model.get('usernames_or_emails'))
 
-            else
+            if @model.get('name') == ""
                 # Remove timezone info from the current date and then use it as
                 # the suffix for new query title.
                 fields = Date().toString().split(' ')
