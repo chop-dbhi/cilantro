@@ -81,8 +81,19 @@ define [
 
             windowHeight = $(window).outerHeight()
 
-            # Offset relative to the document (including the top margin)
-            offsetTop = $elem.offset().top
+            # Determine offset relative to the document. For an accurate
+            # calculation, all parents must be traverse to determine if any
+            # have an absolute or fixed position.
+            offsetTop = null
+
+            $elem.parents().each (i, parent) ->
+                parent = $(parent)
+                if parent.css('position') is 'fixed'
+                    offsetTop = parent.position().top
+                    return false
+
+            if not offsetTop?
+                offsetTop = $elem.offset().top
 
             # Substract the bottom margin from the height to respect the
             # spacing
@@ -247,17 +258,26 @@ define [
                 toggleChildOverlay($(child), @options)
             return @
 
-        restack: =>
+        restack: (event, height) =>
+            if not (event instanceof $.Event)
+                height = event
+                event = null
+
             options = $.extend {}, @options,
                 maxHeight: getMaxHeight(@$element, @options)
                 minHeight: getMinHeight(@$element, @options)
 
+            if height?
+                height = Math.min(height, options.maxHeight)
+            else
+                height = options.maxHeight
+
             if @_optimized
                 @$element.clearQueue('fx')
                 if @options.animate
-                    @$element.animate(height: options.maxHeight, 200)
+                    @$element.animate(height: height, 200)
                 else
-                    @$element.height(options.maxHeight)
+                    @$element.height(height)
             else
                 heights = getStackedHeights(@$element, options)
                 applyStackedHeights(@$element, heights, options)
@@ -274,19 +294,19 @@ define [
             return @
 
 
-    $.fn.stacked = (option) ->
-        if $.isPlainObject option
-            options = $.extend {}, defaultOptions, option
+    $.fn.stacked = (method, args...) ->
+        if $.isPlainObject method
+            options = $.extend {}, defaultOptions, method
+            method = null
         else
             options = $.extend {}, defaultOptions
 
         @each ->
-            $this = $ @
-            data = $this.data('stacked')
-            if not data
-                $this.data 'stacked', (data = new StackedColumn $this, options)
-            if typeof option is 'string' and option.charAt(0) isnt '_'
-                data[option]()
+            $this = $(@)
+            if not (data = $this.data('stacked'))
+                $this.data('stacked', (data = new StackedColumn $this, options))
+            if typeof method is 'string' and method.charAt(0) isnt '_'
+                data[method](args...)
 
 
     $.fn.stacked.Constructor = StackedColumn

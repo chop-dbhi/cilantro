@@ -56,6 +56,8 @@ define [
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
             navbar: '.results-workflow-navbar'
+            contextContainer: '.context-container'
+            resultsContainer: '.results-container'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
@@ -66,6 +68,8 @@ define [
             'click [data-toggle=export-progress]': 'showExportProgress'
             'click #pages-text-ranges': 'selectPagesOption'
             'click [data-toggle=create-report]': 'showCreateReport'
+            'click #toggle-context-panel-button': 'toggleContextPanel'
+            'click #toggle-context-panel-button': 'toggleContextPanelButtonClicked'
 
         regions:
             count: '.count-region'
@@ -78,12 +82,54 @@ define [
 
         initialize: ->
             $(document).on 'scroll', @onPageScroll
+            $(window).resize @onWindowResize
 
             @monitors = {}
 
             c.subscribe c.SESSION_OPENED, ->
                 if not c.isSupported()
                     $('.serrano-version-warning').show()
+
+            # Used to tell if filters were hidden by user clicking the button
+            @areFiltersManuallyHidden = false
+            # Flag indicating the current visibility of the context panel
+            @areFiltersHidden = false
+
+        onWindowResize: =>
+            @updateContextPanelOffsets()
+
+        updateContextPanelOffsets: =>
+            if not @isClosed? or @isClosed
+                return
+
+            # Find the bounds of the results workflow to properly fix the
+            # position of the context/filter panel.
+            @workflowTopOffset = @$el.position().top
+            @workflowRightOffset = window.innerWidth - (@$el.position().left + @$el.width())
+
+            @ui.contextContainer.css('top', @workflowTopOffset)
+            @ui.contextContainer.css('right', @workflowRightOffset)
+
+        toggleContextPanelButtonClicked: =>
+            if @areFiltersHidden
+                @areFiltersManuallyHidden = false
+                @showContextPanel()
+            else
+                @areFiltersManuallyHidden = true
+                @hideContextPanel()
+
+        showContextPanel: =>
+            @areFiltersHidden = false
+            @ui.contextContainer.css('display', 'block')
+            @ui.resultsContainer.addClass('span9')
+            @$('#toggle-context-panel-button').html('Hide Filters...')
+            @$('.context').stacked('restack', @$el.height())
+
+        hideContextPanel: =>
+            @areFiltersHidden = true
+            @ui.contextContainer.css('display', 'none')
+            @ui.resultsContainer.removeClass('span9')
+            @$('#toggle-context-panel-button').html('Show Filters...')
 
         onPageScroll: =>
             # If the view isn't rendered yet, then don't bother
@@ -96,11 +142,19 @@ define [
                 if scrollPos < (@navbarVerticalOffset - @topNavbarHeight)
                     # Remove the results navbar from the top
                     @ui.navbar.removeClass('navbar-fixed-top')
+                    @ui.contextContainer.css('top', @workflowTopOffset)
+
+                    if not @areFiltersManuallyHidden
+                        @showContextPanel()
             else
                 if scrollPos >= (@navbarVerticalOffset - @topNavbarHeight)
                     # Move the results navbar to the top
                     @ui.navbar.css('top', @topNavbarHeight)
                     @ui.navbar.addClass('navbar-fixed-top')
+                    @ui.contextContainer.css('top', @workflowTopOffset + 35)
+
+                    if not @areFiltersManuallyHidden
+                        @hideContextPanel()
 
         selectPagesOption: ->
             $('#pages-radio-all').prop('checked', false)
@@ -335,12 +389,15 @@ define [
 
             # If there is already something fixed to the top, record the height
             # of it so we can account for it in our scroll calculations later.
-            if not @topNavbarHeight
+            if not @topNavbarHeight?
                 topElement = $('.navbar-fixed-top')
                 if topElement.length
                     @topNavbarHeight = topElement.height()
                 else
                     @topNavbarHeight = 0
+
+            if not @workflowTopOffset?
+                @updateContextPanelOffsets()
 
         showExportOptions: ->
             $('.export-options-modal .alert-block').hide()
