@@ -17,6 +17,14 @@ define [
         events:
             'click [data-save]': 'saveQuery'
 
+        initialize: (options) ->
+            if options.model?
+                @model = @options.model
+            else
+                @model = new query.QueryModel
+
+            @collection = options.collection
+
         ui:
             nameGroup: '.query-name-group'
             nameText: '.query-name'
@@ -40,6 +48,7 @@ define [
             # class's parent.
             @$el.modal('hide')
 
+            @collection.add(@model)
             @model.save({
                 name: @ui.nameText.val(),
                 description: @ui.descriptionText.val(),
