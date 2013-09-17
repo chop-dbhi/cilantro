@@ -1,6 +1,6 @@
-define(['cilantro'], function(c) {
+define(['cilantro/models/view'], function(view) {
 
-    describe('View Model', function() {
+    describe('ViewModel', function() {
         var model, json;
 
         beforeEach(function() {
@@ -8,12 +8,12 @@ define(['cilantro'], function(c) {
                 columns: [1, 2, 3],
                 ordering: [[2, 'desc'], [1, 'asc']]
             };
-            model = new c.models.ViewModel({
+            model = new view.ViewModel({
                 json: json
             });
         });
 
-        describe('Facets collection', function() {
+        describe('FacetsCollection', function() {
             it('should define the facets collection', function() {
                 expect(model.facets).toBeDefined();
             });
@@ -57,13 +57,40 @@ define(['cilantro'], function(c) {
                     }
                 ]);
             });
+
+            describe('facetsToJSON', function() {
+                it('should serialize as the original json', function() {
+                    expect(model.facetsToJSON()).toEqual(json);
+                });
+            });
+
+        });
+    });
+
+    describe('ViewCollection', function() {
+        var col;
+
+        beforeEach(function() {
+            col = new view.ViewCollection;
         });
 
-        describe('facetsToJSON', function() {
-            it('should serialize as the original json', function() {
-                expect(model.facetsToJSON()).toEqual(json);
+        it('should define a default session', function() {
+            expect(col.getSession()).toBeDefined();
+        });
+
+        it('should merge session data on fetch', function() {
+            col.url = '/mock/views.json';
+            runs(function() {
+                col.fetch();
+            });
+
+            waitsFor(function() {
+                return !!col.getSession().id;
+            });
+
+            runs(function() {
+                expect(col.length).toBe(1);
             });
         });
-
     });
 });
