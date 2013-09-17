@@ -7,35 +7,18 @@ define [
     templates = c._.object ['dialog'], templates
 
 
-    class ModalRegion extends c.Marionette.Region
-        constructor: ->
-            c.Marionette.Region.prototype.constructor.apply(this, arguments)
-
-            @ensureEl()
-
-            @$el.on 'hidden', {region:this}, (event) ->
-                event.data.region.close()
-
-        onShow: ->
-            @$el.modal('show')
-
-        onClose: ->
-            @$el.modal('hide')
-
-
-    class QueryDialog extends c.Backbone.View
+    class QueryDialog extends c.Marionette.ItemView
         template: templates.dialog
 
         model: query.QueryModel
+
+        className: 'modal hide'
 
         events:
             'click [data-save]': 'saveQuery'
 
         initialize: ->
             @render()
-
-        render: ->
-            @$el.html(@template)
 
         saveQuery: ->
             # Make sure the name is valid, everything else can be left blank
@@ -74,4 +57,9 @@ define [
                 name = "Query on #{fields[0]} #{fields[1]} #{fields[2]} #{fields[3]} #{fields[4]}"
                 $('#query-name').val(name)
 
-    {ModalRegion, QueryDialog}
+            @$el.modal
+                show: true
+                keyboard: false
+                backdrop: 'static'
+
+    {QueryDialog}

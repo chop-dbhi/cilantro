@@ -80,13 +80,13 @@ define [
             columns: '.columns-modal .modal-body'
             exportTypes: '.export-options-modal .export-type-region'
             exportProgress: '.export-progress-modal .export-progress-region'
+            createQueryModal: '.create-query-modal'
 
         initialize: ->
             $(document).on 'scroll', @onPageScroll
             $(window).resize @onWindowResize
 
             @monitors = {}
-            @createQueryModal = new query.ModalRegion({el:'.create-query-modal'})
 
             c.subscribe c.SESSION_OPENED, ->
                 if not c.isSupported()
