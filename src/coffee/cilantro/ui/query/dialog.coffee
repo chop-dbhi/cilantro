@@ -10,20 +10,10 @@ define [
     class QueryDialog extends c.Marionette.ItemView
         template: templates.dialog
 
-        model: query.QueryModel
-
         className: 'modal hide'
 
         events:
             'click [data-save]': 'saveQuery'
-
-        initialize: (options) ->
-            if options.model?
-                @model = @options.model
-            else
-                @model = new query.QueryModel
-
-            @collection = options.collection
 
         ui:
             nameGroup: '.query-name-group'
