@@ -368,6 +368,9 @@ define [
             @exportProgress.show new exporter.ExportProgressCollection
                 collection: c.data.exporters
 
+            @createQueryModal.show new query.QueryDialog
+                collection: c.data.queries
+
             c.promiser.when 'contexts', =>
                 @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
@@ -415,9 +418,7 @@ define [
             @ui.columns.modal('show')
 
         showCreateQuery: =>
-            @createQueryModal.show new query.QueryDialog({
-                collection: c.data.queries
-            })
+            @createQueryModal.currentView.$el.modal('show')
 
         cancelColumnChanges: ->
             _.delay =>

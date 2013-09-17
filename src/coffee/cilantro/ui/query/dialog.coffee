@@ -46,7 +46,7 @@ define [
                 view_json: c.data.views.getSession().toJSON().json
             })
 
-        onShow: =>
+        onRender: =>
             if @model?
                 @ui.nameText.val(@model.get('name'))
                 @ui.descriptionText.val(@model.get('description'))
@@ -60,7 +60,7 @@ define [
                 @ui.nameText.val(name)
 
             @$el.modal
-                show: true
+                show: false
                 keyboard: false
                 backdrop: 'static'
 
