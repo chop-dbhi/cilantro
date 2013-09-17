@@ -34,6 +34,9 @@ define [
 
             @$el.modal('hide')
 
+            if not @model?
+                @model = new query.QueryModel
+
             @collection.add(@model)
             @model.save({
                 name: @ui.nameText.val(),
@@ -49,7 +52,7 @@ define [
                 @ui.descriptionText.val(@model.get('description'))
                 @ui.emailText.val(@model.get('usernames_or_emails'))
 
-            if @model.get('name') == ""
+            if @ui.nameText.val() == ""
                 # Remove timezone info from the current date and then use it as
                 # the suffix for new query title.
                 fields = Date().toString().split(' ')
