@@ -40,34 +40,12 @@
         margin-top: 20px;
         overflow-x: scroll;
 
-        thead {
-            th {
-                position: relative;
-                cursor: pointer;
+        thead th {
+            cursor: pointer;
+            min-height: 100px;
 
-                i {
-                    position: absolute;
-                    right: 5px;
-                    top: 50%;
-
-                    // Only about 6/13px are visible, margin is used to offset
-                    // visible portion
-                    &.icon-sort-up {
-                        margin-top: -4px;
-                    }
-
-                    &.icon-sort-down {
-                        margin-top: -8px;
-                    }
-
-                    &.icon-sort {
-                        margin-top: -6px;
-                    }
-                }
-
-                &:hover {
-                    background-color: #eee;
-                }
+            &:hover {
+                background-color: #eee;
             }
         }
     }
