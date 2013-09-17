@@ -1,7 +1,7 @@
 define [
     '../core'
-    '../models/query'
-    'tpl!templates/report/dialog.html'
+    '../../models/query'
+    'tpl!templates/query/dialog.html'
 ], (c, query, templates...) ->
 
     templates = c._.object ['dialog'], templates
@@ -23,7 +23,7 @@ define [
             @$el.modal('hide')
 
 
-    class ReportDialog extends c.Backbone.View
+    class QueryDialog extends c.Backbone.View
         template: templates.dialog
 
         model: query.QueryModel
@@ -36,15 +36,15 @@ define [
 
         onShow: =>
             if @model? and @model.name?
-                $('#report-name').val(@model.name)
-                $('#report-description').val(@model.description)
-                $('#report-emails').val(@model.emails)
+                $('#query-name').val(@model.name)
+                $('#query-description').val(@model.description)
+                $('#query-emails').val(@model.emails)
 
             else
                 # Remove timezone info from the current date and then use it as
-                # the suffix for new report title.
+                # the suffix for new query title.
                 fields = Date().toString().split(' ')
-                name = "Report on #{fields[0]} #{fields[1]} #{fields[2]} #{fields[3]} #{fields[4]}"
-                $('#report-name').val(name)
+                name = "Query on #{fields[0]} #{fields[1]} #{fields[2]} #{fields[3]} #{fields[4]}"
+                $('#query-name').val(name)
 
-    {ModalRegion, ReportDialog}
+    {ModalRegion, QueryDialog}

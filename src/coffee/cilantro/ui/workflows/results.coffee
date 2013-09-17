@@ -11,10 +11,10 @@ define [
     '../context'
     '../concept'
     '../exporter'
-    '../report'
+    '../query'
     'tpl!templates/count.html'
     'tpl!templates/workflows/results.html'
-], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, report, templates...) ->
+], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, query, templates...) ->
 
     templates = _.object ['count', 'results'], templates
 
@@ -68,7 +68,7 @@ define [
             'click [data-toggle=export-options]': 'showExportOptions'
             'click [data-toggle=export-progress]': 'showExportProgress'
             'click #pages-text-ranges': 'selectPagesOption'
-            'click [data-toggle=create-report]': 'showCreateReport'
+            'click [data-toggle=create-query]': 'showCreateQuery'
             'click #toggle-context-panel-button': 'toggleContextPanel'
             'click #toggle-context-panel-button': 'toggleContextPanelButtonClicked'
 
@@ -86,7 +86,7 @@ define [
             $(window).resize @onWindowResize
 
             @monitors = {}
-            @createReportModal = new report.ModalRegion({el:'.create-report-modal'})
+            @createQueryModal = new query.ModalRegion({el:'.create-query-modal'})
 
             c.subscribe c.SESSION_OPENED, ->
                 if not c.isSupported()
@@ -414,8 +414,8 @@ define [
         showColumns: ->
             @ui.columns.modal('show')
 
-        showCreateReport: =>
-            @createReportModal.show new report.ReportDialog(
+        showCreateQuery: =>
+            @createQueryModal.show new query.QueryDialog(
                 {model: new c.models.QueryModel})
 
         cancelColumnChanges: ->
