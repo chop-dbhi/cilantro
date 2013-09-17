@@ -4,8 +4,6 @@ define [
 ], (c, base) ->
 
     class QueryModel extends base.Model
-        url: ->
-            c.session.url('queries')
 
     class QueryCollection extends base.Collection
         model: QueryModel
@@ -22,6 +20,5 @@ define [
     class SharedQueryCollection extends QueryCollection
         url: ->
             c.session.url('shared_queries')
-
 
     { QueryModel, QueryCollection, SharedQueryCollection }

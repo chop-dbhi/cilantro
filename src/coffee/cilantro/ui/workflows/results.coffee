@@ -415,8 +415,10 @@ define [
             @ui.columns.modal('show')
 
         showCreateQuery: =>
+            model = new c.models.QueryModel
+            c.data.queries.add(model)
             @createQueryModal.show new query.QueryDialog(
-                {model: new c.models.QueryModel})
+                {model: model})
 
         cancelColumnChanges: ->
             _.delay =>
