@@ -6,7 +6,7 @@
 </div>
 
 <div class=row-fluid>
-    <div class="span9">
+    <div class="results-container span9">
         <div class=row-fluid>
             <div class=span12>
                 <div class="navbar navbar-masthead results-workflow-navbar">
@@ -16,6 +16,7 @@
                             <button data-toggle=columns class="btn btn-primary btn-mini"><i class=icon-columns></i> Change Columns...</button>
                             <button data-toggle=export-options class="btn btn-primary btn-mini"><i class=icon-file></i> Export...</button>
                             <button data-toggle=create-report class="btn btn-primary btn-mini"><i class=icon-save></i> Create Report...</button>
+                            <button id="toggle-context-panel-button" class="btn btn-primary btn-mini expand-collapse">Hide Filters...</button>
                         </div>
                         <span class="navbar-text count-region"></span>
                     </div>
@@ -28,7 +29,7 @@
         </div>
     </div>
 
-    <div class="span3">
+    <div class="context-container span3 affix">
         <div class="context-region"></div>
         <div data-toggle=export-progress class="export-progress-container pull-right hide">
             <i class="icon-circle-arrow-down"></i>
