@@ -81,8 +81,19 @@ define [
 
             windowHeight = $(window).outerHeight()
 
-            # Offset relative to the document (including the top margin)
-            offsetTop = $elem.offset().top
+            # Determine offset relative to the document. For an accurate
+            # calculation, all parents must be traverse to determine if any
+            # have an absolute or fixed position.
+            offsetTop = null
+
+            $elem.parents().each (i, parent) ->
+                parent = $(parent)
+                if parent.css('position') is 'fixed'
+                    offsetTop = parent.position().top
+                    return false
+
+            if not offsetTop?
+                offsetTop = $elem.offset().top
 
             # Substract the bottom margin from the height to respect the
             # spacing
