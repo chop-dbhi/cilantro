@@ -32,10 +32,6 @@ define [
             @ui.nameHelp.hide()
             @ui.nameGroup.removeClass('error')
 
-            # This class is not the actual modal window, only the contents
-            # of the modal itself. The parent is a ModalRegion which is what
-            # contains the modal wrapper so we need to hide the modal via this
-            # class's parent.
             @$el.modal('hide')
 
             @collection.add(@model)
@@ -43,8 +39,8 @@ define [
                 name: @ui.nameText.val(),
                 description: @ui.descriptionText.val(),
                 usernames_or_emails: @ui.emailText.val(),
-                context_json: c.data.contexts.getSession().attributes.json,
-                view_json: c.data.views.getSession().attributes.json
+                context_json: c.data.contexts.getSession().toJSON().json,
+                view_json: c.data.views.getSession().toJSON().json
             })
 
         onShow: =>
