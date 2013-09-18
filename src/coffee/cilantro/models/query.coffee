@@ -21,4 +21,11 @@ define [
         url: ->
             c.session.url('shared_queries')
 
+        initialize: ->
+            super
+
+            @on 'reset', ->
+                c.promiser.resolve('shared_queries')
+
+
     { QueryModel, QueryCollection, SharedQueryCollection }
