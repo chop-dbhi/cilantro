@@ -11,9 +11,10 @@ define [
     '../context'
     '../concept'
     '../exporter'
+    '../query'
     'tpl!templates/count.html'
     'tpl!templates/workflows/results.html'
-], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, templates...) ->
+], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, query, templates...) ->
 
     templates = _.object ['count', 'results'], templates
 
@@ -67,7 +68,7 @@ define [
             'click [data-toggle=export-options]': 'showExportOptions'
             'click [data-toggle=export-progress]': 'showExportProgress'
             'click #pages-text-ranges': 'selectPagesOption'
-            'click [data-toggle=create-report]': 'showCreateReport'
+            'click [data-toggle=create-query]': 'showCreateQuery'
             'click #toggle-context-panel-button': 'toggleContextPanel'
             'click #toggle-context-panel-button': 'toggleContextPanelButtonClicked'
 
@@ -79,6 +80,7 @@ define [
             columns: '.columns-modal .modal-body'
             exportTypes: '.export-options-modal .export-type-region'
             exportProgress: '.export-progress-modal .export-progress-region'
+            createQueryModal: '.create-query-modal'
 
         initialize: ->
             $(document).on 'scroll', @onPageScroll
@@ -366,6 +368,10 @@ define [
             @exportProgress.show new exporter.ExportProgressCollection
                 collection: c.data.exporters
 
+            @createQueryModal.show new query.QueryDialog
+                header: 'Create Query'
+                collection: c.data.queries
+
             c.promiser.when 'contexts', =>
                 @context.show new context.ContextPanel
                     model: c.data.contexts.getSession()
@@ -412,8 +418,10 @@ define [
         showColumns: ->
             @ui.columns.modal('show')
 
-        showCreateReport: ->
-            @ui.createReport.modal('show')
+        showCreateQuery: =>
+            # Opens the query modal without passing a model which assumes a new one
+            # will be created based on the current session
+            @createQueryModal.currentView.open()
 
         cancelColumnChanges: ->
             _.delay =>

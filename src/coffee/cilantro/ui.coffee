@@ -14,6 +14,7 @@ define [
     './ui/controls'
     './ui/exporter'
     './ui/tables'
+    './ui/query'
     './ui/workflows'
     './ui/paginator'
 ], ($, _, Backbone, c, router, mods...) ->

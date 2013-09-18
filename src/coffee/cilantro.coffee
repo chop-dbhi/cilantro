@@ -19,6 +19,7 @@ define [
 
     if c.isSupported('2.1.0')
         shared_queries: new models.SharedQueryCollection
+        queries: new models.QueryCollection
 
     if c.config.get('autoload')
         c.session.open(c.config.get('url'), c.config.get('credentials'))
