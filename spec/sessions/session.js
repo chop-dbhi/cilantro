@@ -1,7 +1,6 @@
 define(['jquery', 'cilantro/session'], function($, session) {
 
     describe('Session', function() {
-
         var s;
 
         beforeEach(function() {
@@ -14,20 +13,20 @@ define(['jquery', 'cilantro/session'], function($, session) {
             expect(s.get('url')).toBe('/mock/root.json');
             expect(s.isValid()).toBe(true);
             expect(s.opened).toBe(false);
-            expect(s.loading).toBe(false);
+            expect(s.opening).toBe(false);
             expect(s.started).toBe(false);
         });
 
         it('open', function() {
             s.open();
-            expect(s.loading).toBe(true);
+            expect(s.opening).toBe(true);
 
             waitsFor(function() {
                 return s.opened;
             }, 100);
 
             runs(function() {
-                expect(s.loading).toBe(false);
+                expect(s.opening).toBe(false);
                 expect(s.opened).toBe(true);
                 expect(s.response).toBeDefined();
                 expect(s.error).toBeUndefined();
@@ -42,12 +41,18 @@ define(['jquery', 'cilantro/session'], function($, session) {
         });
 
         it('start', function() {
-            s.open();
+            var that;
+            s.open().done(function() {
+                that = this;
+            });
+
             waitsFor(function() {
                 return s.opened;
             }, 100);
 
             runs(function() {
+                // Ensure the context of the promise is the session itself
+                expect(that).toBe(s);
                 s.start();
             });
         });

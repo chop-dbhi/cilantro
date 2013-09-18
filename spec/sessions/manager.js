@@ -1,35 +1,76 @@
 define(['cilantro/session'], function(session) {
     var events = session.events;
 
-    describe('Session Manager', function() {
+    describe('SessionManager', function() {
         var manager, triggered;
 
         beforeEach(function() {
             manager = new session.SessionManager;
             triggered = [];
 
-            manager.on(events.SESSION_OPENING, function() {
-                triggered.push(events.SESSION_OPENING);
+            manager.on('all', function(event) {
+                if (/^session:/.test(event)) {
+                    triggered.push(event);
+                }
             });
-
-            manager.on(events.SESSION_OPENED, function() {
-                triggered.push(events.SESSION_OPENED);
-            });
-
-            manager.on(events.SESSION_CLOSED, function() {
-                triggered.push(events.SESSION_CLOSED);
-            });
-
         });
 
         it('open', function() {
             var url = '/mock/root.json';
-            manager.open(url)
-                .done(function() {
-                    expect(manager.length).toEqual(1);
-                    expect(manager.active.get('url')).toBeDefined();
-                    expect(triggered).toEqual([events.SESSION_OPENING, events.SESSION_OPENED]);
-                });
+            manager.open(url);
+
+            waitsFor(function() {
+                return !manager.pending;
+            });
+
+            runs(function() {
+                expect(manager.length).toEqual(1);
+                expect(manager.active.opened).toBe(true);
+                expect(triggered).toEqual([events.SESSION_OPENING, events.SESSION_OPENED]);
+
+            });
+
+            runs(function() {
+                // Opening it again does trigger the events since it is
+                // already open
+                triggered = [];
+                manager.open(url);
+            });
+
+            waitsFor(function() {
+                return !manager.pending;
+            });
+
+            runs(function() {
+                expect(manager.length).toEqual(1);
+                expect(triggered).toEqual([]);
+            });
+        });
+
+        it('close', function() {
+            manager.open('/mock/root.json');
+
+            waitsFor(function() {
+                return !manager.pending;
+            });
+
+            runs(function() {
+                manager.close();
+                expect(triggered).toEqual([events.SESSION_OPENING, events.SESSION_OPENED, events.SESSION_CLOSED]);
+                expect(manager.active).toBeUndefined();
+            });
+        });
+
+        it('fail', function() {
+            manager.open('/mock/noroot.json');
+
+            waitsFor(function() {
+                return !manager.pending;
+            });
+
+            runs(function() {
+                expect(triggered).toEqual([events.SESSION_OPENING, events.SESSION_ERROR]);
+            });
         });
     });
 

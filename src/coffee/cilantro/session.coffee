@@ -43,7 +43,7 @@ define [
         initialize: ->
             @opened = false
             @started = false
-            @loading = false
+            @opening = false
 
         validate: (attrs, options) ->
             if not attrs.url? then true
@@ -67,7 +67,7 @@ define [
 
             # Define the primary router with the main element and app root
             @router = new router.Router
-                el: @get('main')
+                main: @get('main')
                 root: @get('root')
 
             # Register pre-defined routes
@@ -88,7 +88,14 @@ define [
         # credentials supplied as JSON. A successful response will _ready_
         # the session for use.
         open: ->
-            @loading = true
+            # Session already opened or opening, return a promise
+            if @opened or @opening
+                return @_opening.promise()
+
+            # Set state and create deferred that will be used for creating
+            # promises while
+            @opening = true
+            @_opening = $.Deferred()
 
             options =
                 url: @get('url')
@@ -104,18 +111,24 @@ define [
 
             @fetch(options)
                 .always =>
-                    @loading = false
+                    @opening = false
                 .done (resp, status, xhr) =>
                     @opened = true
                     @response = resp
+                    @_opening.resolveWith(@, [@, resp, status, xhr])
                 .fail (xhr, status, error) =>
-                    @error = err
+                    @error = error
+                    @_opening.rejectWith(@, [@, xhr, status, error])
+
+            return @_opening.promise()
 
         # Closing a session will remove the cached data and require it to be
         # opened again.
         # TODO: unload router views?
         close: ->
-            @loading = @started = @opened = false
+            @end()
+            @opening = @opened = false
+            delete @_opening
             delete @response
             # Reset all collections to deference models
             for key, collection of @data
@@ -149,72 +162,68 @@ define [
     # made the active once finished. The `active` property references the
     # currently active session if one exists.
     class SessionManager extends Backbone.Collection
-        switch: (session) ->
+        _switch: (session) ->
+            if @active is session
+                return
             delete @pending
-            if @active?
-                @active.end()
-                @trigger(events.SESSION_CLOSED, session)
+            # End the current active session
+            @close()
+            # Set session as active and start it
             @active = session
             @active.start()
             @trigger(events.SESSION_OPENED, session)
 
-        # Opens a session. The options are the session configuration options
-        # and must contain at least a `url` for referencing and opening the
-        # session.
+        # Opens a session. Takes an object of options that are passed into
+        # the session constructor. The url can be passed by itself as the
+        # first argument as a shorthand method for opening sessions.
         open: (url, options) ->
             if typeof url is 'object'
                 options = url
             else
                 options ?= {}
                 options.url = url
-            # name is always the key, so check existing sessions first
+
+            # Get or create the session
             if not (session = @get(options.url))
                 session = new Session(options)
                 @add(session)
 
-            # Set the session as the pending session
-            @pending = @get(options.url)
+            # Ensure redundant calls are not being made
+            if session isnt @active and session isnt @pending
+                @pending = session
+                @trigger(events.SESSION_OPENING, session)
 
-            # Publish the session is opening by the name supplied
-            @trigger(events.SESSION_OPENING, session)
-
-            # If this session is already open, immediately switch it
-            if session.opened
-                @switch(session)
-                $.Deferred().resolveWith(session)
-            else
-                # Open returns a deferred object. If the opened session is *still*
-                # the pending session, activate it. This could not be true if the
-                # client quickly switches between available sessions and the first
-                # session has not yet responded.
-                session.open()
-                    .done =>
-                        if @pending is session then @switch(session)
-                    .fail (xhr, status, error) =>
-                        # Select to the appropriate channel to publish on depending
-                        # if it's a forbidden, unauthorized, or general error
-                        event = switch xhr.statusCode
-                            when 401, 403
-                                events.SESSION_UNAUTHORIZED
-                            else
-                                events.SESSION_ERROR
-                        @trigger(event, session, error)
+            # Open returns a deferred object. If the opened session is *still*
+            # the pending session, activate it. This could not be true if the
+            # client quickly switches between available sessions and the first
+            # session has not yet responded.
+            return session.open()
+                .done =>
+                    if @pending isnt session then return
+                    @_switch(session)
+                .fail (_session, xhr, status, error) =>
+                    if @pending isnt session then return
+                    @pending = null
+                    # Select to the appropriate channel to publish on depending
+                    # if it's a forbidden, unauthorized, or general error
+                    event = switch xhr.statusCode
+                        when 401, 403
+                            events.SESSION_UNAUTHORIZED
+                        else
+                            events.SESSION_ERROR
+                    @trigger(event, session, error)
 
         # Closes the current sessions and publishes a message
         close: ->
-            if (session = @current)?
-                delete @current
+            if (session = @active)?
+                delete @active
                 session.close()
+                @trigger(events.SESSION_CLOSED, session)
 
         # Closes the current session and clears all sessions
         clear: ->
             @close()
             @reset()
-
-        # Proxy for accessing the current session's endpoints.
-        url: (ref) ->
-            if not @current? then return
-            @current.url(ref)
 
         # Give the session manager events
         _.extend(SessionManager::, Backbone.Events)
