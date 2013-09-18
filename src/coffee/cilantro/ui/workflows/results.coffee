@@ -369,6 +369,7 @@ define [
                 collection: c.data.exporters
 
             @createQueryModal.show new query.QueryDialog
+                header: 'Create Query'
                 collection: c.data.queries
 
             c.promiser.when 'contexts', =>
@@ -418,7 +419,9 @@ define [
             @ui.columns.modal('show')
 
         showCreateQuery: =>
-            @createQueryModal.currentView.$el.modal('show')
+            # Opens the query modal without passing a model which assumes a new one
+            # will be created based on the current session
+            @createQueryModal.currentView.open()
 
         cancelColumnChanges: ->
             _.delay =>

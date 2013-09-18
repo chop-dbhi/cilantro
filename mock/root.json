@@ -27,6 +27,7 @@
         "queries": {
             "href": "/mock/queries.json",
             "rel": "dataqueries"
+        },
         "self": {
             "href": "/mock/root.json",
             "rel": "self"
