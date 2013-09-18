@@ -17,6 +17,7 @@ define [
     './ui/query'
     './ui/workflows'
     './ui/paginator'
+    './ui/notify'
 ], ($, _, Backbone, c, router, mods...) ->
 
 

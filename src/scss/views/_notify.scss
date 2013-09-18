@@ -1,0 +1,16 @@
+.notifications {
+    z-index: 2000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: 400px;
+    min-width: 200px;
+    width: 20%;
+}
+
+#notifications {
+    position: fixed;
+    // Offset relative to document
+    right: 10px;
+    top: 10px;
+}
