@@ -1,13 +1,14 @@
 define [
+    'underscore'
+    'marionette'
     '../core'
     '../../models/query'
     'tpl!templates/query/dialog.html'
-], (c, query, templates...) ->
+], (_, Marionette, c, query, templates...) ->
 
-    templates = c._.object ['dialog'], templates
+    templates = _.object ['dialog'], templates
 
-
-    class QueryDialog extends c.Marionette.ItemView
+    class QueryDialog extends Marionette.ItemView
         className: 'modal hide'
 
         template: templates.dialog

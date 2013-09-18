@@ -1,6 +1,6 @@
 define [
-    '../core'
+    'underscore'
     './query/dialog'
-], (c, mods...) ->
+], (_, mods...) ->
 
-    c._.extend {}, mods...
+    _.extend {}, mods...
