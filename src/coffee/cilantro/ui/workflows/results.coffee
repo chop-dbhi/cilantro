@@ -106,7 +106,7 @@ define [
 
             # Find the bounds of the results workflow to properly fix the
             # position of the context/filter panel.
-            @workflowTopOffset = @$el.position().top
+            @workflowTopOffset = @$el.offset().top
             @workflowRightOffset = window.innerWidth - (@$el.position().left + @$el.width())
 
             @ui.contextContainer.css('top', @workflowTopOffset)
