@@ -69,7 +69,7 @@ define [
 
             # TODO: Could we use a template here instead and then just modify
             # the class on the icon in the template?
-            @$el.html("<span>#{ @model.get('name') } <i class=#{ iconClass }></i></span>")
+            @$el.html("<span style='float:left'>#{ @model.get('name') }</span><i style='float:right' class=#{ iconClass }></i></span>")
 
             return @
 
