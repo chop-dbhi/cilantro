@@ -52,13 +52,17 @@ define [
 
         ui:
             columns: '.columns-modal'
+            contextContainer: '.context-container'
             createReport: '.create-query-modal'
             createReportToggle: '[data-toggle=create-query]'
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
+            toggleFiltersButton: '[data-toggle=context-panel]'
+            toggleFiltersIcon: '[data-toggle=context-panel] i'
+            toggleFiltersText: '[data-toggle=context-panel] span'
             navbar: '.results-workflow-navbar'
-            contextContainer: '.context-container'
             resultsContainer: '.results-container'
+            navbarButtons: '.results-workflow-navbar button'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
@@ -69,8 +73,7 @@ define [
             'click [data-toggle=export-progress]': 'showExportProgress'
             'click #pages-text-ranges': 'selectPagesOption'
             'click [data-toggle=create-query]': 'showCreateQuery'
-            'click #toggle-context-panel-button': 'toggleContextPanel'
-            'click #toggle-context-panel-button': 'toggleContextPanelButtonClicked'
+            'click [data-toggle=context-panel]': 'toggleContextPanelButtonClicked'
 
         regions:
             count: '.count-region'
@@ -107,7 +110,7 @@ define [
             # Find the bounds of the results workflow to properly fix the
             # position of the context/filter panel.
             @workflowTopOffset = @$el.offset().top
-            @workflowRightOffset = window.innerWidth - (@$el.position().left + @$el.width())
+            @workflowRightOffset = window.innerWidth - (@$el.offset().left + @$el.width())
 
             @ui.contextContainer.css('top', @workflowTopOffset)
             @ui.contextContainer.css('right', @workflowRightOffset)
@@ -124,14 +127,38 @@ define [
             @areFiltersHidden = false
             @ui.contextContainer.css('display', 'block')
             @ui.resultsContainer.addClass('span9')
-            @$('#toggle-context-panel-button').html('Hide Filters...')
+
+            # If we don't update the title by calling fixTitle the tooltip will
+            # not respect the attribute change. Also, if we are changing the
+            # visibility of the context panel just go ahead and hide the
+            # tooltip in case the cause of this was a user click in which case
+            # the show/hide filter button is no longer under their mouse.
+            @ui.toggleFiltersButton.tooltip('hide')
+                .attr('data-original-title', 'Hide Filter Panel')
+                .tooltip('fixTitle')
+
+            @ui.toggleFiltersIcon.removeClass('icon-collapse-alt')
+            @ui.toggleFiltersIcon.addClass('icon-expand-alt')
+            @ui.toggleFiltersText.html('Hide Filters...')
             @$('.context').stacked('restack', @$el.height())
 
         hideContextPanel: =>
             @areFiltersHidden = true
             @ui.contextContainer.css('display', 'none')
             @ui.resultsContainer.removeClass('span9')
-            @$('#toggle-context-panel-button').html('Show Filters...')
+
+            # If we don't update the title by calling fixTitle the tooltip will
+            # not respect the attribute change. Also, if we are changing the
+            # visibility of the context panel just go ahead and hide the
+            # tooltip in case the cause of this was a user click in which case
+            # the show/hide filter button is no longer under their mouse.
+            @ui.toggleFiltersButton.tooltip('hide')
+                .attr('data-original-title', 'Show Filter Panel')
+                .tooltip('fixTitle')
+
+            @ui.toggleFiltersIcon.addClass('icon-collapse-alt')
+            @ui.toggleFiltersIcon.removeClass('icon-expand-alt')
+            @ui.toggleFiltersText.html('Show Filters...')
 
         onPageScroll: =>
             # If the view isn't rendered yet, then don't bother
@@ -387,6 +414,8 @@ define [
                 @columns.show new concept.ConceptColumns
                     view: c.data.views.getSession()
                     collection: c.data.concepts.viewable
+
+                @ui.navbarButtons.tooltip({animation: false, placement: 'bottom'})
 
             # Record the vertical offset of the masthead nav bar if we
             # haven't done so already. This is used in scroll calculations.

@@ -13,6 +13,14 @@
                 padding-right: 20px;
             }
         }
+
+        // Represents a media query to hide the text content of buttons in the
+        // navbar when the screen width drops below 1200px.
+        @media (max-width: 1200px) {
+            .large-display-button-text {
+                display: none;
+            }
+        }
     }
 
     .serrano-version-warning {
