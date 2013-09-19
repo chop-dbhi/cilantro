@@ -16,7 +16,7 @@ define [
         template: templates.workspace
 
         regions:
-            queries: '.queries-region'
+            queries: '.query-region'
 
         onRender: ->
             @queries.show new base.LoadView

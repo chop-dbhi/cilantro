@@ -12,7 +12,7 @@ define [
 
         itemView: query.QueryItem
 
-        itemViewContainer: '.items-list'
+        itemViewContainer: '.items'
 
         template: templates.list
 
