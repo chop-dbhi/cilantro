@@ -35,6 +35,7 @@ define [
             last: '[data-page=last]'
             pageCount: '.page-count'
             currentPage: '.current-page'
+            buttons: '[data-toggle=tooltip]'
 
         modelEvents:
             'change:pagecount': 'renderPageCount'
@@ -53,6 +54,8 @@ define [
             if not @model.pageIsLoading()
                 @renderPageCount(@model, @model.getPageCount())
                 @renderCurrentPage(@model, @model.getCurrentPageStats()...)
+
+            @ui.buttons.tooltip({animation: false, placement: 'bottom'})
 
         renderPageCount: (model, value, options) ->
             @ui.pageCount.text(value)
