@@ -52,8 +52,8 @@ define [
 
         ui:
             columns: '.columns-modal'
-            createReport: '.create-report-modal'
-            createReportToggle: '[data-toggle=create-report]'
+            createReport: '.create-query-modal'
+            createReportToggle: '[data-toggle=create-query]'
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
             navbar: '.results-workflow-navbar'
