@@ -23,6 +23,14 @@ define [
 
         events:
             'click .delete-query': 'deleteQuery'
+            'click [data-toggle=query-modal]': 'showQueryModal'
+
+        initialize: ->
+            @model.on 'sync', =>
+                @render()
+
+        showQueryModal: ->
+            @trigger('showQueryModal', @model)
 
         deleteQuery: ->
             @model.destroy({wait: true})

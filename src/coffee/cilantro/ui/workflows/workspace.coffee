@@ -17,6 +17,7 @@ define [
 
         regions:
             queries: '.query-region'
+            queryModal: '.create-query-modal'
 
         onRender: ->
             @queries.show new base.LoadView
@@ -25,6 +26,7 @@ define [
             c.promiser.when 'shared_queries', =>
                 @queries.show new query.QueryList
                     collection: c.data.shared_queries
+                    queryModal: @queryModal
 
 
     { WorkspaceWorkflow }
