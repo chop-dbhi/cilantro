@@ -5,6 +5,8 @@ define [
 
     class QueryModel extends base.Model
         parse: (attrs) ->
+            super
+
             if attrs? and not attrs.shared_users?
                 attrs.shared_users = []
 
