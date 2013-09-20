@@ -17,5 +17,14 @@ define [
 
         template: templates.item
 
+        ui:
+            owner: '.owner'
+            nonOwner: '.non-owner'
+
+        onRender: ->
+            if @model.get('is_owner')
+                @ui.nonOwner.hide()
+            else
+                @ui.owner.hide()
 
     { EmptyQueryItem, QueryItem }
