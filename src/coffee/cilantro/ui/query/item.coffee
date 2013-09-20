@@ -21,6 +21,12 @@ define [
             owner: '.owner'
             nonOwner: '.non-owner'
 
+        events:
+            'click .delete-query': 'deleteQuery'
+
+        deleteQuery: ->
+            @model.destroy({wait: true})
+
         onRender: ->
             if @model.get('is_owner')
                 @ui.nonOwner.hide()
