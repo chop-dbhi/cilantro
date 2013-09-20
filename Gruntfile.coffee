@@ -221,6 +221,7 @@ module.exports = (grunt) ->
                     dir: 'dist/js'
                     optimize: 'uglify2'
                     removeCombined: true
+                    generateSourceMaps: false
 
 
         clean:
@@ -229,6 +230,8 @@ module.exports = (grunt) ->
             dist: ['dist']
             postdist: [
                 '<%= distDir %>/js/templates'
+            ]
+            release: [
                 '<%= distDir %>/js/build.txt'
             ]
 
@@ -412,6 +415,7 @@ module.exports = (grunt) ->
     grunt.registerTask 'release', 'Builds the distribution files, creates the release binaries, and creates a Git tag', [
         'bump-final'
         'dist'
+        'clean:release'
         'release-binaries'
         'tag-release'
         'release-help'
