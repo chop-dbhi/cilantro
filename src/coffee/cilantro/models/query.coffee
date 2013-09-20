@@ -4,6 +4,11 @@ define [
 ], (c, base) ->
 
     class QueryModel extends base.Model
+        parse: (attrs) ->
+            if attrs? and not attrs.shared_users?
+                attrs.shared_users = []
+
+            return attrs
 
     class QueryCollection extends base.Collection
         model: QueryModel
