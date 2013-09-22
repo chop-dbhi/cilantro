@@ -55,8 +55,6 @@ define [
     class BranchNodeModel extends base.ContextNodeModel
         type: 'branch'
 
-        childEventPrefix: 'child'
-
         # Default to an 'and' type with no children
         defaults: ->
             type: 'and'
@@ -71,11 +69,6 @@ define [
             # local changes should use the `children` collection directly.
             @on 'change:children', (model, value, options) ->
                 @children.set(value, options)
-
-            @listenTo @children, 'all', (event, args...) =>
-                if not RegExp("^#{ @childEventPrefix }:").test(event)
-                    event = "#{ @childEventPrefix }:#{ event }"
-                @trigger(event, args...)
 
             super
 
