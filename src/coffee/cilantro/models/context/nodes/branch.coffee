@@ -21,7 +21,7 @@ define [
         # Find the node in the collection by using the primary lookup
         # attributes, 'concept' and 'field'.
         get: (attrs) ->
-            if attrs.id? then return super(attrs)
+            if typeof attrs is 'number' or attrs.id? then return super(attrs)
             if attrs instanceof base.ContextNodeModel
                 attrs = attrs.identity()
             else
