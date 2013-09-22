@@ -36,4 +36,12 @@ define [
             return attrs
 
 
-    { Model, Collection }
+    class SynclessModel extends Model
+        sync: ->
+
+
+    class SynclessCollection extends Collection
+        sync: ->
+
+
+    { Model, Collection, SynclessModel, SynclessCollection }

@@ -8,8 +8,12 @@ define [
     class ContextNodeError extends Error
 
 
-    class ContextNodeModel extends Backbone.Model
-
+    ###
+    Base context node model containing basic validation, identity functions,
+    and setting common elements. This is a _syncless_ model since it itself
+    does not sync with the server, but is a component of an upstream structure.
+    ###
+    class ContextNodeModel extends base.SynclessModel
         constructor: (attrs, options={}) ->
             options = _.extend
                 identKeys: ['concept', 'field']
