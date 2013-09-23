@@ -1,7 +1,7 @@
 define [
     'underscore'
     'backbone'
-    './base'
+    '../../base'
 ], (_, Backbone, base) ->
 
 
