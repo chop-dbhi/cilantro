@@ -75,6 +75,7 @@ define [
                 manager: @
                 identKeys: @options.identKeys
                 validate: false
+                remove: false
 
             # Augment the `working` tree with the server's response. Prevent
             # nodes from being removed since this reprsents all nodes that
