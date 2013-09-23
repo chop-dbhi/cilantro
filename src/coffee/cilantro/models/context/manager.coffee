@@ -1,15 +1,11 @@
 define [
     'underscore'
     'backbone'
+    '../../evented'
     './nodes'
-], (_, Backbone, nodes) ->
+], (_, Backbone, Evented, nodes) ->
 
-    class Events
-
-    _.extend Events::, Backbone.Events
-
-
-    class ContextTreeManager extends Events
+    class ContextTreeManager extends Evented
         options:
             identKeys: ['concept', 'field']
 
