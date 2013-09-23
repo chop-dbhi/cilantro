@@ -107,32 +107,13 @@ define [
             ident = ident.identity?() or ident
             return @working.find(ident, options)
 
-        # Define a node in the tree. Takes an option `type` which specifies
-        # the node type to create.
-        define: (attrs, path, options) ->
-            if not _.isArray(path)
-                options = path
-                path = []
 
-            options = _.extend
-                identKeys: @options.identKeys
-            , options
 
-            # Set the manager
-            options.manager = @
 
-            # Start with the top-level node
-            parent = @working
+        # Define a node in the working tree.
+        define: (attrs, options) ->
+            @working.define(attrs, options)
 
-            # Find the parent for the new node will be define in
-            for ident in path
-                # Ensure only nodes are being defined in branch nodes
-                if (parent = parent.find(ident)).type isnt 'branch'
-                    throw new Error 'Cannot define a node in a non-branch'
-
-            # Get the identity of this node and add it to the parent
-            parent.children.add(attrs, options)
-            return @find(_.pick(attrs, options.identKeys))
 
         # Save the model on behalf of a node.
         # TODO this assumes only a single node has been changed. If multiple
