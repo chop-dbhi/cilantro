@@ -128,7 +128,7 @@ define [
         # triggers a sync with a server.
         apply: (ident, options) ->
             ident = ident.identity?() or ident
-            attrs = @working.find(ident).toJSON()
+            attrs = @find(ident).toJSON()
             node = @upstream.define(ident)
             node.set(attrs, options)
             @save(node)
@@ -136,7 +136,7 @@ define [
         # Reverts a working tree node to it's upstream state if one exists.
         revert: (ident, options) ->
             ident = ident.identity?() or ident
-            if not (wn = @working.find(ident))
+            if not (wn = @find(ident))
                 return
             if (un = @upstream.find(ident))
                 wn.set(un.toJSON())
@@ -174,7 +174,7 @@ define [
             ident = ident.identity?() or ident
             if not (u = @upstream.find(ident))
                 return false
-             return not _.isEqual(u.toJSON(), @working.find(ident).toJSON())
+             return not _.isEqual(u.toJSON(), @find(ident).toJSON())
 
         # Check if the node for a given ident is active and enabled. If
         # `enabled` is not defined, it is assumed to be true hence the
