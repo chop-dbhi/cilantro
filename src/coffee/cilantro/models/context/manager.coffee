@@ -9,16 +9,6 @@ define [
     _.extend Events::, Backbone.Events
 
 
-    # Light wrapper for fixing attrs for the top-level branch node. If `attrs`
-    # has ID fields, it is added as a child to the branch. This is primarily
-    # to fix legacy data that did not conform to this structure.
-    _fix = (node, attrs, options) ->
-        if attrs.concept? or attrs.field?
-            node.children.add(attrs, options)
-        else
-            node.set(attrs, options)
-
-
     class ContextTreeManager extends Events
         options:
             identKeys: ['concept', 'field']
@@ -33,11 +23,11 @@ define [
             @upstream = new nodes.BranchNodeModel null,
                 manager: @
 
-            # Initialize trees and any time a successful sync occurs
-            @update(@model.get('json'))
+            # Set trees with  and any time a successful sync occurs
+            @set(@model.get('json'))
 
             @model.on 'sync', (model, resp, options) =>
-                @update(resp.json)
+                @set(resp.json)
 
         # Traverses the working tree and extracts all applied nodes and
         # falls back to the upstream contents.
@@ -81,26 +71,35 @@ define [
         toJSON: (options) ->
             @_toJSON(@working, options)
 
-        # Update the active and working trees. Nodes may not be removed from
-        # the working tree since this would remove local state that controls
-        # may be relying on.
-        update: (attrs) ->
-            # Ensure the active and working trees are not empty, otherwise
-            # change events do not fire.
-            attrs = _.extend
-                children: []
-                type: 'and'
-            , attrs
+        # Light wrapper for fixing attrs for the top-level branch node. If `attrs`
+        # has ID fields, it is added as a child to the branch. This is primarily
+        # to fix legacy data that did not conform to this structure.
+        # [DEPRECATE 2.2]
+        _set: (node, attrs, options) ->
+            if attrs.concept? or attrs.field?
+                node.children.add(attrs, options)
+            else
+                node.set(attrs, options)
 
-            # Update `upstream` tree with server response
-            _fix @upstream, attrs,
+        # Updates the working and upstream trees with the server's response
+        set: (attrs) ->
+            if not attrs?
+                @upstream.clear(reset: true)
+                return
+
+            # Update `upstream` tree with server response. Other than
+            # annotations on nodes themselves, nothing should change. The
+            # upstream tree may have not synced nodes so nodes should not be
+            # removed from the tree.
+            @_set @upstream, attrs,
                 manager: @
                 identKeys: @options.identKeys
                 validate: false
 
             # Augment the `working` tree with the server's response. Prevent
-            # nodes from being removed
-            _fix @working, attrs,
+            # nodes from being removed since this reprsents all nodes that
+            # have been accessed
+            @_set @working, attrs,
                 manager: @
                 identKeys: @options.identKeys
                 validate: false
