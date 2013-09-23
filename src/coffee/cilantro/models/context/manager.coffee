@@ -13,22 +13,13 @@ define [
     with the server, the upstream tree is serialized for use as the `json`
     property on the context model.
 
-    All nodes defined by the manager contain a referene to manager for
-    proxying operations that rely on the working or upstream trees. Below
-    are the supported operations:
-
-    - `disable()` -
-    - `enable()` - Enables a node in the upstream tree that was previously
-    disabled.
-    - `revert()` - Reverts a working tree node to it's upstream state if one
-    exists.
-
-    On a successful sync event, the response json will be merged with both the
-    `working` and `upstream` trees to reflect any annotations made by the
-    server.
+    All nodes defined by the manager contain a referecne to manager for
+    proxying operations that rely on the working or upstream trees.
 
     Other notes:
 
+    - On a successful sync with the server, the response is merged into both
+    the working and upstream trees.
     - The manager never returns nodes from upstream for manipulation. Views
     that bind to the `upstream` node or descendents should use the exposed
     methods on upstream nodes.
@@ -151,13 +142,15 @@ define [
             else
                 wn.clear()
 
+        # Enables a node in the upstream tree that was previously disabled.
+        # Triggers a sync.
         enable: (ident) ->
             ident = ident.identity?() or ident
             if (node = @upstream.find(ident))
                 node.set(enabled: true)
                 @save(node)
 
-        # Disables a node in the upstream tree. Syncs with the server if
+        # Disables a node in the upstream tree. Triggers a sync.
         disable: (ident) ->
             ident = ident.identity?() or ident
             if (node = @upstream.find(ident))
