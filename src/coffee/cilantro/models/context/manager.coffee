@@ -77,12 +77,10 @@ define [
         define: (attrs, options) ->
             @working.define(attrs, options)
 
-
-        # Save the model on behalf of a node.
-        # TODO this assumes only a single node has been changed. If multiple
-        # nodes are changed, only the node that triggers causes the save will
-        # have it's events triggered.
+        # Save the model on behalf of a node. Defaults to the upstream node.
         save: (node, options) ->
+            node ?= @upstream
+
             # Trigger 'request' on node
             options = _.extend {}, options,
                 beforeSend: (xhr) =>
