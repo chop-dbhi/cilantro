@@ -86,6 +86,13 @@ define [
             'click .toggle': 'toggle'
             'click .clear': 'clear'
 
+        # The delay in milliseconds to wait before responding to changes in
+        # the textarea.
+        inputDelay: 500
+
+        initialize: ->
+            @_parseText = _.debounce(@parseText, @inputDelay)
+
         clear: (event) ->
             event?.preventDefault()
             @collection.reset()
@@ -99,7 +106,6 @@ define [
                 @ui.textarea.show()
                 @ui.toggle.html('<i class=icon-list></i> Show List')
             else
-                @parseText()
                 @ui.list.show()
                 @ui.textarea.hide()
                 @ui.toggle.html('<i class=icon-edit></i> Edit List')
@@ -147,6 +153,10 @@ define [
                         index: i
 
             @collection.set(models)
+
+        onRender: ->
+            @ui.textarea.on 'input propertychange', =>
+                @_parseText()
 
 
     { ValueList }
