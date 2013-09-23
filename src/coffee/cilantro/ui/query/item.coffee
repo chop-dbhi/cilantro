@@ -20,6 +20,7 @@ define [
         ui:
             owner: '.owner'
             nonOwner: '.non-owner'
+            shareCount: '.share-count'
 
         events:
             'click .delete-query': 'deleteQuery'
@@ -38,6 +39,10 @@ define [
         onRender: ->
             if @model.get('is_owner')
                 @ui.nonOwner.hide()
+
+                emailHTML = _.pluck(@model.get('shared_users'), 'email').join('<br />')
+                @ui.shareCount.attr('title', emailHTML)
+                @ui.shareCount.tooltip({animation: false, html: true, placement: 'right'})
             else
                 @ui.owner.hide()
 
