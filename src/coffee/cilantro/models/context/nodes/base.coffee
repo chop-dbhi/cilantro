@@ -46,6 +46,10 @@ define [
             super
             @set(attrs, silent: true)
 
+        # Removes the node from the collection, no syncing
+        destroy: (options) ->
+            @trigger('destroy', @, @collection, options)
+
         # Attempts to fetch a node relative to this one. The `ident` is a set
         # of attributes the target node must match in order to be returned.
         # Takes an option `create` which specifies a valid node type.
