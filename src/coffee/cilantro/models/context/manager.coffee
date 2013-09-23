@@ -23,13 +23,6 @@ define [
         options:
             identKeys: ['concept', 'field']
 
-        nodeEventPrefix: 'node'
-
-        nodeEvents:
-            'apply': 'save'
-            'remove': 'save'
-            'change:enabled': 'save'
-
         constructor: (@model, options) ->
             @options = _.extend({}, @options, options)
 
@@ -45,17 +38,6 @@ define [
 
             @model.on 'sync', (model, resp, options) =>
                 @update(resp.json)
-
-        _listenToNode: (node) ->
-            # Proxy events from nodes
-            @listenTo node, 'all', (event, args...) =>
-                @trigger("#{ @nodeEventPrefix }:#{ event }", args...)
-
-            # Bind node events
-            for event, method of @nodeEvents
-                @listenTo node, event, @[method], @
-
-            return
 
         # Traverses the working tree and extracts all applied nodes and
         # falls back to the upstream contents.
@@ -124,14 +106,11 @@ define [
                 validate: false
                 remove: false
 
-        # Attempts to find a node. The `ident` is a set of attributes the
-        # target node must match in order to be returned.
+        # Find a node in the working tree. The `ident` is a set of attributes
+        # the target node must match in order to be returned.
         find: (ident, options) ->
-            if (node = @working.find(ident, options))
-                # First time access, start listening to the node for events
-                if not @_listeners?[node._listenerId]?
-                    @_listenToNode(node)
-            return node
+            ident = ident.identity?() or ident
+            return @working.find(ident, options)
 
         # Define a node in the tree. Takes an option `type` which specifies
         # the node type to create.
