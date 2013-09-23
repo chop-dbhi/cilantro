@@ -5,6 +5,36 @@ define [
     './nodes'
 ], (_, Backbone, Evented, nodes) ->
 
+    ###
+    The context tree manager maintains two trees, `working` and `upstream`.
+    The working tree contains the current state of all context nodes
+    that have been interacted with during the session. The upstream tree
+    contains nodes that were applied while in a valid state. When synced
+    with the server, the upstream tree is serialized for use as the `json`
+    property on the context model.
+
+    All nodes defined by the manager contain a referene to manager for
+    proxying operations that rely on the working or upstream trees. Below
+    are the supported operations:
+
+    - `disable()` -
+    - `enable()` - Enables a node in the upstream tree that was previously
+    disabled.
+    - `revert()` - Reverts a working tree node to it's upstream state if one
+    exists.
+
+    On a successful sync event, the response json will be merged with both the
+    `working` and `upstream` trees to reflect any annotations made by the
+    server.
+
+    Other notes:
+
+    - The manager never returns nodes from upstream for manipulation. Views
+    that bind to the `upstream` node or descendents should use the exposed
+    methods on upstream nodes.
+    - `ident = ident.identity?() or ident` gets the identity of a node if passed
+
+    ###
     class ContextTreeManager extends Evented
         options:
             identKeys: ['concept', 'field']
@@ -70,9 +100,6 @@ define [
             ident = ident.identity?() or ident
             return @working.find(ident, options)
 
-
-
-
         # Define a node in the working tree.
         define: (attrs, options) ->
             @working.define(attrs, options)
@@ -95,11 +122,74 @@ define [
                 .fail (xhr, status, error) =>
                     node.trigger('error', node, xhr, options)
 
-        # Marks the entire working tree as removed
-        remove: (options) ->
-            @working.remove()
-            @save(@working)
+        # Removes a node from the upstream tree. Since the working tree
+        # acts as a local storage and synchronization between controls of
+        # the node, nodes in the working tree are never removed.
+        remove: (ident, options) ->
+            ident = ident.identity?() or ident
+            if (node = @upstream.find(ident))
+                node.destroy()
+                @save(node)
+
+        # Applies a node in the working tree to upstream. This triggers a
+        # validation and only gets applied if deemed valid. On success, this
+        # triggers a sync with a server.
+        apply: (ident, options) ->
+            ident = ident.identity?() or ident
+            attrs = @working.find(ident).toJSON()
+            node = @upstream.define(ident)
+            node.set(attrs, options)
+            @save(node)
+
+        # Reverts a working tree node to it's upstream state if one exists.
+        revert: (ident, options) ->
+            ident = ident.identity?() or ident
+            if not (wn = @working.find(ident))
+                return
+            if (un = @upstream.find(ident))
+                wn.set(un.toJSON())
+            else
+                wn.clear()
+
+        enable: (ident) ->
+            ident = ident.identity?() or ident
+            if (node = @upstream.find(ident))
+                node.set(enabled: true)
+                @save(node)
+
+        # Disables a node in the upstream tree. Syncs with the server if
+        disable: (ident) ->
+            ident = ident.identity?() or ident
+            if (node = @upstream.find(ident))
+                node.set(enabled: false)
+                @save(node)
+
+        clear: ->
+            @upstream.clear(reset: true)
+            @save()
             return @
+
+        # Returns true if the node is not found upstream.
+        isNew: (ident) ->
+            ident = ident.identity?() or ident
+            return not @upstream.find(ident)
+
+        # Checks if this node is different from upstream. If it does not exist
+        # upstream, it is never considered dirty.
+        isDirty: (ident) ->
+            ident = ident.identity?() or ident
+            if not (u = @upstream.find(ident))
+                return false
+             return not _.isEqual(u.toJSON(), @working.find(ident).toJSON())
+
+        # Check if the node for a given ident is active and enabled. If
+        # `enabled` is not defined, it is assumed to be true hence the
+        # condition `isnt false`.
+        isEnabled: (ident) ->
+            ident = ident.identity?() or ident
+            if (node = @upstream.find(ident))
+                return node.get('enabled') isnt false
+            return false
 
 
     { ContextTreeManager }

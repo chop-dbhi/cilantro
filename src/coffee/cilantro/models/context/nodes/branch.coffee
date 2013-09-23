@@ -79,42 +79,6 @@ define [
                 attrs.children.push child.toJSON()
             return attrs
 
-        _recurse: (method, flag=true, options) ->
-            options = _.extend
-                deep: false
-            , options
-
-            if options.deep
-                for child in @children.models
-                    if child[method](options) is flag
-                        return flag
-            return not flag
-
-        _isDirty: (options) ->
-            not @isValid()
-
-        isValid: (options={}) ->
-            # Override to ensure the attributes are set
-            options.validate = true
-            if not @_validate(@toJSON(), options) then return false
-            return @_recurse('isValid', false, options)
-
-        isNew: (options) ->
-            if super then return true
-            return @_recurse('isNew', false, options)
-
-        isEnabled: (options) ->
-            if super then return true
-            return @_recurse('isEnabled', true, options)
-
-        isRemoved: (options) ->
-            if super then return true
-            return @_recurse('isRemoved', true, options)
-
-        isDirty: (options) ->
-            if super then return true
-            return @_recurse('isDirty', true, options)
-
         # Branch nodes must of the type 'and' or 'or'
         validate: (attrs, options) ->
             if not (attrs.type is 'and' or attrs.type is 'or')
@@ -145,13 +109,6 @@ define [
             if options.reset
                 @children.reset()
             return
-
-        revert: (options) ->
-            # Update internal `children` attributes prior to reverting to
-            # since the state for children is stored in the `children`
-            # collection.
-            @set('children', @children.toJSON(), silent: true)
-            super(options)
 
 
     { BranchNodeModel }
