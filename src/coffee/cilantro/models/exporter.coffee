@@ -28,7 +28,7 @@ define [
         parse: (attrs) ->
             if attrs? and attrs._links?
                 # Ignore the exporter endpoint itself
-                return (value for key, value of attrs._links if key isnt "self")
+                return (value for key, value of attrs._links when key isnt "self")
 
 
     { ExporterModel, ExporterCollection }
