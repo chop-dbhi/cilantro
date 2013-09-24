@@ -70,6 +70,17 @@ define [
             @on 'change:children', (model, value, options) ->
                 @children.set(value, options)
 
+            # Clear is triggered top-down, so all children must receive this event
+            @on 'clear', ->
+                for model in @children.models
+                    model.trigger('clear')
+
+            # Bubble up change events from children
+            @children.on 'change', (args...) =>
+                # Ensure the internal children attribute is up-to-date
+                @set('children', @children.toJSON(), silent: true)
+                @trigger('change', args...)
+
             super
 
         # Serializes the node to JSON including child nodes. Only
@@ -135,7 +146,6 @@ define [
 
         # Find itself or recurse into the children
         find: (ident, options) ->
-            # Initially check if this node matches
             if (node = super(ident, options))
                 return node
             return @children.find(ident, options)
