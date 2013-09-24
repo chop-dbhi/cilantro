@@ -40,7 +40,7 @@ define [
             @upstream = new nodes.BranchNodeModel null,
                 manager: @
 
-            # Set trees with  and any time a successful sync occurs
+            # Set trees with initial model json and any time a successful sync occurs
             @set(@model.get('json'))
 
             @model.on 'sync', (model, resp, options) =>
