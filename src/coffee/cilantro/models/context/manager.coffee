@@ -97,6 +97,7 @@ define [
             @working.define(attrs, options)
 
         # Save the model on behalf of a node. Defaults to the upstream node.
+        # TODO debounce this call to prevent successive calls from firing.
         save: (node, options) ->
             node ?= @upstream
 
@@ -119,47 +120,74 @@ define [
         # the node, nodes in the working tree are never removed.
         remove: (ident, options) ->
             ident = ident.identity?() or ident
-            if (node = @upstream.find(ident))
-                node.destroy()
-                @save(node)
+            if not (n = @find(ident))
+                return
+            if (u = @upstream.find(ident))
+                u.destroy()
+                n.trigger('remove')
+                u.trigger('remove')
+                @save(n)
 
         # Applies a node in the working tree to upstream. This triggers a
         # validation and only gets applied if deemed valid. On success, this
         # triggers a sync with a server.
         apply: (ident, options) ->
             ident = ident.identity?() or ident
-            attrs = @find(ident).toJSON()
-            node = @upstream.define(ident)
-            node.set(attrs, options)
-            @save(node)
+            if not (n = @find(ident))
+                return
+            # No attributes, which means this is not valid
+            if not (attrs = n.toJSON({strict: true}))
+                return
+            # Define upstream, this is idempotent
+            u = @upstream.define(ident, n.path(), type: n.type)
+            u.set(attrs, options)
+            if u.hasChanged()
+                n.trigger('apply')
+                u.trigger('apply')
+                @save(u)
 
         # Reverts a working tree node to it's upstream state if one exists.
         revert: (ident, options) ->
             ident = ident.identity?() or ident
-            if not (wn = @find(ident))
+            if not (n = @find(ident))
                 return
-            if (un = @upstream.find(ident))
-                wn.set(un.toJSON())
+            if (u = @upstream.find(ident))
+                n.set(u.toJSON())
+                if n.hasChanged()
+                    n.trigger('revert')
+                    u.trigger('revert')
             else
-                wn.clear()
+                n.clear()
 
         # Enables a node in the upstream tree that was previously disabled.
         # Triggers a sync.
         enable: (ident) ->
             ident = ident.identity?() or ident
-            if (node = @upstream.find(ident))
-                node.set(enabled: true)
-                @save(node)
+            if not (n = @find(ident))
+                return
+            if (u = @upstream.find(ident))
+                u.set(enabled: true)
+                if u.hasChanged('enabled')
+                    n.trigger('enable')
+                    u.trigger('enable')
+                    @save(u)
 
         # Disables a node in the upstream tree. Triggers a sync.
         disable: (ident) ->
             ident = ident.identity?() or ident
-            if (node = @upstream.find(ident))
-                node.set(enabled: false)
-                @save(node)
+            if not (n = @find(ident))
+                return
+            if (u = @upstream.find(ident))
+                u.set(enabled: false)
+                if u.hasChanged('enabled')
+                    n.trigger('disable')
+                    u.trigger('disable')
+                    @save(u)
 
         clear: ->
             @upstream.clear(reset: true)
+            @upstream.trigger('clear')
+            @working.trigger('clear')
             @save()
             return @
 
