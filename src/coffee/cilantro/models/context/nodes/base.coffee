@@ -1,15 +1,19 @@
 define [
     'underscore'
     'backbone'
-    './base'
+    '../../base'
 ], (_, Backbone, base) ->
 
 
     class ContextNodeError extends Error
 
 
-    class ContextNodeModel extends Backbone.Model
-
+    ###
+    Base context node model containing basic validation, identity functions,
+    and setting common elements. This is a _syncless_ model since it itself
+    does not sync with the server, but is a component of an upstream structure.
+    ###
+    class ContextNodeModel extends base.SynclessModel
         constructor: (attrs, options={}) ->
             options = _.extend
                 identKeys: ['concept', 'field']
@@ -17,27 +21,22 @@ define [
 
             @manager = options.manager
             @identKeys = options.identKeys
-
             super(attrs, options)
-
-            # Validate on construction and marked as dirty
-            if attrs? and @_isDirty()
-                @dirty = true
-
-            # Any time the node changes, check if it is dirty
-            @on 'change', =>
-                @dirty = @_isDirty()
-
-        # Convenience methods for accessing the
-        _working: (options) ->
-            @manager?.find(@identity(), options)
-
-        _upstream: (options) ->
-            @manager?.upstream.find(@identity(), options)
 
         # Returns the identity object that represents this node.
         identity: ->
             @pick(@identKeys...)
+
+        # Traverses up the tree and builds the path to this node
+        path: ->
+            path = []
+            node = @
+            while true
+                if (node = node.collection?.parent) and not _.isEmpty (ident = node.identity())
+                    path.unshift(ident)
+                else
+                    break
+            return path
 
         # Checks if the attributes are valid for the node type. The node type
         # is determined dynamically by iterating over an validating against
@@ -57,6 +56,10 @@ define [
             super
             @set(attrs, silent: true)
 
+        # Removes the node from the collection, no syncing
+        destroy: (options) ->
+            @trigger('destroy', @, @collection, options)
+
         # Attempts to fetch a node relative to this one. The `ident` is a set
         # of attributes the target node must match in order to be returned.
         # Takes an option `create` which specifies a valid node type.
@@ -74,103 +77,43 @@ define [
             if match isnt false
                 return @
 
-        # Attempts to apply a node in the working tree. If the node is not
-        # valid, false is returned. Otherwise the node is
-        apply: (options={}) ->
-            # Only unmanaged or working nodes can be applied
-            if (node = @_working())? and @ isnt node
-                return @
-
-            if not options.silent
-                @trigger('before:apply', @, options)
-
+        # Applies the node to the upstream tree via the manager
+        apply: (options) ->
             if not @isValid(options)
                 return false
+            @manager.apply(@, options)
 
-            # Apply all descendents
-            if @type is 'branch'
-                passed = true
-                for child in @children.models
-                    if child.apply(_.extend({}, options, silent: true)) is false
-                        passed = false
+        remove: (options) ->
+            @manager.remove(@, options)
 
-                # If the branch contains a single child that does not pass
-                # fail the apply
-                if @children.length is 1 and not passed
-                    return false
+        revert: (options) ->
+            @manager.revert(@, options)
 
-            # Remove state flags
-            delete @dirty
-            delete @removed
-
-            if not options.silent
-                @trigger('apply', @, options)
-            return @
-
-        # Mark the node as removed
-        remove: (options={}) ->
-            if not options.silent
-                @trigger('before:remove', @, options)
-            @removed = true
-            if not options.silent
-                @trigger('remove', @, options)
-            if (node = @_working()) and node isnt @
-                node.remove(options)
-            return @
-
-        revert: (options={}) ->
-            if not options.silent
-                @trigger('before:revert', @, options)
-            if (node = @_upstream()) and node isnt @
-                @set(node.toJSON(), options)
-                if not options.silent
-                    @trigger('revert', @, options)
-
-        # Enable the node
         enable: (options) ->
-            @set('enabled', true, options)
-            if (node = @_working()) and node isnt @
-                node.enable(options)
-            return @
+            @manager.enable(@, options)
 
-        # Disable the node
         disable: (options) ->
-            @set('enabled', false, options)
-            if (node = @_working()) and node isnt @
-                node.disable(options)
-            return @
+            @manager.disable(@, options)
 
-        # Toggle the enabled state of the node
         toggleEnabled: (options) ->
-            if @isEnabled(options)
-                 @disable(options)
+            if (enabled = @isEnabled(options))
+                @disable(options)
             else
-                 @enable(options)
-            return @isEnabled(options)
+                @enable(options)
+            return not enabled
 
-        # Check if this node is defined in the upstream tree
         isNew: (options) ->
-            not @_upstream(options)
+            @manager.isNew(@, options)
 
-        # Checks if this node is new or is different from upstream
-        _isDirty: (options) ->
-            if not (node = @_upstream(options))
-                return true
-            return not _.isEqual(node.toJSON(), @toJSON())
-
-        # Check if this node is dirty
         isDirty: (options) ->
-            @dirty is true
+            @manager.isDirty(@, options)
 
-        # Check if the node for a given ident is active and enabled. If
-        # `enabled` is not defined, it is assumed to be true hence the
-        # condition `isnt false`.
+        # Proxy to manager to check if the node is enabled. Note, this seems
+        # like it could be checked locally, however the upstream node is the
+        # source of truth and thus the manager must perform the check in case
+        # this is a working node.
         isEnabled: (options) ->
-            @get('enabled') isnt false
-
-        # Return true if marked for removal
-        isRemoved: (options) ->
-            @removed is true
+            @manager.isEnabled(@, options)
 
 
     { ContextNodeError, ContextNodeModel }

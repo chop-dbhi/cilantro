@@ -21,7 +21,7 @@ define [
         # Find the node in the collection by using the primary lookup
         # attributes, 'concept' and 'field'.
         get: (attrs) ->
-            if attrs.id? then return super(attrs)
+            if typeof attrs is 'number' or attrs.id? then return super(attrs)
             if attrs instanceof base.ContextNodeModel
                 attrs = attrs.identity()
             else
@@ -55,8 +55,6 @@ define [
     class BranchNodeModel extends base.ContextNodeModel
         type: 'branch'
 
-        childEventPrefix: 'child'
-
         # Default to an 'and' type with no children
         defaults: ->
             type: 'and'
@@ -72,55 +70,48 @@ define [
             @on 'change:children', (model, value, options) ->
                 @children.set(value, options)
 
-            @listenTo @children, 'all', (event, args...) =>
-                if not RegExp("^#{ @childEventPrefix }:").test(event)
-                    event = "#{ @childEventPrefix }:#{ event }"
-                @trigger(event, args...)
+            # Clear is triggered top-down, so all children must receive this event
+            @on 'clear', ->
+                for model in @children.models
+                    model.trigger('clear')
+
+            # Bubble up change events from children
+            @children.on 'change', (args...) =>
+                # Ensure the internal children attribute is up-to-date
+                @set('children', @children.toJSON(), silent: true)
+                @trigger('change', args...)
 
             super
 
-        # Serializes the node to JSON including child nodes
-        toJSON: ->
-            (attrs = super).children = []
-            for child in @children.models
-                attrs.children.push child.toJSON()
-            return attrs
-
-        _recurse: (method, flag=true, options) ->
+        # Serializes the node to JSON including child nodes. Only
+        # valid nodes are included in the output.
+        toJSON: (options) ->
             options = _.extend
-                deep: false
+                strict: false
             , options
 
-            if options.deep
-                for child in @children.models
-                    if child[method](options) is flag
-                        return flag
-            return not flag
+            # Evaluate children first
+            children = []
+            for child in @children.models
+                # Only valid nodes
+                if options.strict and not child.isValid(options)
+                    continue
+                # Empty child are excluded
+                if (attrs = child.toJSON(options))
+                    children.push(attrs)
 
-        _isDirty: (options) ->
-            not @isValid()
+            # Strict JSON requires children to have a length
+            if options.strict and not children.length
+                return
+            (attrs = super).children = children
+            return attrs
 
-        isValid: (options={}) ->
-            # Override to ensure the attributes are set
-            options.validate = true
-            if not @_validate(@toJSON(), options) then return false
-            return @_recurse('isValid', false, options)
-
-        isNew: (options) ->
-            if super then return true
-            return @_recurse('isNew', false, options)
-
-        isEnabled: (options) ->
-            if super then return true
-            return @_recurse('isEnabled', true, options)
-
-        isRemoved: (options) ->
-            if super then return true
-            return @_recurse('isRemoved', true, options)
-
-        isDirty: (options) ->
-            if super then return true
-            return @_recurse('isDirty', true, options)
+        # Validate base on the attributes prepared by toJSON. The internal
+        # attributes will likely be out of date especially for branch nodes.
+        _validate: (attrs, options) ->
+            if not attrs or _.isEmpty(attrs)
+                attrs = @toJSON(options)
+            super(attrs, options)
 
         # Branch nodes must of the type 'and' or 'or'
         validate: (attrs, options) ->
@@ -128,18 +119,33 @@ define [
                 return 'Not a valid branch type'
 
         # Define a node within this branch via the manager
-        define: (attrs, options) ->
+        define: (attrs, path, options) ->
+            if not path or not _.isArray(path)
+                options = path
+                path = []
+
             options = _.extend
                 manager: @manager
                 identKeys: @identKeys
             , options
 
-            @children.add(attrs, options)
-            return @find(_.pick(attrs, options.identKeys))
+            parent = @
+
+            for ident in path
+                # Create intermediate branches if necessary
+                if not (child = parent.find(ident))
+                    parent.children.add(ident, type: 'branch')
+                    child = parent.children.find(ident)
+
+                if child.type isnt 'branch'
+                    throw new Error('Cannot define node in non-branch')
+                parent = child
+
+            parent.children.add(attrs, options)
+            return parent.find(_.pick(attrs, options.identKeys))
 
         # Find itself or recurse into the children
         find: (ident, options) ->
-            # Initially check if this node matches
             if (node = super(ident, options))
                 return node
             return @children.find(ident, options)
@@ -152,13 +158,6 @@ define [
             if options.reset
                 @children.reset()
             return
-
-        revert: (options) ->
-            # Update internal `children` attributes prior to reverting to
-            # since the state for children is stored in the `children`
-            # collection.
-            @set('children', @children.toJSON(), silent: true)
-            super(options)
 
 
     { BranchNodeModel }
