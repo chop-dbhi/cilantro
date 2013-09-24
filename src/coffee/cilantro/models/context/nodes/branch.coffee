@@ -79,6 +79,13 @@ define [
                 attrs.children.push child.toJSON()
             return attrs
 
+        # Validate base on the attributes prepared by toJSON. The internal
+        # attributes will likely be out of date especially for branch nodes.
+        _validate: (attrs, options) ->
+            if not attrs or _.isEmpty(attrs)
+                attrs = @toJSON(options)
+            super(attrs, options)
+
         # Branch nodes must of the type 'and' or 'or'
         validate: (attrs, options) ->
             if not (attrs.type is 'and' or attrs.type is 'or')
