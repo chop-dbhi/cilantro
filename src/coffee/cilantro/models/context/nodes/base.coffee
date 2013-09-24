@@ -23,10 +23,20 @@ define [
             @identKeys = options.identKeys
             super(attrs, options)
 
-
         # Returns the identity object that represents this node.
         identity: ->
             @pick(@identKeys...)
+
+        # Traverses up the tree and builds the path to this node
+        path: ->
+            path = []
+            node = @
+            while true
+                if (node = node.collection?.parent) and not _.isEmpty (ident = node.identity())
+                    path.unshift(ident)
+                else
+                    break
+            return path
 
         # Checks if the attributes are valid for the node type. The node type
         # is determined dynamically by iterating over an validating against
