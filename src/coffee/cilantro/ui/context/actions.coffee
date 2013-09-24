@@ -33,7 +33,7 @@ define [
             @ui.count.html(c.utils.prettyNumber(value))
 
         clickRemoveAll: ->
-            @model.manager.remove()
+            @model.manager.clear()
 
 
     { ContextActions }
