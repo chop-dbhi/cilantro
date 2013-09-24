@@ -64,8 +64,7 @@ define [
         # Updates the working and upstream trees with the server's response
         set: (attrs) ->
             if not attrs?
-                @upstream.clear(reset: true)
-                return
+                return @clear()
 
             # Update `upstream` tree with server response. Other than
             # annotations on nodes themselves, nothing should change. The
@@ -188,8 +187,8 @@ define [
             @upstream.clear(reset: true)
             @upstream.trigger('clear')
             @working.trigger('clear')
-            @save()
-            return @
+            if @upstream.hasChanged()
+                @save()
 
         # Returns true if the node is not found upstream.
         isNew: (ident) ->
