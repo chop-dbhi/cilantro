@@ -72,11 +72,27 @@ define [
 
             super
 
-        # Serializes the node to JSON including child nodes
-        toJSON: ->
-            (attrs = super).children = []
+        # Serializes the node to JSON including child nodes. Only
+        # valid nodes are included in the output.
+        toJSON: (options) ->
+            options = _.extend
+                strict: false
+            , options
+
+            # Evaluate children first
+            children = []
             for child in @children.models
-                attrs.children.push child.toJSON()
+                # Only valid nodes
+                if options.strict and not child.isValid(options)
+                    continue
+                # Empty child are excluded
+                if (attrs = child.toJSON(options))
+                    children.push(attrs)
+
+            # Strict JSON requires children to have a length
+            if options.strict and not children.length
+                return
+            (attrs = super).children = children
             return attrs
 
         # Validate base on the attributes prepared by toJSON. The internal
