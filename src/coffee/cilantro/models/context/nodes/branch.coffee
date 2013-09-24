@@ -92,14 +92,30 @@ define [
                 return 'Not a valid branch type'
 
         # Define a node within this branch via the manager
-        define: (attrs, options) ->
+        define: (attrs, path, options) ->
+            if not path or not _.isArray(path)
+                options = path
+                path = []
+
             options = _.extend
                 manager: @manager
                 identKeys: @identKeys
             , options
 
-            @children.add(attrs, options)
-            return @find(_.pick(attrs, options.identKeys))
+            parent = @
+
+            for ident in path
+                # Create intermediate branches if necessary
+                if not (child = parent.find(ident))
+                    parent.children.add(ident, type: 'branch')
+                    child = parent.children.find(ident)
+
+                if child.type isnt 'branch'
+                    throw new Error('Cannot define node in non-branch')
+                parent = child
+
+            parent.children.add(attrs, options)
+            return parent.find(_.pick(attrs, options.identKeys))
 
         # Find itself or recurse into the children
         find: (ident, options) ->
