@@ -1,6 +1,6 @@
 # Cilantro
 
-[![Build Status](https://travis-ci.org/cbmi/cilantro.png?branch=2.1)](https://travis-ci.org/cbmi/cilantro)
+[![Build Status](https://travis-ci.org/cbmi/cilantro.png?branch=2.1)](https://travis-ci.org/cbmi/cilantro) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cbmi/cilantro/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 **Documentation**: http://cilantro.harvest.io
 
