@@ -87,8 +87,10 @@ define [
 
         setValue: (value) =>
             if not _.isArray(value) then value = []
-            points = @chart.series[0].points
-            point.select(point.name ? point.category in value, true) for point in points
+            if @chart?
+                points = @chart.series[0].points
+                point.select(point.name ? point.category in value, true) for point in points
+            return
 
 
     { FieldChart }
