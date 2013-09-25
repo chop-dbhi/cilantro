@@ -38,6 +38,12 @@ define [
 
             @$el.append(@header.el, @footer.el)
 
+            @collection.on 'reset', =>
+                if @collection.objectCount == 0
+                    @$el.hide()
+                else
+                    @$el.show()
+
         showCurentPage: (model, num, options) ->
             @children.each (view) ->
                 view.$el.toggle(view.model.id is num)
