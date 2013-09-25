@@ -9,30 +9,39 @@ define [
         constructor: (attrs, options) ->
             @links = {}
             super(attrs, options)
+            @on 'change:_links', (model, attrs, options) ->
+                @_parseLinks(attrs)
 
-        parse: (attrs, options) ->
-            if attrs? and attrs._links?
-                @links = {}
-                for name, link of attrs._links
-                    @links[name] = link.href
+        _parseLinks: (attrs) ->
+            links = {}
+            for name, link of attrs
+                links[name] = link.href
+            @links = links
+
+        parse: (attrs) ->
+            if attrs?._links?
+                @_parseLinks(attrs._links)
             return attrs
 
 
     class Collection extends Backbone.Collection
         model: Model
 
-        url: ->
-            if @isNew() then super else @links.self
+        url: -> @links.self
 
         constructor: (attrs, options) ->
             @links = {}
             super(attrs, options)
 
-        parse: (attrs, options) ->
-            if attrs? and attrs._links?
-                @links = {}
-                for name, link of attrs._links
-                    @links[name] = link.href
+        _parseLinks: (attrs) ->
+            links = {}
+            for name, link of attrs
+                links[name] = link.href
+            @links = links
+
+        parse: (attrs) ->
+            if attrs?._links?
+                @_parseLinks(attrs._links)
             return attrs
 
 
