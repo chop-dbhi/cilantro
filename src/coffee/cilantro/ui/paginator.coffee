@@ -51,11 +51,14 @@ define [
             @_changePage = _.debounce(@changePage, @requestDelay)
 
         onRender: ->
+            # The tooltip call MUST be done before the render calls below or
+            # the tooltip options set here will not be respected because some
+            # of the buttons will be disabled.
+            @ui.buttons.tooltip({animation: false, placement: 'bottom'})
+
             if not @model.pageIsLoading()
                 @renderPageCount(@model, @model.getPageCount())
                 @renderCurrentPage(@model, @model.getCurrentPageStats()...)
-
-            @ui.buttons.tooltip({animation: false, placement: 'bottom'})
 
         renderPageCount: (model, value, options) ->
             @ui.pageCount.text(value)
@@ -66,6 +69,15 @@ define [
             @ui.prev.prop('disabled', !!options.first)
             @ui.next.prop('disabled', !!options.last)
             @ui.last.prop('disabled', !!options.last)
+
+            # If we have disabled the buttons then we need to force hide the
+            # tooltip to prevent it from being permanently visible
+            if !!options.first
+                @ui.first.tooltip('hide')
+                @ui.prev.tooltip('hide')
+            if !!options.last
+                @ui.next.tooltip('hide')
+                @ui.last.tooltip('hide')
 
         changePage: (newPage) ->
             switch newPage
