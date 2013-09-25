@@ -2,19 +2,30 @@ define [
     'underscore'
     'marionette'
     '../base'
+    '../core'
     './item'
     './info'
     './actions'
     'tpl!templates/context.html'
     'tpl!templates/context/empty.html'
     'tpl!templates/context/tree.html'
-], (_, Marionette, base, item, info, actions, templates...) ->
+], (_, Marionette, base, c, item, info, actions, templates...) ->
 
     templates = _.object ['context', 'empty', 'tree'], templates
 
 
     class ContextEmptyTree extends base.EmptyView
         template: templates.empty
+
+        ui:
+            noFiltersResultsMessage: '.no-filters-results-workspace'
+            noFiltersQueryMessage: '.no-filters-query-workspace'
+
+        onRender: ->
+            if c.router.isCurrent('results')
+                @ui.noFiltersQueryMessage.hide()
+            else if c.router.isCurrent('query')
+                @ui.noFiltersResultsMessage.hide()
 
 
     class ContextTree extends Marionette.CompositeView

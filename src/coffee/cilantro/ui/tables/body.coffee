@@ -20,9 +20,5 @@ define [
                 collection: model.data
             , @options
 
-        initialize: ->
-            @on 'collection:rendered', ->
-                if @model.series.length == 0
-                    @$el.html('No data to display')
 
     { Body }

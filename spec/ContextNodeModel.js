@@ -8,7 +8,13 @@ define(['cilantro'], function (c) {
                 operator: 'exact',
                 value: 30
             });
+
             expect(model.isValid()).toBe(true);
+            expect(model.toJSON()).toEqual({
+                field: 1,
+                operator: 'exact',
+                value: 30
+            });
         });
 
         it('should validate as branch', function() {
@@ -17,14 +23,26 @@ define(['cilantro'], function (c) {
                 children: []
             });
 
-            expect(model.isValid({strict: false})).toBe(true);
+            expect(model.isValid()).toBe(true);
+            expect(model.toJSON()).toEqual({
+                type: 'and',
+                children: []
+            });
+            expect(model.toJSON({strict: true})).toEqual({
+                type: 'and',
+                children: []
+            });
         });
 
         it('should validate as composite', function() {
             var model = new c.models.ContextNodeModel({
                 composite: 1
             });
+
             expect(model.isValid()).toBe(true);
+            expect(model.toJSON()).toEqual({
+                composite: 1
+            });
         });
 
         it('should find itself', function() {
@@ -36,7 +54,6 @@ define(['cilantro'], function (c) {
 
             expect(model.find({field: 1})).toBe(model);
         });
-
     });
 
     describe('ConditionNodeModel', function() {
@@ -52,6 +69,11 @@ define(['cilantro'], function (c) {
 
         it('should validate', function() {
             expect(model.isValid()).toBe(true);
+        });
+
+        it('should not validate', function() {
+            model.unset('value');
+            expect(model.isValid()).toBe(false);
         });
     });
 
@@ -94,17 +116,17 @@ define(['cilantro'], function (c) {
         it('should convert descendants into nodes', function() {
             var c0 = model.children.at(0);
             var c1 = model.children.at(1);
-            var c1_0 = c1.children.at(0);
+            var g0 = c1.children.at(0);
             expect(c0 instanceof c.models.ConditionNodeModel).toBe(true);
             expect(c1 instanceof c.models.BranchNodeModel).toBe(true);
-            expect(c1_0 instanceof c.models.ConditionNodeModel).toBe(true);
+            expect(g0 instanceof c.models.ConditionNodeModel).toBe(true);
         });
 
         it('should validate', function() {
             expect(model.isValid()).toBe(true);
         });
 
-        it('should set and merge', function() {
+        it('should merge', function() {
             var attrs = {
                 type: 'and',
                 children: [{
@@ -152,76 +174,7 @@ define(['cilantro'], function (c) {
             expect(model.find({field: 3, concept: 3})).toBe(node);
         });
 
-        it('should clear and reset children', function() {
-            model.clear({reset: true})
-            expect(model.toJSON()).toEqual({
-                type: 'and',
-                children: []
-            })
-        });
-
-        it('should trigger change events', function() {
-            var model = new c.models.BranchNodeModel,
-                changed = 0,
-                added = 0,
-                removed = 0;
-
-            var attrs = {
-                type: 'and',
-                children: [{
-                    field: 1,
-                    concept: 1,
-                    value: 50,
-                    operator: 'gt'
-                }, {
-                    concept: 2,
-                    type: 'or',
-                    children: [{
-                        field: 2,
-                        concept: 2,
-                        value: [1, 3],
-                        operator: '-range'
-                    }]
-                }]
-            };
-
-            model.on('change', function() {
-                changed++;
-            });
-
-            model.children.on('add', function() {
-                added++;
-            });
-
-            model.children.on('remove', function() {
-                removed++;
-            });
-
-            model.set(attrs);
-
-            expect(changed).toBe(1);
-            expect(added).toBe(2);
-            expect(removed).toBe(0);
-
-            var newAttrs = {
-                type: 'and',
-                children: [{
-                    field: 1,
-                    concept: 1,
-                    value: 50,
-                    operator: 'gt'
-                }]
-            };
-
-            model.set(newAttrs);
-
-            expect(changed).toBe(2);
-            expect(added).toBe(2);
-            expect(removed).toBe(1);
-        });
-
         describe('children collection', function() {
-
             it('should add', function() {
                 model.children.add(node);
                 expect(model.children.length).toBe(3);
@@ -246,6 +199,63 @@ define(['cilantro'], function (c) {
                 expect(function() {
                     model.children.add(model);
                 }).toThrow();
+            });
+        });
+
+        describe('define', function() {
+            var root;
+
+            beforeEach(function() {
+                root = new c.models.BranchNodeModel;
+            });
+
+            it('branch node', function() {
+                var b = root.define({concept: 1}, {type: 'branch'});
+
+                expect(b.path()).toEqual([]);
+
+                expect(root.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        type: 'and',
+                        children: []
+                    }]
+                });
+
+                var c = b.define({
+                    concept: 1,
+                    field: 5,
+                    operator: 'gt',
+                    value: 20
+                }, {type: 'condition'});
+
+                expect(c.path()).toEqual([{concept: 1}]);
+
+                expect(root.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        type: 'and',
+                        children: [{
+                            concept: 1,
+                            field: 5,
+                            operator: 'gt',
+                            value: 20
+                        }]
+                    }]
+                });
+            });
+
+            it('condition node', function() {
+                root.define({concept: 1, field: 5}, {type: 'condition'});
+                expect(root.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        field: 5
+                    }]
+                });
             });
         });
     });

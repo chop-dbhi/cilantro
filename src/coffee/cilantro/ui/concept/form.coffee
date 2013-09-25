@@ -46,12 +46,11 @@ define [
             fields: '.fields-region'
 
         contextEvents:
-            'apply': 'renderApplied'
-            'remove': 'renderNew'
-            'change': 'renderChange'
-            'child:change': 'renderChange'
-            'invalid': 'renderInvalid'
-            'child:invalid': 'renderInvalid'
+            apply: 'renderApplied'
+            remove: 'renderNew'
+            clear: 'renderNew'
+            change: 'renderChange'
+            invalid: 'renderInvalid'
 
         delegateEvents: (events) ->
             super
@@ -97,7 +96,7 @@ define [
             @ui.update.prop('disabled', not enabled)
 
         renderChange: ->
-            if @context.isNew(deep: true)
+            if @context.isNew()
                 @renderNew()
             else
                 @renderApplied()
@@ -108,7 +107,7 @@ define [
             message = "<strong>Uh oh.</strong> Cannot apply filter: #{ error }"
 
             # Add the ability to revert the context
-            if not @context.isNew(deep: true)
+            if not @context.isNew()
                 message += ' <a class=revert href=#>Revert</a>'
 
             @_renderFooter(message, className, false)
@@ -118,7 +117,7 @@ define [
             @ui.update.show()
             @ui.remove.show()
 
-            if (enabled = @context.isDirty(deep: true))
+            if (enabled = @context.isDirty())
                 className = 'alert-warning'
                 message = '<strong>Heads up!</strong> The filter has been changed. <a class=revert href=#>Revert</a>'
             @_renderFooter(message, className, enabled)
@@ -133,7 +132,7 @@ define [
         # synced with the server.
         applyFilter: (event) ->
             event?.preventDefault()
-            @context.apply()
+            @context.apply({strict: true})
 
         # Remove the filter
         removeFilter: (event) ->

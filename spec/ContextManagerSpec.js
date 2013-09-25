@@ -14,91 +14,66 @@ define(['cilantro'], function (c) {
             it('branch node', function() {
                 var node = manager.define({concept: 1}, {type: 'branch'});
 
-                // Default states (for branch)
+                // Default states
                 expect(node.isDirty()).toBe(false);
                 expect(node.isNew()).toBe(true);
-                expect(node.isRemoved()).toBe(false);
                 expect(node.isValid()).toBe(true);
-                expect(node.isEnabled()).toBe(true);
+                expect(node.isEnabled()).toBe(false);
             });
 
             it('condition node', function() {
                 var node = manager.define({concept: 1, field: 5}, {type: 'condition'});
 
-                // Default states (for condition)
-                expect(node.isDirty()).toBe(true);
+                // Default states
+                expect(node.isDirty()).toBe(false);
                 expect(node.isNew()).toBe(true);
-                expect(node.isRemoved()).toBe(false);
                 expect(node.isValid()).toBe(false);
-                expect(node.isEnabled()).toBe(true);
-            });
-
-            it('nodes in nested branch', function() {
-                // top level
-                var branch = manager.define({concept: 1}, {type: 'branch'});
-
-                var node = branch.define({concept: 1, field: 5}, {type: 'condition'});
-
-                // Ensure the working tree serializes
-                expect(manager.find({concept: 1, field: 5})).toBe(node);
-            });
-
-            it('ignore redefinition of nodes', function() {
-                manager.define({concept: 1}, {type: 'branch'});
-                var node1 = manager.find({concept: 1});
-
-                manager.define({concept: 1}, {type: 'branch'});
-                var node2 = manager.find({concept: 1});
-
-                expect(node1).toBe(node2);
-            });
-        });
-
-        describe('Remove', function() {
-            it('remove a node', function() {
-                manager.remove();
-                expect(manager.working.isRemoved()).toEqual(true);
-            });
-        });
-
-        describe('Node Events', function() {
-            var node;
-            beforeEach(function() {
-                node = manager.define({concept: 1}, {type: 'branch'});
-            });
-
-            it('should bind when defined', function() {
-                expect(manager._listeners[node._listenerId]).toBeDefined();
-            });
-
-            it('should proxy events via the nodeEventPrefix', function() {
-                var triggered = false;
-
-                manager.on('node:change', function(_node, options) {
-                    triggered = true;
-                    expect(node).toBe(_node);
-                    expect(options).toEqual({test: 1});
-                });
-
-                node.set('type', 'or', {test: 1});
-                expect(triggered).toBe(true);
+                expect(node.isEnabled()).toBe(false);
             });
         });
 
         describe('Serialization', function() {
-            it('ignore dirty nodes', function() {
-                var branch = manager.define({concept: 1}, {type: 'branch'});
-                branch.define({concept: 1, field: 5});
+            it('should serialize an empty upstream', function() {
+                expect(manager.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
+                });
+            });
+        });
 
-                // Empty branches are recursively ignored
-                expect(manager.toJSON()).toEqual(null);
+        describe('Apply', function() {
+            var b;
+            beforeEach(function() {
+                b = manager.define({concept: 1}, {type: 'branch'});
+            });
 
-                // Set a valid node, apply it
-                var node = manager.find({concept: 1, field: 5});
-                node.set({operator: 'exact', value: 50});
-                node.apply();
+            it('initial', function() {
+                expect(manager.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
+                });
+            });
 
-                // no longer dirty
+            it('apply branch', function() {
+                b.apply();
+
+                // no change since an empty branch is not valid
+                expect(manager.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
+                });
+            });
+
+            it('nested condition', function() {
+                var c = b.define({
+                    concept: 1,
+                    field: 5,
+                    operator: 'in',
+                    value: [1, 2]
+                }, {type: 'condition'});
+
+                c.apply();
+
                 expect(manager.toJSON()).toEqual({
                     type: 'and',
                     children: [{
@@ -107,19 +82,65 @@ define(['cilantro'], function (c) {
                         children: [{
                             concept: 1,
                             field: 5,
-                            operator: 'exact',
-                            value: 50
+                            operator: 'in',
+                            value: [1, 2]
+                        }]
+                    }]
+                });
+
+                c.set('value', [3, 4]);
+
+                c.apply();
+
+                expect(manager.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        type: 'and',
+                        children: [{
+                            concept: 1,
+                            field: 5,
+                            operator: 'in',
+                            value: [3, 4]
                         }]
                     }]
                 });
             });
         });
 
-        describe('Update', function() {
+        describe('Apply Session', function() {
 
-            it('update the tree (simple)', function() {
+            it('upstream should be empty', function() {
+                expect(manager.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
+                });
 
-                manager.update({
+                var b = manager.working.define({concept: 1}, {type: 'branch'});
+
+                expect(manager.working.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        type: 'and',
+                        children: []
+                    }]
+                });
+
+                b.apply();
+
+                expect(manager.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
+                });
+
+            });
+
+        });
+
+        describe('Set', function() {
+            it('simple', function() {
+                manager.set({
                     type: 'or',
                     children: []
                 });
@@ -130,15 +151,25 @@ define(['cilantro'], function (c) {
                 });
             });
 
-            it('update the tree', function() {
-                manager.define({concept: 1}, {type: 'branch'});
-                manager.define({concept: 2}, {type: 'branch'});
-                manager.define({concept: 1, field: 1, value: 50, operator: 'gt'},
-                    [{concept: 1}], {type: 'condition'});
-                manager.define({concept: 2, field: 2, value: [1, 2], operator: 'in'},
-                    [{concept: 2}], {type: 'condition'});
+            it('complex', function() {
+                var b1 = manager.define({concept: 1}, {type: 'branch'}),
+                    b2 = manager.define({concept: 2}, {type: 'branch'});
 
-                // pre-update working tree
+                b1.define({
+                    concept: 1,
+                    field: 1,
+                    value: 50,
+                    operator: 'gt'
+                }, {type: 'condition'});
+
+                b2.define({
+                    concept: 2,
+                    field: 2,
+                    value: [1, 2],
+                    operator: 'in'
+                }, {type: 'condition'});
+
+                // pre-set working tree
                 expect(manager.working.toJSON()).toEqual({
                     type: 'and',
                     children: [{
@@ -162,14 +193,14 @@ define(['cilantro'], function (c) {
                     }]
                 });
 
-                // pre-update upstream tree
+                // pre-set upstream tree
                 expect(manager.upstream.toJSON()).toEqual({
                     type: 'and',
                     children: []
                 });
 
-                // update
-                manager.update({
+                // set
+                manager.set({
                     type: 'and',
                     children: [{
                         concept: 1,
@@ -188,7 +219,7 @@ define(['cilantro'], function (c) {
                     }]
                 });
 
-                // post-update working tree
+                // post-set working tree
                 expect(manager.working.toJSON()).toEqual({
                     type: 'and',
                     children: [{
@@ -213,7 +244,7 @@ define(['cilantro'], function (c) {
                     }]
                 });
 
-                // post-update upstream tree
+                // post-set upstream tree
                 expect(manager.upstream.toJSON()).toEqual({
                     type: 'and',
                     children: [{
@@ -231,6 +262,39 @@ define(['cilantro'], function (c) {
                         type: 'and',
                         children: []
                     }]
+                });
+
+                manager.set(null);
+
+                // post-set working tree
+                expect(manager.working.toJSON()).toEqual({
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        type: 'and',
+                        children: [{
+                            concept: 1,
+                            field: 1,
+                            operator: 'gt',
+                            value: 50,
+                            warnings: ['out of bounds']
+                        }]
+                    }, {
+                        concept: 2,
+                        type: 'and',
+                        children: [{
+                            concept: 2,
+                            field: 2,
+                            operator: 'in',
+                            value: [1, 2]
+                        }]
+                    }]
+                });
+
+                // post-set upstream tree
+                expect(manager.upstream.toJSON()).toEqual({
+                    type: 'and',
+                    children: []
                 });
             });
 

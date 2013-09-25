@@ -1,5 +1,6 @@
 define [
     '../core'
+    './notify'
     'bootstrap'
     'plugins/bootstrap-datepicker'
     'plugins/jquery-ui'
@@ -9,6 +10,17 @@ define [
     'plugins/jquery-stacked'
     'plugins/typeahead'
     'plugins/typeselect'
-], (c) ->
+], (c, notify) ->
+
+    # Initialize notification stream and append it to the main element
+    stream = new notify.Notifications
+        id: 'notifications'
+
+    $(c.config.get('ui.main'))
+        .css('position', 'relative')
+        .append(stream.render().el)
+
+    # Attach primary method for creating notifications
+    c.notify = stream.notify
 
     return c
