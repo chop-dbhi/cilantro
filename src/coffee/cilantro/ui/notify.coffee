@@ -88,6 +88,9 @@ define [
             super(options)
 
         notify: (attrs) =>
+            # Handle shorthand notation with only a message
+            if typeof attrs is 'string'
+                attrs = message: attrs
             model = new NotificationModel(attrs)
             @collection.add(model)
             @children.findByModel(model)
