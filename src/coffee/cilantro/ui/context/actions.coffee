@@ -12,25 +12,16 @@ define [
     class ContextActions extends Marionette.ItemView
         template: templates.actions
 
-        ui:
-            count: '.count'
-
         events:
             'click [data-role=remove]': 'clickRemoveAll'
 
         modelEvents:
-            'change:count': 'renderCount'
+            'change': 'render'
 
         serializeData: ->
-            attrs = {}
-            if @model?
-                attrs = _.clone(@model.attributes)
-                delete attrs.json
-                attrs.count = c.utils.prettyNumber(attrs.count)
+            attrs = _.clone(@model.attributes)
+            attrs.pretty_count = c.utils.prettyNumber(attrs.count)
             return attrs
-
-        renderCount: (model, value, options) ->
-            @ui.count.html(c.utils.prettyNumber(value))
 
         clickRemoveAll: ->
             @model.manager.clear()

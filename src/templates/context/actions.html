@@ -4,15 +4,16 @@
 
 <div class=count-label>
     <% if (data.count == null) { %>
-        <em>N/A</em>
+        <span class=count>All</span>
     <% } else { %>
-        <span class=count><%= data.count %></span>
-
+        <span class=count title="<%= data.count %>"><%= data.pretty_count %></span>
+    <% } %>
+    <span class=units>
         <% if (data.count == 1) { %>
             <%= data.object_name %>
         <% } else { %>
             <%= data.object_name_plural %>
         <% } %>
-    <% } %>
+    </span>
     <i class="icon-spinner icon-spin hide"></i>
 </div>
