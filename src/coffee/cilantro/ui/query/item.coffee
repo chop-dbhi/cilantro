@@ -36,10 +36,7 @@ define [
             (context = c.data.contexts.getSession()).set('json', @model.get('context_json'), reset: true)
             (view = c.data.views.getSession()).set('json', @model.get('view_json'))
 
-            d1 = context.save(null, silent: true)
-            d2 = view.save(null, silent: true)
-
-            $.when(d1, d2).done ->
+            $.when(context.save(null, silent: true), view.save(null, silent: true)).done ->
                 c.publish(c.CONTEXT_SYNCED, context, 'success')
                 c.publish(c.VIEW_SYNCED, view, 'success')
 
