@@ -33,8 +33,9 @@ define [
             @on 'request', ->
                 c.publish c.VIEW_SYNCING, @
 
-            @on 'sync', ->
-                c.publish c.VIEW_SYNCED, @, 'success'
+            @on 'sync', (model, attrs, options={}) ->
+                if options.silent isnt true
+                    c.publish c.VIEW_SYNCED, @, 'success'
 
             @on 'error', ->
                 c.publish c.VIEW_SYNCED, @, 'error'

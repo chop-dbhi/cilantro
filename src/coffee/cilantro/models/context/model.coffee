@@ -42,8 +42,12 @@ define [
             @listenTo @manager, 'all', (manager, event, args...) =>
                 @trigger("#{ @managerEventPrefix }:#{ event }", args...)
 
-            @on 'sync', ->
-                c.publish c.CONTEXT_SYNCED, @, 'success'
+            @on 'sync', (model, attrs, options={}) ->
+                if options.silent isnt true
+                    c.publish c.CONTEXT_SYNCED, @, 'success'
+
+            @on 'change:json', (model, value, options) ->
+                @manager.set(value, options)
 
 
         toJSON: (options={}) ->
