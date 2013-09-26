@@ -100,6 +100,8 @@ define [
             # Flag indicating the current visibility of the context panel
             @areFiltersHidden = false
 
+            @on 'router:load', @showContextPanel
+
         onWindowResize: =>
             @updateContextPanelOffsets()
 
@@ -140,6 +142,7 @@ define [
             @ui.toggleFiltersIcon.removeClass('icon-collapse-alt')
             @ui.toggleFiltersIcon.addClass('icon-expand-alt')
             @ui.toggleFiltersText.html('Hide Filters...')
+            @updateContextPanelOffsets()
             @$('.context').stacked('restack', @$el.height())
 
         hideContextPanel: =>
