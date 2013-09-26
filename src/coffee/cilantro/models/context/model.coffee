@@ -45,6 +45,9 @@ define [
             @on 'sync', ->
                 c.publish c.CONTEXT_SYNCED, @, 'success'
 
+            @on 'change:json', (model, value, options) ->
+                @manager.set(value, options)
+
 
         toJSON: (options={}) ->
             attrs = super
