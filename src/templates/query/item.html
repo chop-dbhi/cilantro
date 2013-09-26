@@ -1,0 +1,15 @@
+<span class='name-label span6'>
+    <a class='shared-query-name' href="#"><%= data.name %></a>
+</span>
+<span class='owner span2'>
+    <button data-toggle=query-modal class='edit-query btn btn-mini'><i class=icon-edit></i> Edit</button>
+</span>
+<span class='owner span2'>
+    <button class='delete-query btn btn-mini'><i class=icon-trash></i> Delete</button>
+</span>
+<span class='owner span2'>
+    <i class='icon-group share-count'> (<%= data.shared_users.length %>) </i>
+</span>
+<span class='non-owner span5'>
+    shared with you by <em><%= data.user.username %></em>
+</span>

@@ -43,9 +43,6 @@ define [
             # Set trees with initial model json and any time a successful sync occurs
             @set(@model.get('json'))
 
-            @model.on 'sync', (model, resp, options) =>
-                @set(resp.json)
-
         # Serializes the upstream tree which represents a clean and valid
         # representation of the tree.
         toJSON: (options) ->
@@ -62,7 +59,11 @@ define [
                 node.set(attrs, options)
 
         # Updates the working and upstream trees with the server's response
-        set: (attrs) ->
+        set: (attrs, options={}) ->
+            if options.reset
+                @upstream.clear(reset: true)
+                @working.clear()
+
             if not attrs?
                 return @clear()
 

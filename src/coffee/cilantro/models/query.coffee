@@ -4,6 +4,13 @@ define [
 ], (c, base) ->
 
     class QueryModel extends base.Model
+        parse: (attrs) ->
+            super
+
+            if attrs? and not attrs.shared_users?
+                attrs.shared_users = []
+
+            return attrs
 
     class QueryCollection extends base.Collection
         model: QueryModel
@@ -20,5 +27,12 @@ define [
     class SharedQueryCollection extends QueryCollection
         url: ->
             c.session.url('shared_queries')
+
+        initialize: ->
+            super
+
+            @on 'reset', ->
+                c.promiser.resolve('shared_queries')
+
 
     { QueryModel, QueryCollection, SharedQueryCollection }
