@@ -39,11 +39,15 @@
     .table-region {
         margin-top: 20px;
         overflow-x: scroll;
-
+        
         thead th {
             cursor: pointer;
             min-height: 100px;
-
+            display:block;
+            width: 0%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             &:hover {
                 background-color: #eee;
             }
