@@ -2,8 +2,9 @@ define [
     'underscore'
     'marionette'
     '../base'
+    '../core'
     'tpl!templates/query/item.html'
-], (_, Marionette, base, templates...) ->
+], (_, Marionette, base, c, templates...) ->
 
     templates = _.object ['item'], templates
 
@@ -25,10 +26,24 @@ define [
         events:
             'click .delete-query': 'deleteQuery'
             'click [data-toggle=query-modal]': 'showQueryModal'
+            'click .shared-query-name': 'openQuery'
 
         initialize: ->
             @model.on 'sync', =>
                 @render()
+
+        openQuery: =>
+            (context = c.data.contexts.getSession()).set('json', @model.get('context_json'), reset: true)
+            (view = c.data.views.getSession()).set('json', @model.get('view_json'))
+
+            d1 = context.save(null, silent: true)
+            d2 = view.save(null, silent: true)
+
+            $.when(d1, d2).done ->
+                c.publish(c.CONTEXT_SYNCED, context, 'success')
+                c.publish(c.VIEW_SYNCED, view, 'success')
+
+            c.router.navigate('results/', trigger: true)
 
         showQueryModal: ->
             @trigger('showQueryModal', @model)
