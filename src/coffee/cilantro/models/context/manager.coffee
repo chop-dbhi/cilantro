@@ -59,7 +59,11 @@ define [
                 node.set(attrs, options)
 
         # Updates the working and upstream trees with the server's response
-        set: (attrs) ->
+        set: (attrs, options={}) ->
+            if options.reset
+                @upstream.clear(reset: true)
+                @working.clear()
+
             if not attrs?
                 return @clear()
 
