@@ -101,7 +101,7 @@ define [
         # Returns true if the route config is registered with this router and
         # is navigable.
         isNavigable: (id) ->
-            (config = @get(id))? and config.navigable
+            (config = @get(id))? and config.navigable isnt false
 
         # Checks if the current fragment or id is currently routed
         isCurrent: (fragment) ->
@@ -121,8 +121,8 @@ define [
         # the route specified on the config. This provides a means of
         # aliasing a name/key to a particular route.
         navigate: (fragment, options) ->
-            if (config = @get(fragment))? and config.navigable
-                fragment = config.route
+            if @isNavigable(fragment)
+                fragment = @get(fragment).route
             super(fragment, options)
 
         # Register one or more routes
