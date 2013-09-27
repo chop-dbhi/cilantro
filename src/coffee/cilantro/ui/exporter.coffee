@@ -62,10 +62,11 @@ define [
         render: ->
             success = "<span class='label label-success hide'>Done</span>"
             error = "<span class='label label-important hide'>Error</span>"
+            timeout = "<span class='label label-warning label-timeout hide'>Request Timed Out</span>"
             loading = "<div class='progress progress-striped active hide'><div class='bar' style='width: 100%;'></div></div>"
             pending = "<div class=pending-container><span class=pending-spinner></span> Pending...</div>"
 
-            @$el.html("<div class=span2>#{ getTitle(@model) }:</div><div class=span10>#{ success }#{ error }#{ loading }#{ pending }</div>")
+            @$el.html("<div class=span2>#{ getTitle(@model) }:</div><div class=span10>#{ success }#{ error }#{ timeout }#{ loading }#{ pending }</div>")
 
 
     class ExportTypeCollection extends Marionette.CollectionView
