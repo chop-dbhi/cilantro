@@ -18,15 +18,14 @@ define [
 
         template: templates.list
 
-        initialize: (options) ->
-            @queryModal = options.queryModal
+        initialize: ->
+            @queryModalRegion = @options.queryModalRegion
 
             @on 'itemview:showQueryModal', (options) ->
-                @queryModal.currentView.open(options.model)
+                @queryModalRegion.currentView.open(options.model)
 
-            @queryModal.show new dialog.QueryDialog
+            @queryModalRegion.show new dialog.QueryDialog
                 header: 'Edit Query'
-                collection: c.data.queries
-
+                collection: @collection
 
     { QueryList }

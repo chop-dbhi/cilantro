@@ -9,7 +9,6 @@ define [
 
     templates = _.object ['workspace'], templates
 
-
     class WorkspaceWorkflow extends Marionette.Layout
         className: 'workspace-workflow'
 
@@ -19,14 +18,17 @@ define [
             queries: '.query-region'
             queryModal: '.create-query-modal'
 
+        regionViews:
+            queries: query.QueryList
+
+        initialize: ->
+            @data = {}
+            if (@data.queries = @options.queries)
+                throw new Error 'queries collection required'
+
         onRender: ->
-            @queries.show new base.LoadView
-                message: 'Loading queries...'
-
-            c.promiser.when 'shared_queries', =>
-                @queries.show new query.QueryList
-                    collection: c.data.shared_queries
-                    queryModal: @queryModal
-
+            @queries.show new @regionViews.queries
+                collection: @data.queries
+                queryModalRegion: @queryModal
 
     { WorkspaceWorkflow }

@@ -7,15 +7,11 @@ define [
 
 
     class Facet extends Backbone.Model
+        idAttribute: 'concept'
 
 
     class Facets extends Backbone.Collection
         model: Facet
-
-        get: (obj) ->
-            if not (model = super(obj)) and obj.concept?
-                model = @findWhere concept: obj.concept
-            return model
 
 
     class ViewModel extends base.Model

@@ -28,27 +28,30 @@ define [
         template: templates.query
 
         regions:
+            context: '.context-panel-region'
             concepts: '.concept-panel-region'
             workspace: '.concept-workspace-region'
-            context: '.context-panel-region'
 
-        initialize: (options) ->
-            if not (@context = options.context)
+        initialize: ->
+            @data = {}
+            if not (@data.context = @options.context)
                 throw new Error 'context model required'
-            if not (@concepts = options.concepts)
+            if not (@data.concepts = @options.concepts)
                 throw new Error 'concept collection required'
 
         onRender: ->
             @workspace.show new concept.ConceptWorkspace
+                context: @data.context
+                concepts: @data.concepts
 
             @concepts.show new concept.ConceptPanel
-                collection: @concepts
+                collection: @data.concepts
 
             @concepts.currentView.$el.stacked
                 fluid: '.index-region'
 
             @context.show new context.ContextPanel
-                model: @context
+                model: @data.context
 
             @context.currentView.$el.stacked
                 fluid: '.tree-region'

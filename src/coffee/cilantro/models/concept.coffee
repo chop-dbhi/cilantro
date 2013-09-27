@@ -59,7 +59,6 @@ define [
                     !!m.get('queryable') or !!m.get('queryview')
                 @viewable.reset @filter (m) ->
                     !!m.get('viewable') or !!m.get('formatter_name')
-                c.promiser.resolve('concepts')
 
 
     { ConceptModel, ConceptCollection }
