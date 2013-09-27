@@ -1,5 +1,6 @@
 table thead th {
     border-left: 1px solid #ddd;
+    max-width: 200px;
 
     &:first-child {
         border-left: 0;
@@ -8,11 +9,15 @@ table thead th {
     span {
         position: relative;
         display: block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        padding-right: 20px;
 
         // If an icon is present, it is typically denoting the sort order
         i {
             position: absolute;
-            right: 5px;
+            right: 0;
             top: 50%;
 
             // Only about 6/13px are visible, margin is used to offset
