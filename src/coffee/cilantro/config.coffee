@@ -27,17 +27,14 @@ define [
         # An array of the default routes that are registered on load.
         routes: null
 
-        # A selector that represents the target element views will be
-        # rendered in.
-        ui:
-            main: '#cilantro-main'
-
         # Default json for initial context and view
         defaults:
 
             context: null
 
             view: null
+        # The selector of the target element views will be rendered in
+        main: '#cilantro-main'
 
         # Custom modules corresponding to concepts
         concepts:

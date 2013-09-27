@@ -6,7 +6,7 @@ define [
 
     class Router extends Backbone.Router
         options:
-            el: 'body'
+            main: 'body'
             root: null
 
         initialize: (options) ->
@@ -63,9 +63,9 @@ define [
                 view._rendered = true
                 if options.el isnt false
                     if options.el?
-                        target = Backbone.$(options.el, @options.el)
+                        target = Backbone.$(options.el, @options.main)
                     else
-                        target = Backbone.$(@options.el)
+                        target = Backbone.$(@options.main)
                     target.append(view.el)
                     view.render?()
 
