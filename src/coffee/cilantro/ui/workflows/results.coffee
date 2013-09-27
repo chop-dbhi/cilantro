@@ -43,10 +43,10 @@ define [
 
         template: templates.results
 
-        requestDelay: 2500      # In milliseconds
-        requestTimeout: 10000   # Max time(ms) for unmonitored exports
-        monitorDelay: 500       # In milliseconds
-        monitorTimeout: 60000   # Max time(ms) to monitor exports
+        requestDelay: 2500       # In milliseconds
+        requestTimeout: 60000    # Max time(ms) for unmonitored exports, 1 minute
+        monitorDelay: 500        # In milliseconds
+        monitorTimeout: 600000   # Max time(ms) to monitor exports, 10 minutes
         numPendingDownloads: 0
         pageRangePattern: /^[0-9]+(\.\.\.[0-9]+)?$/
 
@@ -207,6 +207,8 @@ define [
                     statusContainer.find('.label-important').show()
                 when "success"
                     statusContainer.find('.label-success').show()
+                when "timeout"
+                    statusContainer.find('.label-timeout').show()
 
         onExportFinished: (exportTypeTitle) =>
             @numPendingDownloads = @numPendingDownloads - 1
@@ -214,6 +216,8 @@ define [
 
             if @hasExportErrorOccurred(exportTypeTitle)
                 @changeExportStatus(exportTypeTitle, "error")
+            else if @monitors[exportTypeTitle]["execution_time"] > @monitorTimeout
+                @changeExportStatus(exportTypeTitle, "timeout")
             else
                 @changeExportStatus(exportTypeTitle, "success")
 
