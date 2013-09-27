@@ -34,7 +34,7 @@ define [
         # Returns the current session's Serrano version. If there is no
         # active session or version defined, the absolute minimum is returned.
         getSerranoVersion: ->
-            version = @session.current?.data.version
+            version = @sessions.active?.data.version
             return @utils.cleanVersionString(version)
 
         # Returns a boolean as to whether the current Serrano version is

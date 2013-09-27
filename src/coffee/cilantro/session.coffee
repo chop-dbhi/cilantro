@@ -5,7 +5,8 @@ define [
     './models'
     './utils'
     './router'
-], ($, _, Backbone, models, utils, router) ->
+    './core'
+], ($, _, Backbone, models, utils, router, c) ->
 
     events =
         SESSION_OPENING: 'session:opening'
@@ -21,22 +22,24 @@ define [
         fields: models.FieldCollection
         contexts: models.ContextCollection
         views: models.ViewCollection
-        results: models.Results
-        exporters: models.ExporterCollection
+        preview: models.Results
+        exporter: models.ExporterCollection
         queries: models.QueryCollection
         sharedQueries: models.QueryCollection
 
 
-    # A session opens a connection with a Serrano-compatible API endpoint and
-    # uses the response to drive the application state. All the necessary data,
-    # views, router and other state that is specific to a particular endpoint
-    # is stored here. The lifecycle of a session involves:
-    #
-    #   - validating the options
-    #   - requesting the root endpoint of API (with optional authentication)
-    #   - initializing the collections supported by the API
-    #   - fetching the collection data in the background
-    #   - initializing a router and registering top-level routes and views
+    ###
+    A session opens a connection with a Serrano-compatible API endpoint and
+    uses the response to drive the application state. All the necessary data,
+    views, router and other state that is specific to a particular endpoint
+    is stored here. The lifecycle of a session involves:
+
+        - validating the options
+        - requesting the root endpoint of API (with optional authentication)
+        - initializing the collections supported by the API
+        - fetching the collection data in the background
+        - initializing a router and registering top-level routes and views
+    ###
     class Session extends models.Model
         idAttribute: 'url'
 
@@ -65,20 +68,21 @@ define [
                     collection.url = link.href
                     @data[name] = collection
 
-            # Define the primary router with the main element and app root
+            # Define router with the main element and app root based on
+            # the global configuration
             @router = new router.Router
-                main: @get('main')
-                root: @get('root')
+                main: c.config.get('main')
+                root: c.config.get('root')
 
             # Register pre-defined routes
             if (routes = @get('routes'))?
                 # String indicates external module, load and register
                 if typeof routes is 'string'
-                    require([routes], (routes) => @register(routes))
+                    require([routes], (routes) => @router.register(routes))
                 else
                     if typeof routes is 'function'
                         routes = routes()
-                    @register(routes)
+                    @router.register(routes)
 
             return attrs
 
@@ -136,7 +140,7 @@ define [
             delete @data
 
         # Starts/enables the session.
-        start: ->
+        start: (routes) ->
             # Already started, return false denoting the start was not successful
             if @started then return false
 
@@ -147,7 +151,9 @@ define [
 
             # Fetch collection data
             for key, collection of @data
-                collection.fetch()
+                collection.fetch(reset: true)
+
+            if routes? then @router.register(routes)
 
             # Start the router history
             @router.start()
@@ -155,6 +161,7 @@ define [
         # Ends/disables the session.
         end: ->
             @started = false
+            @router.unregister()
 
 
     # Keeps track of sessions as they are created and switched between.
@@ -170,7 +177,6 @@ define [
             @close()
             # Set session as active and start it
             @active = session
-            @active.start()
             @trigger(events.SESSION_OPENED, session)
 
         # Opens a session. Takes an object of options that are passed into
@@ -229,4 +235,4 @@ define [
         _.extend(SessionManager::, Backbone.Events)
 
 
-    { SessionManager, Session, events }
+    _.extend { SessionManager, Session }, events
