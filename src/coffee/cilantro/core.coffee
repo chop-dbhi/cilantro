@@ -1,5 +1,6 @@
 define [
     'underscore'
+    'backbone'
     'promiser'
     './logger'
     './config'
@@ -12,7 +13,7 @@ define [
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
-], (_, promiser, loglevel, config, channels, utils, changelog) ->
+], (_, Backbone, promiser, logger, config, channels, utils, changelog) ->
 
     c =
         # Version of cilantro
