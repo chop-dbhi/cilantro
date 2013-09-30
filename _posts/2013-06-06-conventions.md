@@ -1,9 +1,11 @@
 ---
 layout: page
-title: "Patterns"
-category: ref
+title: "Conventions"
+category: dev
 date: 2013-06-06 16:36:26
+order: 0
 ---
+The Cilantro codebase follows a set of conventions for ensuring consistency across implementations of views and models.
 
 ## Module Headers
 
