@@ -37,8 +37,8 @@ define [
             (view = c.data.views.getSession()).set('json', @model.get('view_json'))
 
             $.when(context.save(null, silent: true), view.save(null, silent: true)).done ->
-                c.publish(c.CONTEXT_SYNCED, context, 'success')
-                c.publish(c.VIEW_SYNCED, view, 'success')
+                c.trigger(c.CONTEXT_SYNCED, context, 'success')
+                c.trigger(c.VIEW_SYNCED, view, 'success')
 
             c.router.navigate('results/', trigger: true)
 

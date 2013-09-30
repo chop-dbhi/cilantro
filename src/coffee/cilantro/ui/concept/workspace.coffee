@@ -75,7 +75,7 @@ define [
             if @options.emptyView?
                 @emptyView = @options.emptyView
 
-            c.subscribe c.CONCEPT_FOCUS, @showItem
+            c.on c.CONCEPT_FOCUS, @showItem
 
         showItem: (model) =>
             @ui.mainTab.tab('show')

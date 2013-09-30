@@ -91,7 +91,7 @@ define [
 
             @monitors = {}
 
-            c.subscribe c.SESSION_OPENED, ->
+            c.on c.SESSION_OPENED, ->
                 if not c.isSupported()
                     $('.serrano-version-warning').show()
 
@@ -466,7 +466,7 @@ define [
 
         saveColumns: ->
             c.data.views.getSession().facets = @columns.currentView.facets.clone()
-            c.publish c.VIEW_SAVE
+            c.trigger c.VIEW_SAVE
             @ui.columns.modal('hide')
 
 

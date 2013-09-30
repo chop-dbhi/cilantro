@@ -1,12 +1,10 @@
 define [
     'underscore'
-    'mediator'
     'promiser'
     './logger'
     './config'
     './channels'
     './utils'
-    './session'
     './changelog'
     './setup'
 
@@ -14,7 +12,7 @@ define [
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
-], (_, mediator, promiser, loglevel, config, channels, utils, session, changelog) ->
+], (_, promiser, loglevel, config, channels, utils, changelog) ->
 
     c =
         # Version of cilantro
@@ -28,8 +26,6 @@ define [
         minSerranoVersion: '2.0.18'
         maxSerranoVersion: '2.1.0'
 
-        # Initialize the session manager and default configuration
-        session: new session.SessionManager
         config: new config.Config(@cilantro)
 
         # Attach commonly used utilities and promiser object
@@ -64,8 +60,5 @@ define [
     if c.config.get('debug')
         logger.setLevel('debug')
 
-    # Mediator channel topics for communication across the application
-    channels = _.extend {}, channels, session.channels
-
-    # Mixin various components
-    _.extend c, mediator, channels
+    # Given the cilantro object events!
+    _.extend c, Backbone.Events, channels

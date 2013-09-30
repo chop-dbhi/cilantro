@@ -1,8 +1,8 @@
 define [
     'jquery',
-    'mediator'
+    './core'
     './utils'
-], ($, mediator, utils) ->
+], ($, c, utils) ->
 
     channels =
         SESSION_OPENING: 'session.opening'
@@ -103,7 +103,7 @@ define [
             if @current isnt session
                 @close()
                 @current = session
-            mediator.publish(channels.SESSION_OPENED, session.name)
+            c.trigger(channels.SESSION_OPENED, session.name)
 
         # Opens a session. A name can be supplied for referencing the session
         # rather than by URL. The session will be initialized and registered
@@ -126,7 +126,7 @@ define [
             if not @current then @current = session
 
             # Publish the session is opening by the name supplied
-            mediator.publish channels.SESSION_OPENING, name
+            c.trigger channels.SESSION_OPENING, name
 
             # Open returns a deferred object. If the opened session is *still*
             # the pending session, activate it. This could not be true if the
@@ -146,14 +146,14 @@ define [
                                 channels.SESSION_UNAUTHORIZED
                             else
                                 channels.SESSION_ERROR
-                        mediator.publish(channel, name, error)
+                        c.trigger(channel, name, error)
 
         # Closes the current sessions and publishes a message
         close: ->
             if (session = @current)?
                 delete @current
                 session.close()
-                mediator.publish channels.SESSION_CLOSED, session.name
+                c.trigger channels.SESSION_CLOSED, session.name
 
         # Closes the current session and clears all sessions
         clear: ->

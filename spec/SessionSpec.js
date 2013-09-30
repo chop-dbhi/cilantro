@@ -3,15 +3,15 @@ define(['cilantro'], function(c) {
     describe('Sessions', function() {
         var events = [];
 
-        c.subscribe(c.SESSION_OPENING, function() {
+        c.on(c.SESSION_OPENING, function() {
             events.push(c.SESSION_OPENING);
         });
 
-        c.subscribe(c.SESSION_OPENED, function() {
+        c.on(c.SESSION_OPENED, function() {
             events.push(c.SESSION_OPENED);
         });
 
-        c.subscribe(c.SESSION_CLOSED, function() {
+        c.on(c.SESSION_CLOSED, function() {
             events.push(c.SESSION_CLOSED);
         });
 

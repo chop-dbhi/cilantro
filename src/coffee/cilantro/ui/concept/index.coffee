@@ -11,11 +11,11 @@ define [
             'click a': 'click'
 
         initialize: ->
-            c.subscribe c.CONCEPT_FOCUS, @toggleFocus
+            c.on c.CONCEPT_FOCUS, @toggleFocus
 
         click: (event) ->
             event.preventDefault()
-            c.publish c.CONCEPT_FOCUS, @model.id
+            c.trigger c.CONCEPT_FOCUS, @model.id
 
         toggleFocus: (id) =>
             @$el.toggleClass('active', (id is @model.id))
