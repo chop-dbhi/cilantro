@@ -102,7 +102,7 @@ define [
             return json
 
 
-    class ViewCollection extends base.Collection
+    class ViewCollection extends base.SessionCollection
         model: ViewModel
 
         url: ->
@@ -110,25 +110,11 @@ define [
 
         initialize: ->
             super
-            c.on c.SESSION_OPENED, =>
-                @fetch(reset: true).done =>
-                    @ensureSession()
+            c.on c.SESSION_OPENED, => @fetch(reset: true)
             c.on c.SESSION_CLOSED, => @reset()
 
             @on 'reset', ->
                 c.promiser.resolve('views')
-
-        getSession: ->
-            (@filter (model) -> model.get 'session')[0]
-
-        hasSession: ->
-            !!@getSession()
-
-        ensureSession: ->
-            if not @hasSession()
-                defaults = session: true
-                defaults.json = c.config.get('defaults.view')
-                @create defaults
 
 
     { ViewModel, ViewCollection }
