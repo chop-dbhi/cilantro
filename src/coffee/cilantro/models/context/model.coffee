@@ -61,32 +61,19 @@ define [
             @get 'archived'
 
 
-    class ContextCollection extends base.Collection
+    class ContextCollection extends base.SessionCollection
         model: ContextModel
 
         url: ->
             c.session.url('contexts')
 
         initialize: ->
-            c.on c.SESSION_OPENED, =>
-                @fetch(reset: true).done =>
-                    @ensureSession()
+            super
+            c.on c.SESSION_OPENED, => @fetch(reset: true)
             c.on c.SESSION_CLOSED, => @reset()
 
             @on 'reset', ->
                 c.promiser.resolve('contexts')
-
-        getSession: ->
-            (@filter (model) -> model.get 'session')[0]
-
-        hasSession: ->
-            !!@getSession()
-
-        ensureSession: ->
-            if not @hasSession()
-                defaults = session: true
-                defaults.json = c.config.get('defaults.context')
-                @create defaults
 
 
     { ContextModel, ContextCollection }

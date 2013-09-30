@@ -12,7 +12,7 @@ define [
 
             return attrs
 
-    class QueryCollection extends base.Collection
+    class QueryCollection extends base.SessionCollection
         model: QueryModel
 
         url: ->
