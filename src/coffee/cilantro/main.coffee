@@ -14,8 +14,8 @@ require ['cilantro'], (c) ->
     # Initialize routes once data is confirmed to be available
     c.sessions.open(options).then ->
 
-        # Register routes and start the session
-        @start [
+        # Define routes
+        routes = [
             id: 'query'
             route: 'query/'
             view: new c.ui.QueryWorkflow
@@ -33,3 +33,14 @@ require ['cilantro'], (c) ->
                 exporters: @data.exporter
                 queries: @data.queries
         ]
+
+        # Workspace supported as of 2.1.0
+        if c.isSupported('2.1.0')
+            routes.push
+                id: 'workspace'
+                route: 'workspace/'
+                view: c.ui.WorkspaceWorkflow
+                    queries: @data.queries
+
+        # Register routes and start the session
+        @start(routes)
