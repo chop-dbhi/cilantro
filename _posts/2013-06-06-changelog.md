@@ -6,6 +6,13 @@ date: 2013-06-06 16:36:26
 order: 1
 ---
 
+### 2.1.0 (in development)
+
+- Implementation of "workspace" workflow view
+- Support for saving and sharing queries
+- Refactor of session management
+- Internal rewrite of context manager
+
 ### 2.0.1
 
 - Add initial support for _stacked_ columns in the query and results workflows
