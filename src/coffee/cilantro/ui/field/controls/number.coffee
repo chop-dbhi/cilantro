@@ -18,8 +18,25 @@ define [
         initialize: (options) ->
             @model = options.model
 
+            @model.stats.on 'reset', =>
+                @statsMin = _.find(@model.stats.models, (stat) ->
+                    return stat.get('label') == 'Min'
+                )?.get('value')
+
+                if @statsMin? and not @ui.lowerBound.val()
+                    @ui.lowerBound.val(@statsMin)
+
+                @statsMax = _.find(@model.stats.models, (stat) ->
+                    return stat.get('label') == 'Max'
+                )?.get('value')
+
+                if @statsMax and not @ui.upperBound.val()
+                    @ui.upperBound.val(@statsMax)
+
         ui:
             inOutSelect: '.btn-select'
+            lowerBound: '.range-from'
+            upperBound: '.range-to'
 
         onRender: ->
             @inOutSelect = new button.ButtonSelect
@@ -48,8 +65,8 @@ define [
             return @model.id
 
         getOperator: ->
-            from = @$('.range-from').val()
-            to = @$('.range-to').val()
+            from = @ui.lowerBound.val()
+            to = @ui.upperBound.val()
             operator = ''
 
             if from != "" and to != ""
@@ -64,10 +81,10 @@ define [
             return operator
 
         getValue: ->
-            from_text = @$('.range-from').val()
+            from_text = @ui.lowerBound.val()
             from_num = new Number(from_text)
 
-            to_text = @$('.range-to').val()
+            to_text = @ui.upperBound.val()
             to_num = new Number(to_text)
 
             value = []
@@ -96,16 +113,16 @@ define [
             switch @operator
                 when 'range', '-range'
                     if value[0]?
-                        @$('.range-from').val(value[0])
+                        @ui.lowerBound.val(value[0])
                     else
-                        @$('.range-from').val('')
+                        @ui.lowerBound.val('')
                     if value[1]?
-                        @$('.range-to').val(value[1])
+                        @ui.upperBound.val(value[1])
                     else
-                        @$('.range-to').val('')
+                        @ui.upperBound.val('')
                 when 'gte'
-                    @$('.range-from').val(value)
+                    @ui.lowerBound.val(value)
                 when 'lte'
-                    @$('.range-to').val(value)
+                    @ui.upperBound.val(value)
 
     { NumberControl }
