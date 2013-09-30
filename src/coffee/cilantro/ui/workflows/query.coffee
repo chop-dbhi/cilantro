@@ -17,7 +17,7 @@ define [
         template: templates.query
 
         initialize: ->
-            c.subscribe c.SESSION_OPENED, ->
+            c.on c.SESSION_OPENED, ->
                 if not c.isSupported()
                     $('.serrano-version-warning').show()
 

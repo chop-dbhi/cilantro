@@ -44,11 +44,10 @@ define [
 
             @on 'sync', (model, attrs, options={}) ->
                 if options.silent isnt true
-                    c.publish c.CONTEXT_SYNCED, @, 'success'
+                    c.trigger c.CONTEXT_SYNCED, @, 'success'
 
             @on 'change:json', (model, value, options) ->
                 @manager.set(value, options)
-
 
         toJSON: (options={}) ->
             attrs = super
@@ -69,10 +68,10 @@ define [
             c.session.url('contexts')
 
         initialize: ->
-            c.subscribe c.SESSION_OPENED, =>
+            c.on c.SESSION_OPENED, =>
                 @fetch(reset: true).done =>
                     @ensureSession()
-            c.subscribe c.SESSION_CLOSED, => @reset()
+            c.on c.SESSION_CLOSED, => @reset()
 
             @on 'reset', ->
                 c.promiser.resolve('contexts')

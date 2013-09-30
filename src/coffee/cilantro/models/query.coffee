@@ -20,8 +20,8 @@ define [
 
         initialize: ->
             super
-            c.subscribe c.SESSION_OPENED, => @fetch(reset: true)
-            c.subscribe c.SESSION_CLOSE, => @reset()
+            c.on c.SESSION_OPENED, => @fetch(reset: true)
+            c.on c.SESSION_CLOSE, => @reset()
 
 
     class SharedQueryCollection extends QueryCollection
