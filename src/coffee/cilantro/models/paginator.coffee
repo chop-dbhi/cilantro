@@ -121,7 +121,8 @@ define [
         idAttribute: 'page_num'
 
         url: ->
-            c.utils.alterUrlParams(@collection.url(), 'page', @id, 'per_page', @collection.perPage)
+            url = _.result(@collection, 'url')
+            c.utils.alterUrlParams(url, 'page', @id, 'per_page', @collection.perPage)
 
 
     # Paginator collection for managing it's pages

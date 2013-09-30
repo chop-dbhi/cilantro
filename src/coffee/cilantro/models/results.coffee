@@ -10,7 +10,8 @@ define [
         idAttribute: 'page_num'
 
         url: ->
-            c.utils.alterUrlParams(@collection.url(), 'page', @id, 'per_page', @collection.perPage)
+            url = _.result(@collection, 'url')
+            c.utils.alterUrlParams(url, 'page', @id, 'per_page', @collection.perPage)
 
 
     # Array of result frames (pages). The first fetch sets the state
