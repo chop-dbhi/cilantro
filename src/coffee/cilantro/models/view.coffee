@@ -62,9 +62,10 @@ define [
             return attrs
 
         jsonToFacets: (json) ->
-            # Implies this is an array of object, set directly
+            # Implies this is an array of object, set directly. This is for
+            # forwards compatibility.
             if _.isArray(json)
-                @facets.set(json)
+                @facets.reset(json)
                 return
 
             models = []
@@ -78,9 +79,9 @@ define [
                     if id is _id
                         attrs.sort = sort
                         attrs.sort_index = i
-                models.push attrs
+                models.push(attrs)
 
-            @facets.set models
+            @facets.reset(models)
 
         facetsToJSON: ->
             json =
