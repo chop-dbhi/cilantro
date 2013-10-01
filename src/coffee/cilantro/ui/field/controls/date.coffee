@@ -21,6 +21,8 @@ define [
 
         ui:
             inOutSelect: '.btn-select'
+            lowerBound: '.range-from'
+            upperBound: '.range-to'
 
         onRender: ->
             @inOutSelect = new button.ButtonSelect
@@ -35,8 +37,8 @@ define [
 
             @inOutSelect.render().$el.prependTo(@$el)
             @$('.help-block').hide()
-            @$('.range-from').datepicker({'autoclose': true})
-            @$('.range-to').datepicker({'autoclose': true})
+            @ui.lowerBound.datepicker({'autoclose': true})
+            @ui.upperBound.datepicker({'autoclose': true})
 
             @set(@context)
 
@@ -51,8 +53,8 @@ define [
             return @model.id
 
         getOperator: ->
-            from = @$('.range-from').val()
-            to = @$('.range-to').val()
+            from = @ui.lowerBound.val()
+            to = @ui.upperBound.val()
             operator = ''
 
             if from != "" and to != ""
@@ -67,11 +69,11 @@ define [
             return operator
 
         getValue: ->
-            from_text = @$('.range-from').val()
-            from_date = @$('.range-from').data('datepicker').getFormattedDate()
+            from_text = @ui.lowerBound.val()
+            from_date = @ui.lowerBound.data('datepicker').getFormattedDate()
 
-            to_text = @$('.range-to').val()
-            to_date = @$('.range-to').data('datepicker').getFormattedDate()
+            to_text = @ui.upperBound.val()
+            to_date = @ui.upperBound.data('datepicker').getFormattedDate()
 
             value = []
 
@@ -99,20 +101,20 @@ define [
             switch @operator
                 when 'range', '-range'
                     if value[0]?
-                        @$('.range-from').data('datepicker').setDate(
+                        @ui.lowerBound.data('datepicker').setDate(
                             new Date(value[0]))
                     else
-                        @$('.range-from').val('')
+                        @ui.lowerBound.val(@minLowerBound ? '')
                     if value[1]?
-                        @$('.range-to').data('datepicker').setDate(
+                        @ui.upperBound.data('datepicker').setDate(
                             new Date(value[1]))
                     else
-                        @$('.range-to').val('')
+                        @ui.upperBound.val(@maxUpperBound ? '')
                 when 'gte'
-                    @$('.range-from').data('datepicker').setDate(
+                    @ui.lowerBound.data('datepicker').setDate(
                         new Date(value))
                 when 'lte'
-                    @$('.range-to').data('datepicker').setDate(
+                    @ui.upperBound.data('datepicker').setDate(
                         new Date(value))
 
     {DateControl}
