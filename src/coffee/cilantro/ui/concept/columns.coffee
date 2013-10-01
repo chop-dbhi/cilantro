@@ -180,9 +180,8 @@ define [
             @data.facets = @options.view.facets.clone()
             @$el.modal(show: false)
 
-        updateView: (view) ->
-            @data.facets.reset(view.facets.toJSON())
-            @render()
+        resetFacets: ->
+            @data.facets.reset(@data.view.facets.toJSON())
 
         onRender: ->
             # Sync and map between available columns and selected

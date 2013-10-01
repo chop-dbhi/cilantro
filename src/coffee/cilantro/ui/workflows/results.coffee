@@ -476,7 +476,7 @@ define [
 
         cancelColumnChanges: ->
             _.delay =>
-                @columns.currentView.updateView(@data.view)
+                @columns.currentView.resetFacets()
             , 25
 
         saveColumns: ->
