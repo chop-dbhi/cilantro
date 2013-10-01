@@ -2,14 +2,14 @@ define [
     'underscore'
     '../../controls'
     '../../button'
-    'tpl!templates/controls/number-range-input.html'
+    'tpl!templates/controls/range-input.html'
 ], (_, controls, button, templates...) ->
 
-    templates = _.object ['number'], templates
+    templates = _.object ['range'], templates
 
     # A control for entering an inclusive or exclusive numeric range
     class NumberControl extends controls.Control
-        template: templates.number
+        template: templates.range
 
         events: ->
             'keyup .range-from, .range-to': 'change'

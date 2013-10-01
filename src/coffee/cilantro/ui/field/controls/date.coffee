@@ -2,13 +2,13 @@ define [
     'underscore'
     '../../controls'
     '../../button'
-    'tpl!templates/controls/date-range-input.html'
+    'tpl!templates/controls/range-input.html'
 ], (_, controls, button, templates...) ->
 
-    templates = _.object ['date'], templates
+    templates = _.object ['range'], templates
 
     class DateControl extends controls.Control
-        template: templates.date
+        template: templates.range
 
         events: ->
             'changeDate .datepicker': 'change'
