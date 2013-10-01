@@ -90,8 +90,8 @@ define [
                 throw new Error 'concepts collection required'
 
         serializeData: ->
-            concept = @data.concepts.get(@model.get('concept'))
-            return name: concept.get('name')
+            if (concept = @data.concepts.get(@model.get('concept')))
+                return name: concept.get('name')
 
         events:
             'click button': 'triggerRemove'
@@ -178,6 +178,11 @@ define [
 
             # Create the initial facets collection
             @data.facets = @options.view.facets.clone()
+
+            # Listen to for sync event to synchronize with the server
+            @listenToOnce(@data.view, 'change:json', @resetFacets)
+            @listenToOnce(@data.concepts, 'reset', @resetFacets)
+
             @$el.modal(show: false)
 
         resetFacets: ->
