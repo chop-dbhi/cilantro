@@ -1,6 +1,4 @@
 define(['cilantro/session'], function(session) {
-    var events = session.events;
-
     describe('SessionManager', function() {
         var manager, triggered;
 
@@ -26,12 +24,12 @@ define(['cilantro/session'], function(session) {
             runs(function() {
                 expect(manager.length).toEqual(1);
                 expect(manager.active.opened).toBe(true);
-                expect(triggered).toEqual([events.SESSION_OPENING, events.SESSION_OPENED]);
+                expect(triggered).toEqual([session.SESSION_OPENING, session.SESSION_OPENED]);
 
             });
 
             runs(function() {
-                // Opening it again does trigger the events since it is
+                // Opening it again does trigger the session since it is
                 // already open
                 triggered = [];
                 manager.open(url);
@@ -56,7 +54,7 @@ define(['cilantro/session'], function(session) {
 
             runs(function() {
                 manager.close();
-                expect(triggered).toEqual([events.SESSION_OPENING, events.SESSION_OPENED, events.SESSION_CLOSED]);
+                expect(triggered).toEqual([session.SESSION_OPENING, session.SESSION_OPENED, session.SESSION_CLOSED]);
                 expect(manager.active).toBeUndefined();
             });
         });
@@ -69,7 +67,7 @@ define(['cilantro/session'], function(session) {
             });
 
             runs(function() {
-                expect(triggered).toEqual([events.SESSION_OPENING, events.SESSION_ERROR]);
+                expect(triggered).toEqual([session.SESSION_OPENING, session.SESSION_ERROR]);
             });
         });
     });

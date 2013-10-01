@@ -39,7 +39,7 @@ define([
             }, {
                 id: 4,
                 route: 'bar/',
-                view: new c.ui.QueryWorkflow,
+                view: new Backbone.View,
                 el: '#region3'
             }];
 
