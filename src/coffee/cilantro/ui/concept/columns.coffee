@@ -176,11 +176,12 @@ define [
             if not (@data.concepts = @options.concepts)
                 throw new Error 'concepts collection required'
 
+            # Create the initial facets collection
             @data.facets = @options.view.facets.clone()
             @$el.modal(show: false)
 
         updateView: (view) ->
-            @data.facets = view.facets.clone()
+            @data.facets.reset(view.facets.toJSON())
             @render()
 
         onRender: ->
