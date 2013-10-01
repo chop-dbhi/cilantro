@@ -7,6 +7,7 @@ define [
 
     templates = _.object ['number'], templates
 
+    # A control for entering an inclusive or exclusive numeric range
     class NumberControl extends controls.Control
         template: templates.number
 
@@ -37,6 +38,7 @@ define [
             inOutSelect: '.btn-select'
             lowerBound: '.range-from'
             upperBound: '.range-to'
+            help: '.help-block'
 
         onRender: ->
             @inOutSelect = new button.ButtonSelect
@@ -50,12 +52,12 @@ define [
                 ]
 
             @inOutSelect.render().$el.prependTo(@$el)
-            @$('.help-block').hide()
+            @ui.help.hide()
 
             @set(@context)
 
         toggleHelpText: (event) ->
-            @$('.help-block').toggle()
+            @ui.help.toggle()
             event.preventDefault()
 
         isBetweenSelected: ->
