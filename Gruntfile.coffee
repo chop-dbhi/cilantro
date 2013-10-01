@@ -204,6 +204,14 @@ module.exports = (grunt) ->
 
                 modules: [
                     name: pkg.name
+                    exclude: [
+                        'jquery'
+                        'backbone'
+                        'underscore'
+                        'marionette'
+                        'highcharts'
+                        'bootstrap'
+                    ]
                 ]
 
                 # Post analysis of built files
