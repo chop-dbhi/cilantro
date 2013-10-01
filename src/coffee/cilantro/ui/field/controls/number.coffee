@@ -82,10 +82,10 @@ define [
 
         getValue: ->
             from_text = @ui.lowerBound.val()
-            from_num = new Number(from_text)
+            from_num = Number(from_text)
 
             to_text = @ui.upperBound.val()
-            to_num = new Number(to_text)
+            to_num = Number(to_text)
 
             value = []
 
