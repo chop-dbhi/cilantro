@@ -163,40 +163,13 @@ define [
         template: templates.toolbar
 
         events:
-            'change .btn-select': 'sortBy'
             'keyup [name=filter]': 'filterBars'
             'click [name=invert]': 'invertSelection'
 
         ui:
             toolbar: '.btn-toolbar'
-            sortSelect: '.btn-select'
             filterInput: '[name=filter]'
             invertButton: '[name=invert]'
-
-        onRender: ->
-            @sortSelect = new button.ButtonSelect
-                collection: [
-                    value: '-count'
-                    label: 'Count (desc)'
-                    selected: true
-                ,
-                    value: 'count'
-                    label: 'Count (asc)'
-                ,
-                    value: '-value'
-                    label: 'Value (desc)'
-                ,
-                    value: 'value'
-                    label: 'Value (asc)'
-                ]
-
-            @sortSelect.render()
-            @sortSelect.$el.addClass('pull-right')
-            @ui.toolbar.append(@sortSelect.el)
-
-        # Sorts the collection based on the current selected value
-        sortBy: (event) ->
-            @collection.sortModelsBy(@sortSelect.getSelection())
 
         # 'Filters' the bars given the input
         filterBars: (event) ->
@@ -217,7 +190,6 @@ define [
                     model.set('selected', not model.get('selected'))
             @collection.trigger('change')
             return
-
 
 
     class BarChart extends controls.Control
