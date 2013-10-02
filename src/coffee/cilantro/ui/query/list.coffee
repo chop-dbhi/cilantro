@@ -18,6 +18,12 @@ define [
 
         template: templates.list
 
+        itemViewOptions: (model, index) ->
+            model: model
+            view: @data.view
+            context: @data.context
+            index: index
+
         initialize: ->
             @data = {}
             if not (@data.context = @options.context)
