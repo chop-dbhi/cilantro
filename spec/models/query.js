@@ -7,6 +7,9 @@ define(['cilantro/models/query'], function (query) {
             col = new query.QueryCollection;
         });
 
+        /* Disabled since this tested session-based functionality
+           which was removed.
+
         it('should define a default session', function() {
             expect(col.getSession()).toBeDefined();
         });
@@ -25,6 +28,7 @@ define(['cilantro/models/query'], function (query) {
                 expect(col.length).toBe(1);
             });
         });
+        */
     });
 
 });

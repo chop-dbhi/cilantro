@@ -64,16 +64,5 @@ define [
     class ContextCollection extends base.SessionCollection
         model: ContextModel
 
-        url: ->
-            c.session.url('contexts')
-
-        initialize: ->
-            super
-            c.on c.SESSION_OPENED, => @fetch(reset: true)
-            c.on c.SESSION_CLOSED, => @reset()
-
-            @on 'reset', ->
-                c.promiser.resolve('contexts')
-
 
     { ContextModel, ContextCollection }

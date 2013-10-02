@@ -7,7 +7,6 @@ define [
 
     templates = _.object ['actions'], templates
 
-
     # Provides a set of actions for manipulating a ContextModel object
     class ContextActions extends Marionette.ItemView
         template: templates.actions
@@ -25,6 +24,5 @@ define [
 
         clickRemoveAll: ->
             @model.manager.clear()
-
 
     { ContextActions }

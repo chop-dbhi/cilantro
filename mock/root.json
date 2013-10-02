@@ -1,40 +1,31 @@
 {
     "_links": {
         "concepts": {
-            "href": "/mock/concepts.json",
-            "rel": "dataconcepts"
+            "href": "/mock/concepts.json"
         },
         "contexts": {
-            "href": "/mock/contexts.json",
-            "rel": "datacontexts"
+            "href": "/mock/contexts.json"
         },
         "exporter": {
-            "href": "/mock/data/export.json",
-            "rel": "data"
+            "href": "/mock/data/export.json"
         },
         "fields": {
-            "href": "/mock/fields.json",
-            "rel": "datafields"
+            "href": "/mock/fields.json"
         },
         "preview": {
-            "href": "/mock/data/preview.json",
-            "rel": "data"
-        },
-        "shared_queries": {
-            "href": "/mock/shared_queries.json",
-            "rel": "datasharedqueries"
+            "href": "/mock/data/preview.json"
         },
         "queries": {
-            "href": "/mock/queries.json",
-            "rel": "dataqueries"
+            "href": "/mock/queries.json"
+        },
+        "shared_queries": {
+            "href": "/mock/shared_queries.json"
         },
         "self": {
-            "href": "/mock/root.json",
-            "rel": "self"
+            "href": "/mock/root.json"
         },
         "views": {
-            "href": "/mock/views.json",
-            "rel": "dataviews"
+            "href": "/mock/views.json"
         }
     },
     "title": "Mock Serrano Hypermedia API",

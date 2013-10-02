@@ -16,7 +16,7 @@ define [
     stream = new notify.Notifications
         id: 'notifications'
 
-    $(c.config.get('ui.main'))
+    $(c.config.get('main'))
         .css('position', 'relative')
         .append(stream.render().el)
 

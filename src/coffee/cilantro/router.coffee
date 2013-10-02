@@ -1,12 +1,12 @@
 define [
     'backbone'
     'underscore'
-    './core'
-], (Backbone, _, c) ->
+    './logger'
+], (Backbone, _, logger) ->
 
     class Router extends Backbone.Router
         options:
-            el: 'body'
+            main: 'body'
             root: null
 
         initialize: (options) ->
@@ -37,24 +37,16 @@ define [
             # module string and loader asynchronously
             if not options._view?
                 if _.isString options.view
-                    require [options.view], (klass) =>
-                        options._view = new klass options.options
+                    require [options.view], (View) =>
+                        options._view = new View options.options
                         @_render(options)
                         @_loaded.push(options.id)
-
+                    , (err) ->
+                        logger.error(err)
                     return
-
                 options._view = options.view
 
-            # XXX: this is hack until #229 is resolved. Views can be rendered
-            # prior to the session being initialized so the API version is not
-            # yet know. Since views depend on the API version to toggle certain
-            # features, rendering must wait.
-            if c.session.current?
-                c.session.current.open().done =>
-                    @_render(options)
-            else
-                @_render(options)
+            @_render(options)
             @_loaded.push(options.id)
 
         _render: (options) =>
@@ -63,9 +55,9 @@ define [
                 view._rendered = true
                 if options.el isnt false
                     if options.el?
-                        target = Backbone.$(options.el, @options.el)
+                        target = Backbone.$(options.el, @options.main)
                     else
-                        target = Backbone.$(@options.el)
+                        target = Backbone.$(@options.main)
                     target.append(view.el)
                     view.render?()
 
@@ -134,17 +126,22 @@ define [
                 @_register options
             return
 
-        # Unregister a route by id
+        # Unregister a route by id or all
         unregister: (id) ->
-            if (options = @_registered[id])?
+            if id?
+                if not (options = @_registered[id])?
+                    throw new Error("No route registered by id '#{id}'")
                 @_unload(options)
                 delete @_registered[id]
                 if (idx = @_routes[options.route]?.indexOf(id)) >= 0
                     @_routes[options.route].splice(idx, 1)
+            else
+                @unregister(id) for id of @_registered
             return
 
         # Shortcut for starting the Backbone.history
         start: ->
+            if Backbone.History.started then return
             root = @options.root or '/'
             if root.charAt(root.length-1) isnt '/'
                 root = root + '/'

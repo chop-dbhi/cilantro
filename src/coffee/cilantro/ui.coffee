@@ -4,7 +4,6 @@ define [
     'underscore'
     'backbone'
     './core'
-    './router'
     './ui/base'
     './ui/button'
     './ui/concept'
@@ -18,24 +17,13 @@ define [
     './ui/workflows'
     './ui/paginator'
     './ui/notify'
-], ($, _, Backbone, c, router, mods...) ->
-
-
-    # Define the primary router with the main element and app root
-    c.router = new router.Router
-        el: c.config.get('ui.main')
-        root: c.config.get('root')
-
-
-    # Register pre-define routes
-    if (routes = c.config.get('routes'))?
-        if typeof routes is 'function'
-            routes = routes()
-        c.router.register(routes)
-
+], ($, _, Backbone, c, mods...) ->
 
     # Route based on the URL
     $(document).on 'click', 'a', (event) ->
+        # Only catch if a router is available
+        if not c.router then return
+
         pathname = @pathname
 
         # Handle IE quirk
@@ -58,11 +46,13 @@ define [
 
     # Route by ID specified by the data-route attribute.
     $(document).on 'click', '[data-route]', (event) ->
+        # Only catch if a router is available
+        if not c.router then return
+
         route = $(@).attr('data-route')
 
         if c.router.isNavigable(route)
             event.preventDefault()
             c.router.navigate(route, trigger: true)
-
 
     _.extend {}, mods...
