@@ -23,7 +23,7 @@ define [
 
         initialize: ->
             @data = {}
-            if (@data.queries = @options.queries)
+            if not (@data.queries = @options.queries)
                 throw new Error 'queries collection required'
 
         onRender: ->
