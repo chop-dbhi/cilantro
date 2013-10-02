@@ -25,7 +25,7 @@ define [
         preview: models.Results
         exporter: models.ExporterCollection
         queries: models.QueryCollection
-        sharedQueries: models.QueryCollection
+        shared_queries: models.QueryCollection
 
 
     ###
