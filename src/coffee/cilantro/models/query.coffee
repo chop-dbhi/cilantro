@@ -11,7 +11,7 @@ define [
 
             return attrs
 
-    class QueryCollection extends base.SessionCollection
+    class QueryCollection extends base.Collection
         model: QueryModel
 
     { QueryModel, QueryCollection }
