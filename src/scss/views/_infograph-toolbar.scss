@@ -1,16 +1,40 @@
-.btn-toolbar {
-    overflow: hidden;
-
-    .invert-button {
-        float: right;
+.toolbar-region {
+    .navbar-toolbar {
+        margin-bottom: 0;
     }
 
-    .filter-container {
+    .btn-toolbar {
         overflow: hidden;
-        display: block;
 
-        .filter-text {
-            width: 90%;
+        .invert-button {
+            float: right;
+        }
+
+        .filter-container {
+            overflow: hidden;
+            display: block;
+
+            .filter-text {
+                width: 90%;
+            }
+        }
+    }
+
+    .sort-region {
+        border-bottom: 1px solid #ddd;
+        padding: 5px;
+        margin-bottom: 5px;
+
+        .sort-label-header, .sort-count-header {
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .sort-count-header {
+            position: absolute;
+            right: 0px;
         }
     }
 }
+
