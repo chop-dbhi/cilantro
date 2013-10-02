@@ -19,7 +19,7 @@ require ['cilantro'], (c) ->
             id: 'query'
             route: 'query/'
             view: new c.ui.QueryWorkflow
-                context: @data.contexts.getSession()
+                context: @data.contexts.session
                 concepts: @data.concepts.queryable
         ,
             id: 'results'
@@ -41,6 +41,8 @@ require ['cilantro'], (c) ->
                 route: 'workspace/'
                 view: new c.ui.WorkspaceWorkflow
                     queries: @data.queries
+                    context: @data.contexts.session
+                    view: @data.views.session
 
         # Register routes and start the session
         @start(routes)
