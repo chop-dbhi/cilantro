@@ -1,0 +1,16 @@
+.btn-toolbar {
+    overflow: hidden;
+
+    .invert-button {
+        float: right;
+    }
+
+    .filter-container {
+        overflow: hidden;
+        display: block;
+
+        .filter-text {
+            width: 90%;
+        }
+    }
+}
