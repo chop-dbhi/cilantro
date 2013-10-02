@@ -48,8 +48,12 @@ define [
             @started = false
             @opening = false
 
+        # Ensure a url is defined when the session is initialized
+        # or updated (using set). See http://backbonejs.org/#Model-validate
+        # for details.
         validate: (attrs, options) ->
-            if not attrs.url? then true
+            if not attrs.url?
+                return 'url is required'
 
         parse: (attrs) ->
             # Title of the API
@@ -96,8 +100,13 @@ define [
             if @opened or @opening
                 return @_opening.promise()
 
+            # Ensure the session is valid before opening
+            if not @isValid()
+                throw new Error(@validationError)
+
             # Set state and create deferred that will be used for creating
-            # promises while
+            # promises while the session is opening and after it is opened
+            # to maintain a consistent interface.
             @opening = true
             @_opening = $.Deferred()
 
