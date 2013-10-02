@@ -39,7 +39,7 @@ require ['cilantro'], (c) ->
             routes.push
                 id: 'workspace'
                 route: 'workspace/'
-                view: c.ui.WorkspaceWorkflow
+                view: new c.ui.WorkspaceWorkflow
                     queries: @data.queries
 
         # Register routes and start the session
