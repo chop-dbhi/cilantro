@@ -5,39 +5,21 @@ define [
 
 
     defaultOptions =
-
         # Run in debug mode for additional logging and turn off other
         # various behaviors that impede development.
         debug: false
 
-        # The default API endpoint that will be used when openSession
-        # is called.
-        url: null
-
         # The root URL to the application. If falsy, default is '/'
         root: null
 
-        # The default set of credentials to use when openSession is called.
+        # The endpoint used when the default session is opened.
+        url: null
+
+        # The credentials used when the default session is opened.
         credentials: null
 
-        # If true a session will be opened for the endpoint specified by `url`
-        # and `credentials`.
-        autoload: false
-
-        # An array of the default routes that are registered on load.
-        routes: null
-
-        # A selector that represents the target element views will be
-        # rendered in.
-        ui:
-            main: '#cilantro-main'
-
-        # Default json for initial context and view
-        defaults:
-
-            context: null
-
-            view: null
+        # The selector of the element views will be rendered within.
+        main: '#cilantro-main'
 
         # Custom modules corresponding to concepts
         concepts:

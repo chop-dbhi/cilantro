@@ -26,6 +26,13 @@ define [
             description: '.query-description'
             email: '.query-emails'
 
+        initialize: ->
+            @data = {}
+            if not (@data.context = @options.context)
+                throw new Error 'context model required'
+            if not (@data.view = @options.view)
+                throw new Error 'view model required'
+
         showError: (message) ->
             @ui.alert.html(message).show()
 
@@ -45,8 +52,8 @@ define [
                 name: @ui.name.val()
                 description: @ui.description.val()
                 usernames_or_emails: @ui.email.val()
-                context_json: c.data.contexts.getSession().toJSON().json
-                view_json: c.data.views.getSession().toJSON().json
+                context_json: @data.context.toJSON().json
+                view_json: @data.view.toJSON().json
 
             # Create a new model if not defined
             if not @model

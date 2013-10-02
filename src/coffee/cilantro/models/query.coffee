@@ -1,7 +1,6 @@
 define [
-    '../core'
     './base'
-], (c, base) ->
+], (base) ->
 
     class QueryModel extends base.Model
         parse: (attrs) ->
@@ -12,27 +11,7 @@ define [
 
             return attrs
 
-    class QueryCollection extends base.SessionCollection
+    class QueryCollection extends base.Collection
         model: QueryModel
 
-        url: ->
-            c.session.url('queries')
-
-        initialize: ->
-            super
-            c.on c.SESSION_OPENED, => @fetch(reset: true)
-            c.on c.SESSION_CLOSE, => @reset()
-
-
-    class SharedQueryCollection extends QueryCollection
-        url: ->
-            c.session.url('shared_queries')
-
-        initialize: ->
-            super
-
-            @on 'reset', ->
-                c.promiser.resolve('shared_queries')
-
-
-    { QueryModel, QueryCollection, SharedQueryCollection }
+    { QueryModel, QueryCollection }

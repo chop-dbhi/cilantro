@@ -18,15 +18,28 @@ define [
 
         template: templates.list
 
-        initialize: (options) ->
-            @queryModal = options.queryModal
+        itemViewOptions: (model, index) ->
+            model: model
+            view: @data.view
+            context: @data.context
+            index: index
+
+        initialize: ->
+            @data = {}
+            if not (@data.context = @options.context)
+                throw new Error 'context model required'
+            if not (@data.view = @options.view)
+                throw new Error 'view model required'
+
+            @queryModalRegion = @options.queryModalRegion
 
             @on 'itemview:showQueryModal', (options) ->
-                @queryModal.currentView.open(options.model)
+                @queryModalRegion.currentView.open(options.model)
 
-            @queryModal.show new dialog.QueryDialog
+            @queryModalRegion.show new dialog.QueryDialog
                 header: 'Edit Query'
-                collection: c.data.queries
-
+                collection: @collection
+                context: @data.context
+                view: @data.view
 
     { QueryList }

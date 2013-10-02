@@ -58,9 +58,6 @@ define [
     class FieldCollection extends base.Collection
         model: FieldModel
 
-        url: ->
-            c.session.url('fields')
-
         search: (query, handler) ->
             Backbone.ajax
                 url: _.result @, 'url'

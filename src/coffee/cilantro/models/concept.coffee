@@ -1,17 +1,15 @@
 define [
-    'jquery'
     'underscore'
     'backbone'
     '../core'
     './base'
     './field'
-], ($, _, Backbone, c, base, field) ->
+], (_, Backbone, c, base, field) ->
 
 
     class ConceptModel extends base.Model
-        constructor: (attrs, options={}) ->
+        constructor: (attrs, options) ->
             @fields = new field.FieldCollection
-            options.parse = true
             super(attrs, options)
 
         initialize: ->
@@ -36,12 +34,9 @@ define [
     class BaseConceptCollection extends base.Collection
         model: ConceptModel
 
-        url: ->
-            c.session.url('concepts')
-
         search: (query, handler) ->
-            $.ajax
-                url: _.result @, 'url'
+            Backbone.ajax
+                url: _.result(@, 'url')
                 data: query: query, brief: 1
                 dataType: 'json'
                 success: (resp) -> handler(resp)
@@ -51,19 +46,19 @@ define [
         constructor: ->
             @queryable = new BaseConceptCollection
             @viewable = new BaseConceptCollection
+
+            @queryable.url = => _.result(@, 'url')
+            @viewable.url = => _.result(@, 'url')
+
             super
 
         initialize: ->
-            c.on c.SESSION_OPENED, => @fetch(reset: true)
-            c.on c.SESSION_CLOSED, => @reset()
-
             # Update the sub-collections with the specific sets of models
             @on 'add remove reset', ->
                 @queryable.reset @filter (m) ->
                     !!m.get('queryable') or !!m.get('queryview')
                 @viewable.reset @filter (m) ->
                     !!m.get('viewable') or !!m.get('formatter_name')
-                c.promiser.resolve('concepts')
 
 
     { ConceptModel, ConceptCollection }

@@ -63,19 +63,23 @@ define [
             history: ConceptWorkspaceHistory
             main: welcome.Welcome
 
-        _ensureModel: (model) ->
-            if not (model instanceof c.models.ConceptModel)
-                model = c.data.concepts.get model
-            return model
-
         initialize: ->
-            super
+            @data = {}
+            if not (@data.concepts = @options.concepts)
+                throw new Error 'concept collection required'
+            if not (@data.context = @options.context)
+                throw new Error 'context model required'
 
             # Enables overriding the view used when the history is empty
             if @options.emptyView?
                 @emptyView = @options.emptyView
 
-            c.on c.CONCEPT_FOCUS, @showItem
+            c.on(c.CONCEPT_FOCUS, @showItem)
+
+        _ensureModel: (model) ->
+            if not (model instanceof c.models.ConceptModel)
+                model = @data.concepts.get model
+            return model
 
         showItem: (model) =>
             @ui.mainTab.tab('show')
@@ -88,7 +92,9 @@ define [
             # Determine if this is registered as a custom concept
             customForm = c.config.get("concepts.forms.#{ model.id }")
 
-            options = model: model
+            options =
+                model: model
+                context: @data.context
 
             # Load external module, catch error if it doesn't exist
             if customForm?
@@ -123,7 +129,6 @@ define [
 
             view.$el.stacked
                 fluid: '.fields-region'
-
 
         onRender: ->
             @main.show new @regionViews.main
