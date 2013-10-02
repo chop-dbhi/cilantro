@@ -321,7 +321,7 @@ define [
             iframe = "<iframe id=export-download-#{ title } src=#{ url } style='display: none'></iframe>"
             @$('.export-iframe-container').append(iframe)
 
-            if @exporters.notifiesOnComplete()
+            if @data.exporters.notifiesOnComplete()
                 @monitors[title] = {}
                 @monitors[title]["execution_time"] = 0
                 @monitors[title]["interval"] = setInterval(
@@ -390,7 +390,7 @@ define [
                 # if the server notifies on complete, we use parallel(to a
                 # degree) downloads, otherwise, we take a more serial approach.
                 delay = @requestDelay
-                if not @exporters.notifiesOnComplete()
+                if not @data.exporters.notifiesOnComplete()
                     delay = @requestTimeout
                 for i in [0..selectedTypes.length-1] by 1
                     @changeExportStatus(@$(selectedTypes[i]).attr('title'), "pending")
