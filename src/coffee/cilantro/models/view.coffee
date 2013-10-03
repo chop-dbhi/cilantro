@@ -7,15 +7,11 @@ define [
 
 
     class Facet extends Backbone.Model
+        idAttribute: 'concept'
 
 
     class Facets extends Backbone.Collection
         model: Facet
-
-        get: (obj) ->
-            if not (model = super(obj)) and obj.concept?
-                model = @findWhere concept: obj.concept
-            return model
 
 
     class ViewModel extends base.Model
@@ -66,9 +62,10 @@ define [
             return attrs
 
         jsonToFacets: (json) ->
-            # Implies this is an array of object, set directly
+            # Implies this is an array of object, set directly. This is for
+            # forwards compatibility.
             if _.isArray(json)
-                @facets.set(json)
+                @facets.reset(json)
                 return
 
             models = []
@@ -82,9 +79,9 @@ define [
                     if id is _id
                         attrs.sort = sort
                         attrs.sort_index = i
-                models.push attrs
+                models.push(attrs)
 
-            @facets.set models
+            @facets.reset(models)
 
         facetsToJSON: ->
             json =
@@ -104,17 +101,6 @@ define [
 
     class ViewCollection extends base.SessionCollection
         model: ViewModel
-
-        url: ->
-            c.session.url('views')
-
-        initialize: ->
-            super
-            c.on c.SESSION_OPENED, => @fetch(reset: true)
-            c.on c.SESSION_CLOSED, => @reset()
-
-            @on 'reset', ->
-                c.promiser.resolve('views')
 
 
     { ViewModel, ViewCollection }

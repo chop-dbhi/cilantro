@@ -1,169 +1,247 @@
 define [
     'jquery',
-    './core'
+    'underscore'
+    'backbone'
+    './models'
     './utils'
-], ($, c, utils) ->
+    './router'
+    './core'
+], ($, _, Backbone, models, utils, router, c) ->
 
-    channels =
-        SESSION_OPENING: 'session.opening'
-        SESSION_ERROR: 'session.error'
-        SESSION_UNAUTHORIZED: 'session.unauthorized'
-        SESSION_OPENED: 'session.opened'
-        SESSION_CLOSED: 'session.closed'
+    events =
+        SESSION_OPENING: 'session:opening'
+        SESSION_ERROR: 'session:error'
+        SESSION_UNAUTHORIZED: 'session:unauthorized'
+        SESSION_OPENED: 'session:opened'
+        SESSION_CLOSED: 'session:closed'
 
 
-    # Changes the first request to authenticate against the server to receive
-    # an API token. On success, a subsequent request will be sent to open the
-    # session.
-    setAuthData = (options, credentials, process, sessionData={}) ->
-        success = options.success
+    # Mapping of Serrano resource links to corresponding collections or models.
+    collectionLinkMap =
+        concepts: models.ConceptCollection
+        fields: models.FieldCollection
+        contexts: models.ContextCollection
+        views: models.ViewCollection
+        preview: models.Results
+        exporter: models.ExporterCollection
+        queries: models.QueryCollection
+        shared_queries: models.QueryCollection
 
-        $.extend options,
-            type: 'POST'
-            contentType: 'application/json'
-            data: JSON.stringify(credentials)
-            success: (resp) ->
-                # Serrano 2.1.0+ does not require a second request
-                # TODO remove this success handler in Cilantro 2.1.0
-                if resp._links?
-                    success(resp)
+
+    ###
+    A session opens a connection with a Serrano-compatible API endpoint and
+    uses the response to drive the application state. All the necessary data,
+    views, router and other state that is specific to a particular endpoint
+    is stored here. The lifecycle of a session involves:
+
+        - validating the options
+        - requesting the root endpoint of API (with optional authentication)
+        - initializing the collections supported by the API
+        - fetching the collection data in the background
+        - initializing a router and registering top-level routes and views
+    ###
+    class Session extends models.Model
+        idAttribute: 'url'
+
+        initialize: ->
+            @opened = false
+            @started = false
+            @opening = false
+
+        # Ensure a url is defined when the session is initialized
+        # or updated (using set). See http://backbonejs.org/#Model-validate
+        # for details.
+        validate: (attrs, options) ->
+            if not attrs.url?
+                return 'url is required'
+
+        parse: (attrs) ->
+            # Title of the API
+            @title = attrs.title
+
+            # Version of the API
+            @version = attrs.version
+
+            # Iterate over the available resource links and initialize
+            # the corresponding collection with the URL
+            @data = {}
+
+            for name, link of attrs._links
+                if (Collection = collectionLinkMap[name])
+                    collection = new Collection
+                    collection.url = link.href
+                    @data[name] = collection
+
+            # Define router with the main element and app root based on
+            # the global configuration
+            @router = new router.Router
+                main: c.config.get('main')
+                root: c.config.get('root')
+
+            # Register pre-defined routes
+            if (routes = @get('routes'))?
+                # String indicates external module, load and register
+                if typeof routes is 'string'
+                    require([routes], (routes) => @router.register(routes))
                 else
-                    sessionData.token = resp.token
-                    openSession(options.url, null, process, sessionData)
+                    if typeof routes is 'function'
+                        routes = routes()
+                    @router.register(routes)
 
+            return attrs
 
-    # An explicit `process` handler is used here to ensure the session is
-    # setup prior to publishing to the session channels. Most downstream
-    # objects depend on the URLs to be accessible.
-    openSession = (url, credentials, deferred, sessionData={}) ->
-        # TODO remove this success handler in Cilantro 2.1.0. This
-        # is needed by the secondary request
-        if sessionData.token?
-            data = token: sessionData.token
-
-        options =
-            url: url
-            type: 'GET'
-            data: data
-            dataType: 'json'
-
-            success: (resp) ->
-                $.extend(sessionData, resp)
-                deferred.resolve(sessionData)
-
-            error: (xhr, status, error) ->
-                deferred.fail(xhr, status, error)
-
-        # If credentials are supplied authorization is assumed to be needed
-        if credentials?
-            setAuthData(options, credentials, process, sessionData)
-
-        return $.ajax(options)
-
-
-    # Contains information for an individual session
-    class Session
-        constructor: (@name, @rootUrl, @crendentials) ->
-
-        # Returns a deferred which will resolve immediately if the session
-        # exists. Otherwise, it will be resolved (or failed) when once the
-        # request has completed.
+        # Opens a session. This sends a request to the target URL which is
+        # assumed to be the root resource of a Serrano-compatible API. If
+        # credentials are supplied, the request will be a POST with the
+        # credentials supplied as JSON. A successful response will _ready_
+        # the session for use.
         open: ->
-            deferred = $.Deferred()
-            if @loaded()
-                deferred.resolve(@data)
-            else
-                openSession @rootUrl, @credentials, deferred.done (data) =>
-                    @data = data
-            return deferred
+            # Session already opened or opening, return a promise
+            if @opened or @opening
+                return @_opening.promise()
 
-        loaded: -> @data?
+            # Ensure the session is valid before opening
+            if not @isValid()
+                throw new Error(@validationError)
 
-        # Close the session (currently a no-op)
+            # Set state and create deferred that will be used for creating
+            # promises while the session is opening and after it is opened
+            # to maintain a consistent interface.
+            @opening = true
+            @_opening = $.Deferred()
+
+            options =
+                url: @get('url')
+                type: 'GET'
+                dataType: 'json'
+
+            # If credentials switch to POST and add the credentials
+            if (credentials = @get('credentials'))?
+                $.extend options,
+                    type:  'POST'
+                    contentType: 'application/json'
+                    data: JSON.stringify(credentials)
+
+            @fetch(options)
+                .always =>
+                    @opening = false
+                .done (resp, status, xhr) =>
+                    @opened = true
+                    @response = resp
+                    @_opening.resolveWith(@, [@, resp, status, xhr])
+                .fail (xhr, status, error) =>
+                    @error = error
+                    @_opening.rejectWith(@, [@, xhr, status, error])
+
+            return @_opening.promise()
+
+        # Closing a session will remove the cached data and require it to be
+        # opened again.
+        # TODO: unload router views?
         close: ->
+            @end()
+            @opening = @opened = false
+            delete @_opening
+            delete @response
+            # Reset all collections to deference models
+            for key, collection of @data
+                collection.reset()
+            delete @data
 
-        # Get the URL by reference name in _links, e.g. 'concepts'
-        url: (ref) ->
-            if not ref then return @rootUrl
-            if not (link = @data._links[ref]) then return
-            current = utils.linkParser(@data.root)
-            target = utils.linkParser(link.href)
-            current.pathname = target.pathname
-            return current.href
+        # Starts/enables the session.
+        start: (routes) ->
+            # Already started, return false denoting the start was not successful
+            if @started then return false
+
+            if not @opened
+                throw new Error('A session must be opened before being loaded')
+
+            @started = true
+
+            # Fetch collection data
+            for key, collection of @data
+                collection.fetch(reset: true)
+
+            if routes? then @router.register(routes)
+
+            # Start the router history
+            @router.start()
+
+        # Ends/disables the session.
+        end: ->
+            @started = false
+            @router.unregister()
 
 
-    class SessionManager
-        constructor: ->
-            @sessions = {}
-            @pending = null
+    # Keeps track of sessions as they are created and switched between.
+    # The `pending` property references any session that is currently loading and will be
+    # made the active once finished. The `active` property references the
+    # currently active session if one exists.
+    class SessionManager extends Backbone.Collection
+        _switch: (session) ->
+            if @active is session
+                return
+            delete @pending
+            # End the current active session
+            @close()
+            # Set session as active and start it
+            @active = session
+            @trigger(events.SESSION_OPENED, session)
 
-        # Handles
-        _activate: (session) ->
-            # Handle the initial case
-            if @current isnt session
-                @close()
-                @current = session
-            c.trigger(channels.SESSION_OPENED, session.name)
+        # Opens a session. Takes an object of options that are passed into
+        # the session constructor. The url can be passed by itself as the
+        # first argument as a shorthand method for opening sessions.
+        open: (url, options) ->
+            if typeof url is 'object'
+                options = url
+            else
+                options ?= {}
+                options.url = url
 
-        # Opens a session. A name can be supplied for referencing the session
-        # rather than by URL. The session will be initialized and registered
-        # and marked as the pending session to be opened. On success, the
-        # session will be activated.
-        open: (name, url, credentials) ->
-            # name is always the key, so check existing sessions first
-            if not (session = @sessions[name])
-                # Shift arguments
-                if not url? or typeof url is 'object'
-                    credentials = url
-                    url = name
-                session = new Session(name, url, credentials)
+            # Get or create the session
+            if not (session = @get(options.url))
+                session = new Session(options)
+                @add(session)
 
-            # Register session and mark is at the pending session
-            @pending = @sessions[name] = session
-
-            # If this is the initial session, also set it as the current
-            # session.
-            if not @current then @current = session
-
-            # Publish the session is opening by the name supplied
-            c.trigger channels.SESSION_OPENING, name
+            # Ensure redundant calls are not being made
+            if session isnt @active and session isnt @pending
+                @pending = session
+                @trigger(events.SESSION_OPENING, session)
 
             # Open returns a deferred object. If the opened session is *still*
             # the pending session, activate it. This could not be true if the
             # client quickly switches between available sessions and the first
             # session has not yet responded.
-            session.open()
+            return session.open()
                 .done =>
-                    if @pending is session
-                        @_activate(session)
-                # Fail will only occur during the first time the session is
-                # being opened.
-                .fail (xhr, status, error) ->
-                    if @pending is session
-                        channel = switch xhr.statusCode
-                            # Forbidden, unauthorized
-                            when 401, 403
-                                channels.SESSION_UNAUTHORIZED
-                            else
-                                channels.SESSION_ERROR
-                        c.trigger(channel, name, error)
+                    if @pending isnt session then return
+                    @_switch(session)
+                .fail (_session, xhr, status, error) =>
+                    if @pending isnt session then return
+                    @pending = null
+                    # Select to the appropriate channel to publish on depending
+                    # if it's a forbidden, unauthorized, or general error
+                    event = switch xhr.statusCode
+                        when 401, 403
+                            events.SESSION_UNAUTHORIZED
+                        else
+                            events.SESSION_ERROR
+                    @trigger(event, session, error)
 
         # Closes the current sessions and publishes a message
         close: ->
-            if (session = @current)?
-                delete @current
+            if (session = @active)?
+                delete @active
                 session.close()
-                c.trigger channels.SESSION_CLOSED, session.name
+                @trigger(events.SESSION_CLOSED, session)
 
         # Closes the current session and clears all sessions
         clear: ->
             @close()
-            @sessions = {}
+            @reset()
 
-        # Proxy for accessing the current session's endpoints.
-        url: (ref) ->
-            if not @current? then return
-            @current.url(ref)
+        # Give the session manager events
+        _.extend(SessionManager::, Backbone.Events)
 
 
-    { SessionManager, channels }
+    _.extend { SessionManager, Session }, events

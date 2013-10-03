@@ -20,15 +20,6 @@ define [
 
         fieldCollectionView: field.FieldFormCollection
 
-        constructor: (options={}) ->
-            if not options.context?
-                session = c.data.contexts.getSession()
-                options.context = session.manager.define
-                    concept: options.model.id
-                , type: 'branch'
-            @context = options.context
-            super(options)
-
         events:
             'click .footer [data-toggle=apply]': 'applyFilter'
             'click .footer [data-toggle=update]': 'applyFilter'
@@ -51,6 +42,21 @@ define [
             clear: 'renderNew'
             change: 'renderChange'
             invalid: 'renderInvalid'
+
+        constructor: (options={}) ->
+            @data = {}
+            if not (@data.context = options.context)
+                throw new Error 'context model required'
+
+            if not options.model
+                throw new Error 'concept model required'
+
+            # Define or get the local context node
+            @context = @data.context.manager.define
+                concept: options.model.id
+            , type: 'branch'
+
+            super(options)
 
         delegateEvents: (events) ->
             super

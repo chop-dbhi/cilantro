@@ -14,14 +14,6 @@ define [
         # support notification on completion.
         minSerranoVersionProgressFeature: '2.0.16'
 
-        url: ->
-            c.session.url('exporter')
-
-        initialize: ->
-            super
-            c.on c.SESSION_OPENED, => @fetch(reset: true)
-            c.on c.SESSION_CLOSED, => @reset()
-
         notifiesOnComplete: ->
             c.isSupported(@minSerranoVersionProgressFeature)
 

@@ -38,6 +38,20 @@ define [
             @ui.label.text('records')
 
 
+    ###
+    The ResultsWorkflow provides an interface for previewing tabular data,
+    mechanisms for customizing the view, and a method for exporting data
+    to alternate formats.
+    TODO: break out context panel as standalone view
+
+    This view requires the following options:
+    - concepts: a collection of concepts that are deemed viewable
+    - context: the session/active context model
+    - view: the session/active view model
+    - results: a Results collection that contains the tabular data
+    - exporters: a collection of supported exporters
+    - queries: a collection of queries
+    ###
     class ResultsWorkflow extends Marionette.Layout
         className: 'results-workflow'
 
@@ -86,14 +100,24 @@ define [
             createQueryModal: '.create-query-modal'
 
         initialize: ->
+            @data = {}
+            if not (@data.context = @options.context)
+                throw new Error 'context model required'
+            if not (@data.view = @options.view)
+                throw new Error 'view model required'
+            if not (@data.concepts = @options.concepts)
+                throw new Error 'concepts collection required'
+            if not (@data.results = @options.results)
+                throw new Error 'results collection required'
+            if not (@data.exporters = @options.exporters)
+                throw new Error 'exporters collection required'
+            if not (@data.queries = @options.queries)
+                throw new Error 'queries collection required'
+
             $(document).on 'scroll', @onPageScroll
             $(window).resize @onWindowResize
 
             @monitors = {}
-
-            c.on c.SESSION_OPENED, ->
-                if not c.isSupported()
-                    $('.serrano-version-warning').show()
 
             # Used to tell if filters were hidden by user clicking the button
             @areFiltersManuallyHidden = false
@@ -189,12 +213,12 @@ define [
                         @hideContextPanel()
 
         selectPagesOption: ->
-            $('#pages-radio-all').prop('checked', false)
-            $('#pages-radio-ranges').prop('checked', true)
-            $('#pages-text-ranges').val('')
+            @$('#pages-radio-all').prop('checked', false)
+            @$('#pages-radio-ranges').prop('checked', true)
+            @$('#pages-text-ranges').val('')
 
         changeExportStatus: (title, newState) ->
-            statusContainer = $(".export-status-#{ title } .span10")
+            statusContainer = @$(".export-status-#{ title } .span10")
 
             statusContainer.children().hide()
 
@@ -212,7 +236,7 @@ define [
 
         onExportFinished: (exportTypeTitle) =>
             @numPendingDownloads = @numPendingDownloads - 1
-            $('.export-progress-container .badge-info').html(@numPendingDownloads)
+            @$('.export-progress-container .badge-info').html(@numPendingDownloads)
 
             if @hasExportErrorOccurred(exportTypeTitle)
                 @changeExportStatus(exportTypeTitle, "error")
@@ -222,23 +246,18 @@ define [
                 @changeExportStatus(exportTypeTitle, "success")
 
             # If all the downloads are finished, re-enable the export button
-            if @numPendingDownloads == 0
-                $('[data-toggle=export-options]').prop('disabled', false)
-                $('.export-progress-container').hide()
+            if @numPendingDownloads is 0
+                @$('[data-toggle=export-options]').prop('disabled', false)
+                @$('.export-progress-container').hide()
 
         hasExportErrorOccurred: (exportTypeTitle) ->
-            id = "#export-download-#{ exportTypeTitle }"
-
             # Since we can't read the content-type of the iframe directly,
             # we need to check to see if the body of the iframe is populated.
             # If it is populated, then an error during export has occurred and
             # the details of that error are contained in the iframe. If all
             # went well, the iframe will have empty head and body elements
             # because the content disposition was attachment.
-            if $(id).contents()[0].body.children.length == 0
-                false
-            else
-                true
+            @$("#export-download-#{ exportTypeTitle }").contents()[0].body.children.length isnt 0
 
         checkExportStatus: (exportTypeTitle) =>
             @monitors[exportTypeTitle]["execution_time"] =
@@ -286,7 +305,7 @@ define [
             return value
 
         startExport: (exportType, pages) =>
-            title = $(exportType).attr('title')
+            title = @$(exportType).attr('title')
             @changeExportStatus(title, "downloading")
 
             # Clear the cookie in case the Serrano version is new enough
@@ -294,15 +313,15 @@ define [
             cookieName = "export-type-#{ title.toLowerCase() }"
             @setCookie(cookieName, null)
 
-            url = $(exportType).attr('href')
+            url = @$(exportType).attr('href')
             if url[url.length-1] != "/"
                 url = "#{ url }/"
             url = "#{ url }#{ pages }"
 
             iframe = "<iframe id=export-download-#{ title } src=#{ url } style='display: none'></iframe>"
-            $('.export-iframe-container').append(iframe)
+            @$('.export-iframe-container').append(iframe)
 
-            if c.data.exporters.notifiesOnComplete()
+            if @data.exporters.notifiesOnComplete()
                 @monitors[title] = {}
                 @monitors[title]["execution_time"] = 0
                 @monitors[title]["interval"] = setInterval(
@@ -317,16 +336,16 @@ define [
 
         initializeExportStatusIndicators: (selectedTypes) ->
             # Start by hiding all of them
-            $('.export-status-container').children().hide()
+            @$('.export-status-container').children().hide()
 
             for st in selectedTypes
-                $(".export-status-#{ st.title }").show()
+                @$(".export-status-#{ st.title }").show()
 
         isPageRangeValid: ->
-            if $('input[name=pages-radio]:checked').val() == "all"
+            if @$('input[name=pages-radio]:checked').val() == "all"
                 return true
             else
-                pageRange = $('#pages-text-ranges').val()
+                pageRange = @$('#pages-text-ranges').val()
 
                 return @pageRangePattern.test(pageRange)
 
@@ -334,27 +353,27 @@ define [
             # Clear any of the old iframes. If we are exporting again, these
             # downloads should all have finished based on the UI blocking
             # during active exports.
-            $('.export-iframe-container').html('')
+            @$('.export-iframe-container').html('')
 
-            selectedTypes = $('input[name=export-type-checkbox]:checked')
+            selectedTypes = @$('input[name=export-type-checkbox]:checked')
 
             if selectedTypes.length == 0
-                $('#export-error-message').html('An export type must be selected.')
-                $('.export-options-modal .alert-block').show()
+                @$('#export-error-message').html('An export type must be selected.')
+                @$('.export-options-modal .alert-block').show()
             else if not @isPageRangeValid()
-                $('#export-error-message').html('Page range is invalid. Must be a single page(example: 1) or a range of pages(example: 2...5).')
-                $('.export-options-modal .alert-block').show()
+                @$('#export-error-message').html('Page range is invalid. Must be a single page(example: 1) or a range of pages(example: 2...5).')
+                @$('.export-options-modal .alert-block').show()
             else
                 @numPendingDownloads = selectedTypes.length
 
                 pagesSuffix = ""
-                if $('input[name=pages-radio]:checked').val() != "all"
-                    pagesSuffix = $('#pages-text-ranges').val() + "/"
+                if @$('input[name=pages-radio]:checked').val() != "all"
+                    pagesSuffix = @$('#pages-text-ranges').val() + "/"
 
                 # Disable export button until the downloads finish
-                $("[data-toggle=export-options]").prop('disabled', true)
-                $('.export-progress-container').show()
-                $('.export-progress-container .badge-info').html(@numPendingDownloads)
+                @$("[data-toggle=export-options]").prop('disabled', true)
+                @$('.export-progress-container').show()
+                @$('.export-progress-container .badge-info').html(@numPendingDownloads)
 
                 @ui.exportOptions.modal('hide')
 
@@ -371,10 +390,10 @@ define [
                 # if the server notifies on complete, we use parallel(to a
                 # degree) downloads, otherwise, we take a more serial approach.
                 delay = @requestDelay
-                if not c.data.exporters.notifiesOnComplete()
+                if not @data.exporters.notifiesOnComplete()
                     delay = @requestTimeout
                 for i in [0..selectedTypes.length-1] by 1
-                    @changeExportStatus($(selectedTypes[i]).attr('title'), "pending")
+                    @changeExportStatus(@$(selectedTypes[i]).attr('title'), "pending")
 
                     setTimeout(@startExport, i * delay, selectedTypes[i], pagesSuffix)
 
@@ -385,44 +404,40 @@ define [
                 @ui.createReport.remove()
 
             @paginator.show new paginator.Paginator
-                model: c.data.results
+                model: @data.results
 
             @count.show new ResultCount
-                model: c.data.results
-
-            @context.show new base.LoadView
-                message: 'Loading session context...'
-
-            @columns.show new base.LoadView
-                message: 'Loading all your query options...'
+                model: @data.results
 
             @exportTypes.show new exporter.ExportTypeCollection
-                collection: c.data.exporters
+                collection: @data.exporters
 
             @exportProgress.show new exporter.ExportProgressCollection
-                collection: c.data.exporters
+                collection: @data.exporters
 
             @createQueryModal.show new query.QueryDialog
                 header: 'Create Query'
-                collection: c.data.queries
+                view: @data.view
+                context: @data.context
+                collection: @data.queries
 
-            c.promiser.when 'contexts', =>
-                @context.show new context.ContextPanel
-                    model: c.data.contexts.getSession()
+            @context.show new context.ContextPanel
+                model: @data.context
 
-                @context.currentView.$el.stacked
-                    fluid: '.tree-region'
+            @context.currentView.$el.stacked
+                fluid: '.tree-region'
 
-            c.promiser.when 'concepts', 'views', =>
-                @table.show new tables.Table
-                    view: c.data.views.getSession()
-                    collection: c.data.results
+            @table.show new tables.Table
+                view: @data.view
+                collection: @data.results
 
-                @columns.show new concept.ConceptColumns
-                    view: c.data.views.getSession()
-                    collection: c.data.concepts.viewable
+            @columns.show new concept.ConceptColumns
+                view: @data.view
+                concepts: @data.concepts
 
-                @ui.navbarButtons.tooltip({animation: false, placement: 'bottom'})
+            @ui.navbarButtons.tooltip
+                animation: false
+                placement: 'bottom'
 
             # Record the vertical offset of the masthead nav bar if we
             # haven't done so already. This is used in scroll calculations.
@@ -442,11 +457,11 @@ define [
                 @updateContextPanelOffsets()
 
         showExportOptions: ->
-            $('.export-options-modal .alert-block').hide()
+            @$('.export-options-modal .alert-block').hide()
             @ui.exportOptions.modal('show')
 
-            if (c.data.exporters.length == 0)
-                $('.export-options-modal .btn-primary').prop('disabled', true)
+            if @data.exporters.length is 0
+                @$('.export-options-modal .btn-primary').prop('disabled', true)
 
         showExportProgress: ->
             @ui.exportProgress.modal('show')
@@ -461,12 +476,12 @@ define [
 
         cancelColumnChanges: ->
             _.delay =>
-                @columns.currentView.updateView(c.data.views.getSession())
+                @columns.currentView.resetFacets()
             , 25
 
         saveColumns: ->
-            c.data.views.getSession().facets = @columns.currentView.facets.clone()
-            c.trigger c.VIEW_SAVE
+            @data.view.facets.reset(@columns.currentView.data.facets.toJSON())
+            @data.view.save()
             @ui.columns.modal('hide')
 
 

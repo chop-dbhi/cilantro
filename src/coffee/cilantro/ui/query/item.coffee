@@ -28,19 +28,22 @@ define [
             'click [data-toggle=query-modal]': 'showQueryModal'
             'click .shared-query-name': 'openQuery'
 
+        modelEvents:
+            sync: 'render'
+
         initialize: ->
-            @model.on 'sync', =>
-                @render()
+            @data = {}
+            if not (@data.context = @options.context)
+                throw new Error 'context model required'
+            if not (@data.view = @options.view)
+                throw new Error 'view model required'
 
+        # Set the query's context and view json on the session context
+        # and view, navigate to the results to view results
         openQuery: =>
-            (context = c.data.contexts.getSession()).set('json', @model.get('context_json'), reset: true)
-            (view = c.data.views.getSession()).set('json', @model.get('view_json'))
-
-            $.when(context.save(null, silent: true), view.save(null, silent: true)).done ->
-                c.trigger(c.CONTEXT_SYNCED, context, 'success')
-                c.trigger(c.VIEW_SYNCED, view, 'success')
-
-            c.router.navigate('results/', trigger: true)
+            @data.view.save('json', @model.get('view_json'))
+            @data.context.save('json', @model.get('context_json'), reset: true)
+            c.router.navigate('results', trigger: true)
 
         showQueryModal: ->
             @trigger('showQueryModal', @model)

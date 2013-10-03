@@ -84,9 +84,14 @@ define [
 
         template: templates.selected
 
+        initialize: ->
+            @data = {}
+            if not (@data.concepts = @options.concepts)
+                throw new Error 'concepts collection required'
+
         serializeData: ->
-            concept = c.data.concepts.get(@model.get('concept'))
-            return name: concept.get('name')
+            if (concept = @data.concepts.get(@model.get('concept')))
+                return name: concept.get('name')
 
         events:
             'click button': 'triggerRemove'
@@ -117,18 +122,35 @@ define [
             'sortupdate': 'triggerItemSort'
 
         initialize: ->
+            @data = {}
+            if not (@data.concepts = @options.concepts)
+                throw new Error 'concepts collection required'
+
             @$el.sortable
                 cursor: 'move'
                 forcePlaceholderSize: true
                 placeholder: 'placeholder'
 
+        itemViewOptions: (model, index) ->
+            model: model
+            index: index
+            concepts: @data.concepts
+
         # 'Sortable' events are not triggered on the item being sorted
         # so this handles proxying the event to the item itself.
         # See the SelectedItem handler for the event above.
         triggerItemSort: (event, ui) ->
-            ui.item.trigger(event, ui.item.index())
+            ui.item.trigger(event, [ui.item.index()])
 
 
+    # Two-column layout representing the available columns on
+    # the left side and the selected columns on the right.
+    # The data this view expects includes:
+    # - collection: a collection of concepts that are deemed viewable
+    # - facets: the facets collection of a view to be rendered
+    #   in this view as selectable and orderable columns
+    # - facets: the collection of Facets derived from the view that
+    #   represent the concepts being chosen.
     class ConceptColumns extends Marionette.Layout
         className: 'concept-columns'
 
@@ -142,49 +164,61 @@ define [
             available: '.available-region'
             selected: '.selected-region'
 
-        constructor: (options) ->
-            if not options.view?
-                throw new Error 'ViewModel instance required'
-            @facets = options.view.facets.clone()
-            delete options.view
-            super(options)
+        regionViews:
+            search: search.ConceptSearch
+            available: AvailableColumns
+            selected: SelectedColumns
 
         initialize: ->
-            @$el.modal show: false
+            @data = {}
+            if not (@data.view = @options.view)
+                throw new Error 'view required'
+            if not (@data.concepts = @options.concepts)
+                throw new Error 'concepts collection required'
 
-        updateView: (view) ->
-            @facets = view.facets.clone()
-            @render()
+            # Create the initial facets collection
+            @data.facets = @options.view.facets.clone()
+
+            # Listen to for sync event to synchronize with the server
+            @listenToOnce(@data.view, 'change:json', @resetFacets)
+            @listenToOnce(@data.concepts, 'reset', @resetFacets)
+
+            @$el.modal(show: false)
+
+        resetFacets: ->
+            @data.facets.reset(@data.view.facets.toJSON())
 
         onRender: ->
-            # Listen for remove event from selected columns
-            @listenTo @collection, 'columns:add', @addColumn, @
-            @listenTo @facets, 'columns:remove', @removeColumn, @
+            # Sync and map between available columns and selected
+            # columns (represented as facets)
+            @listenTo(@data.concepts, 'columns:add', @addColumn, @)
+            @listenTo(@data.facets, 'columns:remove', @removeColumn, @)
 
-            @available.show new AvailableColumns
-                collection: @collection
+            @available.show new @regionViews.available
+                collection: @data.concepts
                 collapsable: false
 
-            @search.show new search.ConceptSearch
-                collection: @collection
+            @search.show new @regionViews.search
+                collection: @data.concepts
                 handler: (query, resp) =>
                     @available.currentView.filter(query, resp)
 
-            @selected.show new SelectedColumns
-                collection: @facets
+            @selected.show new @regionViews.selected
+                collection: @data.facets
+                concepts: @data.concepts
 
-            for facet in @facets.models
-                if (concept = @collection.get(facet.get('concept')))
+            for facet in @data.facets.models
+                if (concept = @data.concepts.get(facet.get('concept')))
                     @addColumn(concept, false)
 
         isConceptUnselected: (concept) ->
-            for facet in @facets.models
+            for facet in @data.facets.models
                 if facet.get('concept') is concept.id
                     return false
             return true
 
         triggerRemoveAll: ->
-            facets = @facets.clone()
+            facets = @data.facets.clone()
             for facet in facets.models
                 @removeColumn(facet)
 
@@ -192,13 +226,13 @@ define [
             @available.currentView.find(concept)?.disable()
 
             if add and @isConceptUnselected(concept)
-                facet = new @facets.model
+                facet = new @data.facets.model
                     concept: concept.id
-                @facets.add(facet)
+                @data.facets.add(facet)
 
         removeColumn: (facet) ->
-            @facets.remove(facet)
-            concept = @collection.get(facet.get('concept'))
+            @data.facets.remove(facet)
+            concept = @data.concepts.get(facet.get('concept'))
             @available.currentView.find(concept)?.enable()
 
 

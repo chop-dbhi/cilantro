@@ -14,7 +14,7 @@ define [
             if not @pending
                 @pending = true
                 @fetch(reset: true).done =>
-                    @pending = false
+                    delete @pending
                     @setCurrentPage(@models[0].id)
 
         # Parses the initial fetch which is a single page, resets if necessary
@@ -121,7 +121,8 @@ define [
         idAttribute: 'page_num'
 
         url: ->
-            c.utils.alterUrlParams(@collection.url(), 'page', @id, 'per_page', @collection.perPage)
+            url = _.result(@collection, 'url')
+            c.utils.alterUrlParams(url, 'page', @id, 'per_page', @collection.perPage)
 
 
     # Paginator collection for managing it's pages

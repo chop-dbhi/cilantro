@@ -1,0 +1,4 @@
+{
+    "index": "README.md",
+    "glob": ["src/coffee/**/**/**/**/**/*.coffee"]
+}
