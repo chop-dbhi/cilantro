@@ -118,6 +118,24 @@ define [
 
             @_renderFooter(message, className, false)
 
+        isContextNonTrivial: ->
+            # If the context has no children then we can consider it trivial
+            # as it has no filter conditions.
+            if not (model = @context.children?.models[0])?
+                return false
+
+            # If the operator is not present or the operator is not the 'in'
+            # operator then the context is considered non-trivial since we
+            # don't have a good clasiffier for those cases yet.
+            if not (operator = model.get('operator'))? or operator != 'in'
+                return true
+
+            # Now that we are sure the operator is 'in', if there are no
+            # values in the list of values to match against the context is
+            # considered trivial since it will never match anything and always
+            # end up returning 0 results.
+            return (value = model.get('value'))? and value.length > 0
+
         renderApplied: ->
             @ui.apply.hide()
             @ui.update.show()
@@ -127,26 +145,16 @@ define [
                 className = 'alert-warning'
                 message = '<strong>Heads up!</strong> The filter has been changed. <a class=revert href=#>Revert</a>'
 
-            # If we are using the 'in' operator and there are now values in
-            # the list of values to match against, then we should disable the
-            # update filter button because it makes no sense to update an 'in'
-            # filter with an empty search list as it will never match anything.
-            enabled = enabled and @context.children.models[0]?.get('value')?.length > 0
+            enabled = enabled and @isContextNonTrivial()
 
             @_renderFooter(message, className, enabled)
 
         renderNew: ->
             @ui.apply.show()
 
-            # If we are using the 'in' operator and there are now values in
-            # the list of values to match against, then we should disable the
-            # apply filter button because it makes no sense to apply an 'in'
-            # filter with an empty search list as it will never match anything.
-            enabled = @context.children.models[0]?.get('value')?.length > 0
-
             @ui.update.hide()
             @ui.remove.hide()
-            @_renderFooter(null, null, enabled)
+            @_renderFooter(null, null, @isContextNonTrivial())
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
