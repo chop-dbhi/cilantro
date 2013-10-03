@@ -121,20 +121,21 @@ define [
         isContextNonTrivial: ->
             # If the context has no children then we can consider it trivial
             # as it has no filter conditions.
-            if not (model = @context.children?.models[0])?
+            if not @context.children?.models?.length == 0
                 return false
 
-            # If the operator is not present or the operator is not the 'in'
-            # operator then the context is considered non-trivial since we
-            # don't have a good clasiffier for those cases yet.
-            if not (operator = model.get('operator'))? or operator != 'in'
-                return true
+            # If there are children, the only case a context will be considered
+            # trivial is if all the children use the 'in' operator and have
+            # no selections. While this is incredibly simple, there are not
+            # accepted rules for classifying other operators as trivial yet.
+            for child in @context.children.models
+                if not (operator = child.get('operator'))? or operator != 'in'
+                    return true
 
-            # Now that we are sure the operator is 'in', if there are no
-            # values in the list of values to match against the context is
-            # considered trivial since it will never match anything and always
-            # end up returning 0 results.
-            return (value = model.get('value'))? and value.length > 0
+                if not (value = child.get('value'))? or value.length > 0
+                    return true
+
+            return false
 
         renderApplied: ->
             @ui.apply.hide()
