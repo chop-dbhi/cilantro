@@ -126,13 +126,27 @@ define [
             if (enabled = @context.isDirty())
                 className = 'alert-warning'
                 message = '<strong>Heads up!</strong> The filter has been changed. <a class=revert href=#>Revert</a>'
+
+            # If we are using the 'in' operator and there are now values in
+            # the list of values to match against, then we should disable the
+            # update filter button because it makes no sense to update an 'in'
+            # filter with an empty search list as it will never match anything.
+            enabled = enabled and @context.children.models[0]?.get('value')?.length > 0
+
             @_renderFooter(message, className, enabled)
 
         renderNew: ->
             @ui.apply.show()
+
+            # If we are using the 'in' operator and there are now values in
+            # the list of values to match against, then we should disable the
+            # apply filter button because it makes no sense to apply an 'in'
+            # filter with an empty search list as it will never match anything.
+            enabled = @context.children.models[0]?.get('value')?.length > 0
+
             @ui.update.hide()
             @ui.remove.hide()
-            @_renderFooter(null, null, true)
+            @_renderFooter(null, null, enabled)
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
