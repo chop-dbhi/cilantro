@@ -52,6 +52,18 @@ define [
 
             @set(@context)
 
+        # Method for parsing the value of the StatModel corresponding to the
+        # minimum viable value for this range. By default, this method simply
+        # returns the value itself.
+        parseMinStat: (value) ->
+            return value
+
+        # Method for parsing the value of the StatModel corresponding to the
+        # maximum viable value for this range. By default, this method simply
+        # returns the value itself.
+        parseMaxStat: (value) ->
+            return value
+
         # Tries to find and read the values of the stats models with the keys
         # 'min' and 'max' from this model's StatsCollection. After these values
         # are read, the bounds will be updated if they need to be so that the
@@ -62,14 +74,14 @@ define [
             )?.get('value')
 
             if statsMin?
-                @minLowerBound = statsMin
+                @minLowerBound = @parseMinStat(statsMin)
 
             statsMax = _.find(@model.stats.models, (stat) ->
                 return stat.get('label') == 'Max'
             )?.get('value')
 
             if statsMax?
-                @maxUpperBound = statsMax
+                @maxUpperBound = @parseMaxStat(statsMax)
 
             @updateBounds()
 
@@ -86,9 +98,9 @@ define [
         updateBounds: ->
             if @isClosed? and not @isClosed
                 if @ui.lowerBound.val() == ""
-                    @ui.lowerBound.val(@minLowerBound)
+                    @setLowerBoundValue(@minLowerBound)
                 if @ui.upperBound.val() == ""
-                    @ui.upperBound.val(@maxUpperBound)
+                    @setUpperBoundValue(@maxUpperBound)
 
         getField: ->
             return @model.id
