@@ -121,7 +121,7 @@ define [
         isContextNonTrivial: ->
             # If the context has no children then we can consider it trivial
             # as it has no filter conditions.
-            if not @context.children?.models?.length == 0
+            if not @context.children.length == 0
                 return false
 
             # If there are children, the only case a context will be considered
