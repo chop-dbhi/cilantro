@@ -22,7 +22,7 @@ define [
 
         parseMinStat: (value) ->
             return @parseMaxStat(value)
-        parseMaxState: (value) ->
+        parseMaxStat: (value) ->
             return value.replace(/-/g, "/")
 
         # We need to override the default behavior here so that the value is
