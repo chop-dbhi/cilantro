@@ -1,11 +1,13 @@
 <div class=navbar-inner>
     <div class=btn-toolbar>
-        <div class="navbar-form pull-left">
-            <input type=text name=filter placeholder="Filter values...">
-        </div>
-
-        <div class="btn-group pull-right">
-            <button class="btn" name=invert title="Invert Selection"><i class="icon-exchange icon-rotate-90"></i> Invert</button>
+        <div class="navbar-form">
+            <button class="btn invert-button" name=invert title="Invert Selection">Invert Selection</button>
+            <span class='filter-container'>
+                <input class=filter-text type=text name=filter placeholder="Filter values...">
+            </span>
         </div>
     </div>
+</div>
+<div class=sort-region>
+    <span class=sort-value-header>Value <i class=icon-sort></i></span><span class=sort-count-header>Count <i class=icon-sort-down></i></span>
 </div>

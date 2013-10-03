@@ -163,40 +163,47 @@ define [
         template: templates.toolbar
 
         events:
-            'change .btn-select': 'sortBy'
             'keyup [name=filter]': 'filterBars'
             'click [name=invert]': 'invertSelection'
+            'click .sort-value-header, .sort-count-header': 'sortBy'
 
         ui:
             toolbar: '.btn-toolbar'
-            sortSelect: '.btn-select'
             filterInput: '[name=filter]'
             invertButton: '[name=invert]'
+            sortValueHeader: '.sort-value-header'
+            sortCountHeader: '.sort-count-header'
 
-        onRender: ->
-            @sortSelect = new button.ButtonSelect
-                collection: [
-                    value: '-count'
-                    label: 'Count (desc)'
-                    selected: true
-                ,
-                    value: 'count'
-                    label: 'Count (asc)'
-                ,
-                    value: '-value'
-                    label: 'Value (desc)'
-                ,
-                    value: 'value'
-                    label: 'Value (asc)'
-                ]
+        initialize: ->
+            @sortDirection = "-count"
 
-            @sortSelect.render()
-            @sortSelect.$el.addClass('pull-right')
-            @ui.toolbar.append(@sortSelect.el)
-
-        # Sorts the collection based on the current selected value
         sortBy: (event) ->
-            @collection.sortModelsBy(@sortSelect.getSelection())
+            if event.currentTarget.className == "sort-value-header"
+                if @sortDirection == "-value"
+                    @sortDirection = "value"
+                else
+                    @sortDirection = "-value"
+            else
+                if @sortDirection == "-count"
+                    @sortDirection = "count"
+                else
+                    @sortDirection = "-count"
+
+            switch @sortDirection
+                when "-count"
+                    @ui.sortValueHeader.html("Value <i class=icon-sort></i>")
+                    @ui.sortCountHeader.html("Count <i class=icon-sort-down></i>")
+                when "count"
+                    @ui.sortValueHeader.html("Value <i class=icon-sort></i>")
+                    @ui.sortCountHeader.html("Count <i class=icon-sort-up></i>")
+                when "-value"
+                    @ui.sortValueHeader.html("Value <i class=icon-sort-down></i>")
+                    @ui.sortCountHeader.html("Count <i class=icon-sort></i>")
+                when "value"
+                    @ui.sortValueHeader.html("Value <i class=icon-sort-up></i>")
+                    @ui.sortCountHeader.html("Count <i class=icon-sort></i>")
+
+            @collection.sortModelsBy(@sortDirection)
 
         # 'Filters' the bars given the input
         filterBars: (event) ->
@@ -217,7 +224,6 @@ define [
                     model.set('selected', not model.get('selected'))
             @collection.trigger('change')
             return
-
 
 
     class BarChart extends controls.Control
