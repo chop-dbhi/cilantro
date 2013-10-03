@@ -23,6 +23,10 @@ define [
         parseMinStat: (value) ->
             return @parseMaxStat(value)
         parseMaxStat: (value) ->
+            # The date string parser apparently has issues with dashes. If we
+            # leave the dashes in, a date of 2009-06-21 will be parsed as
+            # June 20th 2009 so we replaces the dashes with slashes to get the
+            # date to parse it as we expect it to, that is, June 21st 2009.
             return value.replace(/-/g, "/")
 
         # We need to override the default behavior here so that the value is
