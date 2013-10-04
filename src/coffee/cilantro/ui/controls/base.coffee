@@ -54,7 +54,7 @@ define [
     #           @bindContext(@options.context)
 
     ControlViewMixin =
-        attrNames: ['field', 'operator', 'value', 'nulls']
+        attrNames: ['field', 'operator', 'value']
 
         attrGetters:
             field: 'getField'
@@ -117,8 +117,7 @@ define [
             else
                 attrs = {}
                 for key in @attrNames
-                    if (value = @_get key, options)?
-                        attrs[key] = value
+                    attrs[key] = @_get(key, options)
                 return attrs
 
         set: (key, value, options) ->
@@ -132,7 +131,7 @@ define [
                 (attrs = {})[key] = value
 
             for key, value of attrs
-                @_set key, value, options
+                @_set(key, value, options)
             return
 
         clear: (key, options) ->
