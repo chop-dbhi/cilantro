@@ -1,11 +1,17 @@
 define [
+    'underscore'
     './range'
-], (range) ->
+], (_, range) ->
 
     class DateControl extends range.RangeControl
         # Add the change event from the datepickers to existing range events
-        events:
+        _events:
             'changeDate .datepicker': 'change'
+
+        initialize: ->
+            super
+
+            @events = _.extend({}, @_events, @events)
 
         onRender: ->
             super
