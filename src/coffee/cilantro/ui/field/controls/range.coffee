@@ -97,9 +97,9 @@ define [
         # upper and lower bounds are currently empty.
         updateBounds: ->
             if @isClosed? and not @isClosed
-                if @ui.lowerBound.val() == ""
+                if @minLowerBound?
                     @setLowerBoundPlaceholder(@minLowerBound)
-                if @ui.upperBound.val() == ""
+                if @maxUpperBound?
                     @setUpperBoundPlaceholder(@maxUpperBound)
 
         getField: ->
