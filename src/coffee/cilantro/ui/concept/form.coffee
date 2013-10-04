@@ -126,19 +126,25 @@ define [
             if (enabled = @context.isDirty())
                 className = 'alert-warning'
                 message = '<strong>Heads up!</strong> The filter has been changed. <a class=revert href=#>Revert</a>'
+
+            # Strictly check if this context is valid which requires at least
+            # one condition to be present
+            enabled = enabled and @context.isValid()
             @_renderFooter(message, className, enabled)
 
         renderNew: ->
             @ui.apply.show()
             @ui.update.hide()
             @ui.remove.hide()
-            @_renderFooter(null, null, true)
+            # Strictly check if this context is valid which requires at least
+            # one condition to be present
+            @_renderFooter(null, null, @context.isValid())
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
         applyFilter: (event) ->
             event?.preventDefault()
-            @context.apply({strict: true})
+            @context.apply()
 
         # Remove the filter
         removeFilter: (event) ->

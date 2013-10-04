@@ -17,7 +17,7 @@ define(['cilantro'], function (c) {
                 // Default states
                 expect(node.isDirty()).toBe(false);
                 expect(node.isNew()).toBe(true);
-                expect(node.isValid()).toBe(true);
+                expect(node.isValid()).toBe(false);
                 expect(node.isEnabled()).toBe(false);
             });
 
@@ -34,10 +34,7 @@ define(['cilantro'], function (c) {
 
         describe('Serialization', function() {
             it('should serialize an empty upstream', function() {
-                expect(manager.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
+                expect(manager.toJSON()).toBeUndefined();
             });
         });
 
@@ -48,20 +45,14 @@ define(['cilantro'], function (c) {
             });
 
             it('initial', function() {
-                expect(manager.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
+                expect(manager.toJSON()).toBeUndefined();
             });
 
             it('apply branch', function() {
                 b.apply();
 
                 // no change since an empty branch is not valid
-                expect(manager.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
+                expect(manager.toJSON()).toBeUndefined();
             });
 
             it('nested condition', function() {
@@ -108,49 +99,7 @@ define(['cilantro'], function (c) {
             });
         });
 
-        describe('Apply Session', function() {
-
-            it('upstream should be empty', function() {
-                expect(manager.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
-
-                var b = manager.working.define({concept: 1}, {type: 'branch'});
-
-                expect(manager.working.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        concept: 1,
-                        type: 'and',
-                        children: []
-                    }]
-                });
-
-                b.apply();
-
-                expect(manager.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
-
-            });
-
-        });
-
         describe('Set', function() {
-            it('simple', function() {
-                manager.set({
-                    type: 'or',
-                    children: []
-                });
-
-                expect(manager.working.toJSON()).toEqual({
-                    type: 'or',
-                    children: []
-                });
-            });
-
             it('complex', function() {
                 var b1 = manager.define({concept: 1}, {type: 'branch'}),
                     b2 = manager.define({concept: 2}, {type: 'branch'});
@@ -194,10 +143,7 @@ define(['cilantro'], function (c) {
                 });
 
                 // pre-set upstream tree
-                expect(manager.upstream.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
+                expect(manager.upstream.toJSON()).toBeUndefined();
 
                 // set
                 manager.set({
@@ -257,10 +203,6 @@ define(['cilantro'], function (c) {
                             value: 50,
                             warnings: ['out of bounds']
                         }]
-                    }, {
-                        concept: 2,
-                        type: 'and',
-                        children: []
                     }]
                 });
 
@@ -292,10 +234,7 @@ define(['cilantro'], function (c) {
                 });
 
                 // post-set upstream tree
-                expect(manager.upstream.toJSON()).toEqual({
-                    type: 'and',
-                    children: []
-                });
+                expect(manager.upstream.toJSON()).toBeUndefined();
             });
 
         });
