@@ -118,25 +118,6 @@ define [
 
             @_renderFooter(message, className, false)
 
-        isContextNonTrivial: ->
-            # If the context has no children then we can consider it trivial
-            # as it has no filter conditions.
-            if not @context.children.length == 0
-                return false
-
-            # If there are children, the only case a context will be considered
-            # trivial is if all the children use the 'in' operator and have
-            # no selections. While this is incredibly simple, there are not
-            # accepted rules for classifying other operators as trivial yet.
-            for child in @context.children.models
-                if not (operator = child.get('operator'))? or operator != 'in'
-                    return true
-
-                if not (value = child.get('value'))? or value.length > 0
-                    return true
-
-            return false
-
         renderApplied: ->
             @ui.apply.hide()
             @ui.update.show()
@@ -146,22 +127,24 @@ define [
                 className = 'alert-warning'
                 message = '<strong>Heads up!</strong> The filter has been changed. <a class=revert href=#>Revert</a>'
 
-            enabled = enabled and @isContextNonTrivial()
-
+            # Strictly check if this context is valid which requires at least
+            # one condition to be present
+            enabled = enabled and @context.isValid()
             @_renderFooter(message, className, enabled)
 
         renderNew: ->
             @ui.apply.show()
-
             @ui.update.hide()
             @ui.remove.hide()
-            @_renderFooter(null, null, @isContextNonTrivial())
+            # Strictly check if this context is valid which requires at least
+            # one condition to be present
+            @_renderFooter(null, null, @context.isValid())
 
         # Saves the current state of the context which enables it to be
         # synced with the server.
         applyFilter: (event) ->
             event?.preventDefault()
-            @context.apply({strict: true})
+            @context.apply()
 
         # Remove the filter
         removeFilter: (event) ->
