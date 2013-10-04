@@ -6,10 +6,12 @@ define [
     class NumberControl extends range.RangeControl
         # Cast the lower bound to a number for use in the getValue() method
         getLowerBoundValue: ->
-            return parseFloat(@ui.lowerBound.val())
+            if (value = @ui.lowerBound.val().trim())
+                return parseFloat(value)
 
         # Case the upper bound to a number for use in the getValue() method
         getUpperBoundValue: ->
-            return parseFloat(@ui.upperBound.val())
+            if (value = @ui.upperBound.val().trim())
+                return parseFloat(value)
 
     { NumberControl }
