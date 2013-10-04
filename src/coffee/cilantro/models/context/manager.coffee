@@ -152,7 +152,7 @@ define [
             if not (n = @find(ident))
                 return
             if (u = @upstream.find(ident))
-                n.set(u.toJSON())
+                n.set(u.toJSON(), remove: false)
                 if n.hasChanged()
                     n.trigger('revert')
                     u.trigger('revert')
