@@ -10,6 +10,7 @@ define [
     # Returns a flat list of values for `key` that is built by recursing
     # over the `attrs.children` if present.
     flattenAttr = (attrs, key, items=[]) ->
+        if not attrs? then return items
         if attrs[key]?
             items.push(attrs[key])
         if attrs.children?

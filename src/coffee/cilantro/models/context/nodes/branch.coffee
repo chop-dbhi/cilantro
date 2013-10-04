@@ -86,22 +86,13 @@ define [
         # Serializes the node to JSON including child nodes. Only
         # valid nodes are included in the output.
         toJSON: (options) ->
-            options = _.extend
-                strict: false
-            , options
-
             # Evaluate children first
             children = []
             for child in @children.models
                 # Only valid nodes
-                if options.strict and not child.isValid(options)
-                    continue
-                # Empty child are excluded
-                if (attrs = child.toJSON(options))
+                if child.isValid(options) and (attrs = child.toJSON(options))
                     children.push(attrs)
-
-            # Strict JSON requires children to have a length
-            if options.strict and not children.length
+            if not children.length
                 return
             (attrs = super).children = children
             return attrs
@@ -109,14 +100,21 @@ define [
         # Validate base on the attributes prepared by toJSON. The internal
         # attributes will likely be out of date especially for branch nodes.
         _validate: (attrs, options) ->
+            if not options.validate then return true
             if not attrs or _.isEmpty(attrs)
                 attrs = @toJSON(options)
-            super(attrs, options)
+            attrs = _.extend({}, attrs)
+            error = @validationError = @validate(attrs, options) or null
+            if not error then return true
+            @trigger('invalid', @, error, _.extend(options, validationError: error))
+            return false
 
         # Branch nodes must of the type 'and' or 'or'
         validate: (attrs, options) ->
             if not (attrs.type is 'and' or attrs.type is 'or')
                 return 'Not a valid branch type'
+            if not attrs.children.length
+                return 'No children present'
 
         # Define a node within this branch via the manager
         define: (attrs, path, options) ->

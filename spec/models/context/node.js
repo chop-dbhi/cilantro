@@ -23,12 +23,8 @@ define(['cilantro'], function (c) {
                 children: []
             });
 
-            expect(model.isValid()).toBe(true);
+            expect(model.isValid()).toBe(false);
             expect(model.toJSON()).toEqual({
-                type: 'and',
-                children: []
-            });
-            expect(model.toJSON({strict: true})).toEqual({
                 type: 'and',
                 children: []
             });
@@ -214,15 +210,6 @@ define(['cilantro'], function (c) {
 
                 expect(b.path()).toEqual([]);
 
-                expect(root.toJSON()).toEqual({
-                    type: 'and',
-                    children: [{
-                        concept: 1,
-                        type: 'and',
-                        children: []
-                    }]
-                });
-
                 var c = b.define({
                     concept: 1,
                     field: 5,
@@ -248,12 +235,15 @@ define(['cilantro'], function (c) {
             });
 
             it('condition node', function() {
-                root.define({concept: 1, field: 5}, {type: 'condition'});
+                var c = root.define({concept: 1, field: 5}, {type: 'condition'});
+                c.set({operator: 'in', value: [1, 2]});
                 expect(root.toJSON()).toEqual({
                     type: 'and',
                     children: [{
                         concept: 1,
-                        field: 5
+                        field: 5,
+                        operator: 'in',
+                        value: [1, 2]
                     }]
                 });
             });

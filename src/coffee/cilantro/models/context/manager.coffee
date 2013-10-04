@@ -45,7 +45,7 @@ define [
 
         # Serializes the upstream tree which represents a clean and valid
         # representation of the tree.
-        toJSON: (options) ->
+        toJSON: ->
             @upstream.toJSON()
 
         # Light wrapper for fixing attrs for the top-level branch node. If `attrs`
@@ -136,7 +136,7 @@ define [
             if not (n = @find(ident))
                 return
             # No attributes, which means this is not valid
-            if not (attrs = n.toJSON({strict: true}))
+            if not (attrs = n.toJSON())
                 return
             # Define upstream, this is idempotent
             u = @upstream.define(ident, n.path(), type: n.type)
