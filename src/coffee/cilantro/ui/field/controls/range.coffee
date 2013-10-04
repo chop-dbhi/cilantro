@@ -11,7 +11,7 @@ define [
     class RangeControl extends controls.Control
         template: templates.range
 
-        events: ->
+        events:
             'keyup .range-from, .range-to': 'change'
             'change .btn-select': 'change'
             'click .range-help-button': 'toggleHelpText'
@@ -98,9 +98,9 @@ define [
         updateBounds: ->
             if @isClosed? and not @isClosed
                 if @ui.lowerBound.val() == ""
-                    @setLowerBoundValue(@minLowerBound)
+                    @setLowerBoundPlaceholder(@minLowerBound)
                 if @ui.upperBound.val() == ""
-                    @setUpperBoundValue(@maxUpperBound)
+                    @setUpperBoundPlaceholder(@maxUpperBound)
 
         getField: ->
             return @model.id
@@ -173,19 +173,27 @@ define [
             else
                 @inOutSelect.setSelection("between")
 
-        # This method updates the lower bound text box with the supplied value.
-        # Overriding this method allows for transformations of the value itself
-        # before application as well as more complex UI updates beyond the
-        # default behavior. This method simply sets the lower bound text box
-        # to the string supplied as the value argument.
+        # This method updates the lower bound text box placeholder with the
+        # supplied value. Overriding this method allows for transformations
+        # of the value itself before application as well as more complex UI
+        # updates beyond the default behavior. This method simply sets the
+        # lower bound text box placeholder to the string supplied as the value
+        # argument.
+        setLowerBoundPlaceholder: (value) ->
+            @ui.lowerBound.attr('placeholder', value)
+
         setLowerBoundValue: (value) ->
             @ui.lowerBound.val(value)
 
-        # This method updates the upper bound text box with the supplied value.
-        # Overriding this method allows for transformations of the value itself
-        # before application as well as more complex UI updates beyond the
-        # default behavior. This method simply sets the upper bound text box
-        # to the string supplied as the value argument.
+        # This method updates the upper bound text box placeholder with the
+        # supplied value. Overriding this method allows for transformations
+        # of the value itself before application as well as more complex UI
+        # updates beyond the default behavior. This method simply sets the
+        # upper bound text box placeholder to the string supplied as the value
+        # argument.
+        setUpperBoundPlaceholder: (value) ->
+            @ui.upperBound.attr('placeholder', value)
+
         setUpperBoundValue: (value) ->
             @ui.upperBound.val(value)
 
