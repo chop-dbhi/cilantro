@@ -13,12 +13,20 @@ define(['backbone', 'cilantro', 'text!/mock/fields.json'], function (Backbone, c
             });
 
             it('should have an field by default', function() {
-                expect(control.get()).toEqual({field: 30});
+                expect(control.get()).toEqual({
+                    field: 30,
+                    value: null,
+                    operator: null
+                });
             });
 
             it('should never clear the field attr', function() {
                 control.clear();
-                expect(control.get()).toEqual({field: 30});
+                expect(control.get()).toEqual({
+                    field: 30,
+                    value: null,
+                    operator: null
+                });
             });
         });
 
