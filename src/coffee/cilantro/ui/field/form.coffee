@@ -26,7 +26,7 @@ define [
             controls.NumberControl
         else if type is 'boolean'
             controls.BooleanControl
-        else if type is 'datetime'
+        else if type is 'datetime' or type is 'date' or type is 'time'
             controls.DateControl
 
 

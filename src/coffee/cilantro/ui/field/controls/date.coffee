@@ -1,118 +1,76 @@
 define [
     'underscore'
-    '../../controls'
-    '../../button'
-    'tpl!templates/controls/date-range-input.html'
-], (_, controls, button, templates...) ->
+    './range'
+], (_, range) ->
 
-    templates = _.object ['date'], templates
-
-    class DateControl extends controls.Control
-        template: templates.date
-
-        events: ->
+    class DateControl extends range.RangeControl
+        # Add the change event from the datepickers to existing range events
+        _events:
             'changeDate .datepicker': 'change'
-            'keyup .datepicker': 'change'
-            'change .btn-select': 'change'
-            'click .range-help-button': 'toggleHelpText'
 
-        initialize: (options) ->
-            @model = options.model
+        initialize: ->
+            super
 
-        ui:
-            inOutSelect: '.btn-select'
+            @events = _.extend({}, @_events, @events)
 
         onRender: ->
-            @inOutSelect = new button.ButtonSelect
-                collection: [
-                    value: 'between'
-                    label: 'between'
-                    selected: true
-                ,
-                    value: 'not_between'
-                    label: 'not between'
-                ]
+            super
+            # Initialize the datepickers and make them close automatically
+            @ui.lowerBound.datepicker({'autoclose': true})
+            @ui.upperBound.datepicker({'autoclose': true})
 
-            @inOutSelect.render().$el.prependTo(@$el)
-            @$('.help-block').hide()
-            @$('.range-from').datepicker({'autoclose': true})
-            @$('.range-to').datepicker({'autoclose': true})
+        # Convert the lower bound to a date for use in the getValue() method
+        getLowerBoundValue: ->
+            return @ui.lowerBound.datepicker('getFormattedDate')
 
-            @set(@context)
+        # Convert the upper bound to a date for use in the getValue() method
+        getUpperBoundValue: ->
+            return @ui.upperBound.datepicker('getFormattedDate')
 
-        toggleHelpText: (event) ->
-            @$('.help-block').toggle()
-            event.preventDefault()
+        parseMinStat: (value) ->
+            return @parseMaxStat(value)
+        parseMaxStat: (value) ->
+            # The date string parser apparently has issues with dashes. If we
+            # leave the dashes in, a date of 2009-06-21 will be parsed as
+            # June 20th 2009 so we replaces the dashes with slashes to get the
+            # date to parse it as we expect it to, that is, June 21st 2009.
+            return value.replace(/-/g, "/")
 
-        isBetweenSelected: ->
-            return @inOutSelect.getSelection() == 'between'
+        # Override the default behavior so the date is formatted correctly
+        # for use in the placeholder.
+        setLowerBoundPlaceholder: (value) ->
+            date = new Date(value)
 
-        getField: ->
-            return @model.id
+            # We want to display the date in mm/dd/yyyy format. Also, since
+            # months are 0 based, we need to add one there when formatting the
+            # date string for placeholder use.
+            dateStr = "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
 
-        getOperator: ->
-            from = @$('.range-from').val()
-            to = @$('.range-to').val()
-            operator = ''
+            @ui.lowerBound.attr('placeholder', dateStr)
 
-            if from != "" and to != ""
-                operator = if @isBetweenSelected() then 'range' else '-range'
-            else if from != ""
-                operator = if @isBetweenSelected() then 'gte' else 'lte'
-            else if to != ""
-                operator = if @isBetweenSelected() then 'lte' else 'gte'
-            else
-                operator = if @isBetweenSelected() then 'range' else '-range'
+        # We need to override the default behavior here so that the value is
+        # applied to the datepicker rather than the textbox. The datepicker
+        # will handle the updating of the textbox.
+        setLowerBoundValue: (value) ->
+            @ui.lowerBound.datepicker('setDate', new Date(value))
 
-            return operator
+        # Override the default behavior so the date is formatted correctly
+        # for use in the placeholder.
+        setUpperBoundPlaceholder: (value) ->
+            date = new Date(value)
 
-        getValue: ->
-            from_text = @$('.range-from').val()
-            from_date = @$('.range-from').data('datepicker').getFormattedDate()
+            # We want to display the date in mm/dd/yyyy format. Also, since
+            # months are 0 based, we need to add one there when formatting the
+            # date string for placeholder use.
+            dateStr = "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
 
-            to_text = @$('.range-to').val()
-            to_date = @$('.range-to').data('datepicker').getFormattedDate()
+            @ui.upperBound.attr('placeholder', dateStr)
 
-            value = []
+        # We need to override the default behavior here so that the value is
+        # applied to the datepicker rather than the textbox. The datepicker
+        # will handle the updating of the textbox.
+        setUpperBoundValue: (value) ->
+            @ui.upperBound.datepicker('setDate', new Date(value))
 
-            if from_text != "" and to_text != ""
-                value = [from_date, to_date]
-            else if from_text != ""
-                value = from_date
-            else if to_text != ""
-                value = to_date
-            # If both fields are emtpy, return null to invalidate this range
-            else
-                value = null
-
-            return value
-
-        setOperator: (operator) ->
-            @operator = operator
-
-            if operator == '-range'
-                @inOutSelect.setSelection("not_between")
-            else
-                @inOutSelect.setSelection("between")
-
-        setValue: (value) ->
-            switch @operator
-                when 'range', '-range'
-                    if value[0]?
-                        @$('.range-from').data('datepicker').setDate(
-                            new Date(value[0]))
-                    else
-                        @$('.range-from').val('')
-                    if value[1]?
-                        @$('.range-to').data('datepicker').setDate(
-                            new Date(value[1]))
-                    else
-                        @$('.range-to').val('')
-                when 'gte'
-                    @$('.range-from').data('datepicker').setDate(
-                        new Date(value))
-                when 'lte'
-                    @$('.range-to').data('datepicker').setDate(
-                        new Date(value))
 
     {DateControl}
