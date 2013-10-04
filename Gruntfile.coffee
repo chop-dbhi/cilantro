@@ -397,9 +397,9 @@ module.exports = (grunt) ->
         version.release = ''
         version.build = ''
 
-        version = svutil.stringify(version)
+        pkg.version = svutil.stringify(version)
         for fname in ['package.json', 'bower.json']
-            changeVersion(fname, version)
+            changeVersion(fname, pkg.version)
 
     grunt.registerTask 'tag-release', 'Create a release on master', ->
         run 'git add .'
