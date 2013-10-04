@@ -10,7 +10,6 @@ define [
 
         initialize: ->
             super
-
             @events = _.extend({}, @_events, @events)
 
         onRender: ->
@@ -21,20 +20,24 @@ define [
 
         # Convert the lower bound to a date for use in the getValue() method
         getLowerBoundValue: ->
-            return @ui.lowerBound.datepicker('getFormattedDate')
+            @ui.lowerBound.datepicker('getFormattedDate')
 
         # Convert the upper bound to a date for use in the getValue() method
         getUpperBoundValue: ->
-            return @ui.upperBound.datepicker('getFormattedDate')
+            @ui.upperBound.datepicker('getFormattedDate')
+
+        # The date string parser apparently has issues with dashes. If we
+        # leave the dashes in, a date of 2009-06-21 will be parsed as
+        # June 20th 2009 so we replaces the dashes with slashes to get the
+        # date to parse it as we expect it to, that is, June 21st 2009.
+        _parseDate: (value) ->
+            if value? then value.replace(/-/g, '/')
 
         parseMinStat: (value) ->
-            return @parseMaxStat(value)
+            @_parseDate(value)
+
         parseMaxStat: (value) ->
-            # The date string parser apparently has issues with dashes. If we
-            # leave the dashes in, a date of 2009-06-21 will be parsed as
-            # June 20th 2009 so we replaces the dashes with slashes to get the
-            # date to parse it as we expect it to, that is, June 21st 2009.
-            return value.replace(/-/g, "/")
+            @_parseDate(value)
 
         # Override the default behavior so the date is formatted correctly
         # for use in the placeholder.
@@ -45,7 +48,6 @@ define [
             # months are 0 based, we need to add one there when formatting the
             # date string for placeholder use.
             dateStr = "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
-
             @ui.lowerBound.attr('placeholder', dateStr)
 
         # We need to override the default behavior here so that the value is
@@ -63,7 +65,6 @@ define [
             # months are 0 based, we need to add one there when formatting the
             # date string for placeholder use.
             dateStr = "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
-
             @ui.upperBound.attr('placeholder', dateStr)
 
         # We need to override the default behavior here so that the value is
