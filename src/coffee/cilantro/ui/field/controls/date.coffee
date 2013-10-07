@@ -6,7 +6,7 @@ define [
     class DateControl extends range.RangeControl
         # Add the change event from the datepickers to existing range events
         _events:
-            'changeDate .range-lower, .range-upper': 'change'
+            'changeDate .range-lower,.range-upper': 'change'
 
         initialize: ->
             super
@@ -54,7 +54,17 @@ define [
         # applied to the datepicker rather than the textbox. The datepicker
         # will handle the updating of the textbox.
         setLowerBoundValue: (value) ->
-            @ui.lowerBound.datepicker('setDate', new Date(value))
+            # Since the changeDate event is causing this method to receive a
+            # query object we need to read the value of the date here. The
+            # setValue method is always getting an array with the .range-lower
+            # and .range-upper jquery objects in it so checking for empty
+            # values is done here to keep setValue generic.
+            dateString = value?.val()
+
+            if dateString? and dateString != ""
+                @ui.lowerBound.datepicker('setDate', new Date(dateString))
+            else
+                @ui.lowerBound.datepicker('_clearDate', this)
 
         # Override the default behavior so the date is formatted correctly
         # for use in the placeholder.
@@ -71,7 +81,17 @@ define [
         # applied to the datepicker rather than the textbox. The datepicker
         # will handle the updating of the textbox.
         setUpperBoundValue: (value) ->
-            @ui.upperBound.datepicker('setDate', new Date(value))
+            # Since the changeDate event is causing this method to receive a
+            # query object we need to read the value of the date here. The
+            # setValue method is always getting an array with the .range-lower
+            # and .range-upper jquery objects in it so checking for empty
+            # values is done here to keep setValue generic.
+            dateString = value?.val()
+
+            if dateString? and dateString != ""
+                @ui.upperBound.datepicker('setDate', new Date(dateString))
+            else
+                @ui.upperBound.datepicker('_clearDate', this)
 
 
     {DateControl}
