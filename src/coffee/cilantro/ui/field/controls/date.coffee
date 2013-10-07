@@ -39,59 +39,53 @@ define [
         parseMaxStat: (value) ->
             @_parseDate(value)
 
-        # Override the default behavior so the date is formatted correctly
-        # for use in the placeholder.
-        setLowerBoundPlaceholder: (value) ->
+        # Sets the placeholder value on the supplied element to the date value
+        _setPlaceholder: (element, value) ->
             date = new Date(value)
 
             # We want to display the date in mm/dd/yyyy format. Also, since
             # months are 0 based, we need to add one there when formatting the
             # date string for placeholder use.
             dateStr = "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
-            @ui.lowerBound.attr('placeholder', dateStr)
+            element.attr('placeholder', dateStr)
+
+        # Override the default behavior so the date is formatted correctly
+        # for use in the placeholder.
+        setLowerBoundPlaceholder: (value) ->
+            @_setPlaceholder(@ui.lowerBound, value)
+
+        # Override the default behavior so the date is formatted correctly
+        # for use in the placeholder.
+        setUpperBoundPlaceholder: (value) ->
+            @_setPlaceholder(@ui.upperBound, value)
+
+        # Sets the value of the supplied element to the date value or clears
+        # the value of the element if the value or the call to val() is
+        # null or empty.
+        _setValue: (element, value) ->
+            # Since the changeDate event is causing this method to receive a
+            # query object we need to read the value of the date here. The
+            # setValue method is always getting an array with the .range-lower
+            # and .range-upper jquery objects in it so checking for empty
+            # values is done here to keep setValue generic.
+            dateString = value?.val()
+
+            if dateString? and dateString != ""
+                element.datepicker('setDate', new Date(dateString))
+            else
+                element.datepicker('_clearDate', this)
 
         # We need to override the default behavior here so that the value is
         # applied to the datepicker rather than the textbox. The datepicker
         # will handle the updating of the textbox.
         setLowerBoundValue: (value) ->
-            # Since the changeDate event is causing this method to receive a
-            # query object we need to read the value of the date here. The
-            # setValue method is always getting an array with the .range-lower
-            # and .range-upper jquery objects in it so checking for empty
-            # values is done here to keep setValue generic.
-            dateString = value?.val()
-
-            if dateString? and dateString != ""
-                @ui.lowerBound.datepicker('setDate', new Date(dateString))
-            else
-                @ui.lowerBound.datepicker('_clearDate', this)
-
-        # Override the default behavior so the date is formatted correctly
-        # for use in the placeholder.
-        setUpperBoundPlaceholder: (value) ->
-            date = new Date(value)
-
-            # We want to display the date in mm/dd/yyyy format. Also, since
-            # months are 0 based, we need to add one there when formatting the
-            # date string for placeholder use.
-            dateStr = "#{date.getMonth() + 1}/#{date.getDate()}/#{date.getFullYear()}"
-            @ui.upperBound.attr('placeholder', dateStr)
+            @_setValue(@ui.lowerBound, value)
 
         # We need to override the default behavior here so that the value is
         # applied to the datepicker rather than the textbox. The datepicker
         # will handle the updating of the textbox.
         setUpperBoundValue: (value) ->
-            # Since the changeDate event is causing this method to receive a
-            # query object we need to read the value of the date here. The
-            # setValue method is always getting an array with the .range-lower
-            # and .range-upper jquery objects in it so checking for empty
-            # values is done here to keep setValue generic.
-            dateString = value?.val()
-
-            if dateString? and dateString != ""
-                @ui.upperBound.datepicker('setDate', new Date(dateString))
-            else
-                @ui.upperBound.datepicker('_clearDate', this)
+            @_setValue(@ui.upperBound, value)
 
 
     {DateControl}
