@@ -1,6 +1,8 @@
 *.DS_Store
 *.sw?
 *.py?
+*.tar.gz
+*.zip
 .sass-cache
 .watch-pid
 local
