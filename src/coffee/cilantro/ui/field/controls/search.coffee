@@ -170,6 +170,8 @@ define [
             # Set the values from the context
             @set(@context)
 
+        getField: -> @model?.id
+
         # This is currently always an 'in', however 'not in' may be
         # desirable as well.
         getOperator: -> 'in'
