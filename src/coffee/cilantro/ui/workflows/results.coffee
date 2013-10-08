@@ -431,6 +431,9 @@ define [
                 view: @data.view
                 collection: @data.results
 
+            @table.currentView.on 'render', () =>
+                @$('.context').stacked('restack', @$el.height())
+
             @columns.show new concept.ConceptColumns
                 view: @data.view
                 concepts: @data.concepts
