@@ -6,6 +6,9 @@
 define ->
 
     changelog = [
+        version: '2.1.2',
+        changes: []
+    ,
         version: '2.1.1',
         changes: []
     ,
