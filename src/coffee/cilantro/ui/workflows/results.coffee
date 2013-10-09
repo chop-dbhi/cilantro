@@ -119,7 +119,7 @@ define [
             $(window).resize @onWindowResize
 
             @data.results.on 'request', @showLoadingOverlay
-            @data.results.on 'reset', @hideLoadingOverlay
+            @data.results.on 'sync', @hideLoadingOverlay
 
             @monitors = {}
 
