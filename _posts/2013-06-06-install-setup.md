@@ -1,59 +1,18 @@
 ---
 layout: page
-title: "Install & Setup"
+title: "Download & Setup"
 category: ref
-date: 2013-06-06 16:36:26
+date: {}
+published: true
 ---
 
-## Configuration
+## Download
 
-### JavaScript
+Stable releases are available on the [releases](https://github.com/cbmi/cilantro/releases) page. Download either non-source package and unarchive it to produce a folder named `cilantro/`.
 
-Define the RequireJS configuration options:
+## Setup
 
-```javascript
-var require = {
-    baseUrl: '/path/to/scripts'
-};
-```
-
-Define the base Cilantro configuration options:
-
-```javascript
-var cilantro = {
-    url: '/serrano/compatible/endpoint/',
-    autoload: true,
-    ui: {
-        main: '#main'
-    }
-};
-```
-
-Define a `main.js` to setup the Cilantro routes. This makes Cilantro aware of which URLs is has control over and what to show on each one. Views will be rendered and appended to the element defined by the `cilantro.ui.main` selector when their corresponding routes are navigated to.
-
-```javascript
-require(['cilantro.ui'], function(c) {
-    c.router.register([{
-        id: 1,
-        route: 'workspace/',
-        view: new c.WorkspaceWorkflow
-    }, {
-        id: 2,
-        route: 'query/',
-        view: new c.ui.QueryWorkflow
-    }, {
-        id: 3,
-        route: 'results/',
-        view: new c.ResultsWorkflow
-    }]);
-
-    c.Backbone.history.start({pushState: true});
-});
-```
-
-### HTML
-
-Define a simple HTML file:
+Create an HTML file next to the `cilantro/` folder.
 
 ```html
 <!doctype html>
@@ -63,23 +22,28 @@ Define a simple HTML file:
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width">
         <title>Hello Cilantro!</title>
+        <link rel=stylesheet href="/cilantro/css/style.css">
     </head>
     <body>
-        <div id="main></div>
+        <div id="main"></div>
+        <script>
+        	// Pre-configuration of requirejs and cilantro
+        	var require = {
+            		baseUrl: '/cilantro/js'
+            	},
+            	cilantro = {
+					// The Serrano-compatible API endpoint Cilantro
+                    // will talk to
+    				url: '/api/',
+    				// Tells cilantro where to render the app, defaults
+                    // to #cilantro-main if not specified
+			    	main: '#main'
+                }
+             };
+        </script>
+        <script data-main="cilantro/main" src="/cilantro/js/require.js"></script>
     </body>
 </html>
 ```
 
-Add the require.js script tag right before the closing `</body>` tag. Set the [`data-main` attribute](http://requirejs.org/docs/api.html#jsfiles) to load the main.js (omitting the .js) relative to the `baseUrl` setting above:
-
-```html
-<script data-main="main" src="/path/to/require.js"></script>
-```
-
-### Optional
-
-Although not technically required, it is highly recommended you include the default Cilantro stylesheet. Put this right before the closing `</head>` tag:
-
-```html
-<link rel=stylesheet href="/path/to/cilantro.css">
-```
+The require.js script tag right before the closing `</body>` tag. Set the [`data-main` attribute](http://requirejs.org/docs/api.html#jsfiles) to load main module supplied with Cilantro.
