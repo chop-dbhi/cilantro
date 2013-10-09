@@ -147,7 +147,7 @@ define [
         emptyView: LoadingFields
 
         itemViewOptions: (model, index) ->
-            options =
+            options = _.extend {}, @options,
                 model: model
                 context: @options.context
 
@@ -159,7 +159,7 @@ define [
 
             # Only check if another is not already rendered
             if not @fieldChartIndex?
-                if model.links?.distribution?
+                if options.showChart isnt false and model.links?.distribution?
                     @fieldChartIndex = index
                     options.showChart = true
             else

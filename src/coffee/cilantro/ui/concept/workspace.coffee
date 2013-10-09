@@ -89,17 +89,19 @@ define [
             if @currentView and model.id is @currentView.model.id
                 return
 
-            # Determine if this is registered as a custom concept
-            customForm = c.config.get("concepts.forms.#{ model.id }")
-
             options =
                 model: model
                 context: @data.context
 
+            # Check if custom options or a module has been defined for
+            # this concept.
+            if (customForm = c.config.get("concepts.forms.#{ model.id }"))
+                module = customForm.module
+                options = _.extend({}, customForm.options, options)
+
             # Load external module, catch error if it doesn't exist
-            if customForm?
-                require [customForm.module], (CustomForm) =>
-                    options = _.extend {}, customForm.options, options
+            if module
+                require [module], (CustomForm) =>
                     @createView(CustomForm, options)
                 , (err) =>
                     @showErrorView(model)
