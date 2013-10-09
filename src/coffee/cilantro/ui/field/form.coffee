@@ -19,7 +19,10 @@ define [
         type = model.get('simple_type')
 
         if model.get('enumerable') or type is 'boolean'
-            infograph.BarChart
+            if model.links.distribution?
+                infograph.BarChart
+            else
+                controls.FieldValueSearch
         else if model.get('searchable')
             controls.FieldValueSearch
         else if type is 'number'
