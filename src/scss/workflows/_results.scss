@@ -26,6 +26,34 @@
         }
     }
 
+    .loading-overlay {
+        background: rgba(0, 0, 0, 0.3);
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+
+        // Move this overlay above everything else. If this is not set, it
+        // will render above most things but it will render behind other
+        // elements, like Bootstrap buttons for example.
+        z-index: 1;
+
+        .loading-message {
+            height: 50px;
+            width: 170px;
+            background: #d9d9d9;
+            margin: auto;
+            padding: 10px;
+            margin-top: 100px;
+
+            i {
+                padding: 5px;
+                margin-top: 10px;
+            }
+            h4 {
+                display: inline;
+            }
+        }
+    }
+
     .serrano-version-warning {
         text-align: center;
     }

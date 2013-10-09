@@ -77,6 +77,7 @@ define [
             navbar: '.results-workflow-navbar'
             resultsContainer: '.results-container'
             navbarButtons: '.results-workflow-navbar button'
+            loadingOverlay: '.loading-overlay'
 
         events:
             'click .columns-modal [data-save]': 'saveColumns'
@@ -117,6 +118,9 @@ define [
             $(document).on 'scroll', @onPageScroll
             $(window).resize @onWindowResize
 
+            @data.results.on 'request', @showLoadingOverlay
+            @data.results.on 'reset', @hideLoadingOverlay
+
             @monitors = {}
 
             # Used to tell if filters were hidden by user clicking the button
@@ -125,6 +129,13 @@ define [
             @areFiltersHidden = false
 
             @on 'router:load', @showContextPanel
+
+        showLoadingOverlay: =>
+            if @isClosed? and not @isClosed
+                @ui.loadingOverlay.show()
+
+        hideLoadingOverlay: =>
+            @ui.loadingOverlay.hide()
 
         onWindowResize: =>
             @updateContextPanelOffsets()
