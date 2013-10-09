@@ -401,6 +401,28 @@ module.exports = (grunt) ->
         for fname in ['package.json', 'bower.json']
             changeVersion(fname, pkg.version)
 
+    grunt.registerTask 'bump-patch', 'Updates the version to next patch-release', ->
+        svutil = require('semver-utils')
+        current = pkg.version
+        version = svutil.parse(pkg.version)
+
+        # Ensure it is able to be bumped
+        console.log(version.release)
+        if version.release
+            grunt.fatal("Version #{ current } not final. Should this be bumped to a pre-release?")
+
+        # Remove release and build strings
+        version.patch = '' + (parseInt(version.patch, 10) + 1)
+        version.release = 'beta'
+        version.build = ''
+
+        pkg.version = svutil.stringify(version)
+        for fname in ['package.json', 'bower.json']
+            changeVersion(fname, pkg.version)
+
+        run 'git add bower.json package.json'
+        run "git commit -m '#{ [version.major, version.minor, version.patch].join('.') } Bump'"
+
     grunt.registerTask 'tag-release', 'Create a release on master', ->
         run 'git add .'
         run "git commit -m '#{ pkg.version } Release'"
@@ -427,4 +449,5 @@ module.exports = (grunt) ->
         'release-binaries'
         'tag-release'
         'release-help'
+        'bump-patch'
     ]
