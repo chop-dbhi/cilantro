@@ -13,11 +13,7 @@ define [
 
         align: 'left'
 
-        message: 'You don&apos;t have any saved or shared queries yet.
-            <br /><br />
-            You can save a query for future use by clicking the &quot;Create Query&quot; button at the top of the Results page.
-            <br /><br />
-            You can also share a saved query with specific users, either at the time you save the query or by editing the query within your workspace.'
+        message: 'You have not yet created any queries nor have had any shared with you.'
 
     class QueryItem extends Marionette.ItemView
         className: 'row-fluid'
