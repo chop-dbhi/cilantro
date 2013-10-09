@@ -135,7 +135,8 @@ define [
                 @ui.loadingOverlay.show()
 
         hideLoadingOverlay: =>
-            @ui.loadingOverlay.hide()
+            if @isClosed? and not @isClosed
+                @ui.loadingOverlay.hide()
 
         onWindowResize: =>
             @updateContextPanelOffsets()
