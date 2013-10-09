@@ -44,5 +44,11 @@ require ['cilantro'], (c) ->
                     context: @data.contexts.session
                     view: @data.views.session
 
+            # Since it is the queries endpoint that we POST to for creating new
+            # queries we need to update the shared queries list when a model is
+            # successfully added to the queries list.
+            @data.queries.on 'add', (model, collection, options) =>
+                @data.shared_queries.add(model)
+
         # Register routes and start the session
         @start(routes)
