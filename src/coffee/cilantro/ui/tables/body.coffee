@@ -13,8 +13,6 @@ define [
 
         itemView: row.Row
 
-        emptyView: row.EmptyRow
-
         itemViewOptions: (model, index) =>
             _.defaults
                 collection: model.data
