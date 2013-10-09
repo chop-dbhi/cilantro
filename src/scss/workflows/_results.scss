@@ -1,4 +1,7 @@
 .results-workflow {
+    // XXX: Hack for https://github.com/cbmi/cilantro/issues/282
+    //      This can be removed once the context region becomes a proper panel
+    min-height: 300px;
 
     .results-workflow-navbar {
         margin-bottom: 0px;
