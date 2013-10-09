@@ -31,6 +31,12 @@
         }
     }
 
+    .result-count {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
     .serrano-version-warning {
         text-align: center;
     }
