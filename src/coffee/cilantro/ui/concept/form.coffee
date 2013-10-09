@@ -78,10 +78,13 @@ define [
             @info.show new @infoView
                 model: @model
 
-            @fields.show new @fieldCollectionView
+            options = _.extend
+                hideSingleFieldInfo: true
+            , @options,
                 context: @context
                 collection: @model.fields
-                hideSingleFieldInfo: true
+
+            @fields.show new @fieldCollectionView(options)
 
             @renderChange()
 
