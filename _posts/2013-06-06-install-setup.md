@@ -38,8 +38,7 @@ Create an HTML file next to the `cilantro/` folder.
     				// Tells cilantro where to render the app, defaults
                     // to #cilantro-main if not specified
 			    	main: '#main'
-                }
-             };
+                };
         </script>
         <script data-main="cilantro/main" src="/cilantro/js/require.js"></script>
     </body>
