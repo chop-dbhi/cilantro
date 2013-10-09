@@ -11,7 +11,9 @@ define [
     class EmptyQueryItem extends base.EmptyView
         icon: false
 
-        message: 'You have not yet created any queries or have had any shared with you'
+        align: 'left'
+
+        message: 'You have not yet created any queries nor have had any shared with you.'
 
     class QueryItem extends Marionette.ItemView
         className: 'row-fluid'

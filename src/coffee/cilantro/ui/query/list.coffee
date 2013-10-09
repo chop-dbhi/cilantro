@@ -10,7 +10,7 @@ define [
     templates = _.object ['list'], templates
 
     class QueryList extends Marionette.CompositeView
-        emptyView: item.EmtpyQueryItem
+        emptyView: item.EmptyQueryItem
 
         itemView: item.QueryItem
 
