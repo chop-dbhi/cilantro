@@ -87,5 +87,4 @@ define [
         setUpperBoundValue: (value) ->
             @_setValue(@ui.upperBound, value)
 
-
-    {DateControl}
+    { DateControl }
