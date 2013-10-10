@@ -439,6 +439,7 @@ module.exports = (grunt) ->
         run "rm -rf #{ pkg.name }"
 
     grunt.registerTask 'release-help', 'Prints the post-release steps', ->
+        grunt.log.ok 'Did you remember to update the cilantro/changelog module?'
         grunt.log.ok 'Push the code and tags: git push origin develop && git push --tags'
         grunt.log.ok "Go to #{ pkg.homepage }/releases to update the release descriptions and upload the binaries"
 
