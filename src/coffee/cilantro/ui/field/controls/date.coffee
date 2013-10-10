@@ -6,7 +6,7 @@ define [
     class DateControl extends range.RangeControl
         # Add the change event from the datepickers to existing range events
         _events:
-            'changeDate .range-lower,.range-upper': 'change'
+            'changeDate .range-lower,.range-upper': '_change'
 
         initialize: ->
             super
