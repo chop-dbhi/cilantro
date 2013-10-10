@@ -23,12 +23,12 @@ define [
                 infograph.BarChart
             else
                 controls.FieldValueSearch
-        else if model.get('searchable')
-            controls.FieldValueSearch
         else if type is 'number'
             controls.NumberControl
         else if type is 'datetime' or type is 'date' or type is 'time'
             controls.DateControl
+        else
+            controls.FieldValueSearch
 
 
     class LoadingFields extends base.LoadView
@@ -123,8 +123,7 @@ define [
             # enumerable condition is a hack since the above control
             # may already have chart-like display...and the hack grows deeper
             # to prevent a chart being added when dealing with dates...
-            if not @model.get('enumerable') and not @model.get('searchable') \
-                    and @model.get('simple_type') isnt 'datetime'
+            if @model.get('simple_type') is 'number' and not @model.get('enumerable')
                 if @options.showChart and @model.links.distribution?
                     @addControl charts.FieldChart,
                         chart:
