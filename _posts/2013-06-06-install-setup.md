@@ -35,7 +35,7 @@ Create an HTML file next to the `cilantro/` folder.
 			</div>
 		</div>
         
-        <div id="main">Click on the "Query" link above.</div>
+        <div id="main" class="container-fluid">Click on the "Query" link above.</div>
         
         <script>
         	// Pre-configuration of requirejs and cilantro
