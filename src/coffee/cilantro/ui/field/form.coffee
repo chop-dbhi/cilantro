@@ -27,8 +27,6 @@ define [
             controls.FieldValueSearch
         else if type is 'number'
             controls.NumberControl
-        else if type is 'boolean'
-            controls.BooleanControl
         else if type is 'datetime' or type is 'date' or type is 'time'
             controls.DateControl
 
