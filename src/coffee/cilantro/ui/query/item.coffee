@@ -40,6 +40,14 @@ define [
             if not (@data.view = @options.view)
                 throw new Error 'view model required'
 
+        # Custom serialize method to ensure the two nested objects exist for
+        # use by the template.
+        serializeData: ->
+            attrs = @model.toJSON()
+            attrs.shared_users ?= []
+            attrs.user ?= {}
+            return attrs
+
         # Set the query's context and view json on the session context
         # and view, navigate to the results to view results
         openQuery: =>
