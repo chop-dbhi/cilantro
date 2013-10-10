@@ -11,9 +11,11 @@ define [
     class RangeControl extends controls.Control
         template: templates.range
 
+        changeDelay: 1000       # In milliseconds
+
         events:
-            'keyup .range-lower,.range-upper': 'change'
-            'change .btn-select': 'change'
+            'keyup .range-lower,.range-upper': '_change'
+            'change .btn-select': '_change'
             'click .range-help-button': 'toggleHelpText'
 
         ui:
@@ -29,6 +31,8 @@ define [
             # collection.
             if @model.stats.length > 0
                 @readMinMaxStats()
+
+            @_change = _.debounce(@change, @changeDelay)
 
         onRender: ->
             @operatorSelect = new button.ButtonSelect
