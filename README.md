@@ -40,6 +40,7 @@ Distribution builds should only be created off the `develop` branch. This:
 - Freshly compiles and optimizes code
 - Creates zip and tarball binaries
 - Prints instructions to push and upload it to GitHub
+- Bumps the patch version, e.g. `2.0.3` to `2.0.4-beta`
 
 ```bash
 grunt release
