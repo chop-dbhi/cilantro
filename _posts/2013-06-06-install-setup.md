@@ -25,7 +25,18 @@ Create an HTML file next to the `cilantro/` folder.
         <link rel=stylesheet href="/cilantro/css/style.css">
     </head>
     <body>
-        <div id="main"></div>
+    	<div class="navbar">
+			<div class="navbar-inner">
+				<span class="brand">Hello Cilantro!</span>
+				<ul class=nav>
+					<li><a href="/query/">Query</a></li>
+					<li><a href="/results/">Results</a></li>
+				</ul>
+			</div>
+		</div>
+        
+        <div id="main">Click on the "Query" link above.</div>
+        
         <script>
         	// Pre-configuration of requirejs and cilantro
         	var require = {
@@ -34,7 +45,7 @@ Create an HTML file next to the `cilantro/` folder.
             	cilantro = {
 					// The Serrano-compatible API endpoint Cilantro
                     // will talk to
-    				url: '/api/',
+    				url: 'http://harvest.research.chop.edu/demo/api/',
     				// Tells cilantro where to render the app, defaults
                     // to #cilantro-main if not specified
 			    	main: '#main'
