@@ -8,8 +8,6 @@ define [
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
     'plugins/jquery-stacked'
-    'plugins/typeahead'
-    'plugins/typeselect'
 ], (c, notify) ->
 
     # Initialize notification stream and append it to the main element
