@@ -40,7 +40,7 @@ require ['cilantro'], (c) ->
                 id: 'workspace'
                 route: 'workspace/'
                 view: new c.ui.WorkspaceWorkflow
-                    queries: @data.shared_queries
+                    queries: @data.queries
                     context: @data.contexts.session
                     view: @data.views.session
 

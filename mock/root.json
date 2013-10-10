@@ -18,9 +18,6 @@
         "queries": {
             "href": "/mock/queries.json"
         },
-        "shared_queries": {
-            "href": "/mock/shared_queries.json"
-        },
         "self": {
             "href": "/mock/root.json"
         },
