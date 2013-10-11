@@ -24,7 +24,6 @@ define [
             # Pass the collection of concepts to be rendered in the index
             @index.show new index.ConceptIndex
                 collection: @collection
-                collapsable: false
 
             # When a search occurs, the index is filtered relative to the
             # response which contains a listing of IDs that the search
