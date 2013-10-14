@@ -15,8 +15,16 @@ define [
     class FieldStatValue extends Marionette.ItemView
         tagName: 'li'
 
-        template: (data) ->
-            "<span class=stat-label>#{ data.label }</span><span class=stat-value>#{ data.value }</span>"
+        # This is a map of data labels to display labels. For example, when
+        # displaying data with a label of 'Distinct count', it will be
+        # rendered as 'Unique values' when this field stat value is displayed
+        # in the page. If a data label is not in this map, then the data
+        # label itself will be used.
+        labelMap:
+            'Distinct count': 'Unique values'
+
+        template: (data) =>
+            "<span class=stat-label>#{ @labelMap[data.label] or data.label }</span><span class=stat-value>#{ data.value }</span>"
 
 
     class FieldStatsValues extends Marionette.CollectionView
