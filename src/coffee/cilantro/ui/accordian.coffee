@@ -25,8 +25,23 @@ define [
 
         itemViewContainer: '.items'
 
+        option:
+            collapsable: true
+
         ui:
             heading: '.heading'
+            icon: '.heading span'
+            inner: '.inner'
+
+        events:
+            'click > .heading': 'toggleCollapse'
+            'shown > .inner': 'showCollapse'
+            'hidden > .inner': 'hideCollapse'
+
+        onRender: ->
+            if not @options.collapsable
+                @$('.inner').removeClass('collapse')
+                @ui.icon.hide()
 
         # Returns true if this group is *empty*
         isEmpty: ->
@@ -34,6 +49,16 @@ define [
 
         onCompositeCollectionRendered: ->
             @$el.toggle(not @isEmpty())
+
+        toggleCollapse: ->
+            if @options.collapsable
+                @ui.inner.collapse('toggle')
+
+        showCollapse: ->
+            @ui.icon.text('-')
+
+        hideCollapse: ->
+            @ui.icon.text('+')
 
 
     class Group extends Marionette.CompositeView
@@ -54,6 +79,7 @@ define [
             model: model
             index: index
             collection: model[@itemSectionItems]
+            collapsable: @options.collapsable
 
         ui:
             heading: '.heading'
@@ -88,9 +114,20 @@ define [
                 # Get the first model and view for toggle conditions
                 view = @children.findByModel(model = @collection.at(0))
 
+                isMultiChild = length > 1 or model.id >= 0
+
+                # If it is a sinlge child then we turn off the collapsable
+                # flag on the view since it cannot be expanded/collapsed
+                # without a visible header. We need to re-render because
+                # chaning the options doesn't automatically trigger a render
+                # call so we do it manually here.
+                if not isMultiChild
+                    view.options.collapsable = false
+                    view.render()
+
                 # If only a single child is present, hide the heading unless it
                 # is using an explicit heading
-                view.ui.heading.toggle(length > 1 or model.id >= 0)
+                view.ui.heading.toggle(isMultiChild)
 
         toggleCollapse: ->
             if @options.collapsable
