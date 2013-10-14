@@ -60,6 +60,16 @@ define [
         hideCollapse: ->
             @ui.icon.text('+')
 
+        expand: =>
+            if @options.collapsable
+                @ui.inner.collapse('show')
+                @showCollapse()
+
+        collapse: =>
+            if @options.collapsable
+                @ui.inner.collapse('hide')
+                @hideCollapse()
+
 
     class Group extends Marionette.CompositeView
         className: 'group'
@@ -139,6 +149,24 @@ define [
         hideCollapse: ->
             @ui.icon.text('+')
 
+        expand: =>
+            if @options.collapsable
+                @ui.inner.collapse('show')
+                @showCollapse()
+
+                @children.each((view) ->
+                    view.expand()
+                )
+
+        collapse: =>
+            if @options.collapsable
+                @ui.inner.collapse('hide')
+                @hideCollapse()
+
+                @children.each((view) ->
+                    view.collapse()
+                )
+
 
     class Accordian extends Marionette.CollectionView
         className: 'accordian'
@@ -157,6 +185,18 @@ define [
             index: index
             collection: model[@itemGroupSections]
             collapsable: @options.collapsable
+
+        expand: ->
+            if @options.collapsable
+                @children.each((view) ->
+                    view.expand()
+                )
+
+        collapse: ->
+            if @options.collapsable
+                @children.each((view) ->
+                    view.collapse()
+                )
 
 
     { Accordian, Group, Section, Item }
