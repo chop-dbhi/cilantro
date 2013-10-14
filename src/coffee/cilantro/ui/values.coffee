@@ -5,86 +5,24 @@ define [
     './base'
     '../models'
     'tpl!templates/values/list.html'
-    'tpl!templates/values/item.html'
 ], ($, _, Marionette, base, models, templates...) ->
 
-    templates = _.object ['list', 'item'], templates
-
-
-    class EmptyItem extends base.EmptyView
-        icon: false
-
-        message: 'Search or browse values on the left or click "Edit List" above to paste in a list of values. (Hint: you can copy and paste in a column from Excel)'
-
-
-    class ValueItem extends Marionette.ItemView
-        template: templates.item
-
-        className: 'value-item'
-
-        ui:
-            status: '.status'
-            remove: 'button'
-
-        events:
-            'click button': 'destroy'
-
-        modelEvents:
-            'change:valid': 'toggleValid'
-            'change:pending': 'togglePending'
-
-        # This will trigger the collection event which will remove
-        # this item.
-        destroy: ->
-            @model.destroy()
-
-        toggleValid: (model, valid, options) ->
-            @ui.status.show()
-            if valid
-                @ui.status
-                    .html('<i class="icon-ok text-success"></i>')
-                    .fadeOut 2000, =>
-                        # If the view has been closed since this timeout,
-                        # @ui.status will be a string. So check to ensure the
-                        # innerHTML can be set.
-                        @ui.status.html?('')
-            else
-                @ui.status
-                    .html('<i class="icon-exclamation text-warning"></i>')
-
-        togglePending: (model, pending, options) ->
-            if not pending then return
-            @ui.status.html('<i class="icon-spinner icon-spin"></i>').show()
+    templates = _.object ['list'], templates
 
 
     # Interface for representing a user-defined/selected list of values.
-    # There is a list view as well as a textarea for editing the raw text or
-    # for pasting in a list of values.
     #
     # This expects a collection such as cilantro/models/value#Values
-    class ValueList extends Marionette.CompositeView
+    class ValueList extends Marionette.ItemView
         className: 'value-list'
 
         template: templates.list
 
-        itemView: ValueItem
-
-        emptyView: EmptyItem
-
-        itemViewContainer: '.items-list'
-
         collectionEvents:
             'reset': 'clearText'
-            'sort': 'sortItems'
 
         ui:
-            toggle: '.toggle'
-            list: '.items-list'
             textarea: '.items-text'
-
-        events:
-            'click .toggle': 'toggle'
-            'click .clear': 'clear'
 
         # The delay in milliseconds to wait before responding to changes in
         # the textarea.
@@ -93,30 +31,13 @@ define [
         initialize: ->
             @_parseText = _.debounce(@parseText, @inputDelay)
 
+            @collection.on 'add', =>
+                @loadText()
+
         clear: (event) ->
             event?.preventDefault()
             @collection.reset()
 
-        toggle: (event) ->
-            event?.preventDefault()
-
-            if @ui.list.is(':visible')
-                @loadText()
-                @ui.list.hide()
-                @ui.textarea.show()
-                @ui.toggle.html('<i class=icon-list></i> Show List')
-            else
-                @ui.list.show()
-                @ui.textarea.hide()
-                @ui.toggle.html('<i class=icon-edit></i> Edit List')
-
-        # Sort the children based on the models
-        sortItems: (collection, options) ->
-            @collection.each (model) =>
-                view = @children.findByModel(model)
-                @$(@itemViewContainer).append(view.el)
-
-        # Clear the text
         clearText: ->
             @ui.textarea.val('')
 
@@ -152,7 +73,15 @@ define [
                         label: value
                         index: i
 
-            @collection.set(models)
+            # We disable sorting when parsing the text because the sorting
+            # can change the order of the textarea but not the cursor position.
+            # For example, let's say you had 1, 3, 4, 5, 6 in the textarea and
+            # you typed 2 and before you could type a 0, the 2 model is added
+            # and the order changes so now the cursor is after the 6.
+            # Basically, this prevents the text from changing while the user
+            # is editing it. The sorting will only happen when items are
+            # explicitly added to the collection.
+            @collection.set(models, {sort: false})
 
         onRender: ->
             @ui.textarea.on 'input propertychange', =>
