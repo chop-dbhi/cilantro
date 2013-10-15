@@ -54,10 +54,14 @@ define [
             if @options.collapsable
                 @ui.inner.collapse('toggle')
 
-        showCollapse: ->
+        showCollapse: (event) ->
+            # Stop the event here so it doesn't reach the group handler
+            event.stopImmediatePropagation()
             @ui.icon.text('-')
 
-        hideCollapse: ->
+        hideCollapse: (event) ->
+            # Stop the event here so it doesn't reach the group handler
+            event.stopImmediatePropagation()
             @ui.icon.text('+')
 
         expand: =>
