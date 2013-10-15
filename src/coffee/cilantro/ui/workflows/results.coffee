@@ -33,8 +33,17 @@ define [
         modelEvents:
             'change:objectcount': 'renderCount'
 
+        initialize: ->
+            super
+
+            @count = @model.objectCount if @model.objectCount? or ''
+
+        onRender: ->
+            @renderCount(@model, @count)
+
         renderCount: (model, count, options) ->
-            numbers.renderCount(@ui.count, count)
+            @count = count
+            numbers.renderCount(@ui.count, @count)
             @ui.label.text('records')
 
 
