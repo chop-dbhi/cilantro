@@ -3,7 +3,12 @@ The 'main' script for bootstrapping the default Cilantro client. Projects can
 use this directly or emulate the functionality in their own script.
 ###
 
-require ['cilantro'], (c) ->
+require
+    config:
+        tpl:
+            variable: 'data'
+
+, ['cilantro'], (c) ->
 
     # Session options
     options =
