@@ -55,13 +55,21 @@ define [
                 @ui.inner.collapse('toggle')
 
         showCollapse: (event) ->
-            # Stop the event here so it doesn't reach the group handler
-            event.stopImmediatePropagation()
+            # Stop the event here so it doesn't reach the group handler. Since
+            # it is possible to trigger this programmatically, we only stop
+            # propagation when the event is valid.
+            if event?
+                event.stopImmediatePropagation()
+
             @ui.icon.text('-')
 
         hideCollapse: (event) ->
-            # Stop the event here so it doesn't reach the group handler
-            event.stopImmediatePropagation()
+            # Stop the event here so it doesn't reach the group handler. Since
+            # it is possible to trigger this programmatically, we only stop
+            # propagation when the event is valid.
+            if event?
+                event.stopImmediatePropagation()
+
             @ui.icon.text('+')
 
         expand: =>
