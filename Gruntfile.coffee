@@ -296,28 +296,49 @@ module.exports = (grunt) ->
             port: 8125
             keepalive: false
 
+        serveResponse = (filename, response) ->
+            extname = path.extname(filename)
+            contentType = contentTypes[extname] or 'text/plain'
+
+            response.writeHead 200,
+                'Content-Type': contentType
+
+            stream = fs.createReadStream(filename)
+            stream.pipe response
+
+        serve404 = (filename, response) ->
+            response.writeHead 404
+            response.end()
+
+        serve500 = (filename, response) ->
+            response.writeHead 500
+            response.end()
+
         server = http.createServer (request, response) ->
             uri = url.parse(request.url).pathname
             filename = path.join(options.base, uri)
-            extname = path.extname(filename)
-            contentType = contentTypes[extname] or 'text/plain'
 
             fs.exists filename, (exists) ->
                 if exists
                     fs.readFile filename, (error, content) ->
                         if error
-                            response.writeHead 500
-                            response.end()
+                            if error.code is 'EISDIR'
+                                filename += 'index.html'
+                                fs.exists filename, (exists) ->
+                                    if exists
+                                        fs.readFile filename, (error, content) ->
+                                            if error
+                                                serve500(filename, response)
+                                            else
+                                                serveResponse(filename, response)
+                                    else
+                                        serve404(filename, response)
+                            else
+                                serve500(filename, response)
                         else
-                            response.writeHead 200,
-                                'Content-Type': contentType
-
-                            stream = fs.createReadStream(filename)
-                            stream.pipe response
-
+                            serveResponse(filename, response)
                 else
-                    response.writeHead 404
-                    response.end()
+                    serve404(filename, response)
 
         if options.hostname is '*'
             options.hostname = null
