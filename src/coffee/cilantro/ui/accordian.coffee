@@ -25,6 +25,14 @@ define [
 
         itemViewContainer: '.items'
 
+        # Represents the current collapsed/expanded state of the group.
+        isCollapsed: true
+
+        # Represents the previous collapsed/expanded state of the group.
+        # This is especially useful when restoring the state of the group
+        # after a search is cleared.
+        wasCollapsed: true
+
         option:
             collapsable: true
 
@@ -50,8 +58,14 @@ define [
         onCompositeCollectionRendered: ->
             @$el.toggle(not @isEmpty())
 
+        _setIsCollapsed: (newIsCollapsed) ->
+            @wasCollapsed = @isCollapsed
+            @isCollapsed = newIsCollapsed
+
         toggleCollapse: ->
             if @options.collapsable
+                @wasCollapsed = @isCollapsed
+                @isCollapsed = not @isCollapsed
                 @ui.inner.collapse('toggle')
 
         showCollapse: (event) ->
@@ -72,15 +86,30 @@ define [
 
             @ui.icon.text('+')
 
-        expand: =>
+        expand: ->
             if @options.collapsable
+                @_setIsCollapsed(false)
+
                 @ui.inner.collapse('show')
                 @showCollapse()
 
-        collapse: =>
+        collapse: ->
             if @options.collapsable
+                @_setIsCollapsed(true)
+
                 @ui.inner.collapse('hide')
                 @hideCollapse()
+
+        revertToLastState: ->
+            if @options.collapsable
+                if @wasCollapsed
+                    @ui.inner.collapse('hide')
+                    @hideCollapse()
+                else
+                    @ui.inner.collapse('show')
+                    @showCollapse()
+
+                @isCollapsed = @wasCollapsed
 
 
     class Group extends Marionette.CompositeView
@@ -93,6 +122,14 @@ define [
         itemViewContainer: '.sections'
 
         itemSectionItems: 'items'
+
+        # Represents the current collapsed/expanded state of the group.
+        isCollapsed: true
+
+        # Represents the previous collapsed/expanded state of the group.
+        # This is especially useful when restoring the state of the group
+        # after a search is cleared.
+        wasCollapsed: true
 
         options:
             collapsable: true
@@ -151,8 +188,14 @@ define [
                 # is using an explicit heading
                 view.ui.heading.toggle(isMultiChild)
 
+        _setIsCollapsed: (newIsCollapsed) ->
+            @wasCollapsed = @isCollapsed
+            @isCollapsed = newIsCollapsed
+
         toggleCollapse: ->
             if @options.collapsable
+                @_setIsCollapsed(not @isCollapsed)
+
                 @ui.inner.collapse('toggle')
 
         showCollapse: ->
@@ -161,8 +204,10 @@ define [
         hideCollapse: ->
             @ui.icon.text('+')
 
-        expand: =>
+        expand: ->
             if @options.collapsable
+                @_setIsCollapsed(false)
+
                 @ui.inner.collapse('show')
                 @showCollapse()
 
@@ -170,14 +215,31 @@ define [
                     view.expand()
                 )
 
-        collapse: =>
+        collapse: ->
             if @options.collapsable
+                @_setIsCollapsed(true)
+
                 @ui.inner.collapse('hide')
                 @hideCollapse()
 
                 @children.each((view) ->
                     view.collapse()
                 )
+
+        revertToLastState: ->
+            if @options.collapsable
+                @children.each((view) ->
+                    view.revertToLastState()
+                )
+
+                if @wasCollapsed
+                    @ui.inner.collapse('hide')
+                    @hideCollapse()
+                else
+                    @ui.inner.collapse('show')
+                    @showCollapse()
+
+                @isCollapsed = @wasCollapsed
 
 
     class Accordian extends Marionette.CollectionView
@@ -208,6 +270,12 @@ define [
             if @options.collapsable
                 @children.each((view) ->
                     view.collapse()
+                )
+
+        revertToLastState: ->
+            if @options.collapsable
+                @children.each((view) ->
+                    view.revertToLastState()
                 )
 
 

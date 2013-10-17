@@ -61,6 +61,8 @@ define [
 
         itemView: ConceptGroup
 
+        lastQuery: null
+
         # Override to create the parsed collection and render it
         showCollection: ->
             @resetGroups()
@@ -125,6 +127,23 @@ define [
 
             @children.each (view) ->
                 view.filter(query, models)
+
+            # If the query has changed, then we need to check to see if the
+            # accordian state needs to be manipulated.
+            if query != @lastQuery
+                # If this is the first query, then we need to forcefully
+                # expand the accordian. We only want to do this on the first
+                # query and not simply for query changes to take advantage of
+                # the saved state feature of the accordian groups and sections.
+                if query?
+                    if not @lastQuery?
+                        @expand()
+                # If the query has been cleared, then restore the state of the
+                # accordian as it was before the search(es) began.
+                else
+                    @revertToLastState()
+
+            @lastQuery = query
 
         find: (model) ->
             for cid, view of @children._views
