@@ -24,8 +24,6 @@ define [
                 # The data is not invalid, just broken up differently
                 @reset(null, silent: true)
 
-            @currentPageNum = null
-
             @perPage = resp.per_page
             @trigger('change:pagesize', @, @perPage)
 
@@ -34,6 +32,9 @@ define [
 
             @objectCount = resp.object_count
             @trigger('change:objectcount', @, @objectCount)
+
+            @currentPageNum = null
+            @setCurrentPage(resp.page_num)
 
             return [resp]
 
