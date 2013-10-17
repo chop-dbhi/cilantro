@@ -19,6 +19,18 @@ define [
     './ui/notify'
 ], ($, _, Backbone, c, mods...) ->
 
+    $(document).ajaxError (event, xhr, settings, exception) ->
+        # Unknown error which usually means the server is unavailable
+        if not exception
+            c.notify
+                timeout: null
+                dismissable: false
+                level: 'error'
+                header: 'Uh oh.'
+                message: 'There is a communication problem with the server. ' +
+                    '<a href="#" onclick="window.location.reload();return false">Refreshing</a> ' +
+                    'the page may help.'
+
     # Route based on the URL
     $(document).on 'click', 'a', (event) ->
         # Only catch if a router is available

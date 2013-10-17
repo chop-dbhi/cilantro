@@ -68,7 +68,7 @@ define [
             @$el.addClass(levelClass)
 
             # Toggle header if falsy
-            @ui.header.hide(!!@model.get('header'))
+            @ui.header.toggle(!!@model.get('header'))
 
             # Toggle dismiss button
             @ui.dismiss.toggle(@model.get('dismissable'))
