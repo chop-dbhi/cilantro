@@ -68,11 +68,9 @@ define [
         # are read, the bounds will be updated if they need to be so that the
         # min/max are reflected in the UI in the input boxes when needed.
         readMinMaxStats: =>
-            statsMin = @model.stats.find (stat) ->
-                stat.get('label') is 'Min'
+            statsMin = @model.stats.findWhere key: 'min'
 
-            statsMax = @model.stats.find (stat) ->
-                return stat.get('label') is 'Max'
+            statsMax = @model.stats.findWhere key: 'max'
 
             if statsMin?
                 @minLowerBound = @parseMinStat(statsMin.get('value'))
