@@ -13,4 +13,5 @@ define [
     # See http://www.html5rocks.com/en/tutorials/cors/
     $.ajaxPrefilter (settings, origSettings, xhr) ->
         settings.crossDomain = true
-        xhr.withCredentials = true
+        settings.xhrFields =
+            withCredentials: true
