@@ -3,13 +3,19 @@ define [
     'underscore'
     'backbone'
     'marionette'
+    '../core'
     '../base'
     '../charts'
     '../charts/utils'
     'tpl!templates/field/stats.html'
-], ($, _, Backbone, Marionette, base, charts, utils, templates...) ->
+], ($, _, Backbone, Marionette, c, base, charts, utils, templates...) ->
 
     templates = _.object ['layout'], templates
+
+
+    # Prettifies a value for display
+    prettyValue = (value) ->
+        if _.isNumber(value) then c.utils.prettyNumber(value) else value
 
 
     class FieldStatValue extends Marionette.ItemView
@@ -20,11 +26,16 @@ define [
         # rendered as 'Unique values' when this field stat value is displayed
         # in the page. If a data label is not in this map, then the data
         # label itself will be used.
-        labelMap:
-            'Distinct count': 'Unique values'
+        keyMap:
+            min: 'Min'
+            max: 'Max'
+            avg: 'Average'
+            count: 'Count'
+            distinct_count: 'Unique values'
 
         template: (data) =>
-            "<span class=stat-label>#{ @labelMap[data.label] or data.label }</span><span class=stat-value>#{ data.value }</span>"
+            "<span class=stat-label>#{ @keyMap[data.key] or data.key }</span>
+                <span class=stat-value title=\"#{ data.value }\">#{ prettyValue(data.value) }</span>"
 
 
     class FieldStatsValues extends Marionette.CollectionView
