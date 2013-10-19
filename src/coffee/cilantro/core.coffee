@@ -17,6 +17,8 @@ define [
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
+    # Conditional inclusion of json2 (for ie7)
+    if not JSON? then 'json2'
 ], (_, Backbone, logger, config, channels, utils, changelog) ->
 
     c =
