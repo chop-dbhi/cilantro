@@ -37,13 +37,15 @@ define [
             return @utils.cleanVersionString(@session?.version)
 
         # Returns a boolean as to whether the current Serrano version is
-        # supported relative to the min and max. An explicit minimum version
-        # can be passed which is useful when a feature is added that requires
-        # a version greater than the minimum version Cilantro supports.
-        isSupported: (minVersion, maxVersion) ->
-            minVersion ?= @minSerranoVersion
-            maxVersion ?= @maxSerranoVersion
-            version = @getSerranoVersion()
+        # supported relative to the min and max.
+        isSupported: (version) ->
+            minVersion = @minSerranoVersion
+            maxVersion = @maxSerranoVersion
+            serranoVersion = @getSerranoVersion()
+            # Cilantro may support a version of Serrano greater than the
+            # current one being accessed.
+            if utils.versionIsLt(serranoVersion, maxVersion)
+                maxVersion = serranoVersion
             return utils.versionInRange(version, minVersion, maxVersion)
 
         # Initialize the session manager and default configuration
