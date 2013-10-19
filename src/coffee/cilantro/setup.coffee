@@ -9,9 +9,8 @@ define [
            return "Wow, you're quick! Your data is being saved. " +
                 "It will only take a moment."
 
-    # Support cross domain requests with credentials (i.e. cookies)
+    # Support cross origin requests with credentials (i.e. cookies)
     # See http://www.html5rocks.com/en/tutorials/cors/
     $.ajaxPrefilter (settings, origSettings, xhr) ->
-        settings.crossDomain = true
         settings.xhrFields =
             withCredentials: true
