@@ -131,7 +131,15 @@ define [
             # Flag indicating the current visibility of the context panel
             @areFiltersHidden = false
 
-            @on 'router:load', @showContextPanel
+            @on 'router:load', @onRouterLoad
+            @on 'router:unload', @onRouterUnload
+
+        onRouterUnload: =>
+            @data.results.trigger('workspace:unload')
+
+        onRouterLoad: =>
+            @data.results.trigger('workspace:load')
+            @showContextPanel()
 
         showLoadingOverlay: =>
             if @isClosed? and not @isClosed

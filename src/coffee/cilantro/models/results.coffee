@@ -20,19 +20,51 @@ define [
     # to the frame size.
     class Results extends structs.FrameArray
         initialize: ->
+            # We start in a dirty state because initially, we have not
+            # retrieved the results yet so the view and context are
+            # technically out of sync with this results collection since the
+            # collection is empty and the server may have results.
+            @isDirty = true
+            @isWorkspaceOpen = false
+
             # Debounce refresh to ensure changes are reflected up to the last
             # trigger. This is specifically important when the context and view
             # are saved simultaneously. The refresh will trigger after the
             # second
             @_refresh = _.debounce(_.bind(@refresh, @), 500)
 
-            c.on(c.VIEW_SYNCED, @_refresh)
-            c.on(c.CONTEXT_SYNCED, @_refresh)
+            c.on(c.VIEW_SYNCED, @markAsDirty)
+            c.on(c.CONTEXT_SYNCED, @markAsDirty)
 
-        fetch: (options={}) ->
-            options.cache ?= false
-            super(options)
+            @on 'workspace:load', @onWorkspaceLoad
+            @on 'workspace:unload', @onWorkspaceUnload
 
+        onWorkspaceLoad: =>
+            @isWorkspaceOpen = true
+            @_refresh()
+
+        onWorkspaceUnload: =>
+            @isWorkspaceOpen = false
+
+        markAsDirty: =>
+            @isDirty = true
+            @_refresh()
+
+        fetch: (options={}) =>
+            if @isDirty and @isWorkspaceOpen
+                # Since we are making the fetch call immediately below, the
+                # data will be synced again to the current view/context to
+                # mark the results as clean for the time being.
+                @isDirty = false
+                options.cache ?= false
+                return super(options)
+            # If the results aren't dirty or the workspace isn't open then
+            # we simply abort this fetch call and remove the pending flag. If
+            # we do not include this done method then calls from refresh() to
+            # fetch that don't actually result in a call to the server will
+            # never call the done() handler in the refresh() call to fetch()/
+            else
+               new Object({done: () => delete @pending})
 
     # Mix-in paginator functionality for results
     _.extend Results::, paginator.PaginatorMixin
