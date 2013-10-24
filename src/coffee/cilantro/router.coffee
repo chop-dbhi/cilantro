@@ -62,10 +62,10 @@ define [
             if not view._rendered
                 view._rendered = true
                 if options.el isnt false
-                    @_empty()
                     if options.el?
                         target = Backbone.$(options.el, @options.main)
                     else
+                        @_empty()
                         target = Backbone.$(@options.main)
                     target.append(view.el)
                     view.render?()
