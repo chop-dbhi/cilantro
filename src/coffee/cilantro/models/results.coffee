@@ -64,7 +64,7 @@ define [
             # fetch that don't actually result in a call to the server will
             # never call the done() handler in the refresh() call to fetch()/
             else
-               new Object({done: () => delete @pending})
+                done: () => delete @pending
 
     # Mix-in paginator functionality for results
     _.extend Results::, paginator.PaginatorMixin
