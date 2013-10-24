@@ -405,6 +405,18 @@ module.exports = (grunt) ->
         grunt.file.write(fname, JSON.stringify(contents, null, 2))
         grunt.log.ok "#{ fname }: #{ current } => #{ version }"
 
+    replaceVersion = (fname, current, version) ->
+        options = encoding: 'utf8'
+        content = grunt.file.read(fname, options)
+
+        regexp = new RegExp("version: '#{ current }'")
+        if not regexp.test(content)
+            grunt.fatal('File contents does not match version')
+        content = content.replace(regexp, "version: '#{ version }'")
+
+        grunt.file.write(fname, content, options)
+        grunt.log.ok "#{ fname }: #{ current } => #{ version }"
+
     # Uses package.json as the canonical version
     grunt.registerTask 'bump-final', 'Updates the version to final', ->
         svutil = require('semver-utils')
@@ -418,8 +430,10 @@ module.exports = (grunt) ->
         # Remove release and build strings
         version.release = ''
         version.build = ''
-
         pkg.version = svutil.stringify(version)
+
+        replaceVersion('src/coffee/cilantro/core.coffee', current, pkg.version)
+
         for fname in ['package.json', 'bower.json']
             changeVersion(fname, pkg.version)
 
@@ -437,16 +451,18 @@ module.exports = (grunt) ->
         version.patch = '' + (parseInt(version.patch, 10) + 1)
         version.release = 'beta'
         version.build = ''
-
         pkg.version = svutil.stringify(version)
+
+        replaceVersion('src/coffee/cilantro/core.coffee', current, pkg.version)
+
         for fname in ['package.json', 'bower.json']
             changeVersion(fname, pkg.version)
 
-        run 'git add bower.json package.json'
+        run 'git add bower.json package.json src/coffee/cilantro/core.coffee'
         run "git commit -m '#{ [version.major, version.minor, version.patch].join('.') } Bump'"
 
     grunt.registerTask 'tag-release', 'Create a release on master', ->
-        run 'git add .'
+        run 'git add bower.json package.json src/coffee/cilantro/core.coffee'
         run "git commit -m '#{ pkg.version } Release'"
         run "git tag #{ pkg.version }"
 

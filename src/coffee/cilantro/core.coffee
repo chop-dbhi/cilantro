@@ -11,7 +11,6 @@ define [
     './config'
     './channels'
     './utils'
-    './changelog'
     './setup'
     # Core plugins that extend various libraries such as Backbone and jQuery.
     # Note, these are applied in place.
@@ -19,11 +18,11 @@ define [
     'plugins/jquery-ajax-queue'
     # Conditional inclusion of json2 (for ie7)
     if not JSON? then 'json2'
-], (_, Backbone, logger, config, channels, utils, changelog) ->
+], (_, Backbone, logger, config, channels, utils) ->
 
     c =
         # Version of cilantro
-        version: changelog[0].version
+        version: '2.1.5-beta'
 
         # Defines the minimum version and maximum version Serrano that this version
         # of Cilantro is 100% compatible with. While Cilantro will attempt to run
