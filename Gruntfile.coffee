@@ -181,10 +181,6 @@ module.exports = (grunt) ->
                 relativeSrc: '../../<%= srcDir %>/templates'
                 dest: '<%= localDir %>/js/templates'
 
-            extensions:
-                relativeSrc: '../../<%= srcDir %>/extensions'
-                dest: '<%= localDir %>/js/extensions'
-
 
         requirejs:
             options:
