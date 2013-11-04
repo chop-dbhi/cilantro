@@ -16,7 +16,7 @@ define [
 
         regions:
             queries: '.query-region'
-            queryModal: '.create-query-modal'
+            queryModal: '.save-query-modal'
 
         regionViews:
             queries: query.QueryList

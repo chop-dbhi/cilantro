@@ -70,8 +70,8 @@ define [
         ui:
             columns: '.columns-modal'
             contextContainer: '.context-container'
-            createReport: '.create-query-modal'
-            createReportToggle: '[data-toggle=create-query]'
+            saveQuery: '.save-query-modal'
+            saveQueryToggle: '[data-toggle=save-query]'
             exportOptions: '.export-options-modal'
             exportProgress: '.export-progress-modal'
             toggleFiltersButton: '[data-toggle=context-panel]'
@@ -90,7 +90,7 @@ define [
             'click [data-toggle=export-options]': 'showExportOptions'
             'click [data-toggle=export-progress]': 'showExportProgress'
             'click #pages-text-ranges': 'selectPagesOption'
-            'click [data-toggle=create-query]': 'showCreateQuery'
+            'click [data-toggle=save-query]': 'showSaveQuery'
             'click [data-toggle=context-panel]': 'toggleContextPanelButtonClicked'
 
         regions:
@@ -101,7 +101,7 @@ define [
             columns: '.columns-modal .modal-body'
             exportTypes: '.export-options-modal .export-type-region'
             exportProgress: '.export-progress-modal .export-progress-region'
-            createQueryModal: '.create-query-modal'
+            saveQueryModal: '.save-query-modal'
 
         initialize: ->
             @data = {}
@@ -423,8 +423,8 @@ define [
         onRender: ->
             # Remove unsupported features from view
             if not c.isSupported('2.1.0')
-                @ui.createReportToggle.remove()
-                @ui.createReport.remove()
+                @ui.saveQueryToggle.remove()
+                @ui.saveQuery.remove()
 
             @paginator.show new paginator.Paginator
                 model: @data.results
@@ -438,8 +438,8 @@ define [
             @exportProgress.show new exporter.ExportProgressCollection
                 collection: @data.exporters
 
-            @createQueryModal.show new query.QueryDialog
-                header: 'Create Query'
+            @saveQueryModal.show new query.QueryDialog
+                header: 'Save Query'
                 view: @data.view
                 context: @data.context
                 collection: @data.queries
@@ -495,10 +495,10 @@ define [
         showColumns: ->
             @ui.columns.modal('show')
 
-        showCreateQuery: =>
+        showSaveQuery: =>
             # Opens the query modal without passing a model which assumes a new one
             # will be created based on the current session
-            @createQueryModal.currentView.open()
+            @saveQueryModal.currentView.open()
 
         cancelColumnChanges: ->
             _.delay =>
