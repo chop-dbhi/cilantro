@@ -2,6 +2,7 @@ define [
     'underscore'
     'backbone'
     'marionette'
+    '../../logger'
     '../core'
     '../base'
     '../welcome'
@@ -11,7 +12,7 @@ define [
     './info'
     'tpl!templates/concept/workspace.html'
     'tpl!templates/concept/error.html'
-], (_, Backbone, Marionette, c, base, welcome, field, charts, form, info, templates...) ->
+], (_, Backbone, Marionette, logger, c, base, welcome, field, charts, form, info, templates...) ->
 
     templates = _.object ['workspace', 'error'], templates
 
@@ -105,6 +106,7 @@ define [
                     @createView(CustomForm, options)
                 , (err) =>
                     @showErrorView(model)
+                    logger.debug(err)
             else
                 @createView(@itemView, options)
 
