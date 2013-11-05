@@ -187,4 +187,4 @@ define [
             @collection.set(value, merge: false)
 
 
-    { FieldValueSearch, ValueSearch, SearchItem, SearchPage, SearchPageRoll }
+    { FieldValueSearch, ValueSearch, SearchItem, SearchPage, SearchPageRoll, SearchPaginator }
