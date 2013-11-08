@@ -1,9 +1,10 @@
 define [
     'underscore'
     '../core'
+    '../constants'
     '../structs'
     './paginator'
-], (_, c, structs, paginator) ->
+], (_, c, constants, structs, paginator) ->
 
 
     class ResultsPage extends structs.Frame
@@ -31,7 +32,7 @@ define [
             # trigger. This is specifically important when the context and view
             # are saved simultaneously. The refresh will trigger after the
             # second
-            @_refresh = _.debounce(_.bind(@refresh, @), 500)
+            @_refresh = _.debounce(_.bind(@refresh, @), constants.CLICK_DELAY)
 
             c.on(c.VIEW_SYNCED, @markAsDirty)
             c.on(c.CONTEXT_SYNCED, @markAsDirty)
