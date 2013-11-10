@@ -2,9 +2,12 @@
 
 [![Build Status](https://travis-ci.org/cbmi/cilantro.png?branch=2.2)](https://travis-ci.org/cbmi/cilantro) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cbmi/cilantro/trend.png)](https://bitdeli.com/free "Bitdeli Badge") [![devDependency Status](https://david-dm.org/cbmi/cilantro/dev-status.png)](https://david-dm.org/cbmi/cilantro#info=devDependencies)
 
-**Documentation**: http://cilantro.harvest.io
+- **Documentation**: http://cilantro.harvest.io
+- **Demo**: http://harvest.research.chop.edu/demo/
 
 ## Development
+
+_Interested in contributing? Please read the CONTRIBUTING.md guide prior to sending pull requests._
 
 ### Dependencies
 
@@ -26,6 +29,8 @@ grunt work
 ```
 
 ### Testing
+
+To run the tests, simply do:
 
 ```bash
 grunt test

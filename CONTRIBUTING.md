@@ -4,10 +4,7 @@ First off, thank you for considering a contribution!
 
 - If you do not have write access to the repo (i.e. not a core contributor), create a fork of Cilantro
 - Branches are used to isolate development and ensure clear and concise intent of the code. Always do your work in a branch off the `develop` branch. This will be a mirror of the work-in-progres (WIP) branch for the current major version, e.g. `2.x`. Name the branch after the issue and number, e.g. `issue-123`. If there is no issue number, [please create one first](https://github.com/cbmi/cilantro/issues/) before starting your work.
-- If working on existing files, ensure the coding style is kept consistent
-with the code around it. If creating new files or you are unsure of a pattern
-or preference please consult the [style
-guides](https://github.com/cbmi/style-guides/).
+- If working on existing files, ensure the coding style is kept consistent with the code around it. If creating new files or you are unsure of a pattern or preference please consult the [style guides](https://github.com/cbmi/style-guides/).
 
 ## Modules
 
@@ -46,3 +43,40 @@ The current set of modules that can be overridden include the major third-party 
 - marionette
 - highcharts
 - bootstrap
+
+## Testing
+
+Cilantro tests are written using the Jasmine framework which employs the Behavior Driven Development (BDD) paradigm. Tests live under the `spec/` directory and are defined as AMD modules (like the rest of the codebase; see above). The directory structure of the tests should mimic the structure of the modules under `src/coffee/cilantro` for consistency. For example:
+
+```
+spec/
+    router.js       # corresponds to cilantro/router.coffee
+    ui/
+        notify.js   # corresponds to cilantro/ui/notify.coffee
+```
+
+A test module has this general structure:
+
+```javascript
+define(['cilantro'], function(c) {
+
+    var x;
+
+    // This is used to perform setup prior to a test running such as
+    // resetting variables.
+    beforeEach(function() {
+        x = {};
+    });
+
+    // Describe a set of behaviors that are expected
+    describe('Some functionality', function() {
+
+        // Assert some behavior
+        it('should do this', function() {
+            expect(1).toEqual(1);
+        });
+
+    });
+
+});
+```
