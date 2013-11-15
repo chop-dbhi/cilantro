@@ -18,5 +18,6 @@ define [
     c.sessions.on session.SESSION_OPENED, (session) ->
         c.session = session
         c.router = session.router
+        c.data = session.data
 
     return (@cilantro = c)
