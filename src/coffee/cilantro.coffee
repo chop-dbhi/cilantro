@@ -7,6 +7,7 @@ define [
     './cilantro/session'
     './cilantro/models'
     './cilantro/ui'
+    './cilantro/setup'
 ], (c, session, models, ui) ->
 
     c.sessions = new session.SessionManager

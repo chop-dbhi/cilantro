@@ -7,18 +7,16 @@ whether a feature is supported.
 define [
     'underscore'
     'backbone'
-    './logger'
     './config'
     './channels'
     './utils'
-    './setup'
     # Core plugins that extend various libraries such as Backbone and jQuery.
     # Note, these are applied in place.
     'plugins/js'
     'plugins/jquery-ajax-queue'
     # Conditional inclusion of json2 (for ie7)
     if not JSON? then 'json2'
-], (_, Backbone, logger, config, channels, utils) ->
+], (_, Backbone, config, channels, utils) ->
 
     c =
         # Version of cilantro
@@ -57,11 +55,5 @@ define [
 
     # Give the cilantro object events!
     _.extend c, Backbone.Events, channels
-
-    # Set log level to debug
-    if c.config.get('debug')
-        logger.setLevel('debug')
-        c.on 'all', (event, args...) ->
-            logger.info(event, args...)
 
     return c
