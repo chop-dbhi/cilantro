@@ -16,7 +16,7 @@ define [
     class ContextNodeModel extends base.SynclessModel
         constructor: (attrs, options={}) ->
             options = _.extend
-                identKeys: ['concept', 'field']
+                identKeys: ['concept', 'field', 'operator']
             , options
 
             @manager = options.manager
