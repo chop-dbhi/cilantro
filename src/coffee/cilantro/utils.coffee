@@ -33,4 +33,7 @@ define [
         obj[last] = value
         return
 
-    $.extend { getDotProp, setDotProp }, mods...
+    pprint = (obj) ->
+        console.log(JSON.stringify(obj, null, 4))
+
+    $.extend { getDotProp, setDotProp, pprint }, mods...
