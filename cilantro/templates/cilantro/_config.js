@@ -15,13 +15,13 @@ var App = {
         dataviewHistory: '{% url "serrano:views:history" %}',
         datacontexts: '{% url "serrano:contexts:active" %}',
         datacontextHistory: '{% url "serrano:contexts:history" %}',
-        dataconcepts: '{% url "serrano:dataconcepts" %}',
-        datafields: '{% url "serrano:datafields" %}',
+        dataconcepts: '{% url "serrano:concepts" %}',
+        datafields: '{% url "serrano:fields" %}',
         preferences: '{% url "cilantro:preferences" %}'
     },
 
     // Simple way of defining default values for new DataView
-    // and DataContext objects. 
+    // and DataContext objects.
     defaults: {
         dataview: {},
         datacontext: {}
