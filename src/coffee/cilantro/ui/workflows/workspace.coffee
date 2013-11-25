@@ -41,6 +41,16 @@ define [
                 view: @data.view
 
             if c.isSupported('2.2.0')
+                # When the queries are synced we need to manually update the
+                # public queries collection so that any changes to public
+                # queries are reflected there. Right now, this is done lazily
+                # rather than checking if the changed model is public or had
+                # its publicity changed. If this becomes too slow we can
+                # perform these checks but for now this is snappy enough.
+                @data.queries.on 'sync', (model, resp, options) =>
+                    @public_queries.currentView.collection.fetch()
+                    @public_queries.currentView.collection.reset()
+
                 @public_queries.show new @regionViews.queries
                     queryModalRegion: @queryModal
                     collection: @data.public_queries
