@@ -37,15 +37,16 @@ define [
             if not (@title = @options.title)
                 @title = 'Queries'
 
-            if (@queryModalRegion = @options.queryModalRegion)
-                @on 'itemview:showQueryModal', (options) ->
-                    @queryModalRegion.currentView.open(options.model)
+            @queryModalRegion = @options.queryModalRegion
 
-                @queryModalRegion.show new dialog.QueryDialog
-                    header: 'Edit Query'
-                    collection: @collection
-                    context: @data.context
-                    view: @data.view
+            @on 'itemview:showQueryModal', (options) ->
+                @queryModalRegion.currentView.open(options.model)
+
+            @queryModalRegion.show new dialog.QueryDialog
+                header: 'Edit Query'
+                collection: @collection
+                context: @data.context
+                view: @data.view
 
         onRender: ->
             @ui.title.html(@title)
