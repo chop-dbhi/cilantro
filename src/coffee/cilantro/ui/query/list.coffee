@@ -24,12 +24,18 @@ define [
             context: @data.context
             index: index
 
+        ui:
+            title: '.title'
+
         initialize: ->
             @data = {}
             if not (@data.context = @options.context)
                 throw new Error 'context model required'
             if not (@data.view = @options.view)
                 throw new Error 'view model required'
+
+            if not (@title = @options.title)
+                @title = 'Queries'
 
             @editQueryRegion = @options.editQueryRegion
             @deleteQueryRegion = @options.deleteQueryRegion
@@ -44,6 +50,9 @@ define [
                 collection: @collection
                 context: @data.context
                 view: @data.view
+
+        onRender: ->
+            @ui.title.html(@title)
 
             @deleteQueryRegion.show new dialog.DeleteQueryDialog
                 collection: @collection

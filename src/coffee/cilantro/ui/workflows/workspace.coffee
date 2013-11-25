@@ -16,6 +16,7 @@ define [
 
         regions:
             queries: '.query-region'
+            public_queries: '.public-query-region'
             editQueryRegion: '.save-query-modal'
             deleteQueryRegion: '.delete-query-modal'
 
@@ -24,6 +25,8 @@ define [
 
         initialize: ->
             @data = {}
+            if c.isSupported('2.2.0') and not (@data.public_queries = @options.public_queries)
+                throw new Error 'public queries collection required'
             if not (@data.queries = @options.queries)
                 throw new Error 'queries collection required'
             if not (@data.context = @options.context)
@@ -38,5 +41,12 @@ define [
                 collection: @data.queries
                 context: @data.context
                 view: @data.view
+
+            if c.isSupported('2.2.0')
+                @public_queries.show new @regionViews.queries
+                    collection: @data.public_queries
+                    context: @data.context
+                    view: @data.view
+                    title: 'Public Queries'
 
     { WorkspaceWorkflow }
