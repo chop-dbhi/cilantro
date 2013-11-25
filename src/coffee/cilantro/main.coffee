@@ -41,13 +41,19 @@ require
 
         # Workspace supported as of 2.1.0
         if c.isSupported('2.1.0')
+            data =
+                queries: @data.queries
+                context: @data.contexts.session
+                view: @data.views.session
+
+            # Public queries supported as of 2.2.0
+            if c.isSupported('2.2.0')
+                data['public_queries'] = @data.public_queries
+
             routes.push
                 id: 'workspace'
                 route: 'workspace/'
-                view: new c.ui.WorkspaceWorkflow
-                    queries: @data.queries
-                    context: @data.contexts.session
-                    view: @data.views.session
+                view: new c.ui.WorkspaceWorkflow(data)
 
         # Register routes and start the session
         @start(routes)

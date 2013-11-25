@@ -24,6 +24,9 @@ define [
             context: @data.context
             index: index
 
+        ui:
+            title: '.title'
+
         initialize: ->
             @data = {}
             if not (@data.context = @options.context)
@@ -31,15 +34,20 @@ define [
             if not (@data.view = @options.view)
                 throw new Error 'view model required'
 
-            @queryModalRegion = @options.queryModalRegion
+            if not (@title = @options.title)
+                @title = 'Queries'
 
-            @on 'itemview:showQueryModal', (options) ->
-                @queryModalRegion.currentView.open(options.model)
+            if (@queryModalRegion = @options.queryModalRegion)
+                @on 'itemview:showQueryModal', (options) ->
+                    @queryModalRegion.currentView.open(options.model)
 
-            @queryModalRegion.show new dialog.QueryDialog
-                header: 'Edit Query'
-                collection: @collection
-                context: @data.context
-                view: @data.view
+                @queryModalRegion.show new dialog.QueryDialog
+                    header: 'Edit Query'
+                    collection: @collection
+                    context: @data.context
+                    view: @data.view
+
+        onRender: ->
+            @ui.title.html(@title)
 
     { QueryList }
