@@ -44,6 +44,7 @@ define [
 
             if c.isSupported('2.2.0')
                 @public_queries.show new @regionViews.queries
+                    queryModalRegion: @queryModal
                     collection: @data.public_queries
                     context: @data.context
                     view: @data.view
