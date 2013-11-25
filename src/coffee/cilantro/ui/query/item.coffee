@@ -69,11 +69,15 @@ define [
                 @ui.shareCount.attr('title', emailHTML)
                 @ui.shareCount.tooltip({animation: false, html: true, placement: 'right'})
             else
-                # Assuming public queries are supported, we don't want to show
-                # any non-owner information on the query if it is public.
-                if c.isSupported('2.2.0') and @model.get('public')
-                    @ui.nonOwner.hide()
+                @ui.owner.hide()
 
+            # If this is a public query(assuming those are supported), we don't
+            # want the user to see anything outside of the name. If they own
+            # or are a shared user on the query they will see it in their
+            # private list and can edit or delete it there if they have
+            # sufficiaent privileges.
+            if c.isSupported('2.2.0') and @model.get('public')
+                @ui.nonOwner.hide()
                 @ui.owner.hide()
 
     { EmptyQueryItem, QueryItem }
