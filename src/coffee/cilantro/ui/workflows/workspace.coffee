@@ -16,7 +16,7 @@ define [
 
         regions:
             queries: '.query-region'
-            public_queries: '.public-query-region'
+            publicQueries: '.public-query-region'
             queryModal: '.save-query-modal'
 
         regionViews:
@@ -48,13 +48,13 @@ define [
                 # its publicity changed. If this becomes too slow we can
                 # perform these checks but for now this is snappy enough.
                 @data.queries.on 'sync', (model, resp, options) =>
-                    @public_queries.currentView.collection.fetch()
-                    @public_queries.currentView.collection.reset()
+                    @publicQueries.currentView.collection.fetch()
+                    @publicQueries.currentView.collection.reset()
 
                 # We explicitly set the editable option to false below because
                 # users should not be able to edit the public queries
                 # collection.
-                @public_queries.show new @regionViews.queries
+                @publicQueries.show new @regionViews.queries
                     queryModalRegion: @queryModal
                     collection: @data.public_queries
                     context: @data.context
