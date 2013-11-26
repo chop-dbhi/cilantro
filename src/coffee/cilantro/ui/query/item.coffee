@@ -35,6 +35,9 @@ define [
 
         initialize: ->
             @data = {}
+
+            @editable = if @options.editable? then @options.editable else true
+
             if not (@data.context = @options.context)
                 throw new Error 'context model required'
             if not (@data.view = @options.view)
@@ -71,12 +74,7 @@ define [
             else
                 @ui.owner.hide()
 
-            # If this is a public query(assuming those are supported), we don't
-            # want the user to see anything outside of the name. If they own
-            # or are a shared user on the query they will see it in their
-            # private list and can edit or delete it there if they have
-            # sufficiaent privileges.
-            if c.isSupported('2.2.0') and @model.get('public')
+            if not @editable
                 @ui.nonOwner.hide()
                 @ui.owner.hide()
 
