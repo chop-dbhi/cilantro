@@ -8,12 +8,8 @@ define [
 
     templates = _.object ['item'], templates
 
-    class EmptyQueryItem extends base.EmptyView
-        icon: false
-
+    class LoadingQueryItem extends base.LoadView
         align: 'left'
-
-        message: 'You have not yet created any queries nor have had any shared with you.'
 
     class QueryItem extends Marionette.ItemView
         className: 'row-fluid'
@@ -78,4 +74,4 @@ define [
                 @ui.nonOwner.hide()
                 @ui.owner.hide()
 
-    { EmptyQueryItem, QueryItem }
+    { LoadingQueryItem, QueryItem }

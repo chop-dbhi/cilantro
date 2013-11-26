@@ -63,5 +63,6 @@ define [
                     view: @data.view
                     title: 'Public Queries'
                     editable: false
+                    emptyMessage: "There are no public queries. You can create a new, public query by navigating to the 'Results' page and clicking on the 'Save Query...' button. While filling out the query form, you can mark the query as public which will make it visible to all users and cause it to be listed here."
 
     { WorkspaceWorkflow }
