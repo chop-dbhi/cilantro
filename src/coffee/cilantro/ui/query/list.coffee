@@ -10,7 +10,7 @@ define [
     templates = _.object ['list'], templates
 
     class QueryList extends Marionette.CompositeView
-        emptyView: item.EmptyQueryItem
+        emptyView: item.LoadingQueryItem
 
         itemView: item.QueryItem
 
@@ -28,10 +28,17 @@ define [
         ui:
             title: '.title'
 
+        collectionEvents:
+            sync: 'onCollectionSynced'
+
         initialize: ->
             @data = {}
 
             @editable = if @options.editable? then @options.editable else true
+
+            @emptyMessage = "You have not yet created any queries nor have had any shared with you. You can create a new query by navigating to the 'Results' page and clicking on the 'Save Query...' button. This will save a query with the current filters and column view."
+            if @options.emptyMessage?
+                @emptyMessage = @options.emptyMessage
 
             if not (@data.context = @options.context)
                 throw new Error 'context model required'
@@ -51,6 +58,10 @@ define [
                 collection: @collection
                 context: @data.context
                 view: @data.view
+
+        onCollectionSynced: =>
+            if this.collection.length == 0
+                @$el.find('.load-view').html(@emptyMessage)
 
         onRender: ->
             @ui.title.html(@title)
