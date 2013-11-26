@@ -31,15 +31,21 @@ define [
             if not (@data.view = @options.view)
                 throw new Error 'view model required'
 
-            @queryModalRegion = @options.queryModalRegion
+            @editQueryRegion = @options.editQueryRegion
+            @deleteQueryRegion = @options.deleteQueryRegion
 
-            @on 'itemview:showQueryModal', (options) ->
-                @queryModalRegion.currentView.open(options.model)
+            @on 'itemview:showEditQueryModal', (options) ->
+                @editQueryRegion.currentView.open(options.model)
+            @on 'itemview:showDeleteQueryModal', (options) ->
+                @deleteQueryRegion.currentView.open(options.model)
 
-            @queryModalRegion.show new dialog.QueryDialog
+            @editQueryRegion.show new dialog.EditQueryDialog
                 header: 'Edit Query'
                 collection: @collection
                 context: @data.context
                 view: @data.view
+
+            @deleteQueryRegion.show new dialog.DeleteQueryDialog
+                collection: @collection
 
     { QueryList }

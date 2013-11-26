@@ -3,15 +3,70 @@ define [
     'marionette'
     '../core'
     '../../models/query'
-    'tpl!templates/query/dialog.html'
+    'tpl!templates/query/edit-dialog.html'
+    'tpl!templates/query/delete-dialog.html'
 ], (_, Marionette, c, query, templates...) ->
 
-    templates = _.object ['dialog'], templates
+    templates = _.object ['edit', 'delete'], templates
 
-    class QueryDialog extends Marionette.ItemView
+    class DeleteQueryDialog extends Marionette.ItemView
         className: 'modal hide'
 
-        template: templates.dialog
+        template: templates.delete
+
+        options:
+            header: 'Delete Query'
+
+        events:
+            'click .delete-query-button': 'deleteQuery'
+
+        ui:
+            header: '.modal-header h4'
+            alert: '.alert'
+
+        showError: (message) ->
+            @ui.alert.html(message).show()
+
+        hideError: ->
+            @ui.alert.hide()
+
+        deleteQuery: ->
+            @hideError()
+
+            # Re-open on failure and display error message. Closure reference
+            # of model put to prevent re-opening with a new instance
+            model = @model
+            @model.destroy().fail (xhr, status, error) =>
+                @open(model)
+                # TODO evaluate the error and customize the message, e.g. don't
+                # tell a user to try again if there is no hope.
+                @showError('Sorry, there was a problem deleting your query. Please try again.')
+
+            @close()
+
+        onRender: =>
+            @ui.header.text(@options.header)
+
+            @$el.modal
+                show: false
+                keyboard: false
+                backdrop: 'static'
+
+        open: (model) =>
+            @hideError()
+
+            @model = model
+
+            @$el.modal('show')
+
+        close: =>
+            delete @model
+            @$el.modal('hide')
+
+    class EditQueryDialog extends Marionette.ItemView
+        className: 'modal hide'
+
+        template: templates.edit
 
         options:
             header: 'Query Properties'
@@ -70,7 +125,7 @@ define [
                 @open(model)
                 # TODO evaluate the error and customize the message, e.g. don't
                 # tell a user to try again if there is no hope.
-                @showError('Sorry, there was an problem saving your query. Please try again.')
+                @showError('Sorry, there was a problem saving your query. Please try again.')
 
             @close()
 
@@ -110,4 +165,4 @@ define [
             delete @model
             @$el.modal('hide')
 
-    { QueryDialog }
+    { DeleteQueryDialog, EditQueryDialog }
