@@ -48,7 +48,7 @@ require
 
             # Public queries supported as of 2.2.0
             if c.isSupported('2.2.0')
-                data['public_queries'] = @data.public_queries
+                data.public_queries = @data.public_queries
 
             routes.push
                 id: 'workspace'
