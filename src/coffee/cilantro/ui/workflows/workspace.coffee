@@ -53,11 +53,15 @@ define [
                     @public_queries.currentView.collection.fetch()
                     @public_queries.currentView.collection.reset()
 
+                # We explicitly set the editable option to false below because
+                # users should not be able to edit the public queries
+                # collection.
                 @public_queries.show new @regionViews.queries
                     queryModalRegion: @queryModal
                     collection: @data.public_queries
                     context: @data.context
                     view: @data.view
                     title: 'Public Queries'
+                    editable: false
 
     { WorkspaceWorkflow }

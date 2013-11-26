@@ -23,12 +23,16 @@ define [
             view: @data.view
             context: @data.context
             index: index
+            editable: @editable
 
         ui:
             title: '.title'
 
         initialize: ->
             @data = {}
+
+            @editable = if @options.editable? then @options.editable else true
+
             if not (@data.context = @options.context)
                 throw new Error 'context model required'
             if not (@data.view = @options.view)
