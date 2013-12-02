@@ -16,7 +16,7 @@ define [
 
         regions:
             queries: '.query-region'
-            public_queries: '.public-query-region'
+            publicQueries: '.public-query-region'
             editQueryRegion: '.save-query-modal'
             deleteQueryRegion: '.delete-query-modal'
 
