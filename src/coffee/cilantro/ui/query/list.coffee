@@ -27,6 +27,7 @@ define [
 
         ui:
             title: '.title'
+            publicIndicator: '.header > div'
 
         collectionEvents:
             sync: 'onCollectionSynced'
@@ -71,5 +72,8 @@ define [
 
             @deleteQueryRegion.show new dialog.DeleteQueryDialog
                 collection: @collection
+
+            if not @editable
+                @ui.publicIndicator.hide()
 
     { QueryList }

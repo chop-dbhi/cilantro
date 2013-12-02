@@ -20,6 +20,7 @@ define [
             owner: '.owner'
             nonOwner: '.non-owner'
             shareCount: '.share-count'
+            publicIcon: '.public-icon'
 
         events:
             'click [data-toggle=delete-query-modal]': 'showDeleteQueryModal'
@@ -61,6 +62,9 @@ define [
             @trigger('showDeleteQueryModal', @model)
 
         onRender: ->
+            if @editable and @model.get('public')
+                @ui.publicIcon.removeClass('hidden')
+
             if @model.get('is_owner')
                 @ui.nonOwner.hide()
 
