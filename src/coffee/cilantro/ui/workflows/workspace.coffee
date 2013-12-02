@@ -16,7 +16,8 @@ define [
 
         regions:
             queries: '.query-region'
-            queryModal: '.save-query-modal'
+            editQueryRegion: '.save-query-modal'
+            deleteQueryRegion: '.delete-query-modal'
 
         regionViews:
             queries: query.QueryList
@@ -32,7 +33,8 @@ define [
 
         onRender: ->
             @queries.show new @regionViews.queries
-                queryModalRegion: @queryModal
+                editQueryRegion: @editQueryRegion
+                deleteQueryRegion: @deleteQueryRegion
                 collection: @data.queries
                 context: @data.context
                 view: @data.view

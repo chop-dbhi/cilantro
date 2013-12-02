@@ -438,7 +438,7 @@ define [
             @exportProgress.show new exporter.ExportProgressCollection
                 collection: @data.exporters
 
-            @saveQueryModal.show new query.QueryDialog
+            @saveQueryModal.show new query.EditQueryDialog
                 header: 'Save Query'
                 view: @data.view
                 context: @data.context

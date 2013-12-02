@@ -26,8 +26,8 @@ define [
             shareCount: '.share-count'
 
         events:
-            'click .delete-query': 'deleteQuery'
-            'click [data-toggle=query-modal]': 'showQueryModal'
+            'click [data-toggle=delete-query-modal]': 'showDeleteQueryModal'
+            'click [data-toggle=edit-query-modal]': 'showEditQueryModal'
             'click .shared-query-name': 'openQuery'
 
         modelEvents:
@@ -55,11 +55,11 @@ define [
             @data.context.save('json', @model.get('context_json'), reset: true)
             c.router.navigate('results', trigger: true)
 
-        showQueryModal: ->
-            @trigger('showQueryModal', @model)
+        showEditQueryModal: ->
+            @trigger('showEditQueryModal', @model)
 
-        deleteQuery: ->
-            @model.destroy({wait: true})
+        showDeleteQueryModal: ->
+            @trigger('showDeleteQueryModal', @model)
 
         onRender: ->
             if @model.get('is_owner')
