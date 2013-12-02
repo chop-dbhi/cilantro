@@ -35,7 +35,7 @@ define [
         initialize: ->
             @data = {}
 
-            @editable = if @options.editable? then @options.editable else true
+            @editable = if @options.editable? then @options.editable else false
 
             @emptyMessage = "You have not yet created any queries nor have had any shared with you. You can create a new query by navigating to the 'Results' page and clicking on the 'Save Query...' button. This will save a query with the current filters and column view."
             if @options.emptyMessage?
@@ -52,16 +52,17 @@ define [
             @editQueryRegion = @options.editQueryRegion
             @deleteQueryRegion = @options.deleteQueryRegion
 
-            @on 'itemview:showEditQueryModal', (options) ->
-                @editQueryRegion.currentView.open(options.model)
-            @on 'itemview:showDeleteQueryModal', (options) ->
-                @deleteQueryRegion.currentView.open(options.model)
+            if @editable
+                @on 'itemview:showEditQueryModal', (options) ->
+                    @editQueryRegion.currentView.open(options.model)
+                @on 'itemview:showDeleteQueryModal', (options) ->
+                    @deleteQueryRegion.currentView.open(options.model)
 
-            @editQueryRegion.show new dialog.EditQueryDialog
-                header: 'Edit Query'
-                collection: @collection
-                context: @data.context
-                view: @data.view
+                @editQueryRegion.show new dialog.EditQueryDialog
+                    header: 'Edit Query'
+                    collection: @collection
+                    context: @data.context
+                    view: @data.view
 
         onCollectionSynced: =>
             if this.collection.length == 0
@@ -70,10 +71,10 @@ define [
         onRender: ->
             @ui.title.html(@title)
 
-            @deleteQueryRegion.show new dialog.DeleteQueryDialog
-                collection: @collection
-
-            if not @editable
+            if @editable
+                @deleteQueryRegion.show new dialog.DeleteQueryDialog
+                    collection: @collection
+            else
                 @ui.publicIndicator.hide()
 
     { QueryList }

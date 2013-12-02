@@ -33,7 +33,7 @@ define [
         initialize: ->
             @data = {}
 
-            @editable = if @options.editable? then @options.editable else true
+            @editable = if @options.editable? then @options.editable else false
 
             if not (@data.context = @options.context)
                 throw new Error 'context model required'
