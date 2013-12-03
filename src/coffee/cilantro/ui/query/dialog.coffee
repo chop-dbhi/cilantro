@@ -80,6 +80,7 @@ define [
             name: '.query-name'
             description: '.query-description'
             email: '.query-emails'
+            publicity: '.query-publicity'
 
         initialize: ->
             @data = {}
@@ -107,6 +108,7 @@ define [
                 name: @ui.name.val()
                 description: @ui.description.val()
                 usernames_or_emails: @ui.email.val()
+                public: @ui.publicity.prop('checked')
                 context_json: @data.context.toJSON().json
                 view_json: @data.view.toJSON().json
 
@@ -146,6 +148,7 @@ define [
                 name = @model.get('name')
                 description = @model.get('description')
                 emails = _.pluck(@model.get('shared_users'), 'email').join(', ')
+                publicity = @model.get('public')
             else
                 # Remove timezone info from the current date and then use it as
                 # the suffix for new query title.
@@ -153,11 +156,13 @@ define [
                 name = "Query on #{ fields[0] } #{ fields[1] } #{ fields[2] } #{ fields[3] } @ #{ fields[4] }"
                 description = ''
                 emails = ''
+                publicity = false
 
             # Reset form fields
             @ui.name.val(name)
             @ui.description.val(description)
             @ui.email.val(emails)
+            @ui.publicity.prop('checked', publicity)
 
             @$el.modal('show')
 

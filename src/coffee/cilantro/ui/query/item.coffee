@@ -8,12 +8,8 @@ define [
 
     templates = _.object ['item'], templates
 
-    class EmptyQueryItem extends base.EmptyView
-        icon: false
-
+    class LoadingQueryItem extends base.LoadView
         align: 'left'
-
-        message: 'You have not yet created any queries nor have had any shared with you.'
 
     class QueryItem extends Marionette.ItemView
         className: 'row-fluid'
@@ -24,6 +20,7 @@ define [
             owner: '.owner'
             nonOwner: '.non-owner'
             shareCount: '.share-count'
+            publicIcon: '.public-icon'
 
         events:
             'click [data-toggle=delete-query-modal]': 'showDeleteQueryModal'
@@ -35,6 +32,9 @@ define [
 
         initialize: ->
             @data = {}
+
+            @editable = if @options.editable? then @options.editable else false
+
             if not (@data.context = @options.context)
                 throw new Error 'context model required'
             if not (@data.view = @options.view)
@@ -62,6 +62,9 @@ define [
             @trigger('showDeleteQueryModal', @model)
 
         onRender: ->
+            if @editable and @model.get('public')
+                @ui.publicIcon.removeClass('hidden')
+
             if @model.get('is_owner')
                 @ui.nonOwner.hide()
 
@@ -71,4 +74,8 @@ define [
             else
                 @ui.owner.hide()
 
-    { EmptyQueryItem, QueryItem }
+            if not @editable
+                @ui.nonOwner.hide()
+                @ui.owner.hide()
+
+    { LoadingQueryItem, QueryItem }

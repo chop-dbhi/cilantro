@@ -10,7 +10,7 @@ define [
     templates = _.object ['list'], templates
 
     class QueryList extends Marionette.CompositeView
-        emptyView: item.EmptyQueryItem
+        emptyView: item.LoadingQueryItem
 
         itemView: item.QueryItem
 
@@ -23,29 +23,58 @@ define [
             view: @data.view
             context: @data.context
             index: index
+            editable: @editable
+
+        ui:
+            title: '.title'
+            publicIndicator: '.header > div'
+
+        collectionEvents:
+            sync: 'onCollectionSynced'
 
         initialize: ->
             @data = {}
+
+            @editable = if @options.editable? then @options.editable else false
+
+            @emptyMessage = "You have not yet created any queries nor have had any shared with you. You can create a new query by navigating to the 'Results' page and clicking on the 'Save Query...' button. This will save a query with the current filters and column view."
+            if @options.emptyMessage?
+                @emptyMessage = @options.emptyMessage
+
             if not (@data.context = @options.context)
                 throw new Error 'context model required'
             if not (@data.view = @options.view)
                 throw new Error 'view model required'
 
+            if not (@title = @options.title)
+                @title = 'Queries'
+
             @editQueryRegion = @options.editQueryRegion
             @deleteQueryRegion = @options.deleteQueryRegion
 
-            @on 'itemview:showEditQueryModal', (options) ->
-                @editQueryRegion.currentView.open(options.model)
-            @on 'itemview:showDeleteQueryModal', (options) ->
-                @deleteQueryRegion.currentView.open(options.model)
+            if @editable
+                @on 'itemview:showEditQueryModal', (options) ->
+                    @editQueryRegion.currentView.open(options.model)
+                @on 'itemview:showDeleteQueryModal', (options) ->
+                    @deleteQueryRegion.currentView.open(options.model)
 
-            @editQueryRegion.show new dialog.EditQueryDialog
-                header: 'Edit Query'
-                collection: @collection
-                context: @data.context
-                view: @data.view
+                @editQueryRegion.show new dialog.EditQueryDialog
+                    header: 'Edit Query'
+                    collection: @collection
+                    context: @data.context
+                    view: @data.view
 
-            @deleteQueryRegion.show new dialog.DeleteQueryDialog
-                collection: @collection
+        onCollectionSynced: =>
+            if this.collection.length == 0
+                @$el.find('.load-view').html(@emptyMessage)
+
+        onRender: ->
+            @ui.title.html(@title)
+
+            if @editable
+                @deleteQueryRegion.show new dialog.DeleteQueryDialog
+                    collection: @collection
+            else
+                @ui.publicIndicator.hide()
 
     { QueryList }
