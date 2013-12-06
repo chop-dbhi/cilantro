@@ -39,6 +39,16 @@ require
                 queries: @data.queries
         ]
 
+        # Query URLs supported as of 2.2.0
+        if c.isSupported('2.2.0')
+            routes.push
+                id: 'query-load'
+                route: 'results/:query_id/'
+                view: new c.ui.QueryLoader
+                    queries: @data.queries
+                    context: @data.contexts.session
+                    view: @data.views.session
+
         # Workspace supported as of 2.1.0
         if c.isSupported('2.1.0')
             data =
