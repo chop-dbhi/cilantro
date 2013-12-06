@@ -30,10 +30,8 @@ define [
 
             @data.queries.on 'sync', @loadRequestedQuery
 
-        onRouterLoad: (router, fragment, args...) =>
-            @requestedQueryId = null
-            if args? and args[0]?
-                @requestedQueryId = parseInt(args[0])
+        onRouterLoad: (router, fragment, id) =>
+            @requestedQueryId = parseInt(id) or null
 
         loadRequestedQuery: =>
             if @requestedQueryId?
