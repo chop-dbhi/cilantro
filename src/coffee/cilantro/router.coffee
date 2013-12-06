@@ -24,40 +24,40 @@ define [
                 # removing them works..
                 Backbone.$(@options.main).children().remove()
 
-        _unloadAll: =>
-            @_unload(@_registered[id], false) for id in @_loaded.slice()
+        _unloadAll: (args...) =>
+            @_unload(@_registered[id], false, args...) for id in @_loaded.slice()
             return
 
-        _loadAll: =>
-            if not (ids = @_routes[Backbone.history.fragment])? then return
-            @_load(@_registered[id]) for id in ids
+        _loadAll: (route, args...) =>
+            if not (ids = @_routes[route])? then return
+            @_load(@_registered[id], args...) for id in ids
             return
 
-        _unload: (route, force=true) =>
+        _unload: (route, force=true, args...) =>
             if route.route? or force and (idx = @_loaded.indexOf(route.id)) >= 0
                 @_loaded.splice(idx, 1)
                 if (view = route._view)?
                     view?.$el.hide()
-                    view.trigger?('router:unload', @, Backbone.history.fragment)
+                    view.trigger?('router:unload', @, Backbone.history.fragment, args...)
 
-        _load: (options) =>
+        _load: (options, args...) =>
             # If the view has not be loaded before, check if it's a
             # module string and loader asynchronously
             if not options._view?
                 if _.isString options.view
                     require [options.view], (View) =>
                         options._view = new View options.options
-                        @_render(options)
+                        @_render(options, args...)
                         @_loaded.push(options.id)
                     , (err) ->
                         logger.error(err)
                     return
                 options._view = options.view
 
-            @_render(options)
+            @_render(options, args...)
             @_loaded.push(options.id)
 
-        _render: (options) =>
+        _render: (options, args...) =>
             view = options._view
             if not view._rendered
                 view._rendered = true
@@ -71,7 +71,7 @@ define [
                     view.render?()
 
             view.$el.show()
-            view.trigger?('router:load', @, Backbone.history.fragment)
+            view.trigger?('router:load', @, Backbone.history.fragment, args...)
             return
 
         _register: (options) ->
@@ -86,9 +86,9 @@ define [
                 @_load(options)
             else if not @_handlers[options.route]?
                 @_routes[options.route] = []
-                @_handlers[options.route] = handler = =>
-                    @_unloadAll()
-                    @_loadAll()
+                @_handlers[options.route] = handler = (args...) =>
+                    @_unloadAll(args...)
+                    @_loadAll(options.route, args...)
                     return
                 @route options.route, options.id, handler
             if options.route?
