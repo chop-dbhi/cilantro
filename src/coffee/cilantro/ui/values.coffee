@@ -19,6 +19,8 @@ define [
         template: templates.list
 
         collectionEvents:
+            'add': 'reloadText'
+            'remove': 'reloadText'
             'reset': 'clearText'
 
         ui:
@@ -30,11 +32,6 @@ define [
 
         initialize: ->
             @_parseText = _.debounce(@parseText, @inputDelay)
-
-            @collection.on 'add', =>
-                @reloadText()
-            @collection.on 'remove', =>
-                @reloadText()
 
         clear: (event) ->
             event?.preventDefault()
