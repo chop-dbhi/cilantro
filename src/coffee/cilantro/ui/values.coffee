@@ -19,6 +19,8 @@ define [
         template: templates.list
 
         collectionEvents:
+            'add': 'reloadText'
+            'remove': 'reloadText'
             'reset': 'clearText'
 
         ui:
@@ -31,9 +33,6 @@ define [
         initialize: ->
             @_parseText = _.debounce(@parseText, @inputDelay)
 
-            @collection.on 'add', =>
-                @loadText()
-
         clear: (event) ->
             event?.preventDefault()
             @collection.reset()
@@ -42,7 +41,7 @@ define [
             @ui.textarea.val('')
 
         # Load values in textarea
-        loadText: ->
+        reloadText: ->
             @ui.textarea.val(@collection.pluck('value').join('\n'))
 
         # Split by line, create a new set of models and update the collection
