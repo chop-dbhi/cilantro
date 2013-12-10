@@ -32,7 +32,9 @@ define [
             @_parseText = _.debounce(@parseText, @inputDelay)
 
             @collection.on 'add', =>
-                @loadText()
+                @reloadText()
+            @collection.on 'remove', =>
+                @reloadText()
 
         clear: (event) ->
             event?.preventDefault()
@@ -42,7 +44,7 @@ define [
             @ui.textarea.val('')
 
         # Load values in textarea
-        loadText: ->
+        reloadText: ->
             @ui.textarea.val(@collection.pluck('value').join('\n'))
 
         # Split by line, create a new set of models and update the collection

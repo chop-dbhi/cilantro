@@ -76,9 +76,12 @@ define [
 
         ui:
             actions: '.actions'
+            addButton: '.add-item-button'
+            removeButton: '.remove-item-button'
 
         events:
-            'click button': 'addItem'
+            'click .add-item-button': 'addItem'
+            'click .remove-item-button': 'removeItem'
 
         constructor: (options={}) ->
             if (@values = options.values)
@@ -92,8 +95,16 @@ define [
             attrs = _.extend @model.toJSON(), valid: true
             @values.add(attrs)
 
+        removeItem: ->
+            @values.remove(@model)
+
         setState: ->
-            @$el.toggleClass('disabled', !!@values.get(@model))
+            if !!@values.get(@model)
+                @ui.addButton.hide()
+                @ui.removeButton.show()
+            else
+                @ui.addButton.show()
+                @ui.removeButton.hide()
 
         onRender: ->
             @setState()
