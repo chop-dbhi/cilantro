@@ -12,18 +12,18 @@ define [
     templates = _.object ['bar', 'toolbar', 'chart'], templates
 
 
-    class BarModel extends Backbone.Model
-        parse: (attrs) ->
-            attrs.value = attrs.values[0]
-            return attrs
-
-
     sortModelAttr = (attr) ->
         (model) ->
             value = model.get(attr)
             if _.isString(value)
                 value = value.toLowerCase()
             return value
+
+
+    class BarModel extends Backbone.Model
+        parse: (attrs) ->
+            attrs.value = attrs.values[0]
+            return attrs
 
 
     class BarCollection extends Backbone.Collection
@@ -58,6 +58,7 @@ define [
         modelEvents:
             'change:selected': 'setSelected'
             'change:visible': 'setVisible'
+            'change:excluded': 'setExcluded'
 
         serializeData: ->
             attrs = @model.toJSON()
@@ -78,6 +79,9 @@ define [
 
         toggleSelected: (event) ->
             @model.set('selected', not @model.get('selected'))
+
+        setExcluded: (model, value) ->
+            @$el.toggleClass('excluded', value)
 
         setSelected: (model, value) ->
             @$el.toggleClass('selected', value)
@@ -141,7 +145,15 @@ define [
 
         getField: -> @model.id
 
-        getOperator: -> 'in'
+        getOperator: ->
+            # Since all selected bars are either included or excluded, the
+            # precense of a single excluded bar in those selected means that
+            # we should be using the exclusive operator. Otherwise, return
+            # the inclusive operator.
+            if @collection.where(excluded: true).length > 0
+                return '-in'
+            else
+                return 'in'
 
         getValue: ->
             _.map @collection.where(selected: true), (model) ->
@@ -151,6 +163,13 @@ define [
             # Toggle the selection based on the presence values
             @collection.each (model) ->
                 model.set('selected', model.get('value') in values)
+            return
+
+        setOperator: (operator) ->
+            if operator == '-in'
+                @collection.each (model) ->
+                    model.set('excluded', true)
+                $('input[name=exclude]').attr('checked', true)
             return
 
 
@@ -166,6 +185,7 @@ define [
             'keyup [name=filter]': 'filterBars'
             'click [name=invert]': 'invertSelection'
             'click .sort-value-header, .sort-count-header': 'sortBy'
+            'change [name=exclude]': 'excludeCheckboxChanged'
 
         ui:
             toolbar: '.btn-toolbar'
@@ -173,6 +193,7 @@ define [
             invertButton: '[name=invert]'
             sortValueHeader: '.sort-value-header'
             sortCountHeader: '.sort-count-header'
+            excludeCheckbox: '[name=exclude]'
 
         initialize: ->
             @sortDirection = "-count"
@@ -205,6 +226,12 @@ define [
 
             @collection.sortModelsBy(@sortDirection)
 
+        toggle: (show) =>
+            @ui.filterInput.toggle(show)
+            @ui.invertButton.toggle(show)
+            @ui.sortValueHeader.toggle(show)
+            @ui.sortCountHeader.toggle(show)
+
         # 'Filters' the bars given the input
         filterBars: (event) ->
             event.stopPropagation()
@@ -222,6 +249,12 @@ define [
             @collection.each (model) ->
                 if model.get('visible') isnt false or model.get('selected')
                     model.set('selected', not model.get('selected'))
+            @collection.trigger('change')
+            return
+
+        excludeCheckboxChanged: ->
+            @collection.each (model) =>
+                model.set('excluded', @ui.excludeCheckbox.prop('checked'))
             @collection.trigger('change')
             return
 
@@ -246,7 +279,7 @@ define [
         toggleToolbar: =>
             # Not yet rendered, this will be called again in onRender
             if not @toolbar.currentView then return
-            @toolbar.currentView.$el.toggle(@collection.length >= @options.minValuesForToolbar)
+            @toolbar.currentView.toggle(@collection.length >= @options.minValuesForToolbar)
 
         onRender: ->
             @bars.show new Bars
