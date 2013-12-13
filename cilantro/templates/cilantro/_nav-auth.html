@@ -8,6 +8,6 @@
         {% if user.is_staff %}
             <li><a href={% url "admin:index" %}>Admin</a></li>
         {% endif %}
-        <li><a href={% url "admin:logout" %}>Logout</a></li>
+        <li><a href={% url "logout" %}>Logout</a></li>
     </ul>
 </li>
