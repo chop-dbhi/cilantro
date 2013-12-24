@@ -50,7 +50,7 @@ define [
                 # rather than checking if the changed model is public or had
                 # its publicity changed. If this becomes too slow we can
                 # perform these checks but for now this is snappy enough.
-                @data.queries.on 'sync', (model, resp, options) =>
+                @data.queries.on 'sync destroy', (model, resp, options) =>
                     @publicQueries.currentView.collection.fetch()
                     @publicQueries.currentView.collection.reset()
 
