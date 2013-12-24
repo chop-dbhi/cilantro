@@ -65,7 +65,7 @@ define [
                     view: @data.view
 
         onCollectionSynced: =>
-            if this.collection.length == 0
+            if @collection.length == 0
                 @$el.find('.load-view').html(@emptyMessage)
 
         onRender: ->
@@ -76,5 +76,13 @@ define [
                     collection: @collection
             else
                 @ui.publicIndicator.hide()
+
+            # It is possible that the collection was already synced before this
+            # view was created and rendered. To handle that case, check to see
+            # if the collection has been fetched and if so, handle the empty
+            # case here as the onCollectionSynced method will not be called
+            # since the sync happened prior to this view being initialized.
+            if @collection.synced and @collection.length == 0
+                @$el.find('.load-view').html(@emptyMessage)
 
     { QueryList }
