@@ -64,34 +64,29 @@ define [
                     context: @data.context
                     view: @data.view
 
-            @requestPending = false
-
         onCollectionError: =>
-            @requestPending = false
-
             @$('.empty-message').hide()
             @$('.error-message').show()
             @$('.loading-indicator').hide()
 
         onCollectionRequest: =>
-            @requestPending = true
-
             @$('.empty-message').hide()
             @$('.error-message').hide()
             @$('.loading-indicator').show()
 
         onCollectionSync: =>
-            @requestPending = false
-
             @$('.error-message').hide()
             @$('.loading-indicator').hide()
+            @checkForEmptyCollection()
 
+        checkForEmptyCollection: ->
             if @collection.length == 0
                 @$('.empty-message').show()
+            else
+                @$('.empty-message').hide()
 
         onRender: ->
             @ui.title.html(@title)
-            @$('.empty-message').html(@emptyMessage)
 
             if @editable
                 @deleteQueryRegion.show new dialog.DeleteQueryDialog
@@ -99,12 +94,7 @@ define [
             else
                 @ui.publicIndicator.hide()
 
-            # If there is no request pending then the collection should be
-            # populated already so check for an empty collection and render
-            # the empty message if needed.
-            if not @requestPending
-                @$('.loading-indicator').hide()
-                if @collection.length == 0
-                    @$('.empty-message').show()
+            @$('.empty-message').html(@emptyMessage)
+            @checkForEmptyCollection()
 
     { QueryList }
