@@ -10,8 +10,6 @@ define [
     templates = _.object ['list'], templates
 
     class QueryList extends Marionette.CompositeView
-        emptyView: item.LoadingQueryItem
-
         itemView: item.QueryItem
 
         itemViewContainer: '.items'
@@ -30,7 +28,9 @@ define [
             publicIndicator: '.header > div'
 
         collectionEvents:
-            sync: 'onCollectionSynced'
+            error: 'onCollectionError'
+            request: 'onCollectionRequest'
+            sync: 'onCollectionSync'
 
         initialize: ->
             @data = {}
@@ -64,9 +64,26 @@ define [
                     context: @data.context
                     view: @data.view
 
-        onCollectionSynced: =>
-            if this.collection.length == 0
-                @$el.find('.load-view').html(@emptyMessage)
+        onCollectionError: =>
+            @$('.empty-message').hide()
+            @$('.error-message').show()
+            @$('.loading-indicator').hide()
+
+        onCollectionRequest: =>
+            @$('.empty-message').hide()
+            @$('.error-message').hide()
+            @$('.loading-indicator').show()
+
+        onCollectionSync: =>
+            @$('.error-message').hide()
+            @$('.loading-indicator').hide()
+            @checkForEmptyCollection()
+
+        checkForEmptyCollection: ->
+            if @collection.length == 0
+                @$('.empty-message').show()
+            else
+                @$('.empty-message').hide()
 
         onRender: ->
             @ui.title.html(@title)
@@ -76,5 +93,8 @@ define [
                     collection: @collection
             else
                 @ui.publicIndicator.hide()
+
+            @$('.empty-message').html(@emptyMessage)
+            @checkForEmptyCollection()
 
     { QueryList }
