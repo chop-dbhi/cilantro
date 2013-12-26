@@ -20,6 +20,14 @@ define [
             category: '.category'
             description: '.description'
 
+        events:
+            'click .category-link': 'onCategoryLinkClick'
+
+        onCategoryLinkClick: (event) ->
+            $('.concept-search > input[type=text]')
+                .val($(event.target).text())
+                .trigger('keyup')
+
         # If the concept does not have it's own description, use the first
         # associated field. However, this currently does not handle the case
         # when the fields have not been loaded yet.
