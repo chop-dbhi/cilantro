@@ -1,10 +1,10 @@
 <% if (data.category) { %>
     <p class=category>
         <% if (data.category.parent) { %>
-            <%= data.category.parent.name %>
+            <a href='#' class=category-link><%= data.category.parent.name %></a>
             <i class=icon-angle-right></i>
         <% } %>
-        <%= data.category.name %>
+        <a href='#' class=category-link><%= data.category.name %></a>
     </p>
 <% } %>
 
