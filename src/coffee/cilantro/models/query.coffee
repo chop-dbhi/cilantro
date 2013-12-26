@@ -14,8 +14,4 @@ define [
     class QueryCollection extends base.Collection
         model: QueryModel
 
-        initialize: ->
-            @synced = false
-            @listenTo @, 'sync', -> @synced = true
-
     { QueryModel, QueryCollection }

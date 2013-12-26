@@ -10,8 +10,6 @@ define [
     templates = _.object ['list'], templates
 
     class QueryList extends Marionette.CompositeView
-        emptyView: item.LoadingQueryItem
-
         itemView: item.QueryItem
 
         itemViewContainer: '.items'
@@ -30,7 +28,9 @@ define [
             publicIndicator: '.header > div'
 
         collectionEvents:
-            sync: 'onCollectionSynced'
+            error: 'onCollectionError'
+            request: 'onCollectionRequest'
+            sync: 'onCollectionSync'
 
         initialize: ->
             @data = {}
@@ -64,12 +64,34 @@ define [
                     context: @data.context
                     view: @data.view
 
-        onCollectionSynced: =>
+            @requestPending = false
+
+        onCollectionError: =>
+            @requestPending = false
+
+            @$('.empty-message').hide()
+            @$('.error-message').show()
+            @$('.loading-indicator').hide()
+
+        onCollectionRequest: =>
+            @requestPending = true
+
+            @$('.empty-message').hide()
+            @$('.error-message').hide()
+            @$('.loading-indicator').show()
+
+        onCollectionSync: =>
+            @requestPending = false
+
+            @$('.error-message').hide()
+            @$('.loading-indicator').hide()
+
             if @collection.length == 0
-                @$el.find('.load-view').html(@emptyMessage)
+                @$('.empty-message').show()
 
         onRender: ->
             @ui.title.html(@title)
+            @$('.empty-message').html(@emptyMessage)
 
             if @editable
                 @deleteQueryRegion.show new dialog.DeleteQueryDialog
@@ -77,12 +99,12 @@ define [
             else
                 @ui.publicIndicator.hide()
 
-            # It is possible that the collection was already synced before this
-            # view was created and rendered. To handle that case, check to see
-            # if the collection has been fetched and if so, handle the empty
-            # case here as the onCollectionSynced method will not be called
-            # since the sync happened prior to this view being initialized.
-            if @collection.synced and @collection.length == 0
-                @$el.find('.load-view').html(@emptyMessage)
+            # If there is no request pending then the collection should be
+            # populated already so check for an empty collection and render
+            # the empty message if needed.
+            if not @requestPending
+                @$('.loading-indicator').hide()
+                if @collection.length == 0
+                    @$('.empty-message').show()
 
     { QueryList }
