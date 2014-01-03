@@ -135,6 +135,10 @@ module.exports = (grunt) ->
                     cwd: '<%= srcDir %>/img'
                     src: ['**/*']
                     dest: '<%= localDir %>/img'
+                ,
+                    expand: true
+                    src: ['bower.json', 'package.json']
+                    dest: '<%= localDir %>'
                 ]
 
             build:
@@ -237,6 +241,9 @@ module.exports = (grunt) ->
                 '<%= distDir %>/js/templates'
             ]
             release: [
+                '<%= localDir %>/js/build.txt'
+                '<%= localDir %>/js/**/**/**/**/*.map'
+                '<%= localDir %>/css/**/*.map'
                 '<%= distDir %>/js/build.txt'
             ]
 
@@ -470,7 +477,12 @@ module.exports = (grunt) ->
         run "cp -r dist/* #{ pkg.name }"
         run "zip -r #{ releaseDirName }.zip #{ pkg.name }"
         run "tar -Hzcf #{ releaseDirName }.tar.gz #{ pkg.name }"
+
         run "rm -rf #{ pkg.name }"
+        run "mkdir -p #{ pkg.name }"
+        run "cp -r local/* #{ pkg.name }"
+        run "zip -r #{ releaseDirName }-src.zip #{ pkg.name }"
+        run "tar -Hzcf #{ releaseDirName }-src.tar.gz #{ pkg.name }"
 
     grunt.registerTask 'release-help', 'Prints the post-release steps', ->
         grunt.log.ok 'Push the code and tags: git push && git push --tags'
@@ -478,6 +490,7 @@ module.exports = (grunt) ->
 
     grunt.registerTask 'release', 'Builds the distribution files, creates the release binaries, and creates a Git tag', [
         'bump-final'
+        'local'
         'dist'
         'clean:release'
         'release-binaries'
