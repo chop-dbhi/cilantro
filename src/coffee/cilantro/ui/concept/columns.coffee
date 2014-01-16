@@ -183,17 +183,18 @@ define [
             @listenToOnce(@data.view, 'change:json', @resetFacets)
             @listenToOnce(@data.concepts, 'reset', @resetFacets)
 
-            @$el.modal(show: false)
-
-        resetFacets: ->
-            @data.facets.reset(@data.view.facets.toJSON())
-
-        onRender: ->
             # Sync and map between available columns and selected
             # columns (represented as facets)
             @listenTo(@data.concepts, 'columns:add', @addColumn, @)
             @listenTo(@data.facets, 'columns:remove', @removeColumn, @)
 
+            @$el.modal(show: false)
+
+        resetFacets: =>
+            @data.facets.reset(@data.view.facets.toJSON())
+            @render()
+
+        onRender: ->
             @available.show new @regionViews.available
                 collection: @data.concepts
                 collapsable: false
