@@ -26,6 +26,7 @@ define [
         exporter: models.ExporterCollection
         queries: models.QueryCollection
         public_queries: models.QueryCollection
+        sets: models.SetTypesCollection
 
 
     ###

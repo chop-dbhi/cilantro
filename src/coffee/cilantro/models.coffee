@@ -10,6 +10,7 @@ define [
     './models/exporter'
     './models/query'
     './models/value'
+    './models/set'
 ], (_, mods...) ->
 
     _.extend {}, mods...
