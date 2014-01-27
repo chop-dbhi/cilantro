@@ -1,66 +1,49 @@
-define(['jquery'], function(jQuery) {
+/*! jQuery Ajax Queue - v0.1.2pre - 2013-03-19
+* https://github.com/gnarf37/jquery-ajaxQueue
+* Copyright (c) 2013 Corey Frang; Licensed MIT */
+(function($) {
 
-    var ajax = jQuery.ajax,
-        requestQueue = [],
-        requestPending = false;
+// jQuery on an empty object, we are going to use this as our Queue
+var ajaxQueue = $({});
 
-    function sendRequest(options, promise, trigger) {
-        if (trigger !== false) trigger = true;
-        if (trigger) requestPending = true;
+$.ajaxQueue = function( ajaxOpts ) {
+    var jqXHR,
+        dfd = $.Deferred(),
+        promise = dfd.promise();
 
-        promise
-            .done(options.success)
-            .fail(options.error)
-            .always(options.complete);
-
-        var params = {
-            complete: function() {
-                if (trigger) dequeueRequest();
-            },
-            success: function() {
-                promise.resolveWith(this, arguments);
-            },
-            error: function() {
-                promise.rejectWith(this, arguments);
-            }
-        };
-
-        ajax(jQuery.extend({}, options, params));
+    // run the actual query
+    function doRequest( next ) {
+        jqXHR = $.ajax( ajaxOpts );
+        jqXHR.done( dfd.resolve )
+            .fail( dfd.reject )
+            .then( next, next );
     }
 
-    function dequeueRequest() {
-        var args, options, promise;
-        if ((args = requestQueue.shift())) {
-            options = args[0], promise = args[1];
-            sendRequest(options, promise);
-        } else {
-            requestPending = false;
-        }
-    }
+    // queue our ajax request
+    ajaxQueue.queue( doRequest );
 
-    function queueRequest(options) {
-        var promise, type, queue;
-        promise = jQuery.Deferred();
-        type = (options.type || 'get').toLowerCase();
-        queue = options.queue !== null ? options.queue : (type === 'get' ? false : true);
+    // add the abort method
+    promise.abort = function( statusText ) {
 
-        if (queue && requestPending) {
-            requestQueue.push([options, promise]);
-        } else {
-            sendRequest(options, promise, queue);
+        // proxy abort to the jqXHR if it is active
+        if ( jqXHR ) {
+            return jqXHR.abort( statusText );
         }
+
+        // if there wasn't already a jqXHR we need to remove from queue
+        var queue = ajaxQueue.queue(),
+            index = $.inArray( doRequest, queue );
+
+        if ( index > -1 ) {
+            queue.splice( index, 1 );
+        }
+
+        // and then reject the deferred
+        dfd.rejectWith( ajaxOpts.context || ajaxOpts, [ promise, statusText, "" ] );
         return promise;
-    }
-
-    jQuery.ajax = function(options, optional) {
-        if (typeof(options) === "string"){
-            optional.url = options;
-            options = optional;
-        }
-        return queueRequest(options);
     };
 
-    jQuery.hasPendingRequest = function() {
-        return requestPending;
-    };
-});
+    return promise;
+};
+
+})(jQuery);
