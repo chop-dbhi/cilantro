@@ -25,7 +25,8 @@ define(['jquery'], function(jQuery) {
             }
         };
 
-        ajax(jQuery.extend({}, options, params));
+        var jqXHR = ajax(jQuery.extend({}, options, params));
+        promise.abort = jqXHR.abort;
     }
 
     function dequeueRequest() {
@@ -45,7 +46,17 @@ define(['jquery'], function(jQuery) {
         queue = options.queue !== null ? options.queue : (type === 'get' ? false : true);
 
         if (queue && requestPending) {
-            requestQueue.push([options, promise]);
+            var deferredRequest = [options, promise];
+            promise.abort = function(){
+                var index =  requestQueue.indexOf(deferredRequest);
+                if (index > -1) {
+                    requestQueue.splice(index, 1); 
+                }
+                [].unshift.call(arguments, 'abort');
+                promise.rejectWith(promise, arguments);
+            };
+
+            requestQueue.push(deferredRequest);
         } else {
             sendRequest(options, promise, queue);
         }
