@@ -47,7 +47,8 @@ define(['jquery'], function(jQuery) {
 
         if (queue && requestPending) {
             var deferredRequest = [options, promise];
-            promise.abort = function(){
+
+            promise.abort = function() {
                 var index =  requestQueue.indexOf(deferredRequest);
                 if (index > -1) {
                     requestQueue.splice(index, 1); 
@@ -60,6 +61,7 @@ define(['jquery'], function(jQuery) {
         } else {
             sendRequest(options, promise, queue);
         }
+
         return promise;
     }
 
