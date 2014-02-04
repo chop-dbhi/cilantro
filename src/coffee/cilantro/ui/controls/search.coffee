@@ -1,15 +1,16 @@
 define [
     'underscore'
     'marionette'
-    '../../../models'
-    '../../controls'
-    '../../paginator'
-    '../../values'
-    '../../search'
+    './base'
+    '../../models'
+    '../../constants'
+    '../paginator'
+    '../values'
+    '../search'
     'tpl!templates/search.html'
-    'tpl!templates/field/controls/multi-value-item.html'
-    'tpl!templates/field/controls/multi-value-search.html'
-], (_, Marionette, models, controls, paginator, values, search, templates...) ->
+    'tpl!templates/controls/search/item.html'
+    'tpl!templates/controls/search/layout.html'
+], (_, Marionette, base, models, constants, paginator, values, search, templates...) ->
 
     templates = _.object ['search', 'item', 'layout'], templates
 
@@ -57,7 +58,7 @@ define [
         initialize: ->
             super
             @paginator = @options.paginator
-            @search = _.debounce(@search, 300)
+            @search = _.debounce(@search, constants.INPUT_DELAY)
 
         search: (event) ->
             value = @ui.input.val()
@@ -123,7 +124,7 @@ define [
         listView: SearchPage
 
 
-    class FieldValueSearch extends controls.Control
+    class SearchControl extends base.Control
         className: 'field-value-search'
 
         template: templates.layout
@@ -143,7 +144,6 @@ define [
             values: values.ValueList
 
         initialize: (options) ->
-            super(options)
             # Initialize a new collection of values for use by the
             # two regions. This is shared between the source data
             # and the selected values for toggling state changes.
@@ -152,13 +152,13 @@ define [
                 @collection.url = =>
                     @model.links.values
 
-            # Trigger a change event on all collection events
-            @collection.on 'all', @change, @
-
             @valuesPaginator = new @searchPaginator null,
                 field: @model
 
             @valuesPaginator.refresh()
+
+            # Trigger a change event on all collection events
+            @listenTo(@collection, 'add', @triggerChange, @)
 
         onRender: ->
             @search.show new @regionViews.search
@@ -177,12 +177,6 @@ define [
             @values.show new @regionViews.values
                 collection: @collection
 
-            # TODO move this elsewhere, look in cilantro/ui/controls/base
-            # Set the values from the context
-            @set(@context)
-
-        getField: -> @model?.id
-
         # This is currently always an 'in', however 'not in' may be
         # desirable as well.
         getOperator: -> 'in'
@@ -197,5 +191,8 @@ define [
             # additional state (which would be removed due to the merge).
             @collection.set(value, merge: false)
 
+        set: (attrs) ->
+            @setValue(attrs.value)
 
-    { FieldValueSearch, ValueSearch, SearchItem, SearchPage, SearchPageRoll, SearchPaginator }
+
+    { SearchControl, ValueSearch, SearchItem, SearchPage, SearchPageRoll, SearchPaginator }

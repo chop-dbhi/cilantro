@@ -5,12 +5,11 @@ define [
     '../base'
     './info'
     './stats'
-    './controls'
-    '../infograph'
+    '../controls'
     '../charts'
     'tpl!templates/field/form.html'
     'tpl!templates/field/form-condensed.html'
-], (_, Backbone, Marionette, base, info, stats, controls, infograph, charts, templates...) ->
+], (_, Backbone, Marionette, base, info, stats, controls, charts, templates...) ->
 
     templates = _.object ['form', 'condensed'], templates
 
@@ -20,15 +19,15 @@ define [
 
         if model.get('enumerable') or type is 'boolean'
             if model.links.distribution?
-                infograph.BarChart
+                controls.InfographControl
             else
-                controls.FieldValueSearch
+                controls.SearchControl
         else if type is 'number'
             controls.NumberControl
         else if type is 'datetime' or type is 'date' or type is 'time'
             controls.DateControl
         else
-            controls.FieldValueSearch
+            controls.SearchControl
 
 
     class LoadingFields extends base.LoadView

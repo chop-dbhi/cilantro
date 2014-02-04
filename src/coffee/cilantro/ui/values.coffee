@@ -4,34 +4,29 @@ define [
     'marionette'
     './base'
     '../models'
+    '../constants'
     'tpl!templates/values/list.html'
-], ($, _, Marionette, base, models, templates...) ->
+], ($, _, Marionette, base, models, constants, templates...) ->
 
     templates = _.object ['list'], templates
 
-
-    # Interface for representing a user-defined/selected list of values.
-    #
+    # Interface for representing a user-defined/selected list of values
+    # in a textarea (one value per line).
     # This expects a collection such as cilantro/models/value#Values
     class ValueList extends Marionette.ItemView
         className: 'value-list'
 
         template: templates.list
 
+        # Listen for collection events to update the textarea to match
+        # the values
         collectionEvents:
             'add': 'reloadText'
             'remove': 'reloadText'
             'reset': 'clearText'
 
         ui:
-            textarea: '.items-text'
-
-        # The delay in milliseconds to wait before responding to changes in
-        # the textarea.
-        inputDelay: 500
-
-        initialize: ->
-            @_parseText = _.debounce(@parseText, @inputDelay)
+            textarea: 'textarea'
 
         clear: (event) ->
             event?.preventDefault()
@@ -39,6 +34,9 @@ define [
 
         clearText: ->
             @ui.textarea.val('')
+
+        initialize: ->
+            @_parseText = _.debounce(@parseText, constants.INPUT_DELAY)
 
         # Load values in textarea
         reloadText: ->
@@ -49,6 +47,7 @@ define [
         parseText: ->
             models = []
             values = $.trim(@ui.textarea.val()).split('\n')
+
             # We can only make use of the value as label at this point
             # since resolving the label may require an server lookups.
             # This is harmless since _this_ is what the user entered.

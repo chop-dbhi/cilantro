@@ -3,6 +3,7 @@ define [
     './range'
 ], (_, range) ->
 
+
     class DateControl extends range.RangeControl
         # Add the change event from the datepickers to existing range events
         _events:
@@ -86,5 +87,6 @@ define [
         # will handle the updating of the textbox.
         setUpperBoundValue: (value) ->
             @_setValue(@ui.upperBound, value)
+
 
     { DateControl }

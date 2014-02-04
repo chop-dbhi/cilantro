@@ -2,16 +2,17 @@ define [
     'underscore'
     'backbone'
     'marionette'
-    '../controls'
+    './base'
     '../button'
-    'tpl!templates/infograph/bar.html'
-    'tpl!templates/infograph/bar-chart-toolbar.html'
-    'tpl!templates/infograph/bar-chart.html'
-], (_, Backbone, Marionette, controls, button, templates...) ->
+    'tpl!templates/controls/infograph/bar.html'
+    'tpl!templates/controls/infograph/toolbar.html'
+    'tpl!templates/controls/infograph/layout.html'
+], (_, Backbone, Marionette, base, button, templates...) ->
 
-    templates = _.object ['bar', 'toolbar', 'chart'], templates
+    templates = _.object ['bar', 'toolbar', 'layout'], templates
 
-
+    # Returns a function closure that can be used to sort by attribute values
+    # for a collection of models.
     sortModelAttr = (attr) ->
         (model) ->
             value = model.get(attr)
@@ -19,28 +20,39 @@ define [
                 value = value.toLowerCase()
             return value
 
-
+    # Model with minimal parsing for unpacking the source value contained
+    # with an array.
     class BarModel extends Backbone.Model
         parse: (attrs) ->
             attrs.value = attrs.values[0]
             return attrs
 
-
+    # Collection of models representing the distribution data. Includes
+    # a method for sorting models by an attribute. If the attribute is
+    # prefixed with a hyphen '-', the sort will be reversed (descending).
+    # This triggers the 'sort' event unless the 'silent' option is true.
     class BarCollection extends Backbone.Collection
         model: BarModel
 
         comparator: (model) ->
             -model.get('count')
 
-        sortModelsBy: (attr) ->
+        sortModelsBy: (attr, options={}) ->
             if (reverse = attr.charAt(0) is '-')
                 attr = attr.slice(1)
+
             @models = @sortBy(sortModelAttr(attr))
+
             if reverse then @models.reverse()
-            @trigger 'sort', @
+
+            if not options.silent
+                @trigger('sort', @)
+
             return
 
-
+    # View rendering the data in BarModel including stats relative to the
+    # 'total' option such as the percentile of it's 'count'. Bars have
+    # 'selected' and 'visibility' properties, both of which can be toggled.
     class Bar extends Marionette.ItemView
         className: 'info-bar'
 
@@ -65,6 +77,8 @@ define [
             attrs.value = attrs.values[0]
             percentage = @getPercentage()
             attrs.width = percentage
+            # Simplify percentages that are less than one to be represented
+            # as such rather than a small floating point.
             if percentage < 1
                 attrs.percentage = '<1'
             else
@@ -74,22 +88,25 @@ define [
         onRender: ->
             @setSelected(@model, !!@model.get('selected'))
 
+        # Returns the percentage of the value's count relative to the 'total'
         getPercentage: ->
             @model.get('count') / @options.total * 100
 
+        # Toggle the selected state of the bar
         toggleSelected: (event) ->
             @model.set('selected', not @model.get('selected'))
 
         setExcluded: (model, value) ->
             @$el.toggleClass('excluded', value)
 
+        # Sets the selected state of the bar. If the bar is filtered,
+        # deselecting it will hide the bar from view.
         setSelected: (model, value) ->
             @$el.toggleClass('selected', value)
-            # If a delect occurs while a bar is selected, this ensures it
-            # is now hidden
             if not value and model.get('visible') is false
                 @$el.removeClass('filtered').hide()
 
+        # Sets the visibility of the bar based on it's current state.
         setVisible: (model, value) ->
             if value
                 @$el.removeClass('filtered').show()
@@ -108,31 +125,25 @@ define [
 
         itemViewOptions: (model, index) ->
             model: model
-            total: @calcTotal()
+            total: @totalCount
 
         collectionEvents:
-            'change': 'change'
+            'add': 'calcTotal'
+            'remove': 'calcTotal'
+            'reset': 'calcTotal'
             'sort': 'sortChildren'
-
-        constructor: (options) ->
-            options.collection ?= new BarCollection
-            @bindContext(options.context)
-            super(options)
 
         initialize: ->
             # Fetch the field distribution, do not cache
+            # TODO make this more transparent by setting
             @model.distribution (resp) =>
                 @collection.reset(resp.data, parse: true)
-                @setValue(@context.get('value'))
 
         # Sums the total count across all values
         calcTotal: ->
             total = 0
             total += count for count in @collection.pluck('count')
-            return total
-
-        onRender: ->
-            @set(@getContext())
+            @totalCount = total
 
         # Sorts the children based the on the current order of the collection
         sortChildren: (collection, options) ->
@@ -173,15 +184,19 @@ define [
             return
 
 
-    _.defaults Bars::, controls.ControlViewMixin
-
-
+    # The toolbar makes it easier to interact with large lists of values. It
+    # supports filtering values by text. Also, a button is provided to invert
+    # the selection of values. When combined with filtering, values are selected
+    # if they are not filtered by the search. The values themselves are sortable
+    # by the label or the count.
     class BarChartToolbar extends Marionette.ItemView
         className: 'navbar navbar-toolbar'
 
         template: templates.toolbar
 
         events:
+            # Note, that no delay is used since it is working with a local list
+            # of values so the filtering can keep it.
             'keyup [name=filter]': 'filterBars'
             'click [name=invert]': 'invertSelection'
             'click .sort-value-header, .sort-count-header': 'sortBy'
@@ -195,34 +210,31 @@ define [
             sortCountHeader: '.sort-count-header'
             excludeCheckbox: '[name=exclude]'
 
-        initialize: ->
-            @sortDirection = "-count"
-
         sortBy: (event) ->
-            if event.currentTarget.className == "sort-value-header"
-                if @sortDirection == "-value"
-                    @sortDirection = "value"
+            if event.currentTarget.className is 'sort-value-header'
+                if @sortDirection == '-value'
+                    @sortDirection = 'value'
                 else
-                    @sortDirection = "-value"
+                    @sortDirection = '-value'
             else
-                if @sortDirection == "-count"
-                    @sortDirection = "count"
+                if @sortDirection == '-count'
+                    @sortDirection = 'count'
                 else
-                    @sortDirection = "-count"
+                    @sortDirection = '-count'
 
             switch @sortDirection
-                when "-count"
-                    @ui.sortValueHeader.html("Value <i class=icon-sort></i>")
-                    @ui.sortCountHeader.html("Count <i class=icon-sort-down></i>")
-                when "count"
-                    @ui.sortValueHeader.html("Value <i class=icon-sort></i>")
-                    @ui.sortCountHeader.html("Count <i class=icon-sort-up></i>")
-                when "-value"
-                    @ui.sortValueHeader.html("Value <i class=icon-sort-down></i>")
-                    @ui.sortCountHeader.html("Count <i class=icon-sort></i>")
-                when "value"
-                    @ui.sortValueHeader.html("Value <i class=icon-sort-up></i>")
-                    @ui.sortCountHeader.html("Count <i class=icon-sort></i>")
+                when '-count'
+                    @ui.sortValueHeader.html('Value <i class=icon-sort></i>')
+                    @ui.sortCountHeader.html('Count <i class=icon-sort-down></i>')
+                when 'count'
+                    @ui.sortValueHeader.html('Value <i class=icon-sort></i>')
+                    @ui.sortCountHeader.html('Count <i class=icon-sort-up></i>')
+                when '-value'
+                    @ui.sortValueHeader.html('Value <i class=icon-sort-down></i>')
+                    @ui.sortCountHeader.html('Count <i class=icon-sort></i>')
+                when 'value'
+                    @ui.sortValueHeader.html('Value <i class=icon-sort-up></i>')
+                    @ui.sortCountHeader.html('Count <i class=icon-sort></i>')
 
             @collection.sortModelsBy(@sortDirection)
 
@@ -232,16 +244,18 @@ define [
             @ui.sortValueHeader.toggle(show)
             @ui.sortCountHeader.toggle(show)
 
-        # 'Filters' the bars given the input
+        # Filters the bars given a text string or via an event from the input
         filterBars: (event) ->
-            event.stopPropagation()
+            if _.isString(event)
+                text = event
+            else
+                event?.stopPropagation()
+                text = @ui.filterInput.val()
 
-            text = @ui.filterInput.val()
             regex = new RegExp(text, 'i')
 
             @collection.each (model) ->
                 model.set('visible', not text or regex.test(model.get('value')))
-            return
 
         # Inverts the selected bars. If the bar is not visible and not
         # selected it will not be inverted.
@@ -259,19 +273,28 @@ define [
             return
 
 
-    class BarChart extends controls.Control
-        template: templates.chart
+    # Infograph-style control which renders a list of horizontal bars filled
+    # based on their percentage of the total population. Bars can be clicked
+    # to be selected for inclusion. For small sets of values, the
+    # 'minValuesForToolbar' option can be set (to an integer) to hide the
+    # toolbar.
+    class InfographControl extends base.Control
+        template: templates.layout
 
         options:
             minValuesForToolbar: 10
 
         regions:
-            toolbar: '.toolbar-region'
             bars: '.bars-region'
+            toolbar: '.toolbar-region'
 
         collectionEvents:
+            'reset': 'initialSet'
             'reset': 'toggleToolbar'
+            'change': 'triggerChange'
 
+        # Internally defined collection for wrapping the available values as
+        # well as maintaining state for which values are selected.
         constructor: (options) ->
             options.collection ?= new BarCollection
             super(options)
@@ -284,7 +307,6 @@ define [
         onRender: ->
             @bars.show new Bars
                 model: @model
-                context: @context
                 collection: @collection
 
             @toolbar.show new BarChartToolbar
@@ -292,4 +314,18 @@ define [
 
             @toggleToolbar()
 
-    { BarChart }
+        # Always use an 'in' operator
+        getOperator: -> 'in'
+
+        # Get the values from the 'selected' models in the internal collection
+        getValue: ->
+            _.map @collection.where(selected: true), (model) ->
+                model.get('value')
+
+        # Update the internal collection with the selected values
+        setValue: (values=[]) ->
+            @collection.each (model) ->
+                model.set('selected', model.get('value') in values)
+
+
+    { InfographControl }

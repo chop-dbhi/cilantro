@@ -2,7 +2,8 @@ define [
     'underscore'
     'backbone'
     '../structs'
-], (_, structs) ->
+    '../constants'
+], (_, structs, constants) ->
 
 
     # Represents a value as defined in a query condition. For a given list of
@@ -39,7 +40,7 @@ define [
 
         initialize: ->
             super
-            @check = _.debounce(@check, 300)
+            @check = _.debounce(@check, constants.INPUT_DELAY)
             @on 'add', @check
 
         fetch: ->

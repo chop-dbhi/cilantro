@@ -18,7 +18,9 @@ define [
         onRender: ->
             if @options.placeholder
                 @ui.input.attr('placeholder', @options.placeholder)
-            _.defer => @ui.input.focus()
+            _.defer =>
+                if @_isRendered and not @isClosed
+                    @ui.input.focus()
 
 
     { Search }
