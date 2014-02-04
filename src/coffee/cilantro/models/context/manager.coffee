@@ -28,7 +28,7 @@ define [
     ###
     class ContextTreeManager extends Evented
         options:
-            identKeys: ['concept', 'field']
+            identKeys: ['concept', 'field', 'operator']
 
         constructor: (@model, options) ->
             @options = _.extend({}, @options, options)

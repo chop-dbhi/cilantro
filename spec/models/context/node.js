@@ -151,8 +151,19 @@ define(['cilantro'], function (c) {
             var cidsAfter = model.children.map(function(model) {
                 return model.cid;
             });
-            expect(model.toJSON()).toEqual(attrs);
-            expect(cidsBefore).toEqual(cidsAfter);
+
+            var sorter = function(a, b) {
+                if (a.concept > b.concept) return 1;
+                else if (a.concept < b.concept) return -1;
+                return 0;
+            };
+
+            // Sort children prior to comparison
+            var merged = model.toJSON();
+            merged.children.sort(sorter);
+
+            expect(merged).toEqual(attrs);
+            expect(cidsBefore).not.toEqual(cidsAfter);
         });
 
         it('should find child node (by field)', function() {

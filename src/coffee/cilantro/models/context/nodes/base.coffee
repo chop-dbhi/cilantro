@@ -16,7 +16,7 @@ define [
     class ContextNodeModel extends base.SynclessModel
         constructor: (attrs, options={}) ->
             options = _.extend
-                identKeys: ['concept', 'field']
+                identKeys: ['concept', 'field', 'operator']
             , options
 
             @manager = options.manager
@@ -69,7 +69,7 @@ define [
 
             # Check against each key in the ident for a match on attrs
             for key, value of ident
-                if @get(key) isnt value
+                if not _.isEqual(@get(key), value)
                     match = false
                     break
 
