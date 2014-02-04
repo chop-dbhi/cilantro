@@ -84,7 +84,7 @@ define [
         # If a specific key is provided, only return the value for that key.
         get: (key, options) ->
             # Shift arguments
-            if _.isObject('object')
+            if _.isObject(key)
                 options = key
                 key = null
 
@@ -103,7 +103,7 @@ define [
         # is passed, it's toJSON method is called to returned the underlying
         # attributes of the model.
         set: (key, value, options) ->
-            if typeof key is 'object'
+            if _.isObject(key)
                 if key instanceof Backbone.Model
                     attrs = key.toJSON()
                 else
