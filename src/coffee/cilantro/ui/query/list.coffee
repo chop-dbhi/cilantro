@@ -31,6 +31,7 @@ define [
             error: 'onCollectionError'
             request: 'onCollectionRequest'
             sync: 'onCollectionSync'
+            destroy: 'onCollectionDestroy'
 
         initialize: ->
             @data = {}
@@ -64,6 +65,19 @@ define [
                     context: @data.context
                     view: @data.view
 
+        _refreshList: =>
+            @$('.error-message').hide()
+            @$('.loading-indicator').hide()
+            @checkForEmptyCollection()
+
+        # When a model is destroyed, it does not call sync on the collection
+        # but it does trigger a destroy event on the collection. That is the
+        # reason for this separate handler. When a query is deleted, we will
+        # get the request event and then destroy event, there will never be
+        # a sync event in the case a user deleting a query.
+        onCollectionDestroy: =>
+            @_refreshList()
+
         onCollectionError: =>
             @$('.empty-message').hide()
             @$('.error-message').show()
@@ -75,9 +89,7 @@ define [
             @$('.loading-indicator').show()
 
         onCollectionSync: =>
-            @$('.error-message').hide()
-            @$('.loading-indicator').hide()
-            @checkForEmptyCollection()
+            @_refreshList()
 
         checkForEmptyCollection: ->
             if @collection.length == 0
