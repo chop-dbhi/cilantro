@@ -51,8 +51,8 @@ define(['module', 'text', 'underscore'], function(module, text, _) {
 						var template = _.template(eval(contents), undefined, settings);
 						write.asModule(pluginName + "!" + moduleName,
 							"define(function() { var func = " + template.source +
-                                "; func._moduleName = " +
-                                name + "; return func; });");
+                                "; func._moduleName = '" +
+                                name + "'; return func; });");
 					}
 					catch (err) {
 						console.error('~~~~~');
