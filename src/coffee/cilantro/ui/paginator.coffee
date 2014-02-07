@@ -2,11 +2,7 @@ define [
     'underscore'
     'marionette'
     './base'
-    'tpl!templates/paginator.html'
-], (_, Marionette, base, templates...) ->
-
-    templates = _.object ['links'], templates
-
+], (_, Marionette, base) ->
 
     class EmptyPage extends base.EmptyView
         message: 'No page results'
@@ -22,7 +18,7 @@ define [
     # The model is assumed to implement the 'paginator protocol', see
     # cilantro/models/paginator
     class Paginator extends Marionette.ItemView
-        template: templates.links
+        template: 'paginator'
 
         requestDelay: 250
 

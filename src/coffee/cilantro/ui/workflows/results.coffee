@@ -12,19 +12,14 @@ define [
     '../concept'
     '../exporter'
     '../query'
-    'tpl!templates/count.html'
-    'tpl!templates/workflows/results.html'
-], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, query, templates...) ->
-
-    templates = _.object ['count', 'results'], templates
-
+], (_, Marionette, c, base, paginator, numbers, structs, models, tables, context, concept, exporter, query) ->
 
     class ResultCount extends Marionette.ItemView
         tagName: 'span'
 
         className: 'result-count'
 
-        template: templates.count
+        template: 'count'
 
         ui:
             count: '.count'
@@ -58,7 +53,7 @@ define [
     class ResultsWorkflow extends Marionette.Layout
         className: 'results-workflow'
 
-        template: templates.results
+        template: 'workflows/results'
 
         requestDelay: 2500       # In milliseconds
         requestTimeout: 60000    # Max time(ms) for unmonitored exports, 1 minute

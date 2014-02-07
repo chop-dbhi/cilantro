@@ -2,18 +2,12 @@ define [
     'underscore'
     'marionette'
     './base'
-    'tpl!templates/accordian/group.html'
-    'tpl!templates/accordian/section.html'
-    'tpl!templates/accordian/item.html'
-], (_, Marionette, base, templates...) ->
-
-    templates = _.object ['group', 'section', 'item'], templates
-
+], (_, Marionette, base) ->
 
     class Item extends Marionette.ItemView
         tagName: 'li'
 
-        template: templates.item
+        template: 'accordian/item'
 
 
     class Section extends Marionette.CompositeView
@@ -21,7 +15,7 @@ define [
 
         itemView: Item
 
-        template: templates.section
+        template: 'accordian/section'
 
         itemViewContainer: '.items'
 
@@ -39,7 +33,7 @@ define [
     class Group extends Marionette.CompositeView
         className: 'group'
 
-        template: templates.group
+        template: 'accordian/group'
 
         itemView: Section
 

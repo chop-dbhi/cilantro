@@ -1,5 +1,7 @@
 define [
+    'marionette'
     '../core'
+    './templates'
     './notify'
     'bootstrap'
     'plugins/bootstrap-datepicker'
@@ -8,7 +10,26 @@ define [
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
     'plugins/jquery-stacked'
-], (c, notify) ->
+], (Marionette, c, templates, notify) ->
+
+    # Add reference to template cache access methods
+    c.templates = templates
+
+    defaultLoadTemplate = Marionette.TemplateCache::loadTemplate
+    defaultCompileTemplate = Marionette.TemplateCache::compileTemplate
+
+    # See: https://github.com/marionettejs/backbone.marionette/blob/master/docs/marionette.templatecache.md#override-template-retrieval
+    Marionette.TemplateCache::loadTemplate = (templateId) ->
+        if not (func = templates.get(templateId))
+            func = defaultLoadTemplate.call(this, templateId)
+        return func
+
+    # Prevent re-compiling already compiled templates
+    Marionette.TemplateCache::compileTemplate = (template) ->
+        if typeof template isnt 'function'
+            template = defaultCompileTemplate(template)
+        return template
+
 
     # Initialize notification stream and append it to the main element
     stream = new notify.Notifications

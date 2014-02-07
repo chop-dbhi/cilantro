@@ -5,10 +5,7 @@ define [
     '../base'
     '../concept'
     '../context'
-    'tpl!templates/workflows/query.html'
-], (_, Marionette, c, base, concept, context, templates...) ->
-
-    templates = _.object ['query'], templates
+], (_, Marionette, c, base, concept, context) ->
 
     ###
     The QueryWorkflow provides an interface for navigating and viewing
@@ -25,7 +22,7 @@ define [
     class QueryWorkflow extends Marionette.Layout
         className: 'query-workflow'
 
-        template: templates.query
+        template: 'workflows/query'
 
         regions:
             context: '.context-panel-region'

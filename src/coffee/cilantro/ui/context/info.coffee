@@ -2,14 +2,10 @@ define [
     'underscore'
     'marionette'
     '../core'
-    'tpl!templates/context/info.html'
-], (_, Marionette, c, templates...) ->
-
-    templates = _.object ['info'], templates
-
+], (_, Marionette, c) ->
 
     class ContextInfo extends Marionette.ItemView
-        template: templates.info
+        template: 'context/info'
 
         ui:
             query: '[data-route=query]'

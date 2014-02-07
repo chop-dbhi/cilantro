@@ -5,10 +5,7 @@ define [
     './base'
     '../models'
     '../constants'
-    'tpl!templates/values/list.html'
-], ($, _, Marionette, base, models, constants, templates...) ->
-
-    templates = _.object ['list'], templates
+], ($, _, Marionette, base, models, constants) ->
 
     # Interface for representing a user-defined/selected list of values
     # in a textarea (one value per line).
@@ -16,7 +13,7 @@ define [
     class ValueList extends Marionette.ItemView
         className: 'value-list'
 
-        template: templates.list
+        template: 'values/list'
 
         # Listen for collection events to update the textarea to match
         # the values

@@ -7,13 +7,7 @@ define [
     '../paginator'
     '../values'
     '../search'
-    'tpl!templates/search.html'
-    'tpl!templates/controls/search/item.html'
-    'tpl!templates/controls/search/layout.html'
-], (_, Marionette, base, models, constants, paginator, values, search, templates...) ->
-
-    templates = _.object ['search', 'item', 'layout'], templates
-
+], (_, Marionette, base, models, constants, paginator, values, search) ->
 
     # Single page of values
     class SearchPageModel extends models.Page
@@ -47,8 +41,6 @@ define [
     class ValueSearch extends search.Search
         className: 'field-search search'
 
-        template: templates.search
-
         ui:
             input: 'input'
 
@@ -73,7 +65,7 @@ define [
     class SearchItem extends Marionette.ItemView
         className: 'value-item'
 
-        template: templates.item
+        template: 'controls/search/item'
 
         ui:
             actions: '.actions'
@@ -127,7 +119,7 @@ define [
     class SearchControl extends base.Control
         className: 'field-value-search'
 
-        template: templates.layout
+        template: 'controls/search/layout'
 
         searchPaginator: SearchPaginator
 

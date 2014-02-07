@@ -2,15 +2,12 @@ define [
     'underscore'
     'marionette'
     '../core'
-    'tpl!templates/query/loader.html'
-], (_, Marionette, c, templates...) ->
-
-    templates = _.object ['loader'], templates
+], (_, Marionette, c) ->
 
     class QueryLoader extends Marionette.ItemView
         className: 'query-loader'
 
-        template: templates.loader
+        template: 'query/loader'
 
         ui:
             loadingMessage: '.loading-message'

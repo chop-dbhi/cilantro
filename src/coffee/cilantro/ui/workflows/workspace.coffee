@@ -4,15 +4,12 @@ define [
     '../core'
     '../base'
     '../query'
-    'tpl!templates/workflows/workspace.html'
-], (_, Marionette, c, base, query, templates...) ->
-
-    templates = _.object ['workspace'], templates
+], (_, Marionette, c, base, query) ->
 
     class WorkspaceWorkflow extends Marionette.Layout
         className: 'workspace-workflow'
 
-        template: templates.workspace
+        template: 'workflows/workspace'
 
         regions:
             queries: '.query-region'

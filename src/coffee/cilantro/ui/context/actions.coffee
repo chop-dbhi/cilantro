@@ -2,14 +2,11 @@ define [
     'underscore'
     'marionette'
     '../core'
-    'tpl!templates/context/actions.html'
-], (_, Marionette, c, templates...) ->
-
-    templates = _.object ['actions'], templates
+], (_, Marionette, c) ->
 
     # Provides a set of actions for manipulating a ContextModel object
     class ContextActions extends Marionette.ItemView
-        template: templates.actions
+        template: 'context/actions'
 
         events:
             'click [data-role=remove]': 'clickRemoveAll'

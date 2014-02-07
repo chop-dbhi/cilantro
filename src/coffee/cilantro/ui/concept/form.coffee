@@ -5,16 +5,12 @@ define [
     '../field'
     '../charts'
     './info'
-    'tpl!templates/concept/form.html'
-], (_, Marionette, c, field, charts, info, templates...) ->
-
-    templates = _.object ['form'], templates
-
+], (_, Marionette, c, field, charts, info) ->
 
     class ConceptForm extends Marionette.Layout
         className: 'concept-form'
 
-        template: templates.form
+        template: 'concept/form'
 
         infoView: info.ConceptInfo
 

@@ -4,12 +4,7 @@ define [
     'marionette'
     './base'
     '../button'
-    'tpl!templates/controls/infograph/bar.html'
-    'tpl!templates/controls/infograph/toolbar.html'
-    'tpl!templates/controls/infograph/layout.html'
-], (_, Backbone, Marionette, base, button, templates...) ->
-
-    templates = _.object ['bar', 'toolbar', 'layout'], templates
+], (_, Backbone, Marionette, base, button) ->
 
     # Returns a function closure that can be used to sort by attribute values
     # for a collection of models.
@@ -56,7 +51,7 @@ define [
     class Bar extends Marionette.ItemView
         className: 'info-bar'
 
-        template: templates.bar
+        template: 'controls/infograph/bar'
 
         options:
             total: null
@@ -192,7 +187,7 @@ define [
     class BarChartToolbar extends Marionette.ItemView
         className: 'navbar navbar-toolbar'
 
-        template: templates.toolbar
+        template: 'controls/infograph/toolbar'
 
         events:
             # Note, that no delay is used since it is working with a local list
@@ -279,7 +274,7 @@ define [
     # 'minValuesForToolbar' option can be set (to an integer) to hide the
     # toolbar.
     class InfographControl extends base.Control
-        template: templates.layout
+        template: 'controls/infograph/layout'
 
         options:
             minValuesForToolbar: 10

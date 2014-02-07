@@ -7,11 +7,7 @@ define [
     '../base'
     '../charts'
     '../charts/utils'
-    'tpl!templates/field/stats.html'
-], ($, _, Backbone, Marionette, c, base, charts, utils, templates...) ->
-
-    templates = _.object ['layout'], templates
-
+], ($, _, Backbone, Marionette, c, base, charts, utils) ->
 
     # Prettifies a value for display
     prettyValue = (value) ->
@@ -61,7 +57,7 @@ define [
     class FieldStats extends Marionette.Layout
         className: 'field-stats'
 
-        template: templates.layout
+        template: 'field/stats'
 
         regions:
             values: '.stats-values'

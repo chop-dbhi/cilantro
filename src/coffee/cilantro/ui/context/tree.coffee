@@ -6,16 +6,10 @@ define [
     './item'
     './info'
     './actions'
-    'tpl!templates/context.html'
-    'tpl!templates/context/empty.html'
-    'tpl!templates/context/tree.html'
-], (_, Marionette, base, c, item, info, actions, templates...) ->
-
-    templates = _.object ['context', 'empty', 'tree'], templates
-
+], (_, Marionette, base, c, item, info, actions) ->
 
     class ContextEmptyTree extends base.EmptyView
-        template: templates.empty
+        template: 'context/empty'
 
         ui:
             noFiltersResultsMessage: '.no-filters-results-workspace'
@@ -31,7 +25,7 @@ define [
     class ContextTree extends Marionette.CompositeView
         className: 'context-tree'
 
-        template: templates.tree
+        template: 'context/tree'
 
         itemViewContainer: '.branch-children'
 
@@ -43,7 +37,7 @@ define [
     class ContextPanel extends Marionette.Layout
         className: 'context'
 
-        template: templates.context
+        template: 'context'
 
         errorView: base.ErrorOverlayView
 

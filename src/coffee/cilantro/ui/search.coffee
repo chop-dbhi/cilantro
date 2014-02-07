@@ -1,16 +1,12 @@
 define [
     'underscore'
     'marionette'
-    'tpl!templates/search.html'
-], (_, Marionette, templates...) ->
-
-    templates = _.object ['search'], templates
-
+], (_, Marionette) ->
 
     class Search extends Marionette.ItemView
         className: 'search'
 
-        template: templates.search
+        template: 'search'
 
         ui:
             input: 'input'
