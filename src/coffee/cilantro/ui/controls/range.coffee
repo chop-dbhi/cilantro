@@ -3,14 +3,11 @@ define [
     './base'
     '../button'
     '../../constants'
-    'tpl!templates/controls/range/layout.html'
-], (_, base, button, constants, templates...) ->
-
-    templates = _.object ['layout'], templates
+], (_, base, button, constants) ->
 
     # A generic control for entering an inclusive or exclusive range
     class RangeControl extends base.Control
-        template: templates.layout
+        template: 'controls/range/layout'
 
         events:
             'keyup .range-lower,.range-upper': '_triggerChange'

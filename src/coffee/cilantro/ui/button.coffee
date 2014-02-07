@@ -2,19 +2,14 @@ define [
     'underscore'
     'backbone'
     'marionette'
-    'tpl!templates/button/select.html'
-    'tpl!templates/button/select-option.html'
-], (_, Backbone, Marionette, templates...) ->
-
-    templates = _.object ['select', 'option'], templates
-
+], (_, Backbone, Marionette) ->
 
     class ButtonSelectEmptyOption extends Marionette.ItemView
         className: 'disabled'
 
         tagName: 'li'
 
-        template: templates.option
+        template: 'button/select-option'
 
         events:
             'click': 'prevent'
@@ -29,7 +24,7 @@ define [
     class ButtonSelectOption extends Marionette.ItemView
         tagName: 'li'
 
-        template: templates.option
+        template: 'button/select-option'
 
         events:
             'click': 'select'
@@ -45,7 +40,7 @@ define [
     class ButtonSelect extends Marionette.CompositeView
         className: 'btn-group btn-select'
 
-        template: templates.select
+        template: 'button/select'
 
         itemView: ButtonSelectOption
 

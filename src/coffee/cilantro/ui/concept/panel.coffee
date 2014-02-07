@@ -3,16 +3,13 @@ define [
     'marionette'
     './index'
     './search'
-    'tpl!templates/concept/panel.html'
-], (_, Marionette, index, search, templates...) ->
-
-    templates = _.object ['panel'], templates
+], (_, Marionette, index, search) ->
 
     # Takes a collection of c.models.ConceptModel objects
     class ConceptPanel extends Marionette.Layout
         className: 'concept-panel'
 
-        template: templates.panel
+        template: 'concept/panel'
 
         # Two primary regions for the concept panel including the search
         # and the index (listing) of concepts

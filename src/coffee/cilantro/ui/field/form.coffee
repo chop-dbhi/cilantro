@@ -7,12 +7,7 @@ define [
     './stats'
     '../controls'
     '../charts'
-    'tpl!templates/field/form.html'
-    'tpl!templates/field/form-condensed.html'
-], (_, Backbone, Marionette, base, info, stats, controls, charts, templates...) ->
-
-    templates = _.object ['form', 'condensed'], templates
-
+], (_, Backbone, Marionette, base, info, stats, controls, charts) ->
 
     getControlView = (model) ->
         type = model.get('simple_type')
@@ -70,9 +65,9 @@ define [
 
         getTemplate: ->
             if @options.condensedLayout
-                templates.condensed
+                'field/form-condensed'
             else
-                templates.form
+                'field/form'
 
         options:
             nodeType: 'condition'

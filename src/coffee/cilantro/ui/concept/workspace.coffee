@@ -10,15 +10,10 @@ define [
     '../charts'
     './form'
     './info'
-    'tpl!templates/concept/workspace.html'
-    'tpl!templates/concept/error.html'
-], (_, Backbone, Marionette, logger, c, base, welcome, field, charts, form, info, templates...) ->
-
-    templates = _.object ['workspace', 'error'], templates
-
+], (_, Backbone, Marionette, logger, c, base, welcome, field, charts, form, info) ->
 
     class ConceptError extends base.ErrorView
-        template: templates.error
+        template: 'concept/error'
 
 
     # Some of the class properties here are mimicked after CollectionView
@@ -26,7 +21,7 @@ define [
     class ConceptWorkspace extends Marionette.Layout
         className: 'concept-workspace'
 
-        template: templates.workspace
+        template: 'concept/workspace'
 
         itemView: form.ConceptForm
 

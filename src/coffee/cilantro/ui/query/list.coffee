@@ -4,17 +4,14 @@ define [
     '../core'
     './item'
     './dialog'
-    'tpl!templates/query/list.html'
-], (_, Marionette, c, item, dialog, templates...) ->
-
-    templates = _.object ['list'], templates
+], (_, Marionette, c, item, dialog) ->
 
     class QueryList extends Marionette.CompositeView
         itemView: item.QueryItem
 
         itemViewContainer: '.items'
 
-        template: templates.list
+        template: 'query/list'
 
         itemViewOptions: (model, index) ->
             model: model

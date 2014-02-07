@@ -4,17 +4,14 @@ define [
     '../base'
     './core'
     './utils'
-    'tpl!templates/charts/chart.html'
-], ($, _, base, charts, utils, templates...) ->
-
-    templates = _.object ['chart'], templates
+], ($, _, base, charts, utils) ->
 
     class ChartLoading extends base.LoadView
         message: 'Chart loading...'
 
 
     class FieldChart extends charts.Chart
-        template: templates.chart
+        template: 'charts/chart'
 
         loadView: ChartLoading
 

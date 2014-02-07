@@ -3,10 +3,7 @@ define [
     'marionette'
     '../base'
     '../core'
-    'tpl!templates/query/item.html'
-], (_, Marionette, base, c, templates...) ->
-
-    templates = _.object ['item'], templates
+], (_, Marionette, base, c) ->
 
     class LoadingQueryItem extends base.LoadView
         align: 'left'
@@ -14,7 +11,7 @@ define [
     class QueryItem extends Marionette.ItemView
         className: 'row-fluid'
 
-        template: templates.item
+        template: 'query/item'
 
         ui:
             owner: '.owner'

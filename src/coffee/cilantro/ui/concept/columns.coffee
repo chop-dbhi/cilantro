@@ -4,18 +4,10 @@ define [
     '../core'
     './search'
     './index'
-    'tpl!templates/concept/columns.html'
-    'tpl!templates/concept/columns-available.html'
-    'tpl!templates/concept/columns-available-section.html'
-    'tpl!templates/concept/columns-available-group.html'
-    'tpl!templates/concept/columns-selected.html'
-], (_, Marionette, c, search, index, templates...) ->
-
-    templates = _.object ['columns', 'available', 'section', 'group', 'selected'], templates
-
+], (_, Marionette, c, search, index) ->
 
     class AvailableItem extends index.ConceptItem
-        template: templates.available
+        template: 'concept/columns-available'
 
         events:
             'click .column-item-button': 'triggerAdd'
@@ -32,7 +24,7 @@ define [
 
 
     class AvailableSection extends index.ConceptSection
-        template: templates.section
+        template: 'concept/columns-available-section'
 
         itemView: AvailableItem
 
@@ -52,7 +44,7 @@ define [
 
 
     class AvailableGroup extends index.ConceptGroup
-        template: templates.group
+        template: 'concept/columns-avaiable-group'
 
         itemView: AvailableSection
 
@@ -82,7 +74,7 @@ define [
     class SelectedItem extends Marionette.ItemView
         tagName: 'li'
 
-        template: templates.selected
+        template: 'concept/selected'
 
         initialize: ->
             @data = {}
@@ -154,7 +146,7 @@ define [
     class ConceptColumns extends Marionette.Layout
         className: 'concept-columns'
 
-        template: templates.columns
+        template: 'concept/columns'
 
         events:
             'click .columns-remove-all-button': 'triggerRemoveAll'

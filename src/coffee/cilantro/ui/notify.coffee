@@ -6,10 +6,7 @@ define [
     'underscore'
     'backbone'
     'marionette'
-    'tpl!templates/notification.html'
-], (_, Backbone, Marionette, templates...) ->
-
-    templates = _.object ['notification'], templates
+], (_, Backbone, Marionette) ->
 
     class NotificationModel extends Backbone.Model
         defaults:
@@ -22,7 +19,7 @@ define [
     class Notification extends Marionette.ItemView
         className: 'alert'
 
-        template: templates.notification
+        template: 'notification'
 
         ui:
             dismiss: '[data-dismiss]'

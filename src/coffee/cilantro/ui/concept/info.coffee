@@ -1,16 +1,12 @@
 define [
     'underscore'
     'marionette'
-    'tpl!templates/concept/info.html'
-], (_, Marionette, templates...) ->
-
-    templates = _.object ['info'], templates
-
+], (_, Marionette) ->
 
     class ConceptInfo extends Marionette.ItemView
         className: 'concept-info'
 
-        template: templates.info
+        template: 'concept/info'
 
         # Shorthand references to primary UI elements. After the view has been
         # rendered, they can be accessed as is, e.g. `@ui.name` which will be

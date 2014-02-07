@@ -3,14 +3,10 @@ define [
     'underscore'
     './dist'
     './axis'
-    'tpl!templates/charts/editable-chart.html'
-], ($, _, dist, axis, templates...) ->
-
-    templates = _.object ['editable'], templates
-
+], ($, _, dist, axis) ->
 
     class EditableFieldChart extends dist.FieldChart
-        template: templates.editable
+        template: 'charts/editable-chart'
 
         events: _.extend
             'click .fullsize': 'toggleExpanded'

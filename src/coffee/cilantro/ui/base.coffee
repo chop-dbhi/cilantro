@@ -1,11 +1,7 @@
 define [
     'underscore'
     'marionette'
-    'tpl!templates/base/error-overlay.html'
-    'tpl!templates/panel.html'
-], (_, Marionette, templates...) ->
-
-    templates = _.object ['errorOverlay', 'panel'], templates
+], (_, Marionette) ->
 
     # Simple set of views for representing various states.
     #
@@ -63,7 +59,7 @@ define [
     class ErrorOverlayView extends ErrorView
         className: 'error-overlay-view'
 
-        template: templates.errorOverlay
+        template: 'base/error-overlay'
 
         onRender: ->
             $(@options.target)
@@ -82,7 +78,7 @@ define [
     class Panel extends Marionette.Layout
         className: 'panel'
 
-        template: templates.panel
+        template: 'panel'
 
         options:
             content: null

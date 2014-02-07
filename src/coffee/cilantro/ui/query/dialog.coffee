@@ -3,16 +3,12 @@ define [
     'marionette'
     '../core'
     '../../models/query'
-    'tpl!templates/query/edit-dialog.html'
-    'tpl!templates/query/delete-dialog.html'
-], (_, Marionette, c, query, templates...) ->
-
-    templates = _.object ['edit', 'delete'], templates
+], (_, Marionette, c, query) ->
 
     class DeleteQueryDialog extends Marionette.ItemView
         className: 'modal hide'
 
-        template: templates.delete
+        template: 'query/delete-dialog'
 
         options:
             header: 'Delete Query'
@@ -66,7 +62,7 @@ define [
     class EditQueryDialog extends Marionette.ItemView
         className: 'modal hide'
 
-        template: templates.edit
+        template: 'query/edit-dialog'
 
         options:
             header: 'Query Properties'

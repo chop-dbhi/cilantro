@@ -2,10 +2,7 @@ define [
     'underscore'
     'marionette'
     '../core'
-    'tpl!templates/context/item.html'
-], (_, Marionette, c, templates...) ->
-
-    templates = _.object ['item'], templates
+], (_, Marionette, c) ->
 
     # Returns a flat list of values for `key` that is built by recursing
     # over the `attrs.children` if present.
@@ -22,7 +19,7 @@ define [
     class ContextItem extends Marionette.ItemView
         className: 'context-item'
 
-        template: templates.item
+        template: 'context/item'
 
         events:
             'click .language': 'clickShow'
