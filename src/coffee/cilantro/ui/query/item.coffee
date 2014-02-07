@@ -70,7 +70,7 @@ define [
 
                 emailHTML = _.pluck(@model.get('shared_users'), 'email').join('<br />')
                 @ui.shareCount.attr('title', emailHTML)
-                # NOTE: The container needs to be set to overcome and issue
+                # NOTE: The container needs to be set to overcome an issue
                 # with tooltip placement in bootstrap < 3.0. This container
                 # setting can be removed after we upgrade to bootstrap >= 3.0.
                 @ui.shareCount.tooltip({animation: false, html: true, placement: 'right', container: 'body'})
