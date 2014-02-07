@@ -72,9 +72,7 @@ define [
         # Remove templates dir prefix
         name = name.replace(/^templates\//, '')
         # Strip off .html extension
-        name = name.replace(/\.html$/, '')
-        # Replace path separators with dots
-        return name.replace('/', '.')
+        return name.replace(/\.html$/, '')
 
     for templateFunc in templates
         templateId = makeTemplateId(templateFunc._moduleName)
