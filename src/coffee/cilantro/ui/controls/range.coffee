@@ -10,8 +10,8 @@ define [
         template: 'controls/range/layout'
 
         events:
-            'keyup .range-lower,.range-upper': '_triggerChange'
-            'change .btn-select': '_triggerChange'
+            'keyup .range-lower,.range-upper': '_change'
+            'change .btn-select': '_change'
             'click .range-help-button': 'toggleHelpText'
 
         ui:
@@ -21,14 +21,14 @@ define [
             help: '.help-block'
 
         initialize: (options) ->
-            @_triggerChange = _.debounce(@triggerChange, constants.INPUT_DELAY)
-
             @model.stats.on('reset', @readMinMaxStats)
 
             # If already fetched, set the min and max lower the model's stats
             # collection.
             if @model.stats.length > 0
                 @readMinMaxStats()
+
+            @_change = _.debounce(@change, constants.INPUT_DELAY)
 
         onRender: ->
             @operatorSelect = new button.ButtonSelect
@@ -44,6 +44,8 @@ define [
             @operatorSelect.render().$el.prependTo(@$el)
             @ui.help.hide()
             @updateBounds()
+
+            @set(@context)
 
         # Method for parsing the value of the StatModel corresponding to the
         # minimum viable value for this range. By default, this method simply
@@ -193,10 +195,6 @@ define [
                     @setLowerBoundValue(value)
                 else
                     @setUpperBoundValue(value)
-
-        set: (attrs) ->
-            @setOperator(attrs.operator)
-            @setValue(attrs.value)
 
 
     { RangeControl }

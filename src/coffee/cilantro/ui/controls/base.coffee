@@ -16,6 +16,7 @@ define [
     # unbinds a previously bound context
     bindContext = (view, model) ->
         unbindContext(view)
+        if not model then return
 
         model.listenTo view, 'change', (view, attrs) ->
             model.set(attrs)
@@ -30,7 +31,7 @@ define [
     class ControlError extends Error
 
 
-    class Control extends Marionette.Layout
+    ControlViewMixin =
         attrNames: ['concept', 'field', 'operator', 'value']
 
         attrGetters:
@@ -45,24 +46,11 @@ define [
             operator: 'setOperator'
             value: 'setValue'
 
-        constructor: (options={}) ->
-            @context = options.context
-
-            super(options)
-
-            if @context
-                @bindContext(@context)
-                # Set the initial state of the view from the context on render
-                @on('item:rendered', @initialSet)
-
         bindContext: (context) ->
             bindContext(@, context)
 
         unbindContext: ->
             unbindContext(@)
-
-        initialSet: ->
-            @set(_.clone(@context.attributes))
 
         # Get the value from this control for the attr key. This
         # attempts to call the associated method in attrGetters.
@@ -70,7 +58,7 @@ define [
             if not (method = @attrGetters[key]) then return
             if (func = @[method])?
                 return func.call(@, options)
-            throw new ControlError('Getter declared, but not defined')
+            throw new ControlError("Getter declared, but not defined for #{ key }")
 
         # Set the value on this control for the attr key. This
         # attempts to call the associated method in attrSetters.
@@ -78,7 +66,7 @@ define [
             if not (method = @attrSetters[key]) then return
             if (func = @[method])?
                 return func.call(@, value, options)
-            throw new ControlError('Setter declared, but not defined')
+            throw new ControlError("Setter declared, but not defined for #{ key }")
 
         # Return attributes for each getter defined for this control.
         # If a specific key is provided, only return the value for that key.
@@ -88,21 +76,23 @@ define [
                 options = key
                 key = null
 
-            if key?
-                @_get(key, options)
-            else
-                attrs = {}
-                for key in @attrNames
-                    # If the getter returns an undefined result, this implies
-                    # the method is not implemented.
-                    if (value = @_get(key, options)) isnt undefined
-                        attrs[key] = value
-                return attrs
+            if key? then return @_get(key, options)
+
+            attrs = {}
+
+            for key in @attrNames
+                # If the getter returns an undefined result, this implies
+                # the method is not implemented.
+                if (value = @_get(key, options)) isnt undefined
+                    attrs[key] = value
+
+            return attrs
 
         # Sets a value on the control for the attr key or object. If an model
         # is passed, it's toJSON method is called to returned the underlying
         # attributes of the model.
         set: (key, value, options) ->
+            # Shift arguments
             if _.isObject(key)
                 if key instanceof Backbone.Model
                     attrs = key.toJSON()
@@ -115,16 +105,31 @@ define [
             for key, value of attrs
                 if value isnt undefined
                     @_set(key, value, options)
+
             return
 
-        # Should be called when this control's state has changed
-        triggerChange: (key, options) ->
-            if _.isString(key)
-                @trigger("change:#{ key }", @, @get(key, options), options)
+        clear: (key, options) ->
+            # Shift arguments
+            if _.isObject(key)
+                options = key
+                key = null
+
+            attrs = {}
+
+            if key?
+                attrs[key] = null
             else
-                # The real options are in the key argument
-                @trigger('change', @, @get(), key)
+                for key in @attrNames
+                    attrs[key] = null
+
+            @_set(attrs, options)
             return
+
+        # Triggered any time the control contents have changed. Upstream, the
+        # context can be bound to this event and update itself as changes
+        # occur.
+        change: ->
+            @trigger('change', @, @get())
 
         # Placeholder no-op getter/setter functions for each attribute
         getConcept: ->
@@ -138,4 +143,15 @@ define [
         setValue: ->
 
 
-    { Control }
+    class Control extends Marionette.Layout
+        className: 'control'
+
+        constructor: (options={}) ->
+            @bindContext(options.context)
+            super(options)
+
+
+    _.defaults(Control::, ControlViewMixin)
+
+
+    { Control, ControlViewMixin }

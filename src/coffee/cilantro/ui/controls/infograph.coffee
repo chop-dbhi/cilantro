@@ -32,17 +32,14 @@ define [
         comparator: (model) ->
             -model.get('count')
 
-        sortModelsBy: (attr, options={}) ->
+        sortModelsBy: (attr) ->
             if (reverse = attr.charAt(0) is '-')
                 attr = attr.slice(1)
 
             @models = @sortBy(sortModelAttr(attr))
 
             if reverse then @models.reverse()
-
-            if not options.silent
-                @trigger('sort', @)
-
+            @trigger('sort', @)
             return
 
     # View rendering the data in BarModel including stats relative to the
@@ -120,25 +117,31 @@ define [
 
         itemViewOptions: (model, index) ->
             model: model
-            total: @totalCount
+            total: @calcTotal()
 
         collectionEvents:
-            'add': 'calcTotal'
-            'remove': 'calcTotal'
-            'reset': 'calcTotal'
+            'change': 'change'
             'sort': 'sortChildren'
+
+        constructor: (options={}) ->
+            @bindContext(options.context)
+            super(options)
 
         initialize: ->
             # Fetch the field distribution, do not cache
             # TODO make this more transparent by setting
             @model.distribution (resp) =>
                 @collection.reset(resp.data, parse: true)
+                @setValue(@context.get('value'))
 
         # Sums the total count across all values
         calcTotal: ->
             total = 0
             total += count for count in @collection.pluck('count')
-            @totalCount = total
+            return total
+
+        onRender: ->
+            @set(@context)
 
         # Sorts the children based the on the current order of the collection
         sortChildren: (collection, options) ->
@@ -172,11 +175,14 @@ define [
             return
 
         setOperator: (operator) ->
-            if operator == '-in'
+            if operator is '-in'
                 @collection.each (model) ->
                     model.set('excluded', true)
                 $('input[name=exclude]').attr('checked', true)
             return
+
+
+    _.defaults(Bars::, base.ControlViewMixin)
 
 
     # The toolbar makes it easier to interact with large lists of values. It
@@ -204,6 +210,9 @@ define [
             sortValueHeader: '.sort-value-header'
             sortCountHeader: '.sort-count-header'
             excludeCheckbox: '[name=exclude]'
+
+        initialize: ->
+            @sortDirection = '-count'
 
         sortBy: (event) ->
             if event.currentTarget.className is 'sort-value-header'
@@ -251,6 +260,7 @@ define [
 
             @collection.each (model) ->
                 model.set('visible', not text or regex.test(model.get('value')))
+            return
 
         # Inverts the selected bars. If the bar is not visible and not
         # selected it will not be inverted.
@@ -284,9 +294,7 @@ define [
             toolbar: '.toolbar-region'
 
         collectionEvents:
-            'reset': 'initialSet'
             'reset': 'toggleToolbar'
-            'change': 'triggerChange'
 
         # Internally defined collection for wrapping the available values as
         # well as maintaining state for which values are selected.
@@ -302,25 +310,13 @@ define [
         onRender: ->
             @bars.show new Bars
                 model: @model
+                context: @context
                 collection: @collection
 
             @toolbar.show new BarChartToolbar
                 collection: @collection
 
             @toggleToolbar()
-
-        # Always use an 'in' operator
-        getOperator: -> 'in'
-
-        # Get the values from the 'selected' models in the internal collection
-        getValue: ->
-            _.map @collection.where(selected: true), (model) ->
-                model.get('value')
-
-        # Update the internal collection with the selected values
-        setValue: (values=[]) ->
-            @collection.each (model) ->
-                model.set('selected', model.get('value') in values)
 
 
     { InfographControl }

@@ -144,13 +144,13 @@ define [
                 @collection.url = =>
                     @model.links.values
 
+            # Trigger a change event on all collection events
+            @collection.on('all', @change, @)
+
             @valuesPaginator = new @searchPaginator null,
                 field: @model
 
             @valuesPaginator.refresh()
-
-            # Trigger a change event on all collection events
-            @listenTo(@collection, 'add', @triggerChange, @)
 
         onRender: ->
             @search.show new @regionViews.search
@@ -169,6 +169,11 @@ define [
             @values.show new @regionViews.values
                 collection: @collection
 
+            @set(@context)
+
+
+        getField: -> @model?.id
+
         # This is currently always an 'in', however 'not in' may be
         # desirable as well.
         getOperator: -> 'in'
@@ -182,9 +187,6 @@ define [
             # Do not merge into existing models since the collection contains
             # additional state (which would be removed due to the merge).
             @collection.set(value, merge: false)
-
-        set: (attrs) ->
-            @setValue(attrs.value)
 
 
     { SearchControl, ValueSearch, SearchItem, SearchPage, SearchPageRoll, SearchPaginator }
