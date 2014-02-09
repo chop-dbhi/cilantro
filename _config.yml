@@ -7,9 +7,9 @@ codeurl: 'https://github.com/cbmi/cilantro'
 
 # Default categories (in order) to appear in the navigation
 sections: [
-    ['api', 'APIs'],
     ['ref', 'Reference'],
     ['dev', 'Developers'],
+    ['api', 'APIs'],
     ['post', 'Posts']
 ]
 
