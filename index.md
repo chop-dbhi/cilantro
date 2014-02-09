@@ -7,9 +7,5 @@ title: "Cilantro: Official client for the Harvest Stack"
 
 If you would like to learn more about Harvest in general such as what the project is about, it's origin and a tutorial, visit Harvest's project site: http://harvest.research.chop.edu.
 
-### The _Stack_
 
-- [ModelTree](//modeltree.harvest.io)
-- [Avocado](//avocado.harvest.io)
-- [Serrano](//serrano.harvest.io)
-- Cilantro
+Releases are maintained on the [releases page](https://github.com/cbmi/cilantro/releases) on GitHub.
