@@ -29,33 +29,6 @@ define ['jquery', 'underscore', 'marionette'], ($, _, Marionette) ->
     # ...
 ```
 
-## HTML Templates
-
-Cilantro uses HTML templates for defining the content of a UI view. HTML template files are defined in `src/templates/` and should follow the name module path for the view the template is associated with. If it is a general purpose template, name it something informative.
-
-When templates are used in a module, list them at the end of the dependency array and use the CoffeeScript [splat syntax](http://coffeescript.org/#splats) named `templates...`. The simple convention is to convert the array of compiled templates into an object using Underscore's [`_.object` function](http://underscorejs.org/#object). Even for a single template, this convention should be followed for clarity.
-
-```coffeescript
-define [
-    'underscore'
-    'marionette'
-    'tpl!templates/views/foo.html'
-    'tpl!templates/views/bar.html'
-], (_, Marionette, templates...) ->
-
-    # Uses Underscore object function zip together the keys and compiled
-    # templates to produce a templates object.
-    templates = _.object ['foo', 'bar'], templates
-
-    class Foo extends Marionette.ItemView
-        template: templates.foo
-
-    class Bar extends Marionette.ItemView
-        template: templates.bar
-
-    { Foo, Bar }
-```
-
 ## View Data
 
 Most views in Cilantro have a primary model or collection that is being used as the data source for rendering the view. [Backbone](http://backbonejs.org/#View-constructor) and [Marionette](https://github.com/marionettejs/backbone.marionette/blob/master/docs/marionette.itemview.md#modelevents-and-collectionevents) have facilities for automatically referencing and binding to the passed in model or collection. Some views require supplementary data sources or simply act as proxies for passing references down to subviews. The convention is to define a `data` attribute for storing the supplementary models and collections for the view. If the data is required, an error should be thrown if the data is not present.
