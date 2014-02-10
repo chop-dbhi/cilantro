@@ -47,6 +47,7 @@ define [
             @opened = false
             @started = false
             @opening = false
+            @state = {}
 
         # Ensure a url is defined when the session is initialized
         # or updated (using set). See http://backbonejs.org/#Model-validate
