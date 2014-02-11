@@ -56,6 +56,46 @@ define [
             if not attrs.url?
                 return 'url is required'
 
+        startPing: =>
+            # Only if the ping endpoint is available
+            if @links.ping
+                @_ping = setInterval(@ping, 5000)
+
+        stopPing: =>
+            clearTimeout(@_ping)
+
+        ping: =>
+            Backbone.ajax
+                type: 'GET'
+                url: @links.ping
+                dataType: 'json'
+                success: (resp, status, xhr) =>
+                    if resp.status is 'timeout'
+                        @stopPing()
+                        @notifyTimeout(resp.location)
+
+                error: (xhr, status, error) =>
+                    @stopPing()
+
+                    # Handle redirect
+                    if error is 'FOUND'
+                        location = xhr.getResponseHeader('Location')
+                        @notifyTimeout(location)
+
+        notifyTimeout: (location) ->
+            if location
+                message = "Your session timed out. Please \
+                          <a href=\"#{ location }\">refresh the page</a>."
+            else
+                message = 'Your session timed out. Please refresh the page.'
+
+            c.notify
+                header: 'Session Timeout'
+                message: message
+                dismissable: false
+                timeout: false
+                level: 'warning'
+
         parse: (attrs) ->
             # Title of the API
             @title = attrs.title
@@ -167,10 +207,12 @@ define [
 
             # Start the router history
             @router.start()
+            @startPing()
 
         # Ends/disables the session.
         end: ->
             @started = false
+            @stopPing()
             @router.unregister()
 
 
