@@ -73,11 +73,13 @@ define [
             nodeType: 'condition'
             showInfo: true
             showChart: false
+            showStats: true
             showDefaultControl: true
             condensedLayout: false
 
         constructor: ->
             super
+
             @context = @options.context.define
                 concept: @options.context.get('concept')
                 field: @model.id
@@ -98,7 +100,7 @@ define [
                 @info.show new @regionViews.info
                     model: @model
 
-            if @model.stats?
+            if @options.showStats and @model.stats?
                 @stats.show new @regionViews.stats
                     model: @model
 
