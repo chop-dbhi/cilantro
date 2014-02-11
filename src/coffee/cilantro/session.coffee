@@ -72,7 +72,7 @@ define [
                 success: (resp, status, xhr) =>
                     if resp.status is 'timeout'
                         @stopPing()
-                        @notifyTimeout(resp.location)
+                        @timeout(resp.location)
 
                 error: (xhr, status, error) =>
                     @stopPing()
@@ -80,9 +80,9 @@ define [
                     # Handle redirect
                     if error is 'FOUND'
                         location = xhr.getResponseHeader('Location')
-                        @notifyTimeout(location)
+                        @timeout(location)
 
-        notifyTimeout: (location) ->
+        timeout: (location) ->
             if location
                 message = "Your session timed out. Please \
                           <a href=\"#{ location }\">refresh the page</a>."
@@ -95,6 +95,14 @@ define [
                 dismissable: false
                 timeout: false
                 level: 'warning'
+
+            # Auto-refresh after some time
+            setTimeout ->
+                if location
+                    window.location = location
+                else
+                    window.location.reload()
+            , 5000
 
         parse: (attrs) ->
             # Title of the API
