@@ -105,12 +105,17 @@ define [
                 description: @ui.description.val()
                 usernames_or_emails: @ui.email.val()
                 public: @ui.publicity.prop('checked')
-                context_json: @data.context.toJSON().json
-                view_json: @data.view.toJSON().json
 
             # Create a new model if not defined
             if not @model
                 @model = new @collection.model
+
+                # We only want to set the context and view json if this is a
+                # new saved query. Otherwise, we would be stomping on the saved
+                # context and view with whatever the user currently has in
+                # their session.
+                attrs.context_json = @data.context.toJSON().json
+                attrs.view_json = @data.view.toJSON().json
 
             # Don't stomp on model's collection if it already exists in one
             if not @model.collection
