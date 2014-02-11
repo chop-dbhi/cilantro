@@ -44,7 +44,7 @@ define [
 
 
     class AvailableGroup extends index.ConceptGroup
-        template: 'concept/columns-avaiable-group'
+        template: 'concept/columns-available-group'
 
         itemView: AvailableSection
 
@@ -74,7 +74,7 @@ define [
     class SelectedItem extends Marionette.ItemView
         tagName: 'li'
 
-        template: 'concept/selected'
+        template: 'concept/columns-selected'
 
         initialize: ->
             @data = {}
