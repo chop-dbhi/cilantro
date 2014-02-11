@@ -291,8 +291,5 @@ define [
             @close()
             @reset()
 
-        # Give the session manager events
-        _.extend(SessionManager::, Backbone.Events)
-
 
     _.extend { SessionManager, Session }, events
