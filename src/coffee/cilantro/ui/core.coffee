@@ -31,13 +31,11 @@ define [
         return template
 
 
-    # Initialize notification stream and append it to the main element
+    # Initialize notification stream and append it to the body
     stream = new notify.Notifications
-        id: 'notifications'
+        id: 'cilantro-notifications'
 
-    $(c.config.get('main'))
-        .css('position', 'relative')
-        .append(stream.render().el)
+    $('body').append(stream.render().el)
 
     # Attach primary method for creating notifications
     c.notify = stream.notify
