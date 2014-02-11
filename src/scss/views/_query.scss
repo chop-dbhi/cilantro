@@ -22,6 +22,15 @@
             display: inline;
             width: 12px;
         }
+        .name-label {
+            float: left;
+        }
+        .owner, .non-owner {
+            float: right;
+        }
+        .edit-query, .delete-query {
+            width: 60px;
+        }
     }
 }
 
