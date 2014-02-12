@@ -5,24 +5,19 @@ define [
     '../base'
     './info'
     './stats'
+    './types'
     '../controls'
     '../charts'
-], (_, Backbone, Marionette, base, info, stats, controls, charts) ->
+], (_, Backbone, Marionette, base, info, stats, types, controls, charts) ->
 
-    getControlView = (model) ->
-        type = model.get('simple_type')
+    fieldTypeControls =
+        choice: controls.InfographControl
+        number: controls.NumberControl
+        date: controls.DateControl
+        time: controls.DateControl
+        datetime: controls.DateControl
 
-        if model.get('enumerable') or type is 'boolean'
-            if model.links.distribution?
-                controls.InfographControl
-            else
-                controls.SearchControl
-        else if type is 'number'
-            controls.NumberControl
-        else if type is 'datetime' or type is 'date' or type is 'time'
-            controls.DateControl
-        else
-            controls.SearchControl
+    defaultFieldControl = controls.SearchControl
 
 
     class LoadingFields extends base.LoadView
@@ -37,19 +32,27 @@ define [
 
         getItemView: (model) ->
             # If the options specify an explicit view class use it. Otherwise
-            # fallback to infering the interface based on the model's
-            # properties.
-            if not (itemView = model.get('itemView'))?
-                itemView = getControlView(model.get('model'))
+            # fallback to infering the interface based on the field's type
+            if not (itemView = model.get('itemView'))
+                if not (fieldType = model.get('fieldType'))
+                    fieldType = types.getFieldType(model.get('field'))
+
+                if fieldTypeControls[fieldType]
+                    itemView = fieldTypeControls[fieldType]
+                else
+                    itemView = defaultFieldControl
+
             return itemView
 
         itemViewOptions: (model, index) ->
-            attrs = model.toJSON()
-            attrs.index = index
-            return attrs
+            return {
+                context: model.get('context')
+                model: model.get('field')
+                index: index
+            }
 
         buildItemView: (model, itemView, options) ->
-            new itemView options
+            return new itemView(options)
 
 
     # Stores the view class and various options for a control. This is
@@ -76,6 +79,7 @@ define [
             showStats: true
             showDefaultControl: true
             condensedLayout: false
+            fieldType: null
 
         constructor: ->
             super
@@ -130,10 +134,12 @@ define [
 
         addControl: (itemView, options) ->
             model = new FieldControlOptions _.defaults
-                model: @model
                 context: @context
+                field: @model
+                fieldType: @options.fieldType
                 itemView: itemView
             , options
+
             @controls.currentView.collection.add(model)
 
 
