@@ -7,6 +7,14 @@ define [
 ], (_, Backbone, c, base, stats) ->
 
 
+    getLogicalType = (attrs) ->
+        type = attrs.simple_type
+
+        if attrs.enumerable or type is 'boolean'
+            return 'choice'
+        return type
+
+
     class FieldModel extends base.Model
         constructor: ->
             super
@@ -16,7 +24,10 @@ define [
 
         parse: ->
             @_cache = {}
-            super
+            attrs = super
+            if not attrs.logical_type?
+                attrs.logical_type = getLogicalType(attrs)
+            return attrs
 
         distribution: (handler, cache=true) ->
             if not @links.distribution? then handler()

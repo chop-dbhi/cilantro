@@ -5,10 +5,9 @@ define [
     '../base'
     './info'
     './stats'
-    './types'
     '../controls'
     '../charts'
-], (_, Backbone, Marionette, base, info, stats, types, controls, charts) ->
+], (_, Backbone, Marionette, base, info, stats, controls, charts) ->
 
     fieldTypeControls =
         choice: controls.InfographControl
@@ -34,12 +33,7 @@ define [
             # If the options specify an explicit view class use it. Otherwise
             # fallback to infering the interface based on the field's type
             if not (itemView = model.get('itemView'))
-                if not (fieldType = model.get('fieldType'))
-                    fieldType = types.getFieldType(model.get('field'))
-
-                if fieldTypeControls[fieldType]
-                    itemView = fieldTypeControls[fieldType]
-                else
+                if not (itemView = fieldTypeControls[model.get('fieldType')])
                     itemView = defaultFieldControl
 
             return itemView
@@ -79,7 +73,6 @@ define [
             showStats: true
             showDefaultControl: true
             condensedLayout: false
-            fieldType: null
 
         constructor: ->
             super
@@ -136,7 +129,7 @@ define [
             model = new FieldControlOptions _.defaults
                 context: @context
                 field: @model
-                fieldType: @options.fieldType
+                fieldType: @model.get('logical_type')
                 itemView: itemView
             , options
 
