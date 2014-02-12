@@ -2,12 +2,29 @@ define [
     'underscore'
     'backbone'
     'marionette'
+    '../../logger'
+    '../../core'
     '../base'
     './info'
     './stats'
     '../controls'
     '../charts'
-], (_, Backbone, Marionette, base, info, stats, controls, charts) ->
+], (_, Backbone, Marionette, logger, c, base, info, stats, controls, charts) ->
+
+
+    insertAt = (parent, index, element) ->
+        children = parent.children()
+        lastIndex = children.size()
+
+        if (index < 0)
+            index = Math.max(0, lastIndex + 1 + index)
+
+        parent.append(element)
+
+        if index < lastIndex
+            children.eq(index).before(children.last())
+
+        return parent
 
     fieldTypeControls =
         choice: controls.InfographControl
@@ -17,6 +34,53 @@ define [
         datetime: controls.DateControl
 
     defaultFieldControl = controls.SearchControl
+
+    resolveFieldFormOptions = (model) ->
+        formClass = null
+        formClassModule = null
+        formOptions = [{}]
+
+        # Instance options
+        instanceOptions = c.config.get("fields.instances.#{ model.id }.form")
+
+        # Constructor
+        if _.isFunction(instanceOptions)
+            formClass = instanceOptions
+        # Module name for async fetching
+        else if _.isString(instanceOptions)
+            formClassModule = instanceOptions
+        # Options for default form class
+        else if _.isObject(instanceOptions)
+            formOptions.push(instanceOptions)
+
+        # Type options
+        typeOptions = c.config.get("fields.types.#{ model.get('logical_type') }.form")
+
+        # Constructor
+        if not formClass and _.isFunction(typeOptions)
+            formClass = typeOptions
+        # Module name for async fetching
+        else if not formClassModule and _.isString(typeOptions)
+            formClassModule = typeOptions
+        else
+            formOptions.push(typeOptions)
+
+        # Default options
+        defaultOptions = c.config.get('fields.defaults.form')
+
+        # Constructor
+        if not formClass and _.isFunction(defaultOptions)
+            formClass = defaultOptions
+        # Module name for async fetching
+        else if not formClassModule and _.isString(defaultOptions)
+            formClassModule = defaultOptions
+        else
+            formOptions.push(defaultOptions)
+
+        # Compose options in order of precedence
+        formOptions = _.defaults.apply(null, formOptions)
+
+        { view: formClass, module: formClassModule, options: formOptions }
 
 
     class LoadingFields extends base.LoadView
@@ -39,11 +103,10 @@ define [
             return itemView
 
         itemViewOptions: (model, index) ->
-            return {
+            return _.extend model.toJSON(),
                 context: model.get('context')
                 model: model.get('field')
                 index: index
-            }
 
         buildItemView: (model, itemView, options) ->
             return new itemView(options)
@@ -61,18 +124,17 @@ define [
         className: 'field-form'
 
         getTemplate: ->
-            if @options.condensedLayout
+            if @options.condensed
                 'field/form-condensed'
             else
                 'field/form'
 
         options:
+            info: true
+            chart: false
+            stats: true
+            condensed: false
             nodeType: 'condition'
-            showInfo: true
-            showChart: false
-            showStats: true
-            showDefaultControl: true
-            condensedLayout: false
 
         constructor: ->
             super
@@ -93,14 +155,33 @@ define [
             controls: FieldControls
 
         onRender: ->
-            if @options.showInfo
-                @info.show new @regionViews.info
-                    model: @model
+            @renderInfo()
+            @renderStats()
+            @renderControls()
+            @renderChart()
 
-            if @options.showStats and @model.stats?
-                @stats.show new @regionViews.stats
-                    model: @model
+            if @options.condensed
+                @$el.addClass('condensed')
 
+        renderInfo: ->
+            if @options.info
+                options = model: @model
+
+                if _.isObject(@options.info)
+                    _.extend(options, @options.info)
+
+                @info.show(new @regionViews.info(options))
+
+        renderStats: ->
+            if @options.stats and @model.stats?
+                options = model: @model
+
+                if _.isObject(@options.stats)
+                    _.extend(options, @options.stats)
+
+                @stats.show(new @regionViews.stats(options))
+
+        renderControls: ->
             # Initialize empty collection view in which controls can
             # be added to.
             @controls.show new @regionViews.controls
@@ -108,22 +189,20 @@ define [
                 context: @context
 
             # Add the default control
-            if @options.showDefaultControl
-                @addControl()
+            @addControl()
 
-            # HACK
-            # Only represent for fields that support distributions. This
-            # enumerable condition is a hack since the above control
-            # may already have chart-like display...and the hack grows deeper
-            # to prevent a chart being added when dealing with dates...
-            if @model.get('simple_type') is 'number' and not @model.get('enumerable')
-                if @options.showChart and @model.links.distribution?
-                    @addControl charts.FieldChart,
-                        chart:
-                            height: 200
+        renderChart: ->
+            # Append a chart if the field supports a distribution
+            if @options.chart and @model.links.distribution?
+                if @options.condensed
+                    options = chart: height: 100
+                else
+                    options = chart: height: 200
 
-            if @options.condensedLayout
-                @$el.addClass('condensed')
+                if _.isObject(@options.chart)
+                    _.extend(options, @options.chart)
+
+                @addControl(charts.FieldChart, options)
 
         addControl: (itemView, options) ->
             model = new FieldControlOptions _.defaults
@@ -136,31 +215,68 @@ define [
             @controls.currentView.collection.add(model)
 
 
-    class FieldFormCollection extends Marionette.CollectionView
+    class FieldError extends base.ErrorView
+
+
+    class FieldFormCollection extends Marionette.View
         itemView: FieldForm
 
         emptyView: LoadingFields
 
-        itemViewOptions: (model, index) ->
+        errorView: FieldError
+
+        collectionEvents:
+            'reset': 'render'
+
+        render: ->
+            if @collection.length
+                @collection.each (model, index) =>
+                    @renderItem(model, index)
+
+            return @el
+
+        # Renders an item.
+        renderItem: (model, index) ->
             options = _.extend {}, @options,
                 model: model
                 context: @options.context
+                index: index
 
             # This collection is used by a concept, therefore if only one
             # field is present, the concept name and description take
             # precedence
-            if @options.hideSingleFieldInfo and @collection.length < 2
-                options.showInfo = false
+            if @collection.length < 2
+                options.info = false
+            # The non-primary field are rendered in a condensed view
+            else if index > 0
+                options.condensed = true
 
-            # Only check if another is not already rendered
-            if not @fieldChartIndex?
-                if options.showChart isnt false and model.links?.distribution?
-                    @fieldChartIndex = index
-                    options.showChart = true
+            result = resolveFieldFormOptions(model)
+
+            options = _.extend(options, result.options)
+
+            if result.module
+                require [result.module], (viewClass) =>
+                    @createView(viewClass, options)
+                , (err) =>
+                    @showErrorView(model)
+                    logger.debug(err)
             else
-                options.condensedLayout = true
+                @createView(result.view or @itemView, options)
 
-            return options
+        createView: (viewClass, options) =>
+            try
+                view = new viewClass(options)
+                view.render()
+                insertAt(@$el, options.index, view.el)
+            catch err
+                @showErrorView(options.model)
+                if c.config.get('debug') then throw err
+
+        showErrorView: (model) ->
+            view = new @errorView(model: model)
+            view.render()
+            @$el.html(view.el)
 
 
     { FieldControls, FieldForm, FieldFormCollection }
