@@ -217,6 +217,13 @@ define [
             @router.start()
             @startPing()
 
+            if not c.isSupported(c.getSerranoVersion())
+                c.notify
+                    header: 'Serrano Version Unsupported'
+                    message: 'You are connecting to an unsupported version of Serrano. Some functionality may be broken or missing due to compatibility issues.'
+                    level: 'warning'
+                    timeout: false
+
         # Ends/disables the session.
         end: ->
             @started = false
