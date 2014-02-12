@@ -12,6 +12,66 @@ define [
     './info'
 ], (_, Backbone, Marionette, logger, c, base, welcome, field, charts, form, info) ->
 
+
+    resolveConceptFormOptions = (model) ->
+        formClass = null
+        formClassModule = null
+        formOptions = [{}]
+
+        # Instance options
+        instanceOptions = c.config.get("concepts.instances.#{ model.id }.form")
+
+        # Constructor
+        if _.isFunction(instanceOptions)
+            formClass = instanceOptions
+        # Module name for async fetching
+        else if _.isString(instanceOptions)
+            formClassModule = instanceOptions
+        # Options for default form class
+        else if _.isObject(instanceOptions)
+            formOptions.push(instanceOptions)
+
+        # Type options
+        # Note, concept types are not yet supported, so this will always
+        # return nothing
+        typeOptions = c.config.get("concepts.types.#{ model.get('type') }.form")
+
+        # Constructor
+        if not formClass and _.isFunction(typeOptions)
+            formClass = typeOptions
+        # Module name for async fetching
+        else if not formClassModule and _.isString(typeOptions)
+            formClassModule = typeOptions
+        else
+            formOptions.push(typeOptions)
+
+        # Default options
+        defaultOptions = c.config.get('concepts.defaults.form')
+
+        # Constructor
+        if not formClass and _.isFunction(defaultOptions)
+            formClass = defaultOptions
+        # Module name for async fetching
+        else if not formClassModule and _.isString(defaultOptions)
+            formClassModule = defaultOptions
+        else
+            formOptions.push(defaultOptions)
+
+        # Deprecated config
+        if not formClassModule
+            # Check if custom options or a module has been defined for
+            # this concept.
+            if (customForm = c.config.get("concepts.forms.#{ model.id }"))
+                formClassModule = customForm.module
+                formOptions = customForm.options
+                return { module: formClassModule, options: formOptions }
+
+        # Compose options in order of precedence
+        formOptions = _.defaults.apply(null, formOptions)
+
+        { view: formClass, module: formClassModule, options: formOptions }
+
+
     class ConceptError extends base.ErrorView
         template: 'concept/error'
 
@@ -59,21 +119,21 @@ define [
                 model: model
                 context: @data.context
 
-            # Check if custom options or a module has been defined for
-            # this concept.
-            if (customForm = c.config.get("concepts.forms.#{ model.id }"))
-                module = customForm.module
-                options = _.extend({}, customForm.options, options)
+            result = resolveConceptFormOptions(model)
+
+            # Extend options
+            options = _.extend(options, result.options)
 
             # Load external module, catch error if it doesn't exist
-            if module
-                require [module], (CustomForm) =>
-                    @createView(CustomForm, options)
+            if result.module
+                require [result.module], (itemView) =>
+                    @createView(itemView, options)
                 , (err) =>
                     @showErrorView(model)
                     logger.debug(err)
+
             else
-                @createView(@itemView, options)
+                @createView(result.view or @itemView, options)
 
         createView: (itemViewClass, options) =>
             try

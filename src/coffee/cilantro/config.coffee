@@ -21,16 +21,66 @@ define [
         # The selector of the element views will be rendered within.
         main: '#cilantro-main'
 
-        # Custom modules corresponding to concepts
+        # Options for components related to concepts.
+        #
+        # Components:
+        # - form: options for ConceptForm, a ConceptForm subclass, a module name
+        #
+        # Hierarchy:
+        # - defaults: override the default options for the component
+        # - types: options specific to concept type
+        # - instances: options specific to a specific concept instance
         concepts:
 
-            # Modules specific for ConceptForms
+            # DEPRECATED, use instances.<pk>.form
             forms: null
+
+            defaults: {}
+
+            types: {}
+
+            instances: {}
+
+        # Options for components related to fields.
+        #
+        # Components:
+        # - form: options for FieldForm, a FieldForm subclass, module name
+        #   - chart: true (show), false (hide; default), options (show)
+        #   - info: true (show), false (hide), null (hide if only field in concept)
+        #   - stats: true (show; default), false (hide)
+        #   - controls: options for default control or a Control subclass
+        #
+        # Hierarchy:
+        # - defaults: override the default options for the component
+        # - types: options specific to field type
+        # - instances: options specific to a specific field instance
+        fields:
+
+            defaults: {}
+
+            types:
+                number:
+                    form:
+                        chart: true
+
+                date:
+                    form:
+                        chart: true
+
+                time:
+                    form:
+                        chart: true
+
+                datetime:
+                    form:
+                        chart: true
+
+            instances: {}
 
 
     class Config
         constructor: (options...) ->
-            @options = $.extend true, {}, defaultOptions, options...
+            @options = $.extend(true, {}, defaultOptions, options...)
 
         get: (key) ->
             utils.getDotProp(@options, key)
