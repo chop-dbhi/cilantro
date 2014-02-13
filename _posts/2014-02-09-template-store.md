@@ -23,6 +23,7 @@ define(['cilantro'], (c) {
     // Assume the 'templates/welcome.html' file is named 'welcome'
     var template = c.templates.get('welcome');
 });
+```
 
 To solve the latter of the two problems above, templates can be set by name as well:
 
