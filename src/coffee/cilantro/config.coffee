@@ -68,24 +68,34 @@ define [
         # - instances: options specific to a specific field instance
         fields:
 
-            defaults: {}
+            defaults:
+                form:
+                    controls: ['search']
 
             types:
+                choice:
+                    form:
+                        controls: ['infograph']
+
                 number:
                     form:
                         chart: true
+                        controls: ['number']
 
                 date:
                     form:
                         chart: true
+                        controls: ['date']
 
                 time:
                     form:
                         chart: true
+                        controls: ['date']
 
                 datetime:
                     form:
                         chart: true
+                        controls: ['date']
 
             instances: {}
 
