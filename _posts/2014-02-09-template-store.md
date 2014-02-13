@@ -34,6 +34,14 @@ define(['cilantro'], (c) {
 });
 ```
 
+Using the RequireJS tpl plugin, the templates come pre-compiled so they can be set directly in the template store:
+
+```javascript
+define(['cilantro', 'tpl!myproject/templates/welcome.html'], (c, template) {
+    c.templates('welcome', template);
+});
+```
+
 ### Marionette Integration
 
 The template store has been integrated with Marionette, so that template names can used in view definitions.
