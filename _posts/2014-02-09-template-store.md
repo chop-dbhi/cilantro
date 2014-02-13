@@ -38,7 +38,7 @@ Using the RequireJS tpl plugin, the templates come pre-compiled so they can be s
 
 ```javascript
 define(['cilantro', 'tpl!myproject/templates/welcome.html'], (c, template) {
-    c.templates('welcome', template);
+    c.templates.set('welcome', template);
 });
 ```
 
