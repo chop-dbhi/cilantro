@@ -52,7 +52,7 @@ define(['module', 'text', 'underscore'], function(module, text, _) {
 						write.asModule(pluginName + "!" + moduleName,
 							"define(function() { var func = " + template.source +
                                 "; func._moduleName = '" +
-                                name + "'; return func; });");
+                                moduleName + "'; return func; });");
 					}
 					catch (err) {
 						console.error('~~~~~');
