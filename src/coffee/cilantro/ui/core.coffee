@@ -30,6 +30,7 @@ define [
             template = defaultCompileTemplate(template)
         return template
 
+    c.templates.set(c.config.get('templates', {}))
 
     # Initialize notification stream and append it to the body
     stream = new notify.Notifications

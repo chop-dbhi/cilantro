@@ -1,6 +1,4 @@
 define [
-    './core'
-
     'tpl!templates/context.html'
     'tpl!templates/count.html'
     'tpl!templates/notification.html'
@@ -64,10 +62,10 @@ define [
     'tpl!templates/workflows/results.html'
     'tpl!templates/workflows/workspace.html'
 
-], (c, templates...) ->
+], (templates...) ->
 
     templateCache = {}
-    templateCacheCustom = _.extend({}, c.config.get('templates', {}))
+    templateCacheCustom = {}
 
     # Creates a templateId based on the template functions moduleName
     makeTemplateId = (name) ->
