@@ -21,6 +21,18 @@ define [
         # The selector of the element views will be rendered within.
         main: '#cilantro-main'
 
+        # Options for controls
+        #
+        # Keys represent the names of the controls and the value is either
+        # a control class or a module name (that will be fetched on demand).
+        #
+        # Built-in controls:
+        # - infograph: cilantro/ui/controls/infograph
+        # - number: cilantro/ui/controls/number
+        # - date: cilantro/ui/controls/date
+        # - search: cilantro/ui/controls/search
+        controls: {}
+
         # Options for components related to concepts.
         #
         # Components:
@@ -56,24 +68,34 @@ define [
         # - instances: options specific to a specific field instance
         fields:
 
-            defaults: {}
+            defaults:
+                form:
+                    controls: ['search']
 
             types:
+                choice:
+                    form:
+                        controls: ['infograph']
+
                 number:
                     form:
                         chart: true
+                        controls: ['number']
 
                 date:
                     form:
                         chart: true
+                        controls: ['date']
 
                 time:
                     form:
                         chart: true
+                        controls: ['date']
 
                 datetime:
                     form:
                         chart: true
+                        controls: ['date']
 
             instances: {}
 

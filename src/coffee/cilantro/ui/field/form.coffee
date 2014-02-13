@@ -7,7 +7,7 @@ define [
     '../base'
     './info'
     './stats'
-    '../controls'
+    './controls'
     '../charts'
 ], (_, Backbone, Marionette, logger, c, base, info, stats, controls, charts) ->
 
@@ -25,15 +25,6 @@ define [
             children.eq(index).before(children.last())
 
         return parent
-
-    fieldTypeControls =
-        choice: controls.InfographControl
-        number: controls.NumberControl
-        date: controls.DateControl
-        time: controls.DateControl
-        datetime: controls.DateControl
-
-    defaultFieldControl = controls.SearchControl
 
     resolveFieldFormOptions = (model) ->
         formClass = null
@@ -86,38 +77,6 @@ define [
     class LoadingFields extends base.LoadView
         message: 'Loading fields...'
 
-    class LoadingControls extends base.LoadView
-        message: 'Loading and rendering controls...'
-
-
-    class FieldControls extends Marionette.CollectionView
-        emptyView: LoadingControls
-
-        getItemView: (model) ->
-            # If the options specify an explicit view class use it. Otherwise
-            # fallback to infering the interface based on the field's type
-            if not (itemView = model.get('itemView'))
-                if not (itemView = fieldTypeControls[model.get('fieldType')])
-                    itemView = defaultFieldControl
-
-            return itemView
-
-        itemViewOptions: (model, index) ->
-            return _.extend model.toJSON(),
-                context: model.get('context')
-                model: model.get('field')
-                index: index
-
-        buildItemView: (model, itemView, options) ->
-            return new itemView(options)
-
-
-    # Stores the view class and various options for a control. This is
-    # used by FieldForm for adding new controls to the UI. A new instance
-    # is created by specifying the `viewClass`. Any additional options will
-    # be passed into the constructor of the view when initialized.
-    class FieldControlOptions extends Backbone.Model
-
 
     # Contained within the ConceptForm containing views for a single FieldModel
     class FieldForm extends Marionette.Layout
@@ -133,6 +92,7 @@ define [
             info: true
             chart: false
             stats: true
+            controls: true
             condensed: false
             nodeType: 'condition'
 
@@ -147,12 +107,14 @@ define [
         regions:
             info: '.info-region'
             stats: '.stats-region'
+            chart: '.chart-region'
             controls: '.controls-region'
 
         regionViews:
             info: info.FieldInfo
             stats: stats.FieldStats
-            controls: FieldControls
+            chart: charts.FieldChart
+            controls: controls.FieldControls
 
         onRender: ->
             @renderInfo()
@@ -182,14 +144,19 @@ define [
                 @stats.show(new @regionViews.stats(options))
 
         renderControls: ->
-            # Initialize empty collection view in which controls can
-            # be added to.
-            @controls.show new @regionViews.controls
-                collection: new Backbone.Collection
-                context: @context
+            if @options.controls
+                controls = []
 
-            # Add the default control
-            @addControl()
+                for name in @options.controls
+                    controls.push
+                        name: name
+                        model: @model
+                        context: @context
+
+                @controls.show new @regionViews.controls
+                    collection: new Backbone.Collection(controls)
+
+            # TODO show "no controls available" message?, e.g. read-only view
 
         renderChart: ->
             # Append a chart if the field supports a distribution
@@ -199,20 +166,14 @@ define [
                 else
                     options = chart: height: 200
 
+                # Legacy..
+                options.context = @context
+                options.model = @model
+
                 if _.isObject(@options.chart)
                     _.extend(options, @options.chart)
 
-                @addControl(charts.FieldChart, options)
-
-        addControl: (itemView, options) ->
-            model = new FieldControlOptions _.defaults
-                context: @context
-                field: @model
-                fieldType: @model.get('logical_type')
-                itemView: itemView
-            , options
-
-            @controls.currentView.collection.add(model)
+                @chart.show(new @regionViews.chart(options))
 
 
     class FieldError extends base.ErrorView
@@ -279,4 +240,4 @@ define [
             @$el.html(view.el)
 
 
-    { FieldControls, FieldForm, FieldFormCollection }
+    { FieldForm, FieldFormCollection }
