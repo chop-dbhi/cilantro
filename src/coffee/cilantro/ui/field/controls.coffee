@@ -51,14 +51,19 @@ define [
 
             controlId = model.get('name')
 
-            if not (controlView = controls.get(controlId))
-                require [controlId], (controlView) =>
+            # Get the registered control
+            controlView = controls.get(controlId)
+
+            if _.isFunction(controlView)
+                @createView(controlView, options)
+            else
+                # If control view is not defined, fallback to using the
+                # control id as the module path
+                require [controlView or controlId], (controlView) =>
                     @createView(controlView, options)
                 , (err) =>
                     @showErrorView()
                     logger.debug(err)
-            else
-                @createView(controlView, options)
 
         createView: (viewClass, options) =>
             try
