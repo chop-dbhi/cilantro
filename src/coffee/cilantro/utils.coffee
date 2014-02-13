@@ -7,11 +7,11 @@ define [
 
     # Convenience method for getting a value using the dot-notion for
     # accessing nested structures.
-    getDotProp = (obj, key) ->
+    getDotProp = (obj, key, def) ->
         toks = key.split('.')
         for tok in toks
             if not (obj = obj[tok])?
-                return
+                return def
         return obj
 
     # Convenience method for setting a value using the dot-notion for

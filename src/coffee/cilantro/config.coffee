@@ -21,6 +21,12 @@ define [
         # The selector of the element views will be rendered within.
         main: '#cilantro-main'
 
+        # Options for templates
+        #
+        # Keys represent the template names and the values compiled template
+        # functions.
+        templates: {}
+
         # Options for controls
         #
         # Keys represent the names of the controls and the value is either
