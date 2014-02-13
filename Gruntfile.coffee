@@ -484,6 +484,8 @@ module.exports = (grunt) ->
         run "zip -r #{ releaseDirName }-src.zip #{ pkg.name }"
         run "tar -Hzcf #{ releaseDirName }-src.tar.gz #{ pkg.name }"
 
+        run "rm -rf #{ pkg.name }"
+
     grunt.registerTask 'release-help', 'Prints the post-release steps', ->
         grunt.log.ok 'Push the code and tags: git push && git push --tags'
         grunt.log.ok "Go to #{ pkg.homepage }/releases to update the release descriptions and upload the binaries"
