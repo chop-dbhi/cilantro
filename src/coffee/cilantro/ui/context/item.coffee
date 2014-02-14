@@ -44,6 +44,7 @@ define [
             'change:enabled': 'renderState'
 
         stopPropagation: (event) ->
+            event.preventDefault()
             event.stopPropagation()
 
         # Navigate to query page when a concept is triggered
@@ -52,24 +53,27 @@ define [
             c.trigger(c.CONCEPT_FOCUS, @model.get('concept'))
 
         clickRemove: (event) ->
-            @model.remove()
-            @$el.fadeOut
-                duration: 400
-                easing: 'easeOutExpo'
+            if @model.remove()
+                @$el.fadeOut
+                    duration: 400
+                    easing: 'easeOutExpo'
 
         # Toggle the enabled state of the node
         clickState: (event) ->
+            event.preventDefault()
             @model.toggleEnabled()
 
         renderEnabled: ->
             @$el.removeClass('disabled')
             @ui.state.attr('title', 'Disable')
             @ui.check.prop('checked', true)
+            @ui.check.attr('checked', true)
 
         renderDisabled: ->
             @$el.addClass('disabled')
             @ui.state.attr('title', 'Enable')
             @ui.check.prop('checked', false)
+            @ui.check.attr('checked', false)
 
         renderState: (node, value, options) ->
             if @model.isEnabled()

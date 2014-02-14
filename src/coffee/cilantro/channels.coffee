@@ -41,6 +41,8 @@ define ->
     CONTEXT_CLEAR: 'context:clear'
     CONTEXT_SAVE: 'context:save'
 
+    CONTEXT_INVALID: 'context:invalid'
+
     VIEW_CHANGED: 'view:changed'
     VIEW_SYNCING: 'view:syncing'
     VIEW_SYNCED: 'view:synced'
