@@ -61,17 +61,21 @@ define [
 
         # Options for components related to fields.
         #
-        # Components:
+        # Hierarchy:
+        # - defaults: override the default options for the component
+        # - types: options specific to field type
+        # - instances: options specific to a specific field instance
+        #
+        # Shared:
         # - form: options for FieldForm, a FieldForm subclass, module name
         #   - chart: true (show), false (hide; default), options (show)
         #   - info: true (show), false (hide), null (hide if only field in concept)
         #   - stats: true (show; default), false (hide)
         #   - controls: options for default control or a Control subclass
         #
-        # Hierarchy:
-        # - defaults: override the default options for the component
-        # - types: options specific to field type
-        # - instances: options specific to a specific field instance
+        # Instances:
+        # - type: string explicitly defining an instance's type
+        #
         fields:
 
             defaults:
