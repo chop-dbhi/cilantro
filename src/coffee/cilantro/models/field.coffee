@@ -8,10 +8,20 @@ define [
 
 
     getLogicalType = (attrs) ->
+        # Takes precedence since it is specified explicitly
+        if (type = c.config.get("fields.instances.#{ attrs.id }.type"))
+            return type
+
+        # Fallback to the upstream type defined on the field
+        if attrs.logical_type?
+            return attrs.logical_type
+
+        # Infer/select a logical type based on the field's properties
         type = attrs.simple_type
 
         if attrs.enumerable or type is 'boolean'
             return 'choice'
+
         return type
 
 
@@ -25,8 +35,7 @@ define [
         parse: ->
             @_cache = {}
             attrs = super
-            if not attrs.logical_type?
-                attrs.logical_type = getLogicalType(attrs)
+            attrs.logical_type = getLogicalType(attrs)
             return attrs
 
         distribution: (handler, cache=true) ->
