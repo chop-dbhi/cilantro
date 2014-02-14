@@ -64,30 +64,63 @@ define [
 
 ], (templates...) ->
 
+    # Built-in templates and application-defined templates
     templateCache = {}
     templateCacheCustom = {}
 
-    # Creates a templateId based on the template functions moduleName
-    makeTemplateId = (name) ->
-        # Remove templates dir prefix
-        name = name.replace(/^templates\//, '')
-        # Strip off .html extension
-        return name.replace(/\.html$/, '')
+    # Derives a template id from the template's path. This is an internal
+    # function that assumes the base directory is under templates/
+    templatePathToId = (name) ->
+        # Remove templates dir prefix, strip extension
+        name.replace(/^templates\//, '').replace(/\.html$/, '')
 
+    # Registers all built-in templates using the augmented _moduleName from
+    # a modified version of the RequireJS tpl plugin.
     for templateFunc in templates
-        templateId = makeTemplateId(templateFunc._moduleName)
+        templateId = templatePathToId(templateFunc._moduleName)
         templateFunc.templateId = templateId
         templateCache[templateId] = templateFunc
 
+    # Templates can be registered as AMD modules which will be immediately
+    # fetched to obtain the resulting compiled template function. This is
+    # count of the number of pending AMD modules that have not been fetched.
+    pendingRemotes = 0
+
+    # Loads the remote template and adds it to the custom cache.
+    loadRemoteTemplate = (id, module) ->
+        pendingRemotes++
+
+        require [module], (func) ->
+            templateCacheCustom[id] = func
+            pendingRemotes--
+        , (err) ->
+            pendingRemotes--
+
+    # Handles the case when the registered function is *not* a function.
+    _set = (id, func) ->
+        switch (typeof func)
+            when 'function'
+                templateCacheCustom[id] = func
+            when 'string'
+                loadRemoteTemplate(id, func)
+            else
+                throw new Error('template must be a function or AMD module')
+
+    # Get the template function by id. Checks the custom cache and falls back
+    # to the built-in cache.
     get = (id) ->
         templateCacheCustom[id] or templateCache[id]
 
+    # Sets a template in cache.
     set = (id, func) ->
         if typeof id is 'object'
-            for key, func of id
-                templateCacheCustom[key] = func
+            _set(key, func) for key, func of id
         else
-            templateCacheCustom[id] = func
+            _set(id, func)
+        return
 
+    # Returns a boolean denoting if all AMD-based templates have been loaded.
+    ready = ->
+        pendingRemotes is 0
 
-    { get, set }
+    { get, set, ready }

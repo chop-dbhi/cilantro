@@ -20,4 +20,12 @@ define [
         c.router = session.router
         c.data = session.data
 
+    # Takes a handler to call once Cilantro has declared itself "ready".
+    c.ready = (handler) ->
+        id = setInterval ->
+            if c.templates.ready()
+                clearTimeout(id)
+                handler()
+        , 15
+
     return (@cilantro = c)
