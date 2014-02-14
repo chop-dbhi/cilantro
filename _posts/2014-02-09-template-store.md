@@ -42,6 +42,35 @@ define(['cilantro', 'tpl!myproject/templates/welcome.html'], (c, template) {
 });
 ```
 
+_Since 2.2.7_
+
+AMD module paths can be set directly on the template store and they will be fetched and stored immediately. This provides a cleaner approach when setting up the Cilantro configuration:
+
+```javascript
+var cilantro = {
+    templates: {
+        'welcome': 'tpl!myproject/templates/welcome.html'
+    }
+};
+```
+
+To handle the asynchronous nature of this approach, the template store now provides a `ready()` function that returns true if all remote templates have been fetched and false if some are still pending. A simple way to do something once all templates have been loaded is to use polling:
+
+```javascript
+defin(['cilantro'], function(c) {
+    var id;
+
+    id = setInterval(function() {
+        if (c.templates.ready()) {
+            clearTimeout(id);
+            // do something...
+        }
+    }, 15);
+});
+```
+
+This approach has been used in the `c.ready()` function which takes a callback and executes it once Cilantro deems itself "ready". This includes ensuring all the templates have been loaded.
+
 ### Marionette Integration
 
 The template store has been integrated with Marionette, so that template names can used in view definitions.
