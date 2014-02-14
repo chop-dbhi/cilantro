@@ -1,4 +1,7 @@
 /**
+ * 2014-2-12: Modified for Cilantro to augment the module name as a property
+ * on the returned compiled function.
+ *
  * Adapted from the official plugin text.js
  *
  * Uses UnderscoreJS micro-templates : http://documentcloud.github.com/underscore/#template
