@@ -42,7 +42,7 @@ define [
                 manager: @
 
             # Set trees with initial model json and any time a successful sync occurs
-            @set(@model.get('json'), check: false)
+            @set(@model.get('json'))
 
         # Serializes the upstream tree which represents a clean and valid
         # representation of the tree.
@@ -58,9 +58,8 @@ define [
             return c.config.get('query.concepts.required', []).indexOf(id) > -1
 
         # Triggers the context invalid event given a list of invalid nodes
-        _triggerRequired: (invalid) ->
-            c.trigger(c.CONTEXT_INVALID, invalid)
-            c.session.state.context_invalid = true
+        _triggerRequired: (required) ->
+            c.trigger(c.CONTEXT_REQUIRED, required)
 
         # Performs a check in the working tree for required nodes.
         _checkRequired: ->
@@ -80,10 +79,11 @@ define [
                         reason: reason
 
             if invalid.length
-                @_triggerRequired(invalid)
+                c.trigger(c.CONTEXT_INVALID, invalid)
+                c.session?.state.context_invalid = true
                 return false
             else
-                c.session.state.context_invalid = undefined
+                c.session?.state.context_invalid = undefined
 
             return true
 
@@ -100,11 +100,11 @@ define [
         # Updates the working and upstream trees with the server's response
         set: (attrs, options={}) ->
             if options.reset
-                @upstream.clear(_.extend({}, reset: true, options))
-                @working.clear(options)
+                @upstream.clear(reset: true)
+                @working.clear()
 
             if not attrs?
-                return @clear(options)
+                return @clear()
 
             # Update `upstream` tree with server response. Other than
             # annotations on nodes themselves, nothing should change. The
@@ -164,10 +164,7 @@ define [
                 return false
 
             if @_isRequired(n)
-                @_triggerRequired [
-                    id: n.get('concept')
-                    reason: 'required'
-                ]
+                @_triggerRequired [n.get('concept')]
                 return false
 
             if not @_checkRequired() then return
@@ -241,10 +238,7 @@ define [
                 return
 
             if @_isRequired(n)
-                @_triggerRequired [
-                    id: n.get('concept')
-                    reason: 'required'
-                ]
+                @_triggerRequired [n.get('concept')]
                 return
 
             if not @_checkRequired() then return
@@ -258,12 +252,9 @@ define [
                     @save(u)
 
         clear: (options={}) ->
-            if options.check isnt false
-                if @_hasRequired()
-                    @_triggerRequired [
-                        reason: 'required'
-                    ]
-                    return
+            if @_hasRequired()
+                @_triggerRequired()
+                return
 
             @upstream.clear(reset: true)
 
