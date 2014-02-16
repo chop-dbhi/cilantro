@@ -167,7 +167,8 @@ define [
                 @_triggerRequired [n.get('concept')]
                 return false
 
-            if not @_checkRequired() then return
+            if not @_checkRequired()
+                return false
 
             if (u = @upstream.find(ident))
                 u.destroy()
@@ -181,14 +182,15 @@ define [
         apply: (ident, options) ->
             ident = ident.identity?() or ident
 
-            if not @_checkRequired() then return
+            if not @_checkRequired()
+                return false
 
             if not (n = @find(ident))
-                return
+                return false
 
             # No attributes, which means this is not valid
             if not (attrs = n.toJSON())
-                return
+                return false
 
             # Define upstream, this is idempotent
             u = @upstream.define(ident, n.path(), type: n.type)
@@ -235,13 +237,14 @@ define [
             ident = ident.identity?() or ident
 
             if not (n = @find(ident))
-                return
+                return false
 
             if @_isRequired(n)
                 @_triggerRequired [n.get('concept')]
-                return
+                return false
 
-            if not @_checkRequired() then return
+            if not @_checkRequired()
+                return false
 
             if (u = @upstream.find(ident))
                 u.set(enabled: false)
@@ -254,7 +257,7 @@ define [
         clear: (options={}) ->
             if @_hasRequired()
                 @_triggerRequired()
-                return
+                return false
 
             @upstream.clear(reset: true)
 
