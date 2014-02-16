@@ -203,18 +203,18 @@ input[type="radio"]:active {
   background-color: #ebebeb;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffffffff', GradientType=0);
 }
-input[type="checkbox"]:checked,
-input[type="radio"]:checked {
+input[type="checkbox"][checked],
+input[type="radio"][checked] {
   background: #fff;
 }
-input[type="checkbox"]:checked::after {
+input[type="checkbox"][checked="checked"]::after {
   content: url(../img/checkmark.png);
   display: block;
   position: absolute;
   top: -6px;
   left: -5px;
 }
-input[type="radio"]:checked::after {
+input[type="radio"][checked="checked"]::after {
   content: '';
   display: block;
   position: relative;

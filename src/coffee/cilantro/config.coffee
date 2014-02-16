@@ -114,8 +114,8 @@ define [
         constructor: (options...) ->
             @options = $.extend(true, {}, defaultOptions, options...)
 
-        get: (key) ->
-            utils.getDotProp(@options, key)
+        get: (key, def) ->
+            utils.getDotProp(@options, key, def)
 
         set: (key, value) ->
             utils.setDotProp(@options, key, value)

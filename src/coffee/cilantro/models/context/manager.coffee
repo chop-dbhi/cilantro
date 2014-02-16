@@ -1,9 +1,10 @@
 define [
     'underscore'
     'backbone'
+    '../../core'
     '../../evented'
     './nodes'
-], (_, Backbone, Evented, nodes) ->
+], (_, Backbone, c, Evented, nodes) ->
 
     ###
     The context tree manager maintains two trees, `working` and `upstream`.
@@ -47,6 +48,44 @@ define [
         # representation of the tree.
         toJSON: ->
             @upstream.toJSON()
+
+        _hasRequired: ->
+            c.config.get('query.concepts.required', []).length > 0
+
+        # Returns true if a node is required
+        _isRequired: (node) ->
+            id = node.get('concept')
+            return c.config.get('query.concepts.required', []).indexOf(id) > -1
+
+        # Triggers the context invalid event given a list of invalid nodes
+        _triggerRequired: (required) ->
+            c.trigger(c.CONTEXT_REQUIRED, required)
+
+        # Performs a check in the working tree for required nodes.
+        _checkRequired: ->
+            invalid = []
+
+            for id in c.config.get('query.concepts.required', [])
+                if not (n = @find(concept: id))
+                    reason = 'undefined'
+                else if not n.isValid()
+                    reason = 'invalid'
+                else if n.get('enabled') is false
+                    reason = 'disabled'
+
+                if reason
+                    invalid.push
+                        concept: id
+                        reason: reason
+
+            if invalid.length
+                c.trigger(c.CONTEXT_INVALID, invalid)
+                c.session?.state.context_invalid = true
+                return false
+            else
+                c.session?.state.context_invalid = undefined
+
+            return true
 
         # Light wrapper for fixing attrs for the top-level branch node. If `attrs`
         # has ID fields, it is added as a child to the branch. This is primarily
@@ -120,8 +159,17 @@ define [
         # the node, nodes in the working tree are never removed.
         remove: (ident, options) ->
             ident = ident.identity?() or ident
+
             if not (n = @find(ident))
-                return
+                return false
+
+            if @_isRequired(n)
+                @_triggerRequired [n.get('concept')]
+                return false
+
+            if not @_checkRequired()
+                return false
+
             if (u = @upstream.find(ident))
                 u.destroy()
                 n.trigger('remove')
@@ -133,14 +181,21 @@ define [
         # triggers a sync with a server.
         apply: (ident, options) ->
             ident = ident.identity?() or ident
+
+            if not @_checkRequired()
+                return false
+
             if not (n = @find(ident))
-                return
+                return false
+
             # No attributes, which means this is not valid
             if not (attrs = n.toJSON())
-                return
+                return false
+
             # Define upstream, this is idempotent
             u = @upstream.define(ident, n.path(), type: n.type)
             u.set(attrs, options)
+
             if u.hasChanged()
                 n.trigger('apply')
                 u.trigger('apply')
@@ -149,10 +204,13 @@ define [
         # Reverts a working tree node to it's upstream state if one exists.
         revert: (ident, options) ->
             ident = ident.identity?() or ident
+
             if not (n = @find(ident))
                 return
+
             if (u = @upstream.find(ident))
                 n.set(u.toJSON(), remove: false)
+
                 if n.hasChanged()
                     n.trigger('revert')
                     u.trigger('revert')
@@ -163,8 +221,10 @@ define [
         # Triggers a sync.
         enable: (ident) ->
             ident = ident.identity?() or ident
+
             if not (n = @find(ident))
                 return
+
             if (u = @upstream.find(ident))
                 u.set(enabled: true)
                 if u.hasChanged('enabled')
@@ -175,19 +235,35 @@ define [
         # Disables a node in the upstream tree. Triggers a sync.
         disable: (ident) ->
             ident = ident.identity?() or ident
+
             if not (n = @find(ident))
-                return
+                return false
+
+            if @_isRequired(n)
+                @_triggerRequired [n.get('concept')]
+                return false
+
+            if not @_checkRequired()
+                return false
+
             if (u = @upstream.find(ident))
                 u.set(enabled: false)
+
                 if u.hasChanged('enabled')
                     n.trigger('disable')
                     u.trigger('disable')
                     @save(u)
 
-        clear: ->
+        clear: (options={}) ->
+            if @_hasRequired()
+                @_triggerRequired()
+                return false
+
             @upstream.clear(reset: true)
+
             @upstream.trigger('clear')
             @working.trigger('clear')
+
             if @upstream.hasChanged()
                 @save()
 
@@ -200,8 +276,10 @@ define [
         # upstream, it is never considered dirty.
         isDirty: (ident) ->
             ident = ident.identity?() or ident
+
             if not (u = @upstream.find(ident))
                 return false
+
              return not _.isEqual(u.toJSON(), @find(ident).toJSON())
 
         # Check if the node for a given ident is active and enabled. If
@@ -209,8 +287,10 @@ define [
         # condition `isnt false`.
         isEnabled: (ident) ->
             ident = ident.identity?() or ident
+
             if (node = @upstream.find(ident))
                 return node.get('enabled') isnt false
+
             return false
 
 
