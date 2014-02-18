@@ -68,8 +68,11 @@ define [
             @render()
 
         onSelectionChange: (event) ->
+            option = @ui.items.children[0]
+
             @collection.each (model) ->
-                model.set('selected', model.get('value') == event.target.value)
+                if event.target isnt option
+                    model.set('selected', model.get('value') == event.target.value)
 
             @change()
 
@@ -86,7 +89,7 @@ define [
             selection = @collection.findWhere(selected: true)
 
             # We don't want to include the placeholder as a valid value
-            if selection? and selection.get('value') != '---'
+            if selection? and @collection.indexOf(selection) > 0
                 return selection.get('value')
 
             return null
