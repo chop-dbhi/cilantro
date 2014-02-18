@@ -103,10 +103,8 @@ define [
             @render()
 
         onSelectionChange: (event) ->
-            values = (option.value for option in event.target.options when option.selected)
-
-            @collection.each (model) ->
-                model.set('selected', model.get('value') in values)
+            @ui.items.children().each (i, el) =>
+                @collection.models[i].set('selected', el.selected)
 
             @change()
 
