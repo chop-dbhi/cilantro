@@ -27,6 +27,9 @@ define [
     # Renders a dropdown of items allowing for selection of a single item
     # from the list.
     class SingleSelectionList extends Marionette.CompositeView
+        options:
+            emptyValueLabel: '---'
+
         className: 'selection-list'
 
         itemView: SelectionListItem
@@ -60,7 +63,7 @@ define [
 
         onCollectionSync: ->
             @collection.add(
-                {label: @options.emptyValueLabel or '---', value: ''},
+                {label: @options.emptyValueLabel, value: ''},
                 {at: 0})
 
             @render()
