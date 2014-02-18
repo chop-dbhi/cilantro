@@ -12,7 +12,7 @@ define [
             return response.values
 
     class SelectionListItem extends Marionette.ItemView
-        template: 'controls/select/item'
+        template: -> 
 
         tagName: 'option'
 
