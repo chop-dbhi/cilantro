@@ -12,7 +12,7 @@ define [
             return response.values
 
     class SelectionListItem extends Marionette.ItemView
-        template: -> 
+        template: ->
 
         tagName: 'option'
 
@@ -52,6 +52,8 @@ define [
             super(options)
 
         initialize: (options) ->
+            @options.emptyValueLabel = options.emptyValueLable or '---'
+
             if not @collection
                 @collection = new SelectionCollection
                 @collection.url = => @model.links.values
@@ -60,7 +62,7 @@ define [
 
         onCollectionSync: ->
             @collection.add(
-                {label: '---', value: '---'},
+                {label: @options.emptyValueLabel, value: ''},
                 {at: 0})
 
             @render()
