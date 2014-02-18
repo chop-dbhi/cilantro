@@ -4,8 +4,9 @@ define [
     './date'
     './number'
     './search'
+    './select'
     './infograph'
-], (_, c, date, number, search, infograph) ->
+], (_, c, date, number, search, select, infograph) ->
 
 
     builtinControls =
@@ -13,6 +14,8 @@ define [
         number: number.NumberControl
         date: date.DateControl
         search: search.SearchControl
+        singleSelectionList: select.SingleSelectionList
+        multiSelectionList: select.MultiSelectionList
 
     controls = _.extend({}, builtinControls, c.config.get('controls'))
 

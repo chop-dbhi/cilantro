@@ -37,6 +37,8 @@ define [
         # - number: cilantro/ui/controls/number
         # - date: cilantro/ui/controls/date
         # - search: cilantro/ui/controls/search
+        # - singleSelectionList: cilantro/ui/controls/select
+        # - multiSelectionList: cilantro/ui/controls/select
         controls: {}
 
         # Options for components related to concepts.

@@ -141,8 +141,7 @@ define [
             # and the selected values for toggling state changes.
             if not @collection
                 @collection = new models.Values
-                @collection.url = =>
-                    @model.links.values
+                @collection.url = => @model.links.values
 
             # Trigger a change event on all collection events
             @collection.on('all', @change, @)

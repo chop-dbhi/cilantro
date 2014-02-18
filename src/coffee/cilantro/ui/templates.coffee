@@ -42,6 +42,9 @@ define [
 
     'tpl!templates/controls/range/layout.html'
 
+    'tpl!templates/controls/select/layout.html'
+    'tpl!templates/controls/select/list.html'
+
     'tpl!templates/controls/search/layout.html'
     'tpl!templates/controls/search/item.html'
 
