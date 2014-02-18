@@ -70,8 +70,8 @@ define [
 
         onSelectionChange: (event) ->
             @ui.items.children().each (i, el) =>
-                if i is 0 then return
-                @collection.findWhere(value: el.value).set('selected', el.selected)
+                if i > 0
+                    @collection.models[i].set('selected', el.selected)
 
             @change()
 
