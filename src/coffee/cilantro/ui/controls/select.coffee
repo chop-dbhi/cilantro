@@ -54,8 +54,7 @@ define [
         initialize: (options) ->
             if not @collection
                 @collection = new SelectionCollection
-                @collection.url = =>
-                    @model.links.values
+                @collection.url = => @model.links.values
 
             @collection.fetch()
 
