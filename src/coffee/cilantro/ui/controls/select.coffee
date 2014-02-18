@@ -20,7 +20,7 @@ define [
             'change:selected': 'render'
 
         onRender: ->
-            @$el.html(@model.get('label'))
+            @$el.text(@model.get('label'))
             @$el.attr('value', @model.get('value'))
             @$el.attr('selected', @model.get('selected'))
 
