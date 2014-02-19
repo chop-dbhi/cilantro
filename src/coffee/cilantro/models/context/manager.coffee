@@ -49,13 +49,13 @@ define [
         toJSON: ->
             @upstream.toJSON()
 
-        _hasRequired: ->
-            c.config.get('query.concepts.required', []).length > 0
+        _getRequired: ->
+            c.config.get('query.concepts.required', [])
 
         # Returns true if a node is required
         _isRequired: (node) ->
             id = node.get('concept')
-            return c.config.get('query.concepts.required', []).indexOf(id) > -1
+            return @_getRequired().indexOf(id) > -1
 
         # Triggers the context invalid event given a list of invalid nodes
         _triggerRequired: (required) ->
@@ -65,7 +65,7 @@ define [
         _checkRequired: ->
             invalid = []
 
-            for id in c.config.get('query.concepts.required', [])
+            for id in @_getRequired()
                 if not (n = @find(concept: id))
                     reason = 'undefined'
                 else if not n.isValid()
@@ -255,8 +255,8 @@ define [
                     @save(u)
 
         clear: (options={}) ->
-            if @_hasRequired()
-                @_triggerRequired()
+            if (required = @_getRequired()).length
+                @_triggerRequired(required)
                 return false
 
             @upstream.clear(reset: true)
