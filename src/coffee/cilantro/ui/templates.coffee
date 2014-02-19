@@ -68,8 +68,8 @@ define [
 ], (templates...) ->
 
     # Built-in templates and application-defined templates
-    templateCache = {}
-    templateCacheCustom = {}
+    defaultTemplates = {}
+    customTemplates = {}
 
     # Derives a template id from the template's path. This is an internal
     # function that assumes the base directory is under templates/
@@ -82,7 +82,7 @@ define [
     for templateFunc in templates
         templateId = templatePathToId(templateFunc._moduleName)
         templateFunc.templateId = templateId
-        templateCache[templateId] = templateFunc
+        defaultTemplates[templateId] = templateFunc
 
     # Templates can be registered as AMD modules which will be immediately
     # fetched to obtain the resulting compiled template function. This is
@@ -90,11 +90,11 @@ define [
     pendingRemotes = 0
 
     # Loads the remote template and adds it to the custom cache.
-    loadRemoteTemplate = (id, module) ->
+    loadRemote = (id, module) ->
         pendingRemotes++
 
         require [module], (func) ->
-            templateCacheCustom[id] = func
+            customTemplates[id] = func
             pendingRemotes--
         , (err) ->
             pendingRemotes--
@@ -103,16 +103,16 @@ define [
     _set = (id, func) ->
         switch (typeof func)
             when 'function'
-                templateCacheCustom[id] = func
+                customTemplates[id] = func
             when 'string'
-                loadRemoteTemplate(id, func)
+                loadRemote(id, func)
             else
                 throw new Error('template must be a function or AMD module')
 
     # Get the template function by id. Checks the custom cache and falls back
     # to the built-in cache.
     get = (id) ->
-        templateCacheCustom[id] or templateCache[id]
+        customTemplates[id] or defaultTemplates[id]
 
     # Sets a template in cache.
     set = (id, func) ->
