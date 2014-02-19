@@ -1,8 +1,9 @@
 define [
     'marionette'
     '../core'
-    './templates'
     './notify'
+    './templates'
+    './controls'
     'bootstrap'
     'plugins/bootstrap-datepicker'
     'plugins/jquery-ui'
@@ -10,10 +11,13 @@ define [
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
     'plugins/jquery-stacked'
-], (Marionette, c, templates, notify) ->
+], (Marionette, c, notify, templates, controls) ->
 
-    # Add reference to template cache access methods
-    c.templates = templates
+    # Initialize notification stream and append it to the body
+    stream = new notify.Notifications
+        id: 'cilantro-notifications'
+
+    $('body').append(stream.render().el)
 
     defaultLoadTemplate = Marionette.TemplateCache::loadTemplate
     defaultCompileTemplate = Marionette.TemplateCache::compileTemplate
@@ -30,15 +34,13 @@ define [
             template = defaultCompileTemplate(template)
         return template
 
-    c.templates.set(c.config.get('templates', {}))
+    # Set configuration options for corresponding APIs
+    templates.set(c.config.get('templates', {}))
+    controls.get(c.config.get('controls', {}))
 
-    # Initialize notification stream and append it to the body
-    stream = new notify.Notifications
-        id: 'cilantro-notifications'
-
-    $('body').append(stream.render().el)
-
-    # Attach primary method for creating notifications
+    # Add references public API
     c.notify = stream.notify
+    c.templates = templates
+    c.controls = controls
 
     return c
