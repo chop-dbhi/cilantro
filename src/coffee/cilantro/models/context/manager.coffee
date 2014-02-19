@@ -59,7 +59,7 @@ define [
 
         # Triggers the context invalid event given a list of invalid nodes
         _triggerRequired: (required) ->
-            c.trigger(c.CONTEXT_REQUIRED, required)
+            c.trigger(c.CONTEXT_REQUIRED, (concept: id, reason: 'required' for id in required))
 
         # Performs a check in the working tree for required nodes.
         _checkRequired: ->
