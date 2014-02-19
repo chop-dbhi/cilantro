@@ -20,7 +20,7 @@ define [
 
     c =
         # Version of cilantro
-        version: '2.2.11'
+        version: '2.2.12-beta'
 
         # Defines the minimum version and maximum version Serrano that this version
         # of Cilantro is 100% compatible with. While Cilantro will attempt to run
