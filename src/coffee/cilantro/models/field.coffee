@@ -51,28 +51,43 @@ define [
                         handler(resp)
             return
 
-        values: (query, handler, cache=true) ->
-            # Shift argument is not query is supplied
-            if typeof query is 'function'
-                handler = query
+        values: (params, handler, cache=true) ->
+            # Shift argument is params is not supplied
+            if typeof params is 'function'
+                handler = params
                 cache = handler
-                query = ''
+                params = {}
             # Do not cache query-based lookups
-            else
+            else if params
                 cache = false
+                # Support previous behavior of passing a query string.
+                if typeof params is 'string'
+                    params = query: params
 
+            # Field does not support values, call the handler without
+            # a response
             if not @links.values? then handler()
+
+            deferred = Backbone.$.Deferred()
+
+            # Register handler to facilitate previous behavior
+            if handler then deferred.done(handler)
+
+            # Use cache if available
             if cache and @_cache.values?
-                handler(@_cache.values)
+                deferred.resolve(@_cache.values)
             else
                 Backbone.ajax
                     url: @links.values
-                    data: query: query
+                    data: params
                     dataType: 'json'
                     success: (resp) =>
-                        @_cache.values = if cache then resp else null
-                        handler(resp)
-            return
+                        if cache then @_cache.values = resp
+                        deferred.resolve(resp)
+                    error: =>
+                        deferred.reject()
+
+            return deferred.promise()
 
 
     class FieldCollection extends base.Collection
