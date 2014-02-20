@@ -52,7 +52,7 @@ define [
             return
 
         values: (params, handler, cache=true) ->
-            # Shift argument is params is not supplied
+            # Shift arguments if params is not supplied
             if typeof params is 'function'
                 handler = params
                 cache = handler
