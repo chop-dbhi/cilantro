@@ -147,11 +147,17 @@ define [
             if @options.controls
                 controls = []
 
-                for name in @options.controls
-                    controls.push
-                        name: name
+                for options in @options.controls
+                    attrs =
                         model: @model
                         context: @context
+
+                    if _.isObject(options)
+                        _.extend(attrs, options)
+                    else
+                        attrs.control = options
+
+                    controls.push(attrs)
 
                 @controls.show new @regionViews.controls
                     collection: new Backbone.Collection(controls)

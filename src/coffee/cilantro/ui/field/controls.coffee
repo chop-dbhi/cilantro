@@ -44,12 +44,13 @@ define [
 
         # Renders an item.
         renderItem: (model, index) ->
-            options =
+            options = _.extend {},
                 model: model.get('model')
                 context: model.get('context')
                 index: index
+            , model.get('options')
 
-            controlId = model.get('name')
+            controlId = model.get('control')
 
             # Get the registered control
             controlView = controls.get(controlId)
