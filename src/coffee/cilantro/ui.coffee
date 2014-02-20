@@ -19,9 +19,11 @@ define [
     './ui/notify'
 ], ($, _, Backbone, c, mods...) ->
 
+    externalLink = false
+
     $(document).ajaxError (event, xhr, settings, exception) ->
         # Unknown error which usually means the server is unavailable
-        if not exception
+        if not exception and not externalLink
             c.notify
                 timeout: null
                 dismissable: false
@@ -51,8 +53,11 @@ define [
         # otherwise let the event process normally to load the new
         # location.
         if c.router.hasRoute(pathname)
+            externalLink = false
             event.preventDefault()
             c.router.navigate(pathname, trigger: true)
+        else
+            externalLink = true
 
         return
 
