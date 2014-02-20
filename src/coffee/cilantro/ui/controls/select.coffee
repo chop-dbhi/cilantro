@@ -2,14 +2,11 @@ define [
     'underscore'
     'backbone'
     'marionette'
+    # cilantro.core to prevent circular import in cilantro.ui.core
+    '../../core'
     './base'
-], (_, Backbone, Marionette, base) ->
+], (_, Backbone, Marionette, c, base) ->
 
-    class SelectionCollection extends Backbone.Collection
-        model: Backbone.Model
-
-        parse: (response) ->
-            return response.values
 
     class SelectionListItem extends Marionette.ItemView
         template: ->
@@ -48,7 +45,7 @@ define [
             'change .items': 'onSelectionChange'
 
         collectionEvents:
-            'sync': 'onCollectionSync'
+            'reset': 'onCollectionSync'
 
         constructor: (options={}) ->
             @bindContext(options.context)
@@ -56,15 +53,27 @@ define [
 
         initialize: (options) ->
             if not @collection
-                @collection = new SelectionCollection
-                @collection.url = => @model.links.values
+                @collection = new Backbone.Collection
 
-            @collection.fetch()
+                # This is a hack to prevent a 500 error that occurs in
+                # Serrano prior to 2.3.1 if limit is set to 0. The assumption
+                # here is that if this type of control is being used for
+                # selecting a value, it is unlikely to be rendering a large
+                # number of values due to it's poor usability. The field search
+                # control is more appropriate for a large number of values.
+                if c.isSupported('2.3.1')
+                    limit = 0
+                else
+                    limit = 1000
+
+                @model.values(limit: limit).done (resp) =>
+                    @collection.reset(resp.values)
 
         onCollectionSync: ->
-            @collection.add(
-                {label: @options.emptyValueLabel, value: ''},
-                {at: 0})
+            @collection.add
+                label: @options.emptyValueLabel
+                value: ''
+            , at: 0
 
             @render()
 
@@ -98,6 +107,7 @@ define [
 
     _.defaults(SingleSelectionList::, base.ControlViewMixin)
 
+
     class MultiSelectionList extends SingleSelectionList
         onCollectionSync: ->
             @render()
@@ -122,5 +132,6 @@ define [
         setValue: (values=[]) ->
             @collection.each (model) ->
                 model.set('selected', model.get('value') in values)
+
 
     { SingleSelectionList, MultiSelectionList }
