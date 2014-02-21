@@ -23,7 +23,7 @@ define [
 
     # Renders a dropdown of items allowing for selection of a single item
     # from the list.
-    class SingleSelectionList extends Marionette.CompositeView
+    class SingleSelectionList extends base.ControlCompositeView
         options:
             emptyValueLabel: '---'
 
@@ -100,8 +100,6 @@ define [
         setValue: (value) ->
             @collection.each (model) ->
                 model.set('selected', model.get('value') == value)
-
-    _.defaults(SingleSelectionList::, base.ControlViewMixin)
 
 
     class MultiSelectionList extends SingleSelectionList
