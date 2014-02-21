@@ -435,7 +435,7 @@ module.exports = (grunt) ->
         version.build = ''
         pkg.version = svutil.stringify(version)
 
-        replaceVersion('src/coffee/cilantro/core.coffee', current, pkg.version)
+        replaceVersion('src/js/cilantro/core.js', current, pkg.version)
 
         for fname in ['package.json', 'bower.json']
             changeVersion(fname, pkg.version)
@@ -456,16 +456,16 @@ module.exports = (grunt) ->
         version.build = ''
         pkg.version = svutil.stringify(version)
 
-        replaceVersion('src/coffee/cilantro/core.coffee', current, pkg.version)
+        replaceVersion('src/js/cilantro/core.js', current, pkg.version)
 
         for fname in ['package.json', 'bower.json']
             changeVersion(fname, pkg.version)
 
-        run 'git add bower.json package.json src/coffee/cilantro/core.coffee'
+        run 'git add bower.json package.json src/js/cilantro/core.js'
         run "git commit -m '#{ [version.major, version.minor, version.patch].join('.') } Bump'"
 
     grunt.registerTask 'tag-release', 'Create a release on master', ->
-        run 'git add bower.json package.json src/coffee/cilantro/core.coffee'
+        run 'git add bower.json package.json src/js/cilantro/core.js'
         run "git commit -m '#{ pkg.version } Release'"
         run "git tag #{ pkg.version }"
 
