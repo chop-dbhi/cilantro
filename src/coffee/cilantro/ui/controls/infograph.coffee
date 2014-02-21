@@ -110,7 +110,7 @@ define [
 
     # Renders a series of bars for each value. This contains the value,
     # count and percentage for the value.
-    class Bars extends Marionette.CollectionView
+    class Bars extends base.ControlCollectionView
         className: 'info-bar-chart'
 
         itemView: Bar
@@ -123,25 +123,20 @@ define [
             'change': 'change'
             'sort': 'sortChildren'
 
-        constructor: (options={}) ->
-            @bindContext(options.context)
-            super(options)
-
         initialize: ->
+            @wait()
+
             # Fetch the field distribution, do not cache
             # TODO make this more transparent by setting
             @model.distribution (resp) =>
                 @collection.reset(resp.data, parse: true)
-                @setValue(@context.get('value'))
+                @ready()
 
         # Sums the total count across all values
         calcTotal: ->
             total = 0
             total += count for count in @collection.pluck('count')
             return total
-
-        onRender: ->
-            @set(@context)
 
         # Sorts the children based the on the current order of the collection
         sortChildren: (collection, options) ->
@@ -180,9 +175,6 @@ define [
                     model.set('excluded', true)
                 $('input[name=exclude]').attr('checked', true)
             return
-
-
-    _.defaults(Bars::, base.ControlViewMixin)
 
 
     # The toolbar makes it easier to interact with large lists of values. It
@@ -283,7 +275,7 @@ define [
     # to be selected for inclusion. For small sets of values, the
     # 'minValuesForToolbar' option can be set (to an integer) to hide the
     # toolbar.
-    class InfographControl extends base.Control
+    class InfographControl extends base.ControlLayout
         template: 'controls/infograph/layout'
 
         options:
@@ -302,16 +294,27 @@ define [
             options.collection ?= new BarCollection
             super(options)
 
+            @barsControl = new Bars
+                model: @model
+                collection: @collection
+
+            # Proxy all control-based operations to the bars
+            for method in ['set', 'get', 'when', 'ready', 'wait']
+                do (method) =>
+                    @[method] = (args...) =>
+                        @barsControl[method](args...)
+
+            # Propagate change events from the bars control
+            @listenTo(@barsControl, 'change', @change)
+
+
         toggleToolbar: =>
             # Not yet rendered, this will be called again in onRender
             if not @toolbar.currentView then return
             @toolbar.currentView.toggle(@collection.length >= @options.minValuesForToolbar)
 
         onRender: ->
-            @bars.show new Bars
-                model: @model
-                context: @context
-                collection: @collection
+            @bars.show(@barsControl)
 
             @toolbar.show new BarChartToolbar
                 collection: @collection

@@ -1,9 +1,11 @@
 define [
+    'jquery'
     'marionette'
     '../core'
     './notify'
     './templates'
     './controls'
+    './dom'
     'bootstrap'
     'plugins/bootstrap-datepicker'
     'plugins/jquery-ui'
@@ -11,7 +13,7 @@ define [
     'plugins/jquery-panels'
     'plugins/jquery-scroller'
     'plugins/jquery-stacked'
-], (Marionette, c, notify, templates, controls) ->
+], ($, Marionette, c, notify, templates, controls, dom) ->
 
     # Initialize notification stream and append it to the body
     stream = new notify.Notifications
@@ -42,5 +44,6 @@ define [
     c.notify = stream.notify
     c.templates = templates
     c.controls = controls
+    c.dom = dom
 
     return c

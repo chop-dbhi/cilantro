@@ -45,8 +45,6 @@ define [
             @ui.help.hide()
             @updateBounds()
 
-            @set(@context)
-
         # Method for parsing the value of the StatModel corresponding to the
         # minimum viable value for this range. By default, this method simply
         # returns the value itself.
@@ -180,10 +178,16 @@ define [
         setUpperBoundValue: (value) ->
             @ui.upperBound.val(value)
 
-        setValue: (value) ->
+        # Override set method due to the dependency of the operator
+        # when setting the value
+        set: (attrs) ->
+            @setOperator(attrs.operator)
+
             # Reset values prior to setting
             @setUpperBoundValue()
             @setLowerBoundValue()
+
+            value = attrs.value
 
             if _.isArray(value)
                 if value[0]?
@@ -191,7 +195,7 @@ define [
                 if value[1]?
                     @setUpperBoundValue(value[1])
             else if value?
-                if @context.get('operator') is 'gte'
+                if attrs.operator is 'gte'
                     @setLowerBoundValue(value)
                 else
                     @setUpperBoundValue(value)

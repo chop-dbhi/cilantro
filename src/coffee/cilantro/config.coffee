@@ -21,6 +21,10 @@ define [
         # The selector of the element views will be rendered within.
         main: '#cilantro-main'
 
+        # Timeouts for various components in Cilantro
+        timeouts:
+            control: 10000
+
         # Options for templates
         #
         # Keys represent the template names and the values compiled template
@@ -53,7 +57,7 @@ define [
         concepts:
 
             # DEPRECATED, use instances.<pk>.form
-            forms: null
+            forms: {}
 
             defaults: {}
 

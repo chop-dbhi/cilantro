@@ -12,20 +12,6 @@ define [
 ], (_, Backbone, Marionette, logger, c, base, info, stats, controls, charts) ->
 
 
-    insertAt = (parent, index, element) ->
-        children = parent.children()
-        lastIndex = children.size()
-
-        if (index < 0)
-            index = Math.max(0, lastIndex + 1 + index)
-
-        parent.append(element)
-
-        if index < lastIndex
-            children.eq(index).before(children.last())
-
-        return parent
-
     resolveFieldFormOptions = (model) ->
         formClass = null
         formClassModule = null
@@ -235,7 +221,7 @@ define [
             try
                 view = new viewClass(options)
                 view.render()
-                insertAt(@$el, options.index, view.el)
+                c.dom.insertAt(@$el, options.index, view.el)
             catch err
                 @showErrorView(options.model)
                 if c.config.get('debug') then throw err
