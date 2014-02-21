@@ -1,0 +1,14 @@
+{
+    "camelcase": true,
+    "immed": true,
+    "indent": 4,
+    "latedef": true,
+    "noarg": true,
+    "noempty": true,
+    "undef": true,
+    "unused": true,
+    "trailing": true,
+    "maxdepth": 2,
+    "maxlen": 90,
+    "browser": true
+}
