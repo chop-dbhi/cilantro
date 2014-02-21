@@ -1,18 +1,19 @@
-/* global define */
+/* global define, console */
 
 define([
     'jquery',
     'underscore',
     'marionette',
     './base',
+    '../core',
     '../models',
     '../constants'
-], function($, _, Marionette, base, models, constants) {
+], function($, _, Marionette, base, c, models, constants) {
 
     // Interface for representing a user-defined/selected list of values
-    // in a textarea (one value per line). In majority of cases, values
+    // in a textarea (one per line). In majority of cases, values
     // correspond to the labels, but in certain cases, the underlying
-    // values are surrogate identifiers. In this case the values rendred
+    // values are surrogate identifiers. In this case the values rendered
     // in the textarea will be the labels.
     // This expects a collection such as cilantro/models/value#Values
     var ValueList = Marionette.ItemView.extend({
@@ -65,7 +66,7 @@ define([
             // string (e.g. foreign key, lexicon, object set)
             for (var model, label, i = 0; i < labels.length; i++) {
                 // Ignore empty lines
-                if (!(label = $.trim(label))) continue;
+                if (!(label = $.trim(labels[i]))) continue;
 
                 // If the model already exists, use it so it does not
                 // reset (and thus revalidate) the attributes.
@@ -73,7 +74,16 @@ define([
                     model.set('index', i);
                     models.push(model);
                 } else {
-                    models.push({value: label, label: label, index: i});
+                    // 2.3.2 correctly supports validating against the label.
+                    // Prior to this, only the value is supported for validation.
+                    if (c.isSupported('2.3.2')) {
+                        models.push({label: label, index: i});
+                    } else {
+                        models.push({value: label, index: i});
+                        var warn = console.warn || console.log;
+                        warn('Serrano 2.3.2+ is required for proper ' +
+                             'validation of search values');
+                    }
                 }
             }
 
