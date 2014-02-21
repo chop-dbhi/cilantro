@@ -294,18 +294,18 @@ define [
             options.collection ?= new BarCollection
             super(options)
 
-            @barsControl = barsControl = new Bars
+            @barsControl = new Bars
                 model: @model
                 collection: @collection
 
             # Proxy all control-based operations to the bars
             for method in ['set', 'get', 'when', 'ready', 'wait']
                 do (method) =>
-                    @[method] = (args...) ->
-                        barsControl[method](args...)
+                    @[method] = (args...) =>
+                        @barsControl[method](args...)
 
             # Propagate change events from the bars control
-            @listenTo(barsControl, 'change', @change)
+            @listenTo(@barsControl, 'change', @change)
 
 
         toggleToolbar: =>
