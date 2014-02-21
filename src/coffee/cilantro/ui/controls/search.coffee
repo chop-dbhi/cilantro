@@ -168,8 +168,6 @@ define [
             @values.show new @regionViews.values
                 collection: @collection
 
-            @set(@context)
-
 
         getField: -> @model?.id
 

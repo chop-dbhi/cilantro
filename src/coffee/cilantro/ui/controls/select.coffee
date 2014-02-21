@@ -47,11 +47,9 @@ define [
         collectionEvents:
             'reset': 'onCollectionSync'
 
-        constructor: (options={}) ->
-            @bindContext(options.context)
-            super(options)
-
         initialize: (options) ->
+            @wait()
+
             if not @collection
                 @collection = new Backbone.Collection
 
@@ -68,6 +66,7 @@ define [
 
                 @model.values(limit: limit).done (resp) =>
                     @collection.reset(resp.values)
+                    @ready()
 
         onCollectionSync: ->
             @collection.add
@@ -83,9 +82,6 @@ define [
                     @collection.models[i].set('selected', el.selected)
 
             @change()
-
-        onRender: ->
-            @set(@context)
 
         getField: ->
             return @model.id
@@ -120,7 +116,6 @@ define [
 
         onRender: ->
             @ui.items.attr('multiple', true)
-            @set(@context)
 
         getOperator: ->
             return "in"
