@@ -11,7 +11,7 @@ define([
     // values, a value can not be specified twice, so it is treated
     // as the `id`.
     var Value = Backbone.Model.extend({
-        idAttribute: 'value',
+        idAttribute: 'label',
 
         defaults: {
             valid: null,
