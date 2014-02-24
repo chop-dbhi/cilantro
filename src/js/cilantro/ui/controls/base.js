@@ -63,51 +63,34 @@ define([
             warn('bindContext is deprecated and no longer required for controls');
         },
 
-        // Controls call this to initialize a deferred which enables callers
-        // to call `when` to receive a promise that will be resolved or
-        // rejected once the control finishes it's async actions.
+        // Controls call this to put this itself in a waiting state
         wait: function() {
-            if (!this._deferred) {
-                this._deferred = $.Deferred();
+            if (this._waiting) return;
 
-                var _this = this;
+            this._waiting = true;
 
-                // Times if the control does not resolve/reject itself after
-                // some time. This is to prevent async operations from hanging
-                // too long.
-                var timer = setTimeout(function() {
-                    _this._deferred.reject();
-                }, c.config.get('timeouts.control'));
+            var _this = this;
 
-                // Clear the timeout once the deferred has been resolved
-                // or rejected.
-                this._deferred.always(function() {
-                    clearTimeout(timer);
-                });
-            }
+            var timer = setTimeout(function() {
+                _this.trigger('error');
+            }, c.config.get('timeouts.control'));
+
+            // Clear the timeout on success or error
+            this.on('beforeready error', function() {
+                clearTimeout(timer);
+            });
         },
 
-        // Controls call this to mark themselves as ready
-        ready: function() {
-            if (!this._deferred) {
-                this._deferred = $.Deferred();
-            }
-            this._deferred.resolve();
-        },
+        // Controls call this to mark themselves as ready. If the `wait`
+        // flag is set, only trigger the ready state if control is not already
+        // waiting.
+        ready: function(wait) {
+            if (wait && this._waiting) return;
 
-        // Returns a promise to callers that will be resolved when the control
-        // is ready.
-        when: function(done, fail) {
-            // If deferred is not bound, it is assumed the control does not
-            // have any async task to perform so it is immediately resolved.
-            if (!this._deferred) this.ready();
+            delete this._waiting;
 
-            // Shortcut for binding handlers
-            var promise = this._deferred.promise();
-            if (done) promise = promise.done(done);
-            if (fail) promise = promise.fail(fail);
-
-            return promise;
+            this.trigger('beforeready');
+            this.trigger('ready');
         },
 
         // Return attributes for each getter defined for this control.

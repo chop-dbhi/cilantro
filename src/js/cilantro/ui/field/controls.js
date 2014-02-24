@@ -85,13 +85,20 @@ define([
 
             view.render();
 
-            // Bind the context and render the control only when it is ready
-            view.when(function() {
-                view.set(context.toJSON());
-                bindContext(view, context);
-            }, function() {
-                _this.showErrorView();
+            // Before the control is declared ready, set the initial state of
+            // the control and bind the context for future changes.
+            view.on({
+                'beforeready': function() {
+                    this.set(context.toJSON());
+                    bindContext(this, context);
+                },
+                'error': function() {
+                    this.showErrorView();
+                }
             });
+
+            // Declare this view is conditionally ready
+            view.ready(true);
 
             // Perform DOM operation as the last step in case the above
             // deferred resolves immediately.
