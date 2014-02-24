@@ -26,7 +26,6 @@ define [
             'click .actions .remove': 'clickRemove'
             'click .actions .state': 'clickState'
             'change .actions .state input': 'clickState'
-            # Prevent the click event from input to bubble up to parent button
             'click .actions .state input': 'stopPropagation'
 
         ui:
@@ -61,7 +60,8 @@ define [
         # Toggle the enabled state of the node
         clickState: (event) ->
             event.preventDefault()
-            @model.toggleEnabled()
+            _.defer =>
+                @model.toggleEnabled()
 
         renderEnabled: ->
             @$el.removeClass('disabled')
