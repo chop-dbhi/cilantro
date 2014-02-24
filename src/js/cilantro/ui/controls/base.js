@@ -85,14 +85,24 @@ define([
                     clearTimeout(timer);
                 });
             }
+
+            this._deferred.waiting = true;
         },
 
-        // Controls call this to mark themselves as ready
-        ready: function() {
+        // Controls call this to mark themselves as ready. If the `wait`
+        // flag is set, only trigger/resolve the ready state if control
+        // is not already waiting.
+        ready: function(wait) {
             if (!this._deferred) {
                 this._deferred = $.Deferred();
+            } else if (wait && this._deferred.waiting) {
+                return;
             }
+
+            this._deferred.waiting = false;
+            this.trigger('beforeready');
             this._deferred.resolve();
+            this.trigger('ready');
         },
 
         // Returns a promise to callers that will be resolved when the control
@@ -100,12 +110,17 @@ define([
         when: function(done, fail) {
             // If deferred is not bound, it is assumed the control does not
             // have any async task to perform so it is immediately resolved.
-            if (!this._deferred) this.ready();
+            if (!this._deferred) {
+                this._deferred = $.Deferred();
+            }
 
             // Shortcut for binding handlers
             var promise = this._deferred.promise();
             if (done) promise = promise.done(done);
             if (fail) promise = promise.fail(fail);
+
+            // If this is not in a waiting state, trigger ready
+            if (!this._deferred.waiting) this.ready();
 
             return promise;
         },

@@ -278,6 +278,9 @@ define [
     class InfographControl extends base.ControlLayout
         template: 'controls/infograph/layout'
 
+        events:
+            change: 'change'
+
         options:
             minValuesForToolbar: 10
 
@@ -304,9 +307,10 @@ define [
                     @[method] = (args...) =>
                         @barsControl[method](args...)
 
-            # Propagate change events from the bars control
-            @listenTo(@barsControl, 'change', @change)
-
+            # Proxy events
+            @listenTo @barsControl, 'all', (event, args...) ->
+                if event in ['change', 'beforeready', 'ready']
+                    @trigger(event, args...)
 
         toggleToolbar: =>
             # Not yet rendered, this will be called again in onRender
