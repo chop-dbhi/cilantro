@@ -87,9 +87,14 @@ define([
 
             // Before the control is declared ready, set the initial state of
             // the control and bind the context for future changes.
-            view.on('beforeready', function() {
-                view.set(context.toJSON());
-                bindContext(view, context);
+            view.on({
+                'beforeready': function() {
+                    this.set(context.toJSON());
+                    bindContext(this, context);
+                },
+                'error': function() {
+                    this.showErrorView();
+                }
             });
 
             // Declare this view is conditionally ready
