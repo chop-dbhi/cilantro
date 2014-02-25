@@ -42,7 +42,7 @@ define([
         url: function() {
             var url = this.field.links.values;
             if (this.urlParams) {
-                url = url + $.param(this.urlParams);
+                url = url + '?' + $.param(this.urlParams);
             }
             return url;
         }
