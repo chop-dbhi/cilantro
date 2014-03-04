@@ -288,6 +288,9 @@ define [
             bars: '.bars-region'
             toolbar: '.toolbar-region'
 
+        ui:
+            loading: '[data-target=loading-indicator]'
+
         collectionEvents:
             'reset': 'toggleToolbar'
 
@@ -311,6 +314,9 @@ define [
             @listenTo @barsControl, 'all', (event, args...) ->
                 if event in ['change', 'beforeready', 'ready']
                     @trigger(event, args...)
+
+                if event == 'ready'
+                    @ui.loading.hide()
 
         toggleToolbar: =>
             # Not yet rendered, this will be called again in onRender
