@@ -282,9 +282,9 @@ define [
             cookieName = "export-type-#{ exportTypeTitle.toLowerCase() }"
 
             # Check if the download finished and the cookie was set
-            if @getCookie(cookieName) == "complete"
+            if c.utils.getCookie(cookieName) == "complete"
                 clearInterval(@monitors[exportTypeTitle]["interval"])
-                @setCookie(cookieName, null)
+                c.utils.setCookie(cookieName, null)
                 @onExportFinished(exportTypeTitle)
 
             # Check for a timeout, if we reached this point, we don't really
@@ -297,29 +297,6 @@ define [
                 clearInterval(@monitors[exportTypeTitle]["interval"])
                 @onExportFinished(exportTypeTitle)
 
-        setCookie: (name, value) ->
-            document.cookie= "#{ name }=#{ escape(value) }; path=/"
-
-        getCookie: (name) ->
-            # Code adapted from JS on this page:
-            #   http://www.w3schools.com/js/js_cookies.asp
-            value = document.cookie
-            startIndex = value.indexOf(" #{ name }=")
-
-            if startIndex == -1
-                startIndex = value.indexOf("#{ name }=")
-
-            if startIndex == -1
-                value = null
-            else
-                startIndex = value.indexOf("=", startIndex) + 1
-                endIndex = value.indexOf(";", startIndex)
-                if endIndex == -1
-                    endIndex = value.length
-                value = unescape(value.substring(startIndex, endIndex))
-
-            return value
-
         startExport: (exportType, pages) =>
             title = @$(exportType).attr('title')
             @changeExportStatus(title, "downloading")
@@ -327,7 +304,7 @@ define [
             # Clear the cookie in case the Serrano version is new enough
             # to be setting the cookie in response.
             cookieName = "export-type-#{ title.toLowerCase() }"
-            @setCookie(cookieName, null)
+            c.utils.setCookie(cookieName, null)
 
             url = @$(exportType).attr('href')
             if url[url.length-1] != "/"
