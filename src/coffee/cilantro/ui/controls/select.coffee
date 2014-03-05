@@ -24,9 +24,6 @@ define [
     # Renders a dropdown of items allowing for selection of a single item
     # from the list.
     class SingleSelectionList extends base.ControlCompositeView
-        options:
-            emptyValueLabel: '---'
-
         className: 'selection-list'
 
         itemView: SelectionListItem
@@ -68,19 +65,19 @@ define [
                     @collection.reset(resp.values)
                     @ready()
 
-        onCollectionSync: ->
-            @collection.add
-                label: @options.emptyValueLabel
-                value: ''
-            , at: 0
+            @on 'ready', ->
+                # Since the first item is selected immediately by the very
+                # nature of a drow down list without a placeholder, we need to
+                # call the change method when the control originally renders
+                # so the value is set to the default selected option in the
+                # dropdown and the apply(or update) filter button becomes
+                # activated.
+                @change()
 
+        onCollectionSync: ->
             @render()
 
-        onSelectionChange: (event) ->
-            @ui.items.children().each (i, el) =>
-                if i > 0
-                    @collection.models[i].set('selected', el.selected)
-
+        onSelectionChange: ->
             @change()
 
         getField: ->
@@ -90,16 +87,10 @@ define [
             return "exact"
 
         getValue: ->
-            selection = @collection.findWhere(selected: true)
-
-            if selection?
-                return selection.get('value')
-
-            return null
+            return @ui.items.val()
 
         setValue: (value) ->
-            @collection.each (model) ->
-                model.set('selected', model.get('value') == value)
+            @ui.items.val(value)
 
 
     class MultiSelectionList extends SingleSelectionList
