@@ -16,6 +16,9 @@ define [
 
         fieldCollectionView: field.FieldFormCollection
 
+        options:
+            condense: false
+
         events:
             'click .footer [data-toggle=apply]': 'applyFilter'
             'click .footer [data-toggle=update]': 'applyFilter'

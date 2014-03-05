@@ -200,8 +200,9 @@ define [
             # precedence
             if @collection.length < 2
                 options.info = false
-            # The non-primary field are rendered in a condensed view
-            else if index > 0
+            # The condense option causes all fields after the first to render
+            # in a condensed view by default.
+            else if index > 0 and @options.condense
                 options.condensed = true
 
             result = resolveFieldFormOptions(model)
