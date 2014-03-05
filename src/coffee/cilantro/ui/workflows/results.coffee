@@ -40,7 +40,6 @@ define [
     The ResultsWorkflow provides an interface for previewing tabular data,
     mechanisms for customizing the view, and a method for exporting data
     to alternate formats.
-    TODO: break out context panel as standalone view
 
     This view requires the following options:
     - concepts: a collection of concepts that are deemed viewable
@@ -56,7 +55,6 @@ define [
         template: 'workflows/results'
 
         requestDelay: 2500       # In milliseconds
-        requestTimeout: 60000    # Max time(ms) for unmonitored exports, 1 minute
         monitorDelay: 500        # In milliseconds
         monitorTimeout: 600000   # Max time(ms) to monitor exports, 10 minutes
         numPendingDownloads: 0
@@ -339,18 +337,10 @@ define [
             iframe = "<iframe id=export-download-#{ title } src=#{ url } style='display: none'></iframe>"
             @$('.export-iframe-container').append(iframe)
 
-            if @data.exporters.notifiesOnComplete()
-                @monitors[title] = {}
-                @monitors[title]["execution_time"] = 0
-                @monitors[title]["interval"] = setInterval(
-                    @checkExportStatus,
-                    @monitorDelay,
-                    title)
-            else
-                setTimeout(
-                    @onExportFinished,
-                    @requestTimeout,
-                    title)
+            @monitors[title] =
+                'execution_time': 0
+                'interval': setInterval(
+                    @checkExportStatus, @monitorDelay, title)
 
         initializeExportStatusIndicators: (selectedTypes) ->
             # Start by hiding all of them
@@ -401,15 +391,8 @@ define [
 
                 # Introduce an artificial delay in between download requests
                 # to keep the browser from freaking out about too many
-                # simultaneous download requests. We go slower for unmonitored
-                # downloads because we don't know for sure when a download
-                # completes so we need to give it plenty of time to finish
-                # before we make a judgement call on the download. Essentially
-                # if the server notifies on complete, we use parallel(to a
-                # degree) downloads, otherwise, we take a more serial approach.
+                # simultaneous download requests.
                 delay = @requestDelay
-                if not @data.exporters.notifiesOnComplete()
-                    delay = @requestTimeout
                 for i in [0..selectedTypes.length-1] by 1
                     @changeExportStatus(@$(selectedTypes[i]).attr('title'), "pending")
 
