@@ -52,6 +52,11 @@ define [
             @_refresh()
 
         fetch: (options={}) =>
+            if c.config.get('preview.view')?
+                options.type = 'POST'
+                options.contentType = 'application/json'
+                options.data = JSON.stringify({view: c.config.get('preview.view')})
+
             if @isDirty and @isWorkspaceOpen
                 # Since we are making the fetch call immediately below, the
                 # data will be synced again to the current view/context to
