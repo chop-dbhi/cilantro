@@ -53,25 +53,14 @@ define([
     var ValueSearch = search.Search.extend({
         className: 'field-search search',
 
-        ui: {
-            input: 'input'
-        },
-
-        events: {
-            'keydown input': 'search'
-        },
-
         initialize: function() {
             search.Search.prototype.initialize.call(this);
             this.paginator = this.options.paginator;
-            this.search = _.debounce(this.search, constants.INPUT_DELAY);
         },
 
-        search: function() {
-            var value = this.ui.input.val();
-
-            if (value) {
-                this.paginator.urlParams = {query: value};
+        search: function(query) {
+            if (query) {
+                this.options.paginator.urlParams = {query: query};
             } else {
                 this.paginator.urlParams = null;
             }
