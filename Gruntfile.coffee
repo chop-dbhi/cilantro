@@ -462,11 +462,11 @@ module.exports = (grunt) ->
             changeVersion(fname, pkg.version)
 
         run 'git add bower.json package.json src/js/cilantro/core.js'
-        run "git commit -m '#{ [version.major, version.minor, version.patch].join('.') } Bump'"
+        run "git commit -s -m '#{ [version.major, version.minor, version.patch].join('.') } Bump'"
 
     grunt.registerTask 'tag-release', 'Create a release on master', ->
         run 'git add bower.json package.json src/js/cilantro/core.js'
-        run "git commit -m '#{ pkg.version } Release'"
+        run "git commit -s -m '#{ pkg.version } Release'"
         run "git tag #{ pkg.version }"
 
     grunt.registerTask 'release-binaries', 'Create a release binary for upload', ->
