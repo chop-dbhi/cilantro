@@ -21,6 +21,16 @@ define [
         # The selector of the element views will be rendered within.
         main: '#cilantro-main'
 
+        # Session-based configuration options
+        #
+        # Options:
+        # - data: Keys correspond to each resource under the `session.data`
+        # object and the value corresponds to GET or POST data to be used
+        # during a fetch.
+        session:
+            defaults:
+                data: {}
+
         # Timeouts for various components in Cilantro
         timeouts:
             control: 10000
