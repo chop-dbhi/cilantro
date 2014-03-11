@@ -1,9 +1,20 @@
-branches:
-    except:
-        - master
+language: node_js
 
-before_script:
+before_install:
+    - env | sort
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq python-yaml
+    - git remote add upstream git://github.com/cbmi/cilantro.git
+    - upstream=master;
+      if [ "$TRAVIS_PULL_REQUEST" != false ]; then
+          upstream=$TRAVIS_BRANCH;
+      fi;
+      git fetch --append --no-tags upstream refs/heads/$upstream:refs/remotes/upstream/$upstream
+    - python bin/check_signoff.py
+
+install:
     - npm install -g grunt-cli
     - npm install
 
-script: grunt test --verbose
+script:
+    - grunt test --verbose
