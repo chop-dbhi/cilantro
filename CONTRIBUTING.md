@@ -32,7 +32,7 @@ This DCO simply certifies that the code you are submitting abides by the clauses
 ## Logistics
 
 - If you do not have write access to the repo (i.e. not a core contributor), create a fork of Cilantro
-- Branches are used to isolate development and ensure clear and concise intent of the code. Always do your work in a branch off the `develop` branch. This will be a mirror of the work-in-progres (WIP) branch for the current major version, e.g. `2.x`. Name the branch after the issue and number, e.g. `issue-123`. If there is no issue number, [please create one first](https://github.com/cbmi/cilantro/issues/) before starting your work.
+- Branches are used to isolate development and ensure clear and concise intent of the code. Always do your work in a branch off the `master` branch. This will be a mirror of the work-in-progres (WIP) branch for the current major version, e.g. `2.x`. Name the branch after the issue and number, e.g. `issue-123`. If there is no issue number, [please create one first](https://github.com/cbmi/cilantro/issues/) before starting your work.
 - If working on existing files, ensure the coding style is kept consistent with the code around it. If creating new files or you are unsure of a pattern or preference please consult the [style guides](https://github.com/cbmi/style-guides/).
 
 ## Source Code
