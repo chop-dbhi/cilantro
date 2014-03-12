@@ -1,4 +1,10 @@
-language: node_js
+language: python
+
+python:
+    - 2.7
+
+virtualenv:
+    system_site_packages: true
 
 before_install:
     - env | sort
@@ -10,11 +16,16 @@ before_install:
           upstream=$TRAVIS_BRANCH;
       fi;
       git fetch --append --no-tags upstream refs/heads/$upstream:refs/remotes/upstream/$upstream
-    - python bin/check_signoff.py
+    - /usr/bin/python bin/check_signoff.py
 
 install:
+    - git clone --branch demo git://github.com/cbmi/harvest-openmrs.git
+    - pip install -r harvest-openmrs/requirements.txt
     - npm install -g grunt-cli
     - npm install
+
+before_script:
+    - python harvest-openmrs/bin/manage.py runserver --traceback &
 
 script:
     - grunt test --verbose
