@@ -1,3 +1,5 @@
+/* global define, describe, it, expect */
+
 define(['cilantro'], function(c) {
 
     describe('linkParser', function() {
@@ -18,14 +20,29 @@ define(['cilantro'], function(c) {
 
         it('should augment existing params with arguments', function() {
             var href = 'http://www.example.com/?key1=param1',
-                expected_href = 'http://www.example.com/?key1=param1&key2=param2&key3=param3';
-            expect(c.utils.alterUrlParams(href, 'key2', 'param2', 'key3', 'param3')).toBe(expected_href);
+                expected = 'http://www.example.com/?key1=param1&key2=param2&key3=param3';
+            expect(c.utils.alterUrlParams(href, {
+                key2: 'param2',
+                key3: 'param3'
+            })).toBe(expected);
         });
 
-        it('should set default if no param is set for key', function() {
+        it('should set default if null param is set for key', function() {
             var href = 'http://www.example.com/?key1=param1',
-                expected_href = 'http://www.example.com/?key1=param1&key2=param2&key3=';
-            expect(c.utils.alterUrlParams(href, 'key2', 'param2', 'key3')).toBe(expected_href);
+                expected = 'http://www.example.com/?key1=param1&key2=param2&key3=';
+            expect(c.utils.alterUrlParams(href, {
+                key2: 'param2',
+                key3: null
+            })).toBe(expected);
+        });
+
+        it('should not set key if param is undefined', function() {
+            var href = 'http://www.example.com/?key1=param1',
+                expected = 'http://www.example.com/?key1=param1&key2=param2';
+            expect(c.utils.alterUrlParams(href, {
+                key2: 'param2',
+                key3: undefined
+            })).toBe(expected);
         });
 
     });

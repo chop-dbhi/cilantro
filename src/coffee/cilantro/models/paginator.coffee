@@ -123,7 +123,9 @@ define [
 
         url: ->
             url = _.result(@collection, 'url')
-            c.utils.alterUrlParams(url, 'page', @id, 'per_page', @collection.perPage)
+            c.utils.alterUrlParams url,
+                page: @id
+                per_page: @collection.perPage
 
 
     # Paginator collection for managing it's pages

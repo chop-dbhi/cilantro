@@ -1,5 +1,6 @@
 /* global define */
-define(function() {
+
+define(['jquery'], function($) {
 
     /*
      * Utility method for parsing links. See:
@@ -13,62 +14,34 @@ define(function() {
     };
 
     /*
-     * Augments/changes a URL's query parameters. Takes a URL and a variable
-     * number of param pairs.
+     * Augments/changes a URL's query parameters. Takes a URL and object
+     * of URL params.
      */
-    var alterUrlParams = function(href) {
-        var args = Array.prototype.slice.call(arguments, 1);
+    var alterUrlParams = function(href, data) {
+        if (!data) return href;
 
-        var a = linkParser(href),
-            keys = [],
-            params = {};
+        // Parse the href into a temporary anchor element
+        var a = linkParser(href);
 
-        var fields = a.search.substr(1).split('&');
-        var temp, temp_fields, key, param;
-        for (var i = 0; i < fields.length; i++) {
-            temp = fields[i];
-            temp_fields = temp.split('=');
-            key = temp_fields[0];
-            param = temp_fields[1];
+        // Parse existing params on URL
+        var params = {},
+            search = a.search.substr(1).split('&');
 
-            if (key) {
-                params[key] = param;
-                // Maintain the order of the keys
-                keys.push(key);
+        // De-parametize URL
+        for (var i = 0; i< search.length; i++) {
+            var param = search[i].split('=');
+
+            if (param[0]) {
+                params[param[0]] = window.decodeURIComponent(param[1]);
             }
         }
 
-        // Update the params hash with parameters
-        for (i = 0; i < args.length; i++) {
-            temp = args[i];
+        // Update params hash with passed params
+        $.extend(params, data);
 
-            if (i % 2 === 0) {
-                param = temp;
+        // Reset parameters on the href
+        a.search = '?' + $.param(params);
 
-                if (params[param] == null) {
-                    keys.push(param);
-                }
-            }
-            else {
-                // We are at an odd number index so the previous index will
-                // have set the param value we are using to index into the
-                // params collection.
-                params[param] = temp;
-            }
-        }
-
-        // Rebuild search params
-        var search = [];
-        for (i = 0; i < keys.length; i++) {
-            key = keys[i];
-
-            if ((param = params[key]) == null) {
-                param = '';
-            }
-            search.push('' + key + '=' + param);
-        }
-
-        a.search = "?" + (search.join('&'));
         return a.href;
     };
 
