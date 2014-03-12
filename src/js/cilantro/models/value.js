@@ -47,9 +47,17 @@ define([
 
         comparator: 'label',
 
-        initialize: function() {
-            this.check = _.debounce(this.check, constants.INPUT_DELAY);
-            this.on('add', this.check);
+        options: {
+            check: true
+        },
+
+        initialize: function(models, options) {
+            options = _.extend({}, this.options, options || {});
+
+            // If values must be checked, bind to the add event
+            if (options.check) {
+                this.on('add', _.debounce(this.check, constants.INPUT_DELAY));
+            }
         },
 
         fetch: function() {},
