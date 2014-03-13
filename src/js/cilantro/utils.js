@@ -40,7 +40,12 @@ define([
             }
         }
         // Final value of obj is returned
-        return obj;
+        if (typeof obj === 'function') {
+            return obj.apply();
+        }
+        else {
+            return obj;
+        }
     };
 
     // Convenience method for setting a value using the dot-notion for
