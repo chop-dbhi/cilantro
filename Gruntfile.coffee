@@ -47,6 +47,10 @@ module.exports = (grunt) ->
                     port: 8126
 
         watch:
+            grunt:
+                tasks: ['jasmine:local:build']
+                files: ['Gruntfile.coffee']
+
             coffee:
                 tasks: ['coffee:local']
                 files: ['<%= srcDir %>/coffee/**/*']
