@@ -1,3 +1,5 @@
+/* global define, describe, beforeEach, afterEach, it, expect, waitsFor, runs */
+
 define([
     'jquery',
     'underscore',
@@ -10,21 +12,20 @@ define([
         var r, routes;
 
         beforeEach(function() {
-            $('#region1, #region2, #region3').remove();
+            $('#cilantro-main').remove();
 
             $('body')
-                .append('<div id=region1 />')
-                .append('<div id=region2 />')
-                .append('<div id=region3 />');
+                .append('<div id=cilantro-main><div id=region1 />' +
+                        '<div id=region2 /><div id=region3 /></div>');
 
             r = new router.Router({
-                main: 'body'
+                main: '#cilantro-main'
             });
 
             routes = [{
                 id: 1,
                 route: 'foo/',
-                view: new Backbone.View,
+                view: new Backbone.View(),
                 el: '#region1'
             }, {
                 id: 2,
@@ -34,17 +35,21 @@ define([
             }, {
                 id: 3,
                 route: 'foo/',
-                view: new Backbone.View,
+                view: new Backbone.View(),
                 el: '#region3'
             }, {
                 id: 4,
                 route: 'bar/',
-                view: new Backbone.View,
+                view: new Backbone.View(),
                 el: '#region3'
             }];
 
             r.register(routes);
-            r.start();
+
+            r.start({
+                hashChange: true,
+                pushState: false
+            });
         });
 
         afterEach(function() {
@@ -65,7 +70,7 @@ define([
             it('should load non-route routes on register', function() {
                 r.register({
                     id: 5,
-                    view: new Backbone.View
+                    view: new Backbone.View()
                 });
                 expect(_.keys(r._registered).length).toEqual(5);
                 expect(r._loaded.length).toEqual(1);
@@ -86,7 +91,7 @@ define([
             it('should load non-route routes on register', function() {
                 r.register({
                     id: 5,
-                    view: new Backbone.View
+                    view: new Backbone.View()
                 });
 
                 expect(_.keys(r._registered).length).toEqual(5);
@@ -122,7 +127,7 @@ define([
                 expect(Backbone.history.navigate('bar/', {trigger: true})).toBe(true);
                 expect(r._loaded.length).toEqual(1);
 
-                children = $('#region3').children();
+                var children = $('#region3').children();
                 expect(children.length).toEqual(1);
 
                 expect(Backbone.history.navigate('foo/', {trigger: true})).toBe(true);
@@ -131,7 +136,8 @@ define([
                 children = $('#region3').children();
                 expect(children.length).toEqual(2);
                 expect(children.filter(':visible').length).toEqual(1);
-                expect(children.filter(':visible').is(r._registered[3]._view.el)).toBe(true);
+                expect(children.filter(':visible')
+                    .is(r._registered[3]._view.el)).toBe(true);
             });
 
             describe('Events', function() {
@@ -140,11 +146,11 @@ define([
                 beforeEach(function() {
                     loaded = false;
 
-                    routes[0].view.on('router:load', function(router, route) {
+                    routes[0].view.on('router:load', function() {
                         loaded = true;
                     });
 
-                    routes[0].view.on('router:unload', function(router, route) {
+                    routes[0].view.on('router:unload', function() {
                         loaded = false;
                     });
                 });

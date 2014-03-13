@@ -198,7 +198,7 @@ define [
             delete @data
 
         # Starts/enables the session.
-        start: (routes) ->
+        start: (routes, options) ->
             # Already started, return false denoting the start was not successful
             if @started then return false
 
@@ -214,7 +214,7 @@ define [
             if routes? then @router.register(routes)
 
             # Start the router history
-            @router.start()
+            @router.start(options)
             @startPing()
 
             if not c.isSupported(c.getSerranoVersion())

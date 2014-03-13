@@ -1,3 +1,5 @@
+/* global define, describe, expect, it */
+
 define(['cilantro'], function(c) {
 
     describe('Button Select', function() {

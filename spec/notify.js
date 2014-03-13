@@ -1,6 +1,9 @@
+/* global define, describe, it, expect */
+
 define(['cilantro/ui/notify'], function(notify) {
 
-    var stream = new notify.Notifications;
+    var stream = new notify.Notifications();
+
     stream.$el.appendTo('body').css({
         position: 'fixed',
         right: 0,

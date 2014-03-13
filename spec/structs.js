@@ -1,54 +1,38 @@
-define(['cilantro/structs', 'text!/mock/data/preview.json'], function(structs, dataJSON) {
+/* global define, describe, beforeEach, it, expect, waitsFor */
 
+define(['cilantro', 'cilantro/structs'], function(c, structs) {
 
     describe('Structures', function() {
-        var data;
+        var frame, series, datum;
 
-        beforeEach(function() {
-            data = JSON.parse(dataJSON);
-        });
-
-        describe('Frame', function() {
-
-            it('should populate local data', function() {
-                var frame = new structs.Frame(data);
-                expect(frame.indexes.length).toEqual(6);
-                expect(frame.series.length).toEqual(30);
+		beforeEach(function() {
+            frame = new structs.Frame(null, null, {
+                url: 'http://localhost:8000/api/data/preview/'
             });
 
+            frame.fetch();
+
+            waitsFor(function() {
+                return frame.series.length > 0;
+            });
+		});
+
+        describe('Frame', function() {
             it('should populate remote data on fetch', function() {
-                var frame = new structs.Frame(null, null, {
-                    url: '/mock/data/preview.json'
-                });
-
-                runs(function() {
-                    frame.fetch();
-                });
-
-                waitsFor(function() {
-                    return !!frame.series.length;
-                });
-
-                runs(function() {
-                    expect(frame.width()).toEqual(6);
-                    expect(frame.size()).toEqual(30);
-                });
+                expect(frame.width()).toEqual(3);
+                expect(frame.size()).toEqual(20);
             });
 
             it('should be able to extract columns', function() {
-                var frame = new structs.Frame(data);
                 var column = frame.column(2);
                 expect(column.width()).toEqual(1);
-                expect(column.size()).toEqual(30);
+                expect(column.size()).toEqual(20);
                 expect(column.isColumn()).toBe(true);
             });
         });
 
         describe('Series', function() {
-            var frame, series;
-
             beforeEach(function() {
-                frame = new structs.Frame(data);
                 series = frame.series.at(0);
             });
 
@@ -57,7 +41,7 @@ define(['cilantro/structs', 'text!/mock/data/preview.json'], function(structs, d
             });
 
             it('should should have data', function() {
-                expect(series.width()).toEqual(6);
+                expect(series.width()).toEqual(3);
                 expect(series.size()).toEqual(1);
             });
 
@@ -69,16 +53,13 @@ define(['cilantro/structs', 'text!/mock/data/preview.json'], function(structs, d
 
 
         describe('Datum', function() {
-            var frame, series, datum;
-
             beforeEach(function() {
-                frame = new structs.Frame(data);
                 series = frame.series.at(0);
                 datum = series.data.at(0);
             });
 
             it('should contain a value', function() {
-                expect(datum.get('value')).toEqual('<a href="/demo/patient/39/">MR00000039</a>');
+                expect(datum.get('value')).toBeDefined();
             });
 
             it('should have the correct index from series', function() {

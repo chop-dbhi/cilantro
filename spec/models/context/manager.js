@@ -1,13 +1,37 @@
+/* global define, describe, beforeEach, afterEach, waitsFor, it, expect, runs */
+
 define(['cilantro'], function (c) {
 
     describe('ContextManager', function() {
         var model, manager;
 
         beforeEach(function() {
-            model = new c.models.ContextModel(null, {
-                url: '/mock/context.json'
+            c.sessions.open(c.config.get('url'));
+
+            waitsFor(function() { return c.data; });
+
+            runs(function() {
+                model = c.data.contexts.create(null, {wait: true});
+                manager = model.manager;
             });
-            manager = model.manager;
+
+            waitsFor(function() {
+                return model.id;
+            });
+        });
+
+        afterEach(function() {
+            var done;
+
+            model.destroy({
+                success: function() {
+                    done = true;
+                }
+            }, {wait: true});
+
+            waitsFor(function() {
+                return done;
+            });
         });
 
         describe('Define', function() {

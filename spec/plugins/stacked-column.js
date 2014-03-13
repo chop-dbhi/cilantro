@@ -1,4 +1,6 @@
-define(['jquery', 'cilantro'], function($, c) {
+/* global define, beforeEach, describe, it, expect */
+
+define(['jquery'], function($) {
 
     function parsePixelString(string) {
         var match = string.match(/(\d*(?:\.\d+)?)px/);
@@ -22,7 +24,7 @@ define(['jquery', 'cilantro'], function($, c) {
 
         for (var c, i = 0; i < num; i++) {
             c = $('<div />').addClass(className);
-            if (heights[i] != null) {
+            if (heights[i] !== null) {
                 c.height(heights[i]);
             }
             children.push(c);

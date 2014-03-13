@@ -149,11 +149,12 @@ define [
             return
 
         # Shortcut for starting the Backbone.history
-        start: ->
+        start: (options) ->
             if Backbone.History.started then return
             root = @options.root or '/'
             if root.charAt(root.length-1) isnt '/'
                 root = root + '/'
-            Backbone.history.start(root: root, pushState: true)
+            options = _.extend({root: root, pushState: true}, options)
+            Backbone.history.start(options)
 
     { Router }
