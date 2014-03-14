@@ -37,7 +37,11 @@ This DCO simply certifies that the code you are submitting abides by the clauses
 
 ## Source Code
 
-All code up to version 2.2.11 has been done in CoffeeScript, however the decision has been made to port over code to JavaScript. All new code is to be written in JavaScript and any heavy refactors of existing files should be done in JavaScript. The repository has a `.jshintrc` file that will enforce certain rules and conventions on the JavaScript source code. Files should not have any JSHint warnings when being committed.
+All code up to version 2.2.11 has been done in CoffeeScript, however the decision has been made to port over code to JavaScript. All new code is to be written in JavaScript and any heavy refactors of existing files should be done in JavaScript.
+
+### JSHint
+
+The repository has a `.jshintrc` file that will enforce certain rules and conventions on the JavaScript source code. Files should not have any JSHint errors warnings when being committed. Most likely [there is a plugin](http://www.jshint.com/install/) you can install for your favorite editor to show errors after each save to the file.
 
 ## Modules
 
@@ -63,7 +67,7 @@ define([
     var mods = [].slice.call(arguments, 1);
 
     // Merge the mods into an empty object that will be exported
-    return _.extend.apply(_, [{}}.concat(mods));
+    return _.extend.apply(_, [{}].concat(mods));
 });
 ```
 
