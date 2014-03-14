@@ -47,6 +47,10 @@ module.exports = (grunt) ->
                     port: 8126
 
         watch:
+            grunt:
+                tasks: ['jasmine:local:build']
+                files: ['Gruntfile.coffee']
+
             coffee:
                 tasks: ['coffee:local']
                 files: ['<%= srcDir %>/coffee/**/*']
@@ -252,6 +256,7 @@ module.exports = (grunt) ->
             options:
                 specs: '<%= specDir %>/**/**/**/*.js'
                 host: 'http://127.0.0.1:8126'
+                helpers: './specConfig.js'
                 keepRunner: true
                 template: require('grunt-template-jasmine-requirejs')
 

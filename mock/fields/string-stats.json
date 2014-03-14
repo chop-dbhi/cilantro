@@ -1,9 +1,0 @@
-{
-    "_links": {
-        "parent": {
-            "href": "/mock/fields/string.json",
-            "rel": "parent"
-        }
-    },
-    "distinct_count": 23
-}

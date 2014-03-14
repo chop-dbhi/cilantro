@@ -1,20 +1,24 @@
-language: node_js
+language: python
+
+python:
+    - 2.7
+
+virtualenv:
+    system_site_packages: true
 
 before_install:
-    - env | sort
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq python-yaml
-    - git remote add upstream git://github.com/cbmi/cilantro.git
-    - upstream=master;
-      if [ "$TRAVIS_PULL_REQUEST" != false ]; then
-          upstream=$TRAVIS_BRANCH;
-      fi;
-      git fetch --append --no-tags upstream refs/heads/$upstream:refs/remotes/upstream/$upstream
-    - python bin/check_signoff.py
+    - sh bin/check_signoff.sh
+
 
 install:
+    - git clone --branch demo git://github.com/cbmi/harvest-openmrs.git
+    - pip install -r harvest-openmrs/requirements.txt
+    - pip install uwsgi
     - npm install -g grunt-cli
     - npm install
+
+before_script:
+    - uwsgi --http :8000 --chdir harvest-openmrs --wsgi-file wsgi.py &
 
 script:
     - grunt test --verbose

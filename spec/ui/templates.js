@@ -1,5 +1,9 @@
+/* global define, describe, it, expect */
+
 define(['cilantro', 'underscore', 'marionette'], function(c, _, Marionette) {
+
     describe('Templates', function() {
+
         it('should be populated', function() {
             expect(c.templates).toBeDefined();
             expect(c.templates.get('welcome')).toBeDefined();
@@ -25,5 +29,7 @@ define(['cilantro', 'underscore', 'marionette'], function(c, _, Marionette) {
             view.render();
             expect(view.$('h1').text()).toEqual('Foobar');
         });
+
     });
+
 });

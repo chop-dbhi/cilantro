@@ -1,3 +1,5 @@
+/* global define, describe, beforeEach, it, expect, waitsFor, runs */
+
 define(['jquery', 'cilantro/session'], function($, session) {
 
     describe('Session', function() {
@@ -5,12 +7,12 @@ define(['jquery', 'cilantro/session'], function($, session) {
 
         beforeEach(function() {
             s = new session.Session({
-                url: '/mock/root.json'
+                url: 'http://localhost:8000/api/'
             });
         });
 
         it('initial state', function() {
-            expect(s.get('url')).toBe('/mock/root.json');
+            expect(s.get('url')).toBe('http://localhost:8000/api/');
             expect(s.isValid()).toBe(true);
             expect(s.opened).toBe(false);
             expect(s.opening).toBe(false);
@@ -53,7 +55,10 @@ define(['jquery', 'cilantro/session'], function($, session) {
             runs(function() {
                 // Ensure the context of the promise is the session itself
                 expect(that).toBe(s);
-                s.start();
+                s.start({
+                    pushState: false,
+                    hashChange: true
+                });
             });
         });
 

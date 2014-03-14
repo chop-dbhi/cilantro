@@ -50,11 +50,9 @@ define [
             @get 'archived'
 
         toJSON: ->
-            id: @id
-            json: @facetsToJSON()
-            session: @get 'session'
-            archived: @get 'archived'
-            published: @get 'published'
+            attrs = super
+            attrs.json = @facetsToJSON()
+            return attrs
 
         parse: (attrs) ->
             super

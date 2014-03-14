@@ -1,34 +1,52 @@
-define(['cilantro/models/query'], function (query) {
+/* global define, describe, beforeEach, waitsFor, it, expect, runs */
 
-    describe('QueryCollection', function() {
-        var col;
+define(['cilantro'], function(c) {
+
+    describe('Query', function() {
 
         beforeEach(function() {
-            col = new query.QueryCollection;
+            c.sessions.open(c.config.get('url'));
+
+            waitsFor(function() { return c.data; });
         });
 
-        /* Disabled since this tested session-based functionality
-           which was removed.
-
-        it('should define a default session', function() {
-            expect(col.getSession()).toBeDefined();
+        it('should be empty to start', function() {
+            expect(c.data.queries.length).toEqual(0);
         });
 
-        it('should merge session data on fetch', function() {
-            col.url = '/mock/queries.json';
+        it('should support creating', function() {
+            var done;
+
+            var model = c.data.queries.create({}, {
+                success: function() {
+                    done = true;
+                }
+            });
+
+            waitsFor(function() { return done; });
+
             runs(function() {
-                col.fetch();
-            });
-
-            waitsFor(function() {
-                return !!col.getSession().id;
-            });
-
-            runs(function() {
-                expect(col.length).toBe(1);
+                expect(model.id).toBeDefined();
             });
         });
-        */
+
+        it('should support updating', function() {
+            var done, model = c.data.queries.at(0);
+
+            model.save({'name': 'Special'}, {
+                wait: true,
+                success: function() { done = true; }
+            });
+
+            waitsFor(function() { return done; });
+
+            runs(function() {
+                expect(model.get('name')).toEqual('Special');
+            });
+        });
+
+        /* TODO add tests for sharing.. */
+
     });
 
 });
