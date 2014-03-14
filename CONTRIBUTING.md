@@ -105,3 +105,17 @@ define(['cilantro'], function(c) {
 
 });
 ```
+
+### Live Server
+
+Some tests requires a live server of the OpenMRS Harvest demo running at `http://localhost:8000`. To install and setup the demo (only needed once) simply do:
+
+```
+virtualenv harvest-openmrs-env
+cd harvest-openmrs-env
+source bin/activate
+git clone --branch demo git://github.com/cbmi/harvest-openmrs.git
+cd harvest-openmrs
+pip install -r requirements.txt
+python bin/manage.py runserver
+```
