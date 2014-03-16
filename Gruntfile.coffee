@@ -58,10 +58,10 @@ module.exports = (grunt) ->
             js:
                 tasks: ['copy:local']
                 files: [
-                    '<%= srcDir %>/js/**/*'
-                    '<%= srcDir %>/css/**/*'
-                    '<%= srcDir %>/font/**/*'
-                    '<%= srcDir %>/img/**/*'
+                    '<%= srcDir %>/js/**/**/**/*'
+                    '<%= srcDir %>/css/**/**/**/*'
+                    '<%= srcDir %>/font/**/**/**/*'
+                    '<%= srcDir %>/img/**/**/**/*'
                 ]
 
             tests:
