@@ -14,8 +14,6 @@ define [
 
         infoView: info.ConceptInfo
 
-        fieldCollectionView: field.FieldFormCollection
-
         options:
             condense: false
 
@@ -24,6 +22,7 @@ define [
             'click .footer [data-toggle=update]': 'applyFilter'
             'click .footer [data-toggle=remove]': 'removeFilter'
             'click .footer .revert': 'revertFilter'
+            'click [data-target=links] a': 'jumpToField'
 
         ui:
             state: '.footer .state'
@@ -33,6 +32,7 @@ define [
 
         regions:
             info: '.info-region'
+            links: '.links-region'
             fields: '.fields-region'
 
         contextEvents:
@@ -81,7 +81,11 @@ define [
                 context: @context
                 collection: @model.fields
 
-            @fields.show(new @fieldCollectionView(options))
+            fieldForms = new field.FieldFormCollection(options)
+            @fields.show(fieldForms)
+
+            fieldLinks = new field.FieldLinkCollection(options)
+            @links.show(fieldLinks)
 
             @renderChange()
 
@@ -156,5 +160,15 @@ define [
             event?.preventDefault()
             @context.revert()
 
+        jumpToField: (event) ->
+            event.preventDefault()
+
+            elem = $(event.target.hash)
+            fields = @fields.$el
+
+            # Current scroll position + the relative position of the element
+            scrollTop = elem.position().top + fields.scrollTop()
+
+            fields.animate(scrollTop: scrollTop)
 
     { ConceptForm }

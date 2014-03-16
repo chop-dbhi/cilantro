@@ -11,6 +11,9 @@ define [
     '../charts'
 ], (_, Backbone, Marionette, logger, c, base, info, stats, controls, charts) ->
 
+    fieldIdAttr = (concept, field) ->
+        "c#{ concept }f#{ field }"
+
 
     resolveFieldFormOptions = (model) ->
         formClass = null
@@ -103,6 +106,10 @@ define [
             controls: controls.FieldControls
 
         onRender: ->
+            # Set id for anchoring
+            concept = @options.context.get('concept')
+            @$el.attr('id', fieldIdAttr(concept, @model.id))
+
             @renderInfo()
             @renderStats()
             @renderControls()
@@ -233,4 +240,30 @@ define [
             @$el.html(view.el)
 
 
-    { FieldForm, FieldFormCollection }
+
+    class FieldLink extends Marionette.ItemView
+        tagName: 'li'
+
+        template: 'field/link'
+
+        ui:
+            anchor: 'a'
+
+        serializeData: ->
+            name: @model.get('alt_name') or @model.get('name')
+
+
+    class FieldLinkCollection extends Marionette.CompositeView
+        template: 'field/links'
+
+        itemView: FieldLink
+
+        itemViewContainer: '[data-target=links]'
+
+        onAfterItemAdded: (view) ->
+            # Add anchor href to link to anchor
+            concept = @options.context.get('concept')
+            view.ui.anchor.attr('href', '#' + fieldIdAttr(concept, view.model.id))
+
+
+    { FieldForm, FieldFormCollection, FieldLinkCollection }
