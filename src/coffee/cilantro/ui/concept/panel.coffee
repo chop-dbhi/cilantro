@@ -5,7 +5,6 @@ define [
     './search'
 ], (_, Marionette, index, search) ->
 
-    # Takes a collection of c.models.ConceptModel objects
     class ConceptPanel extends Marionette.Layout
         className: 'concept-panel'
 
