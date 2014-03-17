@@ -48,6 +48,8 @@ define [
     'tpl!templates/controls/search/layout.html'
     'tpl!templates/controls/search/item.html'
 
+    'tpl!templates/controls/null/layout.html'
+
     'tpl!templates/field/form-condensed.html'
     'tpl!templates/field/form.html'
     'tpl!templates/field/info.html'

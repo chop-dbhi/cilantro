@@ -6,7 +6,8 @@ define [
     './search'
     './select'
     './infograph'
-], (_, c, date, number, search, select, infograph) ->
+    './null'
+], (_, c, date, number, search, select, infograph, nullSelector) ->
 
     defaultControls =
         infograph: infograph.InfographControl
@@ -15,6 +16,7 @@ define [
         search: search.SearchControl
         singleSelectionList: select.SingleSelectionList
         multiSelectionList: select.MultiSelectionList
+        nullSelector: nullSelector.NullSelector
 
     customControls = {}
 
