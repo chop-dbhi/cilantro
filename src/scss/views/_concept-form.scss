@@ -1,4 +1,13 @@
 .concept-form {
+
+    .links-region {
+        margin-bottom: 10px;
+        // XXX: This is to hide a bug seen when scrolling which is due to how
+        // elements are stacked using the jquery-stacked plugin. Once that
+        // is resolved this background can be removed.
+        background-color: #fff;
+    }
+
     .fields-region .field-form {
         border-bottom: 1px dashed #ccc;
         padding: 10px 0;

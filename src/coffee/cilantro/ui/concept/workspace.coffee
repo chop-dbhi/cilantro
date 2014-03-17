@@ -105,7 +105,7 @@ define [
             c.on(c.CONCEPT_FOCUS, @showItem)
 
         _ensureModel: (model) ->
-            if not (model instanceof c.models.ConceptModel)
+            if not (model instanceof c.models.Concept)
                 model = @data.concepts.get model
             return model
 

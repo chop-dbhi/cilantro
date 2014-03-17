@@ -18,7 +18,7 @@ define [
 
     # Mapping of Serrano resource links to corresponding collections or models.
     collectionLinkMap =
-        concepts: models.ConceptCollection
+        concepts: models.Concepts
         fields: models.FieldCollection
         contexts: models.ContextCollection
         views: models.ViewCollection

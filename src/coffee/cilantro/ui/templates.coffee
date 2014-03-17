@@ -52,6 +52,8 @@ define [
     'tpl!templates/field/form.html'
     'tpl!templates/field/info.html'
     'tpl!templates/field/stats.html'
+    'tpl!templates/field/links.html'
+    'tpl!templates/field/link.html'
 
     'tpl!templates/query/delete-dialog.html'
     'tpl!templates/query/edit-dialog.html'

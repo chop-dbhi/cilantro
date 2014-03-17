@@ -6,7 +6,7 @@ define(['cilantro'], function(c) {
         var collection;
 
         beforeEach(function() {
-            collection = new c.models.ConceptCollection();
+            collection = new c.models.Concepts();
             collection.url = 'http://localhost:8000/api/concepts/';
             collection.fetch();
 
