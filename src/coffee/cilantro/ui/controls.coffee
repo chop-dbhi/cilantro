@@ -7,6 +7,7 @@ define [
     './controls/search'
     './controls/infograph'
     './controls/registry'
+    './controls/null'
 ], (_, mods...) ->
 
     _.extend {}, mods...
