@@ -43,7 +43,12 @@ define [
     class Session extends models.Model
         idAttribute: 'url'
 
-        initialize: ->
+        options:
+            pingInterval: 5000
+
+        initialize: (attrs, options) ->
+            @options = _.extend({}, this.options, options)
+
             @opened = false
             @started = false
             @opening = false
@@ -58,11 +63,13 @@ define [
 
         startPing: =>
             # Only if the ping endpoint is available
-            if @links.ping
-                @_ping = setInterval(@ping, 5000)
+            if @links.ping and not @_ping
+                @ping()
+                @_ping = setInterval(@ping, @options.pingInterval)
 
         stopPing: =>
             clearTimeout(@_ping)
+            @_ping = undefined
 
         ping: =>
             Backbone.ajax
@@ -217,6 +224,11 @@ define [
             @router.start(options)
             @startPing()
 
+            # When the page loses focus, stop pinging, resume when visibility is regained
+            @listenTo c,
+                visible: @startPing
+                hidden: @stopPing
+
             if not c.isSupported(c.getSerranoVersion())
                 c.notify
                     header: 'Serrano Version Unsupported'
@@ -228,6 +240,7 @@ define [
         end: ->
             @started = false
             @stopPing()
+            @stopListening(c, 'visible hidden')
             @router.unregister()
 
 
