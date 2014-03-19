@@ -16,7 +16,8 @@ define([
     './ui/query',
     './ui/workflows',
     './ui/paginator',
-    './ui/notify'
+    './ui/notify',
+    './ui/pagination'
 ], function(_) {
 
     // Note, the ui/core module is intentially left out

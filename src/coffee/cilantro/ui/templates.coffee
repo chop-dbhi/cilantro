@@ -1,10 +1,12 @@
 define [
     'tpl!templates/count.html'
     'tpl!templates/notification.html'
-    'tpl!templates/paginator.html'
     'tpl!templates/panel.html'
     'tpl!templates/search.html'
     'tpl!templates/welcome.html'
+
+    'tpl!templates/paginator.html'
+    'tpl!templates/paginator/toolbar.html'
 
     'tpl!templates/accordian/group.html'
     'tpl!templates/accordian/section.html'

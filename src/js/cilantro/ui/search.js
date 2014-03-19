@@ -27,8 +27,8 @@ define([
             'keyup @ui.input': 'triggerSearch'
         },
 
-        constructor: function(options) {
-            Marionette.ItemView.prototype.constructor.call(this, options);
+        constructor: function() {
+            Marionette.ItemView.prototype.constructor.apply(this, arguments);
 
             this._query = '';
 
