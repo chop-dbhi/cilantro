@@ -1,76 +1,18 @@
 /* global define */
 
 define([
-    'jquery',
     'underscore',
     'marionette',
     './base',
     '../../models',
-    '../../constants',
-    '../paginator',
+    '../pagination',
     '../values',
-    '../search'
-], function($, _, Marionette, base, models, constants, paginator, values, search) {
+], function(_, Marionette, controls, models, pagination, values) {
 
-    // Single page of values
-    var SearchPageModel = models.Page.extend({
-        constructor: function(attrs, options) {
-            (options = options || {}).parse = true;
-            this.items = new models.Values();
-            models.Page.prototype.constructor.call(this, attrs, options);
-        },
-
-        parse: function(resp, options) {
-            this.items.reset(resp.values, options);
-            delete resp.values;
-            return resp;
-        }
-    });
-
-
-    // Paginator (collection) of pages which is driven by a field values
-    // endpoint.
-    var SearchPaginator = models.Paginator.extend({
-        model: SearchPageModel,
-
-        initialize: function(items, options) {
-            options = options || {};
-            this.field = options.field;
-            models.Paginator.prototype.initialize.call(this, items, options);
-        },
-
-        url: function() {
-            var url = this.field.links.values;
-            if (this.urlParams) {
-                url = url + '?' + $.param(this.urlParams);
-            }
-            return url;
-        }
-    });
-
-
-    // View for querying field values
-    var ValueSearch = search.Search.extend({
-        className: 'field-search search',
-
-        initialize: function() {
-            search.Search.prototype.initialize.call(this);
-            this.paginator = this.options.paginator;
-        },
-
-        search: function(query) {
-            if (query) {
-                this.options.paginator.urlParams = {query: query};
-            } else {
-                this.paginator.urlParams = null;
-            }
-
-            this.paginator.refresh();
-        }
-    });
-
-
-    // Single search result item
+    // Single item from the list of available items. This takes
+    // a `values` collection that represents values that have been
+    // selected. The state of this item will be toggled based on
+    // whether it has been to `values` or not.
     var SearchItem = Marionette.ItemView.extend({
         className: 'value-item',
 
@@ -125,26 +67,29 @@ define([
     });
 
 
-    // A single page of search results
-    var SearchPage = paginator.ListingPage.extend({
-        className: 'search-value-list',
-        itemView: SearchItem
+    var SearchItems = pagination.PaginatedItems.extend({
+        className: 'value-list',
+
+        itemView: SearchItem,
+
+        initialize: function(options) {
+            this.values = options.values;
+        },
+
+        // Pass values to each item.
+        // TODO have this parent view update children as the values change?
+        itemViewOptions: function() {
+            return {
+                values: this.values
+            };
+        }
     });
 
 
-    // All search result pages, only the current page is shown, the rest are
-    // hidden.
-    var SearchPageRoll = paginator.PageRoll.extend({
-        listView: SearchPage
-    });
-
-
-    var SearchControl = base.ControlLayout.extend({
+    var SearchControl = controls.ControlLayout.extend({
         className: 'field-value-search',
 
         template: 'controls/search/layout',
-
-        searchPaginator: SearchPaginator,
 
         regions: {
             search: '.search-region',
@@ -154,9 +99,9 @@ define([
         },
 
         regionViews: {
-            search: ValueSearch,
-            paginator: paginator.Paginator,
-            browse: SearchPageRoll,
+            search: pagination.PaginationSearch,
+            paginator: pagination.PaginationToolbar,
+            browse: SearchItems,
             values: values.ValueList
         },
 
@@ -164,45 +109,54 @@ define([
             // Initialize a new collection of values for use by the
             // two regions. This is shared between the source data
             // and the selected values for toggling state changes.
-            if (!this.collection) {
-                this.collection = new models.Values();
+            this._values = new models.Values();
 
-                var _this = this;
-                this.collection.url = function() {
-                    return _this.model.links.values;
-                };
-            }
-
-            // Trigger a change event on all collection events
-            this.listenTo(this.collection, 'all', this.change);
-
-            this.valuesPaginator = new this.searchPaginator(null, {
-                field: this.model
+            // Initialize paginated collection of items that values can
+            // be selected from. Pass the values collection in to enable
+            // the available items to react to the changes.
+            this.items = new models.PaginatedCollection(null, {
+                model: models.Value,
+                field: this.model,
+                values: this._values
             });
 
-            this.valuesPaginator.refresh();
+            // Both the values collection and available items need the URL
+            var valuesUrl = this.model.links.values;
+
+            this._values.url = function() {
+                return valuesUrl;
+            };
+
+            this.items.url = function() {
+                return valuesUrl;
+            };
+
+            // Trigger a change event on all values events
+            this.listenTo(this._values, 'all', this.change);
         },
 
         onRender: function() {
             var searchRegion = new this.regionViews.search({
-                model: this.model,
-                paginator: this.valuesPaginator,
+                collection: this.items,
                 placeholder: 'Search ' + this.model.get('plural_name') + '...'
             });
 
             var browseRegion = new this.regionViews.browse({
-                collection: this.valuesPaginator,
-                values: this.collection
+                collection: this.items,
+                values: this._values
             });
 
             var paginatorRegion = new this.regionViews.paginator({
                 className: 'paginator mini',
-                model: this.valuesPaginator
+                collection: this.items
             });
 
             var valuesRegion = new this.regionViews.values({
-                collection: this.collection
+                collection: this._values
             });
+
+            // Fetch
+            this.items.fetch();
 
             this.search.show(searchRegion);
             this.browse.show(browseRegion);
@@ -223,24 +177,19 @@ define([
         // Returns an array of objects with value and label attributes.
         // These are returned as is to enable correct repopulation.
         getValue: function() {
-            return this.collection.toJSON();
+            return this._values.toJSON();
         },
 
         setValue: function(value) {
             // Do not merge into existing models since the collection contains
             // additional state (which would be removed due to the merge).
-            this.collection.set(value, {merge: false});
+            this._values.set(value, {merge: false});
         }
 
     });
 
     return {
         SearchControl: SearchControl,
-        ValueSearch: ValueSearch,
-        SearchItem: SearchItem,
-        SearchPage: SearchPage,
-        SearchPageRoll: SearchPageRoll,
-        SearchPaginator: SearchPaginator
     };
 
 });
