@@ -1,10 +1,46 @@
 /* global define */
 
 define([
+    'backbone',
+    'marionette',
     'jquery',
     './core',
+    './ui',
     './logger'
-], function($, c, logger) {
+], function(Backbone, Marionette, $, c, ui, logger) {
+
+    // Set configuration options for corresponding APIs
+    c.templates.set(c.config.get('templates', {}));
+    c.controls.get(c.config.get('controls', {}));
+
+    // Extend Marionette template loader facilities to use Cilantro template API
+    var defaultLoadTemplate = Marionette.TemplateCache.prototype.loadTemplate,
+        defaultCompileTemplate = Marionette.TemplateCache.prototype.compileTemplate;
+
+    // Override to get in the template cache
+    Marionette.TemplateCache.prototype.loadTemplate = function(templateId) {
+        var func = c.templates.get(templateId);
+        if (!func) func = defaultLoadTemplate.call(this, templateId);
+        return func;
+    };
+
+    // Prevent re-compiling already compiled templates
+    Marionette.TemplateCache.prototype.compileTemplate = function(template) {
+        if (typeof template !== 'function') {
+            template = defaultCompileTemplate(template);
+        }
+        return template;
+    };
+
+    // Initialize notification stream and append it to the body
+    var stream = new ui.Notifications({
+        id: 'cilantro-notifications'
+    });
+
+    $('body').append(stream.render().el);
+
+    // Add public method
+    c.notify = stream.notify;
 
     // Support cross origin requests with credentials (i.e. cookies)
     // See http://www.html5rocks.com/en/tutorials/cors/
@@ -26,12 +62,68 @@ define([
     // Relies on the jquery-ajax-queue plugin to supply this method.
     // This ensures data is not silently lost
     $(window).on('beforeunload', function() {
-        if (!c.config.get('debug') && $.hasPendingRequest()) {
-            return "Wow, you're quick! Your data is being saved. " +
-                   "It will only take a moment.";
+        if (c.config.get('debug') || !$.hasPendingRequest()) return;
+
+        return "Wow, you're quick! Your data is being saved. It will only take a moment.";
+    });
+
+    $(document).ajaxError(function(event, xhr, settings, exception) {
+        // Status of 0 is an aborted request which is usually intentional
+        // by the app or from a page reload.
+        // An empty exception value is an unknown error which usually
+        // means the server is unavailable
+        if (xhr.status === 0 || exception) return;
+
+        c.notify({
+            timeout: null,
+            dismissable: false,
+            level: 'error',
+            header: 'Uh oh.',
+            message: 'There is a communication problem with the server. ' +
+                '<a href="#" onclick="location.reload()">Refreshing</a> ' +
+                'the page may help.'
+        });
+    });
+
+    // Route based on the URL
+    $(document).on('click', 'a', function(event) {
+        // Only catch if a router is available
+        if (!c.router) return;
+
+        // Path of the target link
+        var path = this.pathname;
+
+        // Handle IE quirk
+        if (path.charAt(0) !== '/') path = '/' + path;
+
+        // Trim off the root on the path if present
+        var root = Backbone.history.root || '/';
+
+        if (path.slice(0, root.length) === root) {
+            path = path.slice(root.length);
+        }
+
+        // If this is a valid route then go ahead and navigate to it,
+        // otherwise let the event process normally to load the new
+        // location.
+        if (c.router.hasRoute(path)) {
+            event.preventDefault();
+            c.router.navigate(path, {trigger: true});
         }
     });
 
+    // Route by ID specified by the data-route attribute.
+    $(document).on('click', '[data-route]', function(event) {
+        // Only catch if a router is available
+        if (!c.router) return;
+
+        var route = $(event.target).attr('data-route');
+
+        if (c.router.isNavigable(route)) {
+            event.preventDefault();
+            c.router.navigate(route, {trigger: true});
+        }
+    });
 
     // Page visibility API: http://stackoverflow.com/a/1060034/407954
     var hidden = 'hidden';
