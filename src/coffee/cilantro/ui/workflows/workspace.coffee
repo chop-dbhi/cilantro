@@ -32,6 +32,10 @@ define [
             if not (@data.view = @options.view)
                 throw new Error 'view model required'
 
+            @on 'router:load', ->
+                c.panels.context.closePanel(full: true)
+                c.panels.concept.closePanel(full: true)
+
         onRender: ->
             queryView = new @regionViews.queries
                 editQueryRegion: @editQueryRegion
@@ -57,8 +61,8 @@ define [
                 # rather than checking if the changed model is public or had
                 # its publicity changed. If this becomes too slow we can
                 # perform these checks but for now this is snappy enough.
-                @data.queries.on 'sync destroy', (model, resp, options) =>
-                    @data.publicQueries.fetch()
+                @data.queries.on 'sync', =>
+                    @data.publicQueries.fetch(add: true, remove: true, merge: true)
 
                 # We explicitly set the editable option to false below because
                 # users should not be able to edit the public queries

@@ -5,6 +5,8 @@
 @import "lib/bootstrap-responsive";
 @import "lib/font-awesome";
 
+@import "variables";
+
 @import "plugins/panels";
 
 @import "base/modal";
@@ -13,7 +15,6 @@
 @import "base/button";
 @import "base/navbar";
 @import "base/table";
-@import "base/stacked";
 @import "base/links";
 
 @import "views/base";
@@ -22,10 +23,10 @@
 @import "views/query";
 @import "views/welcome";
 
+@import "views/concept-panel";
 @import "views/concept-info";
 @import "views/concept-form";
 @import "views/concept-workspace";
-@import "views/concept-panel";
 @import "views/concept-columns";
 
 @import "views/range";
@@ -40,7 +41,7 @@
 @import "views/infograph-bar";
 @import "views/infograph-toolbar";
 
-@import "views/context";
+@import "views/context-panel";
 
 @import "views/exporter";
 
@@ -48,5 +49,6 @@
 
 @import "views/select";
 
+@import "workflows/workspace";
 @import "workflows/query";
 @import "workflows/results";

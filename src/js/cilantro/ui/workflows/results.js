@@ -1,6 +1,7 @@
 /* global define */
 
 define([
+    'jquery',
     'underscore',
     'marionette',
     '../core',
@@ -11,7 +12,7 @@ define([
     '../concept',
     '../exporter',
     '../query'
-], function(_, Marionette, c, paginator, numbers, tables, context, concept, exporter, query) {
+], function($, _, Marionette, c, paginator, numbers, tables, context, concept, exporter, query) {
 
     var ResultCount = Marionette.ItemView.extend({
         tagName: 'span',
@@ -30,7 +31,7 @@ define([
         },
 
         onRender: function() {
-            if (this.model.objectCount != null) {
+            if (this.model.objectCount !== undefined) {
                 this.renderCount(this.model, this.model.objectCount);
             }
             else {
@@ -79,7 +80,6 @@ define([
 
         ui: {
             columns: '.columns-modal',
-            contextContainer: '.context-container',
             saveQuery: '.save-query-modal',
             saveQueryToggle: '[data-toggle=save-query]',
             exportOptions: '.export-options-modal',
@@ -109,7 +109,6 @@ define([
             count: '.count-region',
             table: '.table-region',
             paginator: '.paginator-region',
-            context: '.context-region',
             columns: '.columns-modal .modal-body',
             exportTypes: '.export-options-modal .export-type-region',
             exportProgress: '.export-progress-modal .export-progress-region',
@@ -119,11 +118,6 @@ define([
         initialize: function() {
             this.data = {};
             this.monitors = {};
-
-            // Used to tell if filters were hidden by user clicking the button
-            this.areFiltersManuallyHidden = false;
-            // Flag indicating the current visibility of the context panel
-            this.areFiltersHidden = false;
 
             if (!(this.data.context = this.options.context)) {
                 throw new Error('context model required');
@@ -145,7 +139,6 @@ define([
             }
 
             $(document).on('scroll', this.onPageScroll);
-            $(window).resize(this.onWindowResize);
 
             this.data.results.on('request', this.showLoadingOverlay);
             this.data.results.on('sync', this.hideLoadingOverlay);
@@ -156,7 +149,7 @@ define([
 
         onRouterLoad: function() {
             this.data.results.trigger('workspace:load');
-            this.showContextPanel();
+            this.hideContextPanel();
         },
 
         onRouterUnload: function() {
@@ -175,39 +168,18 @@ define([
             }
         },
 
-        onWindowResize: function() {
-            this.updateContextPanelOffsets();
-        },
-
-        updateContextPanelOffsets: function() {
-            // If we are closed or don't exists then don't bother screwing with
-            // the context panel offset.
-            if (this.isClosed == null || this.isClosed) return;
-
-            // Find the bounds of the results workflow to properly fix the
-            // position of the context/filter panel.
-            this.workflowTopOffset = this.$el.offset().top;
-            this.workflowRightOffset = window.innerWidth - (this.$el.offset().left + this.$el.width());
-
-            this.ui.contextContainer.css('top', this.workflowTopOffset);
-            this.ui.contextContainer.css('right', this.workflowRightOffset);
-        },
-
         toggleContextPanelButtonClicked: function() {
-            if (this.areFiltersHidden) {
-                this.areFiltersManuallyHidden = false;
+            if (c.panels.context.isPanelClosed()) {
                 this.showContextPanel();
             }
             else {
-                this.areFiltersManuallyHidden = true;
                 this.hideContextPanel();
             }
         },
 
         showContextPanel: function() {
-            this.areFiltersHidden = false;
-            this.ui.contextContainer.css('display', 'block');
-            this.ui.resultsContainer.addClass('span9');
+            c.panels.context.openPanel();
+            this.$el.addClass('panel-open');
 
             // If we don't update the title by calling fixTitle the tooltip
             // will not respect the attribute change. Also, if we are changing
@@ -226,9 +198,8 @@ define([
         },
 
         hideContextPanel: function() {
-            this.areFiltersHidden = true;
-            this.ui.contextContainer.css('display', 'none');
-            this.ui.resultsContainer.removeClass('span9');
+            c.panels.context.closePanel({full: true});
+            this.$el.removeClass('panel-open');
 
             // If we don't update the title by calling fixTitle the tooltip
             // will not respect the attribute change. Also, if we are changing
@@ -250,15 +221,29 @@ define([
 
             var scrollPos = $(document).scrollTop();
 
+            // Record the vertical offset of the masthead nav bar if we
+            // haven't done so already. This is used in scroll calculations.
+            if (this.navbarVerticalOffset === undefined) {
+                this.navbarVerticalOffset = this.ui.navbar.offset().top;
+            }
+
+            // If there is already something fixed to the top, record the
+            // height of it so we can account for it in our scroll
+            // calculations later.
+            if (this.topNavbarHeight === undefined) {
+                var topElement = $('.navbar-fixed-top');
+                if (topElement.length > 0) {
+                    this.topNavbarHeight = topElement.height();
+                }
+                else {
+                    this.topNavbarHeight = 0;
+                }
+            }
+
             if (this.ui.navbar.hasClass('navbar-fixed-top')) {
                 if (scrollPos < (this.navbarVerticalOffset - this.topNavbarHeight)) {
                     // Remove the results navbar from the top.
                     this.ui.navbar.removeClass('navbar-fixed-top');
-                    this.ui.contextContainer.css('top', this.workflowTopOffset);
-
-                    if (!this.areFiltersManuallyHidden) {
-                        this.showContextPanel();
-                    }
                 }
             }
             else {
@@ -266,11 +251,6 @@ define([
                     // Move the results navbar to the top.
                     this.ui.navbar.css('top', this.topNavbarHeight);
                     this.ui.navbar.addClass('navbar-fixed-top');
-                    this.ui.contextContainer.css('top', this.workflowTopOffset + 35);
-
-                    if (!this.areFiltersManuallyHidden) {
-                        this.hideContextPanel();
-                    }
                 }
             }
         },
@@ -287,21 +267,21 @@ define([
             statusContainer.children().hide();
 
             switch(newState) {
-                case 'pending':
-                    statusContainer.find('.pending-container').show();
-                    break;
-                case 'downloading':
-                    statusContainer.find('.progress').show();
-                    break;
-                case 'error':
-                    statusContainer.find('.label-important').show();
-                    break;
-                case 'success':
-                    statusContainer.find('.label-success').show();
-                    break;
-                case 'timeout':
-                    statusContainer.find('.label-timeout').show();
-                    break;
+            case 'pending':
+                statusContainer.find('.pending-container').show();
+                break;
+            case 'downloading':
+                statusContainer.find('.progress').show();
+                break;
+            case 'error':
+                statusContainer.find('.label-important').show();
+                break;
+            case 'success':
+                statusContainer.find('.label-success').show();
+                break;
+            case 'timeout':
+                statusContainer.find('.label-timeout').show();
+                break;
             }
         },
 
@@ -312,7 +292,7 @@ define([
             if (this.hasExportErrorOccurred(exportTypeTitle)) {
                 this.changeExportStatus(exportTypeTitle, 'error');
             }
-            else if (this.monitors[exportTypeTitle]['execution_time'] > this.monitorTimeout) {
+            else if (this.monitors[exportTypeTitle].execution_time > this.monitorTimeout) {
                 this.changeExportStatus(exportTypeTitle, 'timeout');
             }
             else {
@@ -343,7 +323,7 @@ define([
 
             // Check if the download finished and the cookie was set.
             if (c.utils.getCookie(cookieName) === 'complete') {
-                clearInterval(this.monitors[exportTypeTitle]['interval']);
+                clearInterval(this.monitors[exportTypeTitle].interval);
                 c.utils.setCookie(cookieName, null);
                 this.onExportFinished(exportTypeTitle);
             }
@@ -360,18 +340,19 @@ define([
         },
 
         startExport: function(exportType, pages) {
-            title = this.$(exportType).attr('title');
+            var title = this.$(exportType).attr('title');
+
             this.changeExportStatus(title, 'downloading');
 
             // Clear the cookie in case the Serrano version is new enough
             // to be setting the cookie in response.
-            cookieName = 'export-type-' + title.toLowerCase();
+            var cookieName = 'export-type-' + title.toLowerCase();
             c.utils.setCookie(cookieName, null);
 
-            url = this.$(exportType).attr('href');
-            if (url[url.length-1] != '/') {
-                url = '' + url + '/';
-            }
+            var url = this.$(exportType).attr('href');
+
+            if (url[url.length-1] != '/') url = '' + url + '/';
+
             url = '' + url + pages;
 
             var iframe = '<iframe id=export-download-' + title + ' src=' + url + ' style="display: none"></iframe>';
@@ -476,22 +457,10 @@ define([
                 collection: this.data.queries
             }));
 
-            this.context.show(new context.ContextPanel({
-                model: this.data.context
-            }));
-
-            this.context.currentView.$el.stacked({
-                fluid: '.tree-region'
-            });
-
             this.table.show(new tables.Table({
                 view: this.data.view,
                 collection: this.data.results
             }));
-
-            this.table.currentView.on('render', function() {
-                this.$('.context').stacked('restack', this.$el.height());
-            });
 
             this.columns.show(new concept.ConceptColumns({
                 view: this.data.view,
@@ -502,29 +471,6 @@ define([
                 animation: false,
                 placement: 'bottom'
             });
-
-            // Record the vertical offset of the masthead nav bar if we
-            // haven't done so already. This is used in scroll calculations.
-            if (this.navbarVerticalOffset == null) {
-                this.navbarVerticalOffset = this.ui.navbar.offset().top;
-            }
-
-            // If there is already something fixed to the top, record the
-            // height of it so we can account for it in our scroll
-            // calculations later.
-            if (this.topNavbarHeight == null) {
-                var topElement = $('.navbar-fixed-top');
-                if (topElement.length != null) {
-                    this.topNavbarHeight = topElement.height();
-                }
-                else {
-                    this.topNavbarHeight = 0;
-                }
-            }
-
-            if (this.workflowTopOffset == null) {
-                this.updateContextPanelOffsets();
-            }
         },
 
         showExportOptions: function() {

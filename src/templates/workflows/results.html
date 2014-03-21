@@ -1,50 +1,35 @@
-<div class=row-fluid>
-    <div class="results-container span9">
-        <div class=row-fluid>
-            <div class=span12>
-                <div class="navbar navbar-masthead results-workflow-navbar">
-                    <div class="navbar-inner">
-                        <div class="navbar-text pull-right">
-                            <span class="paginator-region"></span>
-                            <button data-toggle=columns class="btn btn-primary btn-mini" title="Change Columns">
-                                <i class=icon-columns></i> <span class=large-display-button-text>Change Columns...</span>
-                            </button>
-                            <button data-toggle=export-options class="btn btn-primary btn-mini" title="Export Data">
-                                <i class=icon-file></i> <span class=large-display-button-text>Export...</span>
-                            </button>
-                            <button data-toggle=save-query class="btn btn-primary btn-mini" title="Save New Query">
-                                <i class=icon-save></i> <span class=large-display-button-text>Save Query...</span>
-                            </button>
-                            <button data-toggle=context-panel class="btn btn-primary btn-mini expand-collapse" title="Hide Filter Panel">
-                                <i class=icon-expand-alt></i> <span class=large-display-button-text>Hide Filters</span>
-                            </button>
-                        </div>
-                        <span class="navbar-text count-region"></span>
-                    </div>
-                </div>
-            </div>
+<div class="navbar navbar-masthead results-workflow-navbar">
+    <div class="navbar-inner">
+        <div class="navbar-text pull-right">
+            <span class="paginator-region"></span>
+            <button data-toggle=columns class="btn btn-primary btn-mini" title="Change Columns">
+                <i class=icon-columns></i> <span class=large-display-button-text>Change Columns...</span>
+            </button>
+            <button data-toggle=export-options class="btn btn-primary btn-mini" title="Export Data">
+                <i class=icon-file></i> <span class=large-display-button-text>Export...</span>
+            </button>
+            <button data-toggle=save-query class="btn btn-primary btn-mini" title="Save New Query">
+                <i class=icon-save></i> <span class=large-display-button-text>Save Query...</span>
+            </button>
+            <button data-toggle=context-panel class="btn btn-primary btn-mini expand-collapse" title="Hide Filter Panel">
+                <i class=icon-expand-alt></i> <span class=large-display-button-text>Hide Filters</span>
+            </button>
         </div>
-
-        <div class=row-fluid>
-            <div class="table-container span12">
-                <div class="loading-overlay hide">
-                    <h4><i class="icon-spinner icon-spin"></i> Loading Results</h4>
-                </div>
-                <div class=table-region></div>
-            </div>
-        </div>
+        <span class="navbar-text count-region"></span>
     </div>
+</div>
 
-    <div class="context-container span3 affix">
-        <div class="context-region"></div>
-        <div data-toggle=export-progress class="export-progress-container pull-right hide">
-            <i class="icon-circle-arrow-down"></i>
-            <div class="progress progress-striped active">
-                <div class="bar"></div>
-            </div>
-            <span class="badge badge-info">8</span>
-        </div>
+<div class="loading-overlay hide">
+    <h4><i class="icon-spinner icon-spin"></i> Loading Results</h4>
+</div>
+<div class=table-region></div>
+
+<div data-toggle=export-progress class="export-progress-container pull-right hide">
+    <i class="icon-circle-arrow-down"></i>
+    <div class="progress progress-striped active">
+        <div class="bar"></div>
     </div>
+    <span class="badge badge-info">8</span>
 </div>
 
 <div class="export-iframe-container"></div>

@@ -12,8 +12,7 @@ define([
     'plugins/jquery-ui',
     'plugins/jquery-easing',
     'plugins/jquery-panels',
-    'plugins/jquery-scroller',
-    'plugins/jquery-stacked'
+    'plugins/jquery-scroller'
 ], function(c, templates, controls, dom) {
 
     // Attach public APIs

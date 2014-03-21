@@ -1,10 +1,27 @@
-.context {
-    margin-bottom: 10px;
+#context-panel {
+    .actions-region {
+        overflow: hidden;
+        position: absolute;
+        top: 0;
+    }
+
+    .tree-region {
+        overflow: auto;
+        position: absolute;
+        top: 40px;
+        bottom: 40px;
+    }
+
+    .info-region {
+        overflow: hidden;
+        height: 30px;
+        position: absolute;
+        bottom: 0;
+    }
 
     .actions-region {
         @include clearfix;
         border-bottom: 1px solid #aaa;
-        margin-bottom: 10px;
         padding-bottom: 10px;
 
         .count-label {

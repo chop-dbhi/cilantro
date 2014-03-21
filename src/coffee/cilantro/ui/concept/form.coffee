@@ -172,12 +172,9 @@ define [
         jumpToField: (event) ->
             event.preventDefault()
 
-            elem = $(event.target.hash)
-            fields = @fields.$el
-
-            # Current scroll position + the relative position of the element
-            scrollTop = elem.position().top + fields.scrollTop()
-
-            fields.animate(scrollTop: scrollTop)
+            # Get the scroll position of the target element.
+            # See http://stackoverflow.com/questions/5371139/window-scrolltop-vs-document-scrolltop#comment20034307_5371386 for logic for setting scroll top on html,body.
+            scrollTop = $(event.target.hash).offset().top - 20
+            $('html,body').animate(scrollTop: scrollTop)
 
     { ConceptForm }

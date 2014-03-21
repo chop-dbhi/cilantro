@@ -1,19 +1,19 @@
 .results-workflow {
-    // XXX: Hack for https://github.com/cbmi/cilantro/issues/282
-    //      This can be removed once the context region becomes a proper panel
-    min-height: 300px;
+    @include transition(margin-right, 0.3s);
+
+    padding: 0 10px;
 
     .results-workflow-navbar {
         margin-bottom: 0px;
 
         &.navbar-fixed-top {
             box-shadow: 0 2px 7px rgba(0, 0, 0, 0.1);
-            border-radius: 0;
-            border-bottom-color: #ddd;
 
             .navbar-inner {
-                padding-left: 20px;
-                padding-right: 20px;
+                border-radius: 0;
+                border-color: #ddd;
+                padding-left: 15px;
+                padding-right: 15px;
             }
         }
 
@@ -28,6 +28,14 @@
         .navbar-inner {
             padding-left: 5px;
             padding-right: 5px;
+        }
+    }
+
+    &.panel-open {
+        margin-right: $panel-outer-width;
+
+        .results-workflow-navbar.navbar-fixed-top {
+            right: $panel-outer-width;
         }
     }
 
@@ -65,14 +73,6 @@
 
     [data-toggle=columns] {
         margin-left: 10px;
-    }
-
-    .context-region {
-
-    }
-
-    .table-container {
-        position: relative;
     }
 
     .table-region {

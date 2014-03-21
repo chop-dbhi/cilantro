@@ -1,5 +1,4 @@
 define [
-    'tpl!templates/context.html'
     'tpl!templates/count.html'
     'tpl!templates/notification.html'
     'tpl!templates/paginator.html'
@@ -30,6 +29,7 @@ define [
     'tpl!templates/concept/panel.html'
     'tpl!templates/concept/workspace.html'
 
+    'tpl!templates/context/panel.html'
     'tpl!templates/context/actions.html'
     'tpl!templates/context/empty.html'
     'tpl!templates/context/info.html'

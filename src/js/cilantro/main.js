@@ -12,7 +12,7 @@ require({
             variable: 'data'
         }
     }
-}, ['cilantro'], function(c) {
+}, ['jquery', 'cilantro'], function($, c) {
 
     // Default session options
     var options = {
@@ -26,6 +26,25 @@ require({
         // Open the default session defined in the pre-defined configuration.
         // Initialize routes once data is confirmed to be available
         c.sessions.open(options).then(function() {
+
+            // Panels are defined in their own namespace since they shared
+            // across workflows
+            c.panels = {
+                concept: new c.ui.ConceptPanel({
+                    collection: this.data.concepts
+                }),
+
+                context: new c.ui.ContextPanel({
+                    model: this.data.contexts.session
+                })
+            };
+
+            // Render and append panels in the designated main element
+            // prior to starting the session and loading the initial workflow
+            c.panels.concept.render();
+            c.panels.context.render();
+
+            $(c.config.get('main')).append(c.panels.concept.el, c.panels.context.el);
 
             c.workflows = {
                 query: new c.ui.QueryWorkflow({
@@ -85,8 +104,6 @@ require({
                     view: c.workflows.queryload
                 });
             }
-
-
 
             // Register routes and start the session
             this.start(routes);

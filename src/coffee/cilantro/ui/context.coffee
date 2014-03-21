@@ -1,7 +1,6 @@
 define [
     'underscore'
-    './context/item'
-    './context/tree'
+    './context/panel'
 ], (_, mods...) ->
 
     _.extend {}, mods...
