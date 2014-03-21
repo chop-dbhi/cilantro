@@ -123,8 +123,11 @@ define [
                     if (model = @collection.get datum.id)
                         models[model.cid] = model
 
+            hasResults = false
             @children.each (view) ->
-                view.filter(query, models)
+                hasResults = true if view.filter(query, models)
+            return hasResults
+
 
         find: (model) ->
             for cid, view of @children._views
