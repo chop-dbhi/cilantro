@@ -84,13 +84,17 @@ define [
             fieldForms = new field.FieldFormCollection(options)
             @fields.show(fieldForms)
 
-            @model.fields.once 'reset', (collection) ->
-                if collection.length < 2 then return
-
+            # Assume the fields have not loaded, yet render when done
+            if @model.fields.length is 0
+                @listenToOnce @model.fields, 'reset', (collection) ->
+                    if collection.length < 2 then return
+                    # Display field links only if 2 or more fields are present
+                    fieldLinks = new field.FieldLinkCollection(options)
+                    @links.show(fieldLinks)
+            else if @model.fields.length > 2
                 # Display field links only if 2 or more fields are present
                 fieldLinks = new field.FieldLinkCollection(options)
                 @links.show(fieldLinks)
-            , @
 
             @renderChange()
 
