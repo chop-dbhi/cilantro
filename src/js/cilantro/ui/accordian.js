@@ -52,19 +52,21 @@ define([
         itemSectionItems: 'items',
 
         options: {
-            collapsable: true
+            collapsable: true,
+            // Denotes the initial state of the group
+            collapsed: true
         },
 
         ui: {
             heading: '.heading',
-            icon: '.heading span',
+            icon: '.heading [data-toggle]',
             inner: '.inner'
         },
 
         events: {
             'click > .heading': 'toggleCollapse',
-            'shown > .inner': 'showCollapse',
-            'hidden > .inner': 'hideCollapse'
+            'show > .inner': 'showCollapse',
+            'hide > .inner': 'hideCollapse'
         },
 
         itemViewOptions: function(model, index) {
@@ -78,8 +80,13 @@ define([
         onRender: function() {
             // Remove the icon that denotes the group is collapsable
             if (!this.options.collapsable) {
-                this.$('.inner').removeClass('collapse');
+                // Ensure the group is expanded if it cannot be toggled
+                this.ui.inner.removeClass('collapse');
                 this.ui.icon.hide();
+            }
+            // Expand the collapsed group
+            else if (!this.options.collapsed) {
+                this.ui.inner.removeClass('collapse');
             }
         },
 
@@ -121,11 +128,11 @@ define([
         },
 
         showCollapse: function() {
-            this.ui.icon.text('-');
+            this.$el.addClass('expanded');
         },
 
         hideCollapse: function() {
-            this.ui.icon.text('+');
+            this.$el.removeClass('expanded');
         }
     });
 
@@ -140,6 +147,7 @@ define([
         itemGroupSections: 'sections',
 
         options: {
+            // Denotes whether this group can be collapsed/expanded
             collapsable: true
         },
 
