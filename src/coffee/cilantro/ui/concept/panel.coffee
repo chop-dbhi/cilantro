@@ -6,7 +6,9 @@ define [
 ], (_, Marionette, index, search) ->
 
     class ConceptPanel extends Marionette.Layout
-        className: 'concept-panel'
+        id: 'concept-panel'
+
+        className: 'panel panel-left closed'
 
         template: 'concept/panel'
 
@@ -20,9 +22,8 @@ define [
             noSearchResults: '.no-search-results'
 
         onRender: ->
-            # Pass the collection of concepts to be rendered in the index
-            @index.show new index.ConceptIndex
-                collection: @collection
+            # Initialize panel to set default state
+            @$el.panel()
 
             # When a search occurs, the index is filtered relative to the
             # response which contains a listing of IDs that the search
@@ -37,7 +38,21 @@ define [
                     else
                         @ui.noSearchResults.show()
 
-            # Defer focus of concept search until end of event loop
-            _.defer => @search.currentView.ui.input.focus()
+            # Pass the collection of concepts to be rendered in the index
+            @index.show new index.ConceptIndex
+                collection: @collection
+
+        openPanel: (options) ->
+            @$el.panel('open', options)
+
+        closePanel: (options) ->
+            @$el.panel('close', options)
+
+        isPanelOpen: (options) ->
+            @$el.data('panel').isOpen(options)
+
+        isPanelClosed: (options) ->
+            @$el.data('panel').isClosed(options)
+
 
     { ConceptPanel }

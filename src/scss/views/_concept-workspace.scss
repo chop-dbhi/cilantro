@@ -1,27 +1,5 @@
-.concept-workspace .nav-tabs {
-    display: none;
-}
-
 .concept-workspace {
     .concept-form {
         margin-bottom: 10px;
-    }
-}
-
-.concept-workspace-history {
-    margin: 0;
-
-    .concept-info {
-        border-bottom: 1px solid #ccc;
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-        // Make it link-like..
-        .name {
-            @extend a;
-            cursor: pointer;
-        }
     }
 }

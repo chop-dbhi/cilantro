@@ -16,14 +16,6 @@ define [
             @_routes = {}
             @_handlers = {}
 
-        _empty: =>
-            if not @_emptied
-                @_emptied = true
-                # This should be simply $(...).empty(), however, IE8 throws
-                # experiences an exception, so accessing the children then
-                # removing them works..
-                Backbone.$(@options.main).children().remove()
-
         _unloadAll: (args...) =>
             @_unload(@_registered[id], false, args...) for id in @_loaded.slice()
             return
@@ -65,7 +57,6 @@ define [
                     if options.el?
                         target = Backbone.$(options.el, @options.main)
                     else
-                        @_empty()
                         target = Backbone.$(@options.main)
                     target.append(view.el)
                     view.render?()

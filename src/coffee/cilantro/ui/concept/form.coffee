@@ -84,13 +84,17 @@ define [
             fieldForms = new field.FieldFormCollection(options)
             @fields.show(fieldForms)
 
-            @model.fields.once 'reset', (collection) ->
-                if collection.length < 2 then return
-
+            # Assume the fields have not loaded, yet render when done
+            if @model.fields.length is 0
+                @listenToOnce @model.fields, 'reset', (collection) ->
+                    if collection.length < 2 then return
+                    # Display field links only if 2 or more fields are present
+                    fieldLinks = new field.FieldLinkCollection(options)
+                    @links.show(fieldLinks)
+            else if @model.fields.length > 2
                 # Display field links only if 2 or more fields are present
                 fieldLinks = new field.FieldLinkCollection(options)
                 @links.show(fieldLinks)
-            , @
 
             @renderChange()
 
@@ -168,12 +172,9 @@ define [
         jumpToField: (event) ->
             event.preventDefault()
 
-            elem = $(event.target.hash)
-            fields = @fields.$el
-
-            # Current scroll position + the relative position of the element
-            scrollTop = elem.position().top + fields.scrollTop()
-
-            fields.animate(scrollTop: scrollTop)
+            # Get the scroll position of the target element.
+            # See http://stackoverflow.com/questions/5371139/window-scrolltop-vs-document-scrolltop#comment20034307_5371386 for logic for setting scroll top on html,body.
+            scrollTop = $(event.target.hash).offset().top - 20
+            $('html,body').animate(scrollTop: scrollTop)
 
     { ConceptForm }

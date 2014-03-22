@@ -1,16 +1,16 @@
 /* global define */
 
-define([], function() {
-    /* Utilities to formating numbers in a human-readable way.
-     *
-     *  - toSuffixedNumber - for numbers greater than or equal to 1000,
-     *      the output is a suffixed number
-     *  - toDelimitedNumber - returns a delimited string representation
-     *      of the number
-     *  - prettyNumber - attempts to return a number either rounded and/or
-     *      suffixed, appropriate for the value
-     */
+/* Utilities to formating numbers in a human-readable way.
+ *
+ *  - toSuffixedNumber - for numbers greater than or equal to 1000,
+ *      the output is a suffixed number
+ *  - toDelimitedNumber - returns a delimited string representation
+ *      of the number
+ *  - prettyNumber - attempts to return a number either rounded and/or
+ *      suffixed, appropriate for the value
+ */
 
+define(function() {
     var suffixes = [
         [3, 'K'],
         [6, 'million'],
@@ -27,13 +27,9 @@ define([], function() {
     ];
 
     var toSuffixedNumber = function(value) {
-        if (value == null) {
-            return;
-        }
+        if (value == null || value === '') return;
 
-        if (value < 1000) {
-            return toDelimitedNumber(value);
-        }
+        if (value < 1000) return toDelimitedNumber(value);
 
         var exp, suffix, largeNum, newValue;
         for (var i = 0; i < suffixes.length; i++) {
@@ -50,13 +46,9 @@ define([], function() {
     };
 
     var toDelimitedNumber = function(value, delim) {
-        if (value == null) {
-            return;
-        }
+        if (value == null || value === '') return;
 
-        if (delim == null) {
-            delim = ',';
-        }
+        if (delim === undefined) delim = ',';
 
         var valueParts = value.toString().split('.'),
             intPart = valueParts[0],
@@ -79,9 +71,7 @@ define([], function() {
     };
 
     var prettyNumber = function(value) {
-        if (value == null) {
-            return;
-        }
+        if (value == null || value === '') return;
 
         if (value !== 0) {
             // Small float

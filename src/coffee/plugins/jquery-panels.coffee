@@ -29,21 +29,24 @@ define ['jquery'], ($) ->
       </div>
     ###
 
+    getSlideWidth = (element, options={}) ->
+        # Total width of panel
+        slideWidth = element.outerWidth()
+
+        # If a .panel-toggle exists within the panel, substract the width
+        # to it is still visible for use
+        if options.full isnt false and (toggle = element.children('.panel-toggle'))[0]
+            return slideWidth - toggle.outerWidth()
+
+        return slideWidth
+
     Panel = (element, options) ->
         @element = $(element)
+
         @options = $.extend {},
             side: 'left'
             closed: false
         , options
-
-        # Total width of panel
-        @slideWidth = @element.width()
-
-        # If a .panel-toggle exists within the panel, substract the width
-        # to it is still visible for use
-        if (toggle = @element.children('.panel-toggle'))[0]
-            toggle.on 'click', => @element.panel 'toggle'
-            @slideWidth -= toggle.width()
 
         @state = 1
 
@@ -56,37 +59,70 @@ define ['jquery'], ($) ->
         # Hide without animation
         if @options.closed is true or @element.hasClass 'closed'
             @state = 0
-            (css = {})[@side] = -@slideWidth
-            @element.addClass('closed').css(css).show()
+            @element.addClass('closed').hide()
+
+        @element.on 'click', '.panel-toggle', =>
+            @toggle()
 
         return @
 
     Panel:: =
         constructor: Panel
 
-        open: ->
+        open: (options={}) ->
             if not @state
                 @state = 1
-                (attrs = {})[@side] = 0
-                @element.animate(attrs, 300).removeClass('closed')
 
-        close: ->
+                # Ensure the position is off screen to start. This
+                # is to handle the case when the element was hidden
+                (css = {})[@side] = -getSlideWidth(@element, options)
+                @element.css(css).show()
+
+                (attrs = {})[@side] = 0
+
+                @element.stop()
+
+                if options.animate isnt false
+                    @element.animate(attrs, 300)
+                else
+                    @element.css(attrs)
+
+                @element.removeClass('closed')
+
+        close: (options={}) ->
             if @state
                 @state = 0
-                (attrs = {})[@side] = -@slideWidth
-                @element.animate(attrs, 300).addClass('closed')
+
+                slideWidth = getSlideWidth(@element, options)
+
+                (attrs = {})[@side] = -slideWidth
+
+                @element.stop()
+
+                if options.animate isnt false
+                    @element.animate(attrs, 300)
+                else
+                    @element.css(attrs)
+
+                @element.addClass('closed')
 
         toggle: -> if @state then @close() else @open()
 
+        isOpen: -> @state is 1
 
-    $.fn.panel = (option) ->
+        isClosed: -> @state is 0
+
+
+    $.fn.panel = (option, options) ->
         @each ->
             $this = $(@)
+
             if not (data = $this.data('panel'))
                 if typeof option is 'object' then options = option
                 $this.data('panel', (data = new Panel(@, options)))
+
             if typeof option is 'string'
-                data[option]()
+                data[option](options)
 
     $.fn.panel.Constructor = Panel
 

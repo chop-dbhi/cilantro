@@ -152,9 +152,6 @@ define [
             @currentView = view
             @main.show(view)
 
-            view.$el.stacked
-                fluid: '.fields-region'
-
         onRender: ->
             @main.show new @regionViews.main
 

@@ -22,7 +22,8 @@ define [
 
         initialize: ->
             @data = {}
-            if c.isSupported('2.2.0') and not (@data.public_queries = @options.public_queries)
+
+            if c.isSupported('2.2.0') and not (@data.publicQueries = @options.public_queries)
                 throw new Error 'public queries collection required'
             if not (@data.queries = @options.queries)
                 throw new Error 'queries collection required'
@@ -31,7 +32,12 @@ define [
             if not (@data.view = @options.view)
                 throw new Error 'view model required'
 
-            @queryView = new @regionViews.queries
+            @on 'router:load', ->
+                c.panels.context.closePanel(full: true)
+                c.panels.concept.closePanel(full: true)
+
+        onRender: ->
+            queryView = new @regionViews.queries
                 editQueryRegion: @editQueryRegion
                 deleteQueryRegion: @deleteQueryRegion
                 collection: @data.queries
@@ -39,31 +45,28 @@ define [
                 view: @data.view
                 editable: true
 
+            @queries.show(queryView)
+
             if c.isSupported('2.2.0')
-                @publicQueryView = new @regionViews.queries
-                    collection: @data.public_queries
+                publicQueryView = new @regionViews.queries
+                    collection: @data.publicQueries
                     context: @data.context
                     view: @data.view
                     title: 'Public Queries'
                     emptyMessage: "There are no public queries. You can create a new, public query by navigating to the 'Results' page and clicking on the 'Save Query...' button. While filling out the query form, you can mark the query as public which will make it visible to all users and cause it to be listed here."
 
-        onRender: ->
-            @queries.show @queryView
-
-            if c.isSupported('2.2.0')
                 # When the queries are synced we need to manually update the
                 # public queries collection so that any changes to public
                 # queries are reflected there. Right now, this is done lazily
                 # rather than checking if the changed model is public or had
                 # its publicity changed. If this becomes too slow we can
                 # perform these checks but for now this is snappy enough.
-                @data.queries.on 'sync destroy', (model, resp, options) =>
-                    @publicQueries.currentView.collection.fetch()
-                    @publicQueries.currentView.collection.reset()
+                @data.queries.on 'sync', =>
+                    @data.publicQueries.fetch(add: true, remove: true, merge: true)
 
                 # We explicitly set the editable option to false below because
                 # users should not be able to edit the public queries
                 # collection.
-                @publicQueries.show @publicQueryView
+                @publicQueries.show(publicQueryView)
 
     { WorkspaceWorkflow }
