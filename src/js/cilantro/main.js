@@ -31,7 +31,7 @@ require({
             // across workflows
             c.panels = {
                 concept: new c.ui.ConceptPanel({
-                    collection: this.data.concepts
+                    collection: this.data.concepts.queryable
                 }),
 
                 context: new c.ui.ContextPanel({
