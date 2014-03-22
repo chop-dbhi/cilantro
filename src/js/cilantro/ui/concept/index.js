@@ -37,7 +37,7 @@ define([
             var show = false;
 
             this.children.each(function(view) {
-                if (!query || models[view.model.cid]) {
+                if (!query || models[view.model.id]) {
                     view.$el.show();
                     show = true;
                 }
@@ -189,7 +189,7 @@ define([
                     attrs = resp[i];
 
                     if ((model = this.collection.get(attrs.id))) {
-                        models[model.cid] = model;
+                        models[model.id] = model;
                     }
                 }
             }
