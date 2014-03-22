@@ -27,10 +27,16 @@ define([
             'keyup @ui.input': 'triggerSearch'
         },
 
-        initialize: function() {
+        constructor: function(options) {
+            Marionette.ItemView.prototype.constructor.call(this, options);
+
             this._query = '';
 
             this.trggerSearch = _.debounce(this.triggerSearch, this.options.delay);
+
+            // If this is triggered externally, ensure the input text reflects the
+            // query.
+            this.on('search', this.renderInputText);
 
             // If a search method is supplied, bind it to the search event
             if (this.search) this.on('search', this.search);
@@ -50,12 +56,20 @@ define([
             });
         },
 
+        renderInputText: function(query) {
+            if (this.ui.input.val() !== query) {
+                this._query = query;
+                this.ui.input.val(query);
+            }
+        },
+
         triggerSearch: function(event) {
             // No bubbling of submit events
             event.stopImmediatePropagation();
 
             var query = this.ui.input.val().trim();
 
+            // Prevent redundant queries
             if (query === this._query) return;
 
             this._query = query;
