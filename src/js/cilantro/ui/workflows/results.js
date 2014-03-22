@@ -267,21 +267,21 @@ define([
             statusContainer.children().hide();
 
             switch(newState) {
-            case 'pending':
-                statusContainer.find('.pending-container').show();
-                break;
-            case 'downloading':
-                statusContainer.find('.progress').show();
-                break;
-            case 'error':
-                statusContainer.find('.label-important').show();
-                break;
-            case 'success':
-                statusContainer.find('.label-success').show();
-                break;
-            case 'timeout':
-                statusContainer.find('.label-timeout').show();
-                break;
+                case 'pending':
+                    statusContainer.find('.pending-container').show();
+                    break;
+                case 'downloading':
+                    statusContainer.find('.progress').show();
+                    break;
+                case 'error':
+                    statusContainer.find('.label-important').show();
+                    break;
+                case 'success':
+                    statusContainer.find('.label-success').show();
+                    break;
+                case 'timeout':
+                    statusContainer.find('.label-timeout').show();
+                    break;
             }
         },
 

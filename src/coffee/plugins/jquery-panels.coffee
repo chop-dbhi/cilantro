@@ -74,7 +74,7 @@ define ['jquery'], ($) ->
                 @state = 1
 
                 # Ensure the position is off screen to start. This
-                # is handle the case when the element was hidden
+                # is to handle the case when the element was hidden
                 (css = {})[@side] = -getSlideWidth(@element, options)
                 @element.css(css).show()
 

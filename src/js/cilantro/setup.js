@@ -11,7 +11,7 @@ define([
 
     // Set configuration options for corresponding APIs
     c.templates.set(c.config.get('templates', {}));
-    c.controls.get(c.config.get('controls', {}));
+    c.controls.set(c.config.get('controls', {}));
 
     // Extend Marionette template loader facilities to use Cilantro template API
     var defaultLoadTemplate = Marionette.TemplateCache.prototype.loadTemplate,

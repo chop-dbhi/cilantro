@@ -32,10 +32,8 @@ define([
             return;
         }
 
-        var intervalId, timeoutId;
-
         // Re-evalute ready status every 15 ms
-        intervalId = setInterval(function() {
+        var intervalId = setInterval(function() {
             // TODO use a async registry that loops through and checks
             // that all are ready
             ready = c.templates.ready() && c.controls.ready();
@@ -49,7 +47,7 @@ define([
 
         // Add a timeout in case there is a bug or something cause the components
         // never to be ready.
-        timeoutId = setTimeout(function() {
+        var timeoutId = setTimeout(function() {
             clearTimeout(intervalId);
 
             c.notify({
