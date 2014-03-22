@@ -63,6 +63,11 @@ define([
             this.index.show(indexRegion);
         },
 
+        // Enables triggering a search directly
+        triggerSearch: function(query) {
+            this.search.currentView.trigger('search', query);
+        },
+
         openPanel: function(options) {
             this.$el.panel('open', options);
         },
