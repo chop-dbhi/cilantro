@@ -193,8 +193,6 @@ define([
             this.ui.toggleFiltersIcon.removeClass('icon-collapse-alt');
             this.ui.toggleFiltersIcon.addClass('icon-expand-alt');
             this.ui.toggleFiltersText.html('Hide Filters');
-            this.updateContextPanelOffsets();
-            this.$('.context').stacked('restack', this.$el.height());
         },
 
         hideContextPanel: function() {
