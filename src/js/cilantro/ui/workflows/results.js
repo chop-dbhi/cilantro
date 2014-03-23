@@ -312,7 +312,8 @@ define([
             // the details of that error are contained in the iframe. If all
             // went well, the iframe will have empty head and body elements
             // because the content disposition was attachment.
-            this.$('#export-download-' + exportTypeTitle).contents()[0].body.children.length !== 0;
+            return this.$('#export-download-' + exportTypeTitle)
+                .contents()[0].body.children.length !== 0;
         },
 
         checkExportStatus: function(exportTypeTitle) {
