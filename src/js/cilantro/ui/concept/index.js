@@ -88,6 +88,8 @@ define([
 
         itemView: ConceptGroup,
 
+        emptySearchView: base.EmptySearchView,
+
         // Override to create the parsed collection and render it
         showCollection: function() {
             this.resetGroups();
@@ -200,6 +202,12 @@ define([
                 if (view.filter(query, models)) show = true;
             });
 
+            if (show) {
+                this.closeEmptySearchView();
+            } else {
+                this.showEmptySearchView(query);
+            }
+
             return show;
         },
 
@@ -212,6 +220,26 @@ define([
                 if ((child = view.find(model))) {
                     return child;
                 }
+            }
+        },
+
+        // Override show/close empty view to append and remove rather
+        // than adding it to the internal children collection.
+        showEmptySearchView: function(query) {
+            this.closeEmptySearchView();
+
+            this._emptyView = new this.emptySearchView({
+                message: '<p>We could not find anything related to "' +
+                         query + '"</p>'
+            });
+
+            this.$el.append(this._emptyView.render().el);
+        },
+
+        closeEmptySearchView: function() {
+            if (this._emptyView) {
+                this._emptyView.remove();
+                delete this._emptyView;
             }
         }
     });

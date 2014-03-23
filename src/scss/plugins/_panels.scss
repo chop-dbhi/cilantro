@@ -5,6 +5,7 @@
     width: $panel-width;
     padding: $panel-padding / 2;
     background-color: #f9f9f9;
+    text-shadow: 0 1px 1px #fff;
     z-index: 100;
 
     &.panel-right {

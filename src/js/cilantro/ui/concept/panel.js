@@ -26,37 +26,22 @@ define([
             index: index.ConceptIndex
         },
 
-        ui: {
-            noSearchResults: '.no-search-results'
-        },
-
         onRender: function() {
             // Initialize panel plugin to set default state
             this.$el.panel();
 
-            // When a search occurs, the index is filtered relative to the
-            // response which contains a listing of IDs that the search
-            // has matched.
-            this.ui.noSearchResults.hide();
-
-            var _this = this;
-
-            var searchRegion = new this.regionViews.search({
-                collection: this.collection,
-
-                handler: function(query, resp) {
-                    if (_this.index.currentView.filter(query, resp)) {
-                        _this.ui.noSearchResults.hide();
-                    }
-                    else {
-                        _this.ui.noSearchResults.show();
-                    }
-                }
-            });
-
             // Pass the collection of concepts to be rendered in the index
             var indexRegion = new this.regionViews.index({
                 collection: this.collection
+            });
+
+            // Pass the collection concepts to be searched and a handler
+            // that updates the index based on the matched results.
+            var searchRegion = new this.regionViews.search({
+                collection: this.collection,
+                handler: function(query, resp) {
+                    indexRegion.filter(query, resp);
+                }
             });
 
             this.search.show(searchRegion);
