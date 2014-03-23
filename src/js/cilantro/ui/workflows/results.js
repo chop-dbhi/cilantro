@@ -116,6 +116,9 @@ define([
         },
 
         initialize: function() {
+            // Bind for use as event handlers
+            _.bindAll(this, 'onPageScroll', 'startExport', 'checkExportStatus');
+
             this.data = {};
             this.monitors = {};
 
@@ -137,8 +140,6 @@ define([
             if (!(this.data.queries = this.options.queries)) {
                 throw new Error('queries collection required');
             }
-
-            $(document).on('scroll', this.onPageScroll);
 
             this.data.results.on('request', this.showLoadingOverlay);
             this.data.results.on('sync', this.hideLoadingOverlay);
@@ -426,6 +427,8 @@ define([
         },
 
         onRender: function() {
+            $(document).on('scroll', this.onPageScroll);
+
             // Remove unsupported features from view/
             if (!c.isSupported('2.1.0')) {
                 this.ui.saveQueryToggle.remove();
@@ -469,6 +472,10 @@ define([
                 animation: false,
                 placement: 'bottom'
             });
+        },
+
+        onClose: function() {
+            $(document).off('scroll', this.onPageScroll);
         },
 
         showExportOptions: function() {
