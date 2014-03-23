@@ -56,7 +56,7 @@ define([
             invalid: 'renderInvalid'
         },
 
-        initialize: function(options) {
+        constructor: function(options) {
             options = options || {};
 
             this.data = {};
@@ -74,7 +74,17 @@ define([
                 concept: options.model.id
             }, {type: 'branch'});
 
-            this.delegateContextEvents(this.contextEvents);
+            Marionette.Layout.prototype.constructor.call(this, options);
+        },
+
+        delegateEvents: function() {
+            Marionette.Layout.prototype.delegateEvents.apply(this, arguments);
+            this.delegateContextEvents();
+        },
+
+        undelegateEvents: function() {
+            Marionette.Layout.prototype.undelegateEvents.apply(this, arguments);
+            this.undelegateContextEvents();
         },
 
         // Listen to context events
@@ -88,7 +98,7 @@ define([
         },
 
         // Stop listening to context events
-        undelegateEvents: function() {
+        undelegateContextEvents: function() {
             var event, method;
 
             for (event in this.contextEvents) {
