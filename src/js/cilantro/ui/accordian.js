@@ -64,9 +64,7 @@ define([
         },
 
         events: {
-            'click > .heading': 'toggleCollapse',
-            'show > .inner': 'showCollapse',
-            'hide > .inner': 'hideCollapse'
+            'click > .heading': 'toggleCollapse'
         },
 
         itemViewOptions: function(model, index) {
@@ -77,16 +75,20 @@ define([
             };
         },
 
+        initialize: function() {
+            this.collapsed = this.options.collapsed;
+        },
+
         onRender: function() {
             // Remove the icon that denotes the group is collapsable
             if (!this.options.collapsable) {
+                this.renderExpanded();
                 // Ensure the group is expanded if it cannot be toggled
-                this.ui.inner.removeClass('collapse');
                 this.ui.icon.hide();
             }
             // Expand the collapsed group
-            else if (!this.options.collapsed) {
-                this.ui.inner.removeClass('collapse');
+            else if (this.collapsed) {
+                this.renderCollapsed();
             }
         },
 
@@ -119,20 +121,63 @@ define([
             }
         },
 
-        toggleCollapse: function(event) {
-            if (event) event.preventDefault();
-
+        collapse: function(options) {
             if (this.options.collapsable) {
-                this.ui.inner.collapse('toggle');
+                this.collapsed = true;
+                this.renderCollapsed(options);
             }
         },
 
-        showCollapse: function() {
-            this.$el.addClass('expanded');
+        expand: function(options) {
+            if (this.options.collapsable) {
+                this.collapsed = false;
+                this.renderExpanded(options);
+            }
         },
 
-        hideCollapse: function() {
-            this.$el.removeClass('expanded');
+        toggleCollapse: function(event) {
+            event.preventDefault();
+
+            if (this.options.collapsable) {
+                if (this.collapsed) {
+                    this.expand({animate: true});
+                } else {
+                    this.collapse({animate: true});
+                }
+            }
+        },
+
+        // Renders the current state based on the collapsed flag
+        renderState: function(options) {
+            if (this.collapsed) {
+                this.renderCollapsed(options);
+            } else {
+                this.renderExpanded(options);
+            }
+        },
+
+        renderExpanded: function(options) {
+            options = options || {};
+
+            this.$el.removeClass('collapsed');
+
+            if (options.animate) {
+                this.ui.inner.collapse('show');
+            } else {
+                this.ui.inner.addClass('in');
+            }
+        },
+
+        renderCollapsed: function(options) {
+            options = options || {};
+
+            this.$el.addClass('collapsed');
+
+            if (options.animate) {
+                this.ui.inner.collapse('hide');
+            } else {
+                this.ui.inner.removeClass('in');
+            }
         }
     });
 

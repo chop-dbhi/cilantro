@@ -33,7 +33,7 @@ define([
         itemView: ConceptItem,
 
         filter: function(query, models) {
-            // If any children are visible, show this group, otherwise hide it
+            // If any children are visible, show this section, otherwise hide it
             var show = false;
 
             this.children.each(function(view) {
@@ -46,7 +46,7 @@ define([
                 }
             });
 
-            this.$el.toggle(show && !this.isEmpty());
+            this.$el.toggle(show);
 
             return show;
         }
@@ -57,14 +57,22 @@ define([
         itemView: ConceptSection,
 
         filter: function(query, models) {
-            // If any children are visible, show this group, otherwise hide it
+            // If any sections are visible, show this group, otherwise hide it
             var show = false;
 
             this.children.each(function(view) {
                 if (view.filter(query, models)) show = true;
             });
 
-            this.$el.toggle(show && !this.isEmpty());
+            if (!query) {
+                this.$el.show();
+                this.renderState();
+            } else if (show) {
+                this.$el.show();
+                this.renderExpanded();
+            } else {
+                this.$el.hide();
+            }
 
             return show;
         },
