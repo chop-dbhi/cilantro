@@ -3,8 +3,9 @@
 define([
     'jquery',
     'underscore',
-    'marionette'
-], function($, _, Marionette) {
+    'marionette',
+    '../core'
+], function($, _, Marionette, c) {
 
     var ConceptInfo = Marionette.ItemView.extend({
         className: 'concept-info',
@@ -33,16 +34,11 @@ define([
 
         onCategoryLinkClick: function(event) {
             var target = $(event.target);
-
-            // TODO this is accessing an external element. Change to be
-            // event-driven
-            $('.concept-search > input[type=text]')
-                .val(target.text())
-                .trigger('keyup');
+            c.panels.concept.triggerSearch(target.text());
         },
 
-        // If the concept does not have it's own description, use the first
-        // associated field.
+        // If the concept does not have it's own description and contains only
+        // one field, use the field's description.
         serializeData: function() {
             var data = this.model.toJSON();
 
@@ -54,7 +50,6 @@ define([
         }
 
     });
-
 
     return {
         ConceptInfo: ConceptInfo

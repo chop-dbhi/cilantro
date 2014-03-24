@@ -1,17 +1,5 @@
-.load-view, .error-view, .empty-view {
-    > i {
-        margin-right: 5px;
-    }
-}
-
-.load-view, .empty-view {
+.load-view, .error-view, .empty-view, .empty-search-view {
     color: #575757;
-}
-
-.error-view {
-    i {
-        @extend .text-error;
-    }
 }
 
 .error-overlay-view {

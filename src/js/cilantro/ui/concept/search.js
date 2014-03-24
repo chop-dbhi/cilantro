@@ -15,13 +15,23 @@ define([
             });
         },
 
+        initialize: function() {
+            // Track last request so the handler only gets the latest
+            this._request = null;
+
+            if (!this.options.handler) {
+                throw new Error('no search handler defined');
+            }
+        },
+
         search: function(query) {
+            // Abort the last request
+            if (this._request) this._request.abort();
+
             var handler = this.options.handler;
 
-            if (!handler) throw new Error('no search handler defined');
-
             if (query) {
-                this.collection.search(query, function(resp) {
+                this._request = this.collection.search(query, function(resp) {
                     handler(query, resp);
                 });
             } else {

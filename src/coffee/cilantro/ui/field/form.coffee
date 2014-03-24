@@ -262,7 +262,7 @@ define [
 
         onAfterItemAdded: (view) ->
             # Add anchor href to link to anchor
-            concept = @options.context.get('concept')
+            concept = @options.concept.id
             view.ui.anchor.attr('href', '#' + fieldIdAttr(concept, view.model.id))
 
 

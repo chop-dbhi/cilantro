@@ -25,7 +25,7 @@ define(['jquery', 'cilantro/session'], function($, session) {
 
             waitsFor(function() {
                 return s.opened;
-            }, 100);
+            }, 500);
 
             runs(function() {
                 expect(s.opening).toBe(false);
@@ -50,7 +50,7 @@ define(['jquery', 'cilantro/session'], function($, session) {
 
             waitsFor(function() {
                 return s.opened;
-            }, 100);
+            }, 500);
 
             runs(function() {
                 // Ensure the context of the promise is the session itself

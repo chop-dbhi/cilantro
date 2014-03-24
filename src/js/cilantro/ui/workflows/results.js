@@ -116,6 +116,9 @@ define([
         },
 
         initialize: function() {
+            // Bind for use as event handlers
+            _.bindAll(this, 'onPageScroll', 'startExport', 'checkExportStatus');
+
             this.data = {};
             this.monitors = {};
 
@@ -137,8 +140,6 @@ define([
             if (!(this.data.queries = this.options.queries)) {
                 throw new Error('queries collection required');
             }
-
-            $(document).on('scroll', this.onPageScroll);
 
             this.data.results.on('request', this.showLoadingOverlay);
             this.data.results.on('sync', this.hideLoadingOverlay);
@@ -193,8 +194,6 @@ define([
             this.ui.toggleFiltersIcon.removeClass('icon-collapse-alt');
             this.ui.toggleFiltersIcon.addClass('icon-expand-alt');
             this.ui.toggleFiltersText.html('Hide Filters');
-            this.updateContextPanelOffsets();
-            this.$('.context').stacked('restack', this.$el.height());
         },
 
         hideContextPanel: function() {
@@ -287,7 +286,9 @@ define([
 
         onExportFinished: function(exportTypeTitle) {
             this.numPendingDownloads--;
-            this.$('.export-progress-container .badge-info').html(this.numPendingDownloads);
+
+            this.$('.export-progress-container .badge-info')
+                .html(this.numPendingDownloads);
 
             if (this.hasExportErrorOccurred(exportTypeTitle)) {
                 this.changeExportStatus(exportTypeTitle, 'error');
@@ -313,17 +314,20 @@ define([
             // the details of that error are contained in the iframe. If all
             // went well, the iframe will have empty head and body elements
             // because the content disposition was attachment.
-            this.$('#export-download-' + exportTypeTitle).contents()[0].body.children.length !== 0;
+            return this.$('#export-download-' + exportTypeTitle)
+                .contents()[0].body.children.length !== 0;
         },
 
         checkExportStatus: function(exportTypeTitle) {
-            this.monitors[exportTypeTitle]['execution_time'] = this.monitors[exportTypeTitle]['execution_time'] + this.monitorDelay;
+            var monitor = this.monitors[exportTypeTitle];
+
+            monitor.execution_time = monitor.execution_time + this.monitorDelay;
 
             var cookieName = 'export-type-' + exportTypeTitle.toLowerCase();
 
             // Check if the download finished and the cookie was set.
             if (c.utils.getCookie(cookieName) === 'complete') {
-                clearInterval(this.monitors[exportTypeTitle].interval);
+                clearInterval(monitor.interval);
                 c.utils.setCookie(cookieName, null);
                 this.onExportFinished(exportTypeTitle);
             }
@@ -333,8 +337,10 @@ define([
             // download finished so take the best guess as to the result. Also,
             // check for an error. If an error occurred then kill the monitor
             // and send it to the completed handler.
-            else if ((this.monitors[exportTypeTitle]['execution_time'] > this.monitorTimeout) || this.hasExportErrorOccurred(exportTypeTitle)) {
-                clearInterval(this.monitors[exportTypeTitle]['interval']);
+            else if ((monitor.execution_time > this.monitorTimeout) ||
+                     this.hasExportErrorOccurred(exportTypeTitle)) {
+
+                clearInterval(monitor.interval);
                 this.onExportFinished(exportTypeTitle);
             }
         },
@@ -355,7 +361,8 @@ define([
 
             url = '' + url + pages;
 
-            var iframe = '<iframe id=export-download-' + title + ' src=' + url + ' style="display: none"></iframe>';
+            var iframe = '<iframe id=export-download-' + title + ' src=' +
+                         url + ' style="display: none"></iframe>';
             this.$('.export-iframe-container').append(iframe);
 
             this.monitors[title] = {
@@ -422,12 +429,15 @@ define([
                 for (var i = 0; i < selectedTypes.length; i++) {
                     this.changeExportStatus(this.$(selectedTypes[i]).attr('title'), 'pending');
 
-                    setTimeout(this.startExport, i * this.requestDelay, selectedTypes[i], pagesSuffix);
+                    setTimeout(this.startExport, i * this.requestDelay,
+                        selectedTypes[i], pagesSuffix);
                 }
             }
         },
 
         onRender: function() {
+            $(document).on('scroll', this.onPageScroll);
+
             // Remove unsupported features from view/
             if (!c.isSupported('2.1.0')) {
                 this.ui.saveQueryToggle.remove();
@@ -471,6 +481,10 @@ define([
                 animation: false,
                 placement: 'bottom'
             });
+        },
+
+        onClose: function() {
+            $(document).off('scroll', this.onPageScroll);
         },
 
         showExportOptions: function() {

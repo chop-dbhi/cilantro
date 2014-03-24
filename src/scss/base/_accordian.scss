@@ -1,19 +1,35 @@
 .accordian {
     .group {
-        margin-bottom: 10px;
+        margin-bottom: 5px;
+        border: 1px solid #ddd;
+        padding: 3px 5px;
+        background: #fff;
+        border-radius: 3px;
 
         > .heading {
-            font-size: 1.2em;
             font-weight: 600;
             position: relative;
             cursor: pointer;
 
-            > i {
+            [data-toggle=expand], [data-toggle=collapse] {
                 position: absolute;
-                top: 5px;
-                right: 5px;
+                right: 0;
+                font-size: 0.8em;
             }
 
+            [data-toggle=collapse] {
+                display: none;
+            }
+        }
+
+        &.expanded > .heading {
+            [data-toggle=expand] {
+                display: none;
+            }
+
+            [data-toggle=collapse] {
+                display: inline;
+            }
         }
     }
 
