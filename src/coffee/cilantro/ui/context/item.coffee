@@ -24,15 +24,15 @@ define [
         events:
             'click .language': 'clickShow'
             'click .actions .remove': 'clickRemove'
-            'click .actions .state': 'clickState'
-            'change .actions .state input': 'clickState'
-            'click .actions .state input': 'stopPropagation'
+            'click .state': 'clickState'
+            'change .state input': 'clickState'
+            'click .state input': 'stopPropagation'
 
         ui:
             loader: '.actions .icon-spinner'
             actions: '.actions button'
-            state: '.actions .state'
-            check: '.actions .state input'
+            state: '.state'
+            check: '.state input'
             language: '.language'
 
         modelEvents:
