@@ -69,7 +69,7 @@ define([
 
         icon: '<i class="icon-search icon-2x"></i>',
 
-        message: 'We could not find anything related to your search',
+        message: 'We could not find anything related to your search'
     });
 
 
@@ -78,7 +78,7 @@ define([
 
         icon: '<i class="icon-exclamation"></i>',
 
-        message: 'Something went awry..',
+        message: 'Something went awry..'
     });
 
 

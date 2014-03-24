@@ -74,7 +74,7 @@ define([
          * - search: cilantro/ui/controls/search
          * - singleSelectionList: cilantro/ui/controls/select
          * - multiSelectionList: cilantro/ui/controls/select
-         * - null: cilantro/ui/controls/null
+         * - nullSelector: cilantro/ui/controls/null
          */
 
         controls: {},

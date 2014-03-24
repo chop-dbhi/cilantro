@@ -25,7 +25,7 @@ define([
             'click .footer [data-toggle=apply]': 'applyFilter',
             'click .footer [data-toggle=update]': 'applyFilter',
             'click .footer [data-toggle=remove]': 'removeFilter',
-            'click .footer .revert': 'revertFilter',
+            'click .footer [data-toggle=revert]': 'revertFilter',
             'click [data-target=links] a': 'jumpToField'
         },
 
@@ -33,7 +33,7 @@ define([
             state: '.footer .state',
             apply: '.footer [data-toggle=apply]',
             update: '.footer [data-toggle=update]',
-            remove: '.footer [data-toggle=remove]',
+            remove: '.footer [data-toggle=remove]'
         },
 
         regions: {
@@ -176,13 +176,13 @@ define([
         },
 
         // Renders an error message if the filter is deemed invalid
-        renderInvalid: function(model, error /*, options */) {
+        renderInvalid: function(model, error) {
             var className = 'alert-error';
             var message = '<strong>Uh oh.</strong> Cannot apply filter: ' + error;
 
             // Add the ability to revert the context
             if (!this.context.isNew()) {
-                message += ' <a class=revert href=#>Revert</a>';
+                message += ' <a data-toggle=revert class=revert href=#>Revert</a>';
             }
 
             this._renderFooter(message, className, false);
@@ -198,7 +198,7 @@ define([
             if ((enabled = this.context.isDirty())) {
                 className = 'alert-warning';
                 message = '<strong>Heads up!</strong> The filter has been changed. ' +
-                          '<a class=revert href=#>Revert</a>';
+                          '<a data-toggle=revert class=revert href=#>Revert</a>';
             }
 
             // Strictly check if this context is valid which requires at least
@@ -239,6 +239,8 @@ define([
             event.preventDefault();
 
             // Get the scroll position of the target element.
+            // The additional pixels provides some spacing from the top,
+            // so is not flush with the viewport.
             var scrollTop = $(event.target.hash).offset().top - 20;
             $('html,body').animate({scrollTop: scrollTop});
         },
