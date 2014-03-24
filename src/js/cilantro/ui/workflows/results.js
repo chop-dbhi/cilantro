@@ -9,10 +9,9 @@ define([
     '../numbers',
     '../tables',
     '../context',
-    '../concept',
     '../exporter',
     '../query'
-], function($, _, Marionette, c, paginator, numbers, tables, context, concept, exporter, query) {
+], function($, _, Marionette, c, paginator, numbers, tables, context, exporter, query) {
 
     var ResultCount = Marionette.ItemView.extend({
         tagName: 'span',
@@ -51,7 +50,6 @@ define([
      * to alternate formats.
      *
      * This view requires the following options:
-     *      - concepts: a collection of concepts that are deemed viewable
      *      - context: the session/active context model
      *      - view: the session/active view model
      *      - results: a Results collection that contains the tabular data
@@ -79,7 +77,6 @@ define([
         pageRangePattern: /^[0-9]+(\.\.\.[0-9]+)?$/,
 
         ui: {
-            columns: '.columns-modal',
             saveQuery: '.save-query-modal',
             saveQueryToggle: '[data-toggle=save-query]',
             exportOptions: '.export-options-modal',
@@ -94,22 +91,19 @@ define([
         },
 
         events: {
-            'click .columns-modal [data-save]': 'saveColumns',
-            'click .columns-modal [data-dismiss]': 'cancelColumnChanges',
-            'click [data-toggle=columns]': 'showColumns',
             'click .export-options-modal [data-save]': 'exportData',
             'click [data-toggle=export-options]': 'showExportOptions',
             'click [data-toggle=export-progress]': 'showExportProgress',
             'click #pages-text-ranges': 'selectPagesOption',
             'click [data-toggle=save-query]': 'showSaveQuery',
-            'click [data-toggle=context-panel]': 'toggleContextPanelButtonClicked'
+            'click [data-toggle=context-panel]': 'toggleContextPanelButtonClicked',
+            'click [data-toggle=columns-dialog]': 'showColumnsDialog'
         },
 
         regions: {
             count: '.count-region',
             table: '.table-region',
             paginator: '.paginator-region',
-            columns: '.columns-modal .modal-body',
             exportTypes: '.export-options-modal .export-type-region',
             exportProgress: '.export-progress-modal .export-progress-region',
             saveQueryModal: '.save-query-modal'
@@ -127,9 +121,6 @@ define([
             }
             if (!(this.data.view = this.options.view)) {
                 throw new Error('view model required');
-            }
-            if (!(this.data.concepts = this.options.concepts)) {
-                throw new Error('concepts collection required');
             }
             if (!(this.data.results = this.options.results)) {
                 throw new Error('results collection required');
@@ -472,10 +463,6 @@ define([
                 collection: this.data.results
             }));
 
-            this.columns.show(new concept.ConceptColumns({
-                view: this.data.view,
-                concepts: this.data.concepts
-            }));
 
             this.ui.navbarButtons.tooltip({
                 animation: false,
@@ -500,28 +487,14 @@ define([
             this.ui.exportProgress.modal('show');
         },
 
-        showColumns: function() {
-            this.ui.columns.modal('show');
+        showColumnsDialog: function() {
+            c.dialogs.columns.open();
         },
 
         showSaveQuery: function() {
             // Opens the query modal without passing a model which assumes a
             // new one will be created based on the current session.
             this.saveQueryModal.currentView.open();
-        },
-
-        cancelColumnChanges: function() {
-            var _this = this;
-
-            _.delay(function() {
-                _this.columns.currentView.resetFacets();
-            }, 25);
-        },
-
-        saveColumns: function() {
-            this.data.view.facets.reset(this.columns.currentView.data.facets.toJSON());
-            this.data.view.save();
-            this.ui.columns.modal('hide');
         }
     });
 

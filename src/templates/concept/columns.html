@@ -1,18 +1,12 @@
-<div class=row-fluid>
-    <div class=span6>
-        <p class=muted>Below are the columns of data that are available for
-            viewing. Note that depending on which columns are added to your
-            report, the the number of rows may change.</p>
-        <div class="search-region"></div>
-        <div class="available-region"></div>
+<div class=available-column>
+    <div class="search-region"></div>
+    <div class="available-region"></div>
+</div>
+
+<div class=selected-column>
+    <div class=toolbar>
+        <button type=button data-action=clear class="btn btn-mini btn-danger"><i class="icon-remove icon-white"></i> Clear</button>
+        <strong>Click, drag and drop</strong> to change the order.
     </div>
-    <div class=span6>
-        <p class=muted>
-            The order below (top-bottom) defines the order they
-            will be displayed (left-right). To change the order simply
-            click and drag any of the columns to the desired position.
-        </p>
-        <p class=clearfix><button class="btn btn-mini btn-danger pull-right columns-remove-all-button"><i class="icon-remove icon-white"></i></button></p>
-        <div class="selected-region"></div>
-    </div>
+    <div class="selected-region"></div>
 </div>
