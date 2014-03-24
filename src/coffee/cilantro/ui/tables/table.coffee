@@ -22,7 +22,7 @@ define [
             , @options
 
         collectionEvents:
-            'change:currentpage': 'showCurentPage'
+            'change:currentpage': 'showCurrentPage'
 
         initialize: ->
             @header = new header.Header _.defaults
@@ -44,7 +44,7 @@ define [
                 else
                     @$el.show()
 
-        showCurentPage: (model, num, options) ->
+        showCurrentPage: (model, num, options) ->
             @children.each (view) ->
                 view.$el.toggle(view.model.id is num)
 
