@@ -16,7 +16,28 @@
     }
 
     .description {
-        font-weight: 200;
-        font-size: 1.1em;
+        position: relative;
+
+        &.ellipsis {
+            // Absolute positioned elements are "out of flow" and do not contain
+            // a height in normal document flow. This is to ensure some height exists.
+            min-height: 20px;
+
+            > .text {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+
+                position: absolute;
+                left: 0;
+                // Note, this is dependent on the size of the toggle
+                right: 60px;
+            }
+
+            .toggle {
+                position: absolute;
+                right: 0;
+            }
+        }
     }
 }

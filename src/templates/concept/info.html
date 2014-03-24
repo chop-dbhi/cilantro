@@ -11,5 +11,8 @@
 <p class=name><%= data.name %></p>
 
 <% if (data.description) { %>
-    <p class=description><%= data.description %></p>
+    <div class="description ellipsis">
+        <div class="text"><%= data.description %></div>
+        <a class=toggle href=#>read more</a>
+    </div>
 <% } %>
