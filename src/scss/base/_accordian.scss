@@ -1,4 +1,5 @@
 .accordian {
+
     .group {
         margin-bottom: 5px;
         border: 1px solid #ddd;
@@ -17,25 +18,26 @@
                 font-size: 0.8em;
             }
 
-            [data-toggle=collapse] {
+            // Default state is expanded
+            [data-toggle=expand] {
                 display: none;
             }
         }
 
-        &.expanded > .heading {
-            [data-toggle=expand] {
-                display: none;
-            }
+        &.collapsed {
+            > .heading {
+                [data-toggle=expand] {
+                    display: block;
+                }
 
-            [data-toggle=collapse] {
-                display: inline;
+                [data-toggle=collapse] {
+                    display: none;
+                }
             }
         }
     }
 
     .section {
-        margin-bottom: 15px;
-
         > .heading {
             color: #575757;
             text-transform: uppercase;
