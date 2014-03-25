@@ -40,7 +40,7 @@ require({
             };
 
             c.dialogs = {
-                columns: new c.ui.ColumnsDialog({
+                columns: new c.ui.ConceptColumnsDialog({
                     view: this.data.views.session,
                     concepts: this.data.concepts.viewable
                 }),
