@@ -51,7 +51,6 @@ define([
      *      - view: the session/active view model
      *      - results: a Results collection that contains the tabular data
      *      - exporters: a collection of supported exporters
-     *      - queries: a collection of queries
      */
     var ResultsWorkflow = Marionette.Layout.extend({
         className: 'results-workflow',
