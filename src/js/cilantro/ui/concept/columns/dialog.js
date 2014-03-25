@@ -14,7 +14,7 @@ define([
 
         events: {
             'click [data-save]': 'save',
-            'click [data-dismiss]': 'cancel',
+            'click [data-dismiss]': 'cancel'
         },
 
         regions: {
