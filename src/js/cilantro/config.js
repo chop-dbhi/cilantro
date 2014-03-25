@@ -22,6 +22,7 @@ define([
          * Sessions
          *
          * - url: The URL of the API
+         * - ping: The ping interval for endpoints that support it.
          * - data: Keys correspond to each resource under the `session.data`
          *   object. The value corresponds to GET or POST data to be
          *   used during a fetch.
@@ -30,6 +31,8 @@ define([
         session: {
             defaults: {
                 url: null,
+                credentials: null,
+                ping: 30000, // 30 seconds
                 data: {}
             }
         },

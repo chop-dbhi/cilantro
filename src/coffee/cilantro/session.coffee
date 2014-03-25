@@ -43,11 +43,11 @@ define [
     class Session extends models.Model
         idAttribute: 'url'
 
-        options:
-            pingInterval: 5000
+        options: ->
+            c.config.get('session.defaults')
 
         initialize: (attrs, options) ->
-            @options = _.extend({}, this.options, options)
+            @options = _.extend({}, _.result(@, 'options'), options)
 
             @opened = false
             @started = false
@@ -62,10 +62,10 @@ define [
                 return 'url is required'
 
         startPing: =>
-            # Only if the ping endpoint is available
-            if @links.ping and not @_ping
+            # Only if the ping endpoint is available and has a non-falsy ping interval
+            if @links.ping and @options.ping and not @_ping
                 @ping()
-                @_ping = setInterval(@ping, @options.pingInterval)
+                @_ping = setInterval(@ping, @options.ping)
 
         stopPing: =>
             clearTimeout(@_ping)
