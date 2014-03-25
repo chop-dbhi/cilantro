@@ -43,6 +43,12 @@ require({
                 columns: new c.ui.ColumnsDialog({
                     view: this.data.views.session,
                     concepts: this.data.concepts.viewable
+                }),
+
+                query: new c.ui.EditQueryDialog({
+                    view: this.data.views.session,
+                    context: this.data.contexts.session,
+                    collection: this.data.queries
                 })
             };
 
@@ -73,11 +79,9 @@ require({
 
                 results: new c.ui.ResultsWorkflow({
                     view: this.data.views.session,
-                    context: this.data.contexts.session,
                     // The differences in these names are noted
                     results: this.data.preview,
                     exporters: this.data.exporter,
-                    queries: this.data.queries
                 })
             };
 
