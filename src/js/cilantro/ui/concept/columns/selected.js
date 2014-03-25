@@ -2,8 +2,7 @@
 
 define([
     'marionette',
-    '../../base',
-    '../index'
+    '../../base'
 ], function(Marionette, base) {
 
 
