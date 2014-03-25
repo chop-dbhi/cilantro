@@ -54,9 +54,8 @@ define([
         release: function() {
             if (!this._startTime) return;
 
-            // Determine the time left relative to the start time
-
-            // Release after one second in case the mouse runs away
+            // Determine the time left relative to the start time and
+            // release after one second in case the mouse runs away
             var end = this._startTime + this.model.get('timeout'),
                 timeout = Math.max(end - (new Date()).getTime(), 1000);
 
