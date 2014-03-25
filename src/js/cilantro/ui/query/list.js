@@ -1,0 +1,145 @@
+/* global define */
+
+define([
+    'underscore',
+    'marionette',
+    '../core',
+    './item',
+    './dialog'
+], function(_, Marionette, c, item, dialog) {
+
+    var QueryList = Marionette.CompositeView.extend({
+        itemView: item.QueryItem,
+
+
+        itemViewContainer: '.items',
+
+        template: 'query/list',
+
+        options: {
+            title: 'Queries',
+            editable: false,
+            emptyMessage: 'You have not yet created any queries nor have had ' +
+                          'any shared with you. You can create a new query by ' +
+                          'navigating to the "Results" page and clicking on ' +
+                          'the "Save Query..." button. This will save a query with ' +
+                          'the current filters and column view.'
+        },
+
+        ui: {
+            title: '.title',
+            publicIndicator: '.header > div'
+        },
+
+        collectionEvents: {
+            sync: 'onCollectionSync',
+            error: 'onCollectionError',
+            request: 'onCollectionRequest',
+            destroy: 'onCollectionDestroy'
+        },
+
+        itemViewOptions: function(model, index) {
+            return {
+                model: model,
+                view: this.data.view,
+                context: this.data.context,
+                editable: this.options.editable,
+                index: index
+            };
+        },
+
+        initialize: function() {
+            this.data = {};
+
+            if (!(this.data.context = this.options.context)) {
+                throw new Error('context model required');
+            }
+
+            if (!(this.data.view = this.options.view)) {
+                throw new Error('view model required');
+            }
+
+            // TODO refactor all of this.. should be a layout
+            this.editQueryRegion = this.options.editQueryRegion;
+            this.deleteQueryRegion = this.options.deleteQueryRegion;
+
+            if (this.options.editable) {
+                this.on('itemview:showEditQueryModal', function(options) {
+                    this.editQueryRegion.currentView.open(options.model);
+                });
+
+                this.on('itemview:showDeleteQueryModal', function(options) {
+                    this.deleteQueryRegion.currentView.open(options.model);
+                });
+
+                this.editQueryRegion.show(new dialog.EditQueryDialog({
+                    header: 'Edit Query',
+                    collection: this.collection,
+                    context: this.data.context,
+                    view: this.data.view
+                }));
+            }
+        },
+
+        _refreshList: function() {
+            this.$('.error-message').hide();
+            this.$('.loading-indicator').hide();
+            this.checkForEmptyCollection();
+        },
+
+        // When a model is destroyed, it does not call sync on the collection
+        // but it does trigger a destroy event on the collection. That is the
+        // reason for this separate handler. When a query is deleted, we will
+        // get the request event and then destroy event, there will never be
+        // a sync event in the case a user deleting a query.
+        onCollectionDestroy: function() {
+            this._refreshList();
+        },
+
+        onCollectionError: function() {
+            this.$('.empty-message').hide();
+            this.$('.error-message').show();
+            this.$('.loading-indicator').hide();
+        },
+
+        onCollectionRequest: function() {
+            this.$('.empty-message').hide();
+            this.$('.error-message').hide();
+            this.$('.loading-indicator').show();
+        },
+
+        onCollectionSync: function() {
+            this._refreshList();
+        },
+
+        checkForEmptyCollection: function() {
+            if (this.collection.length === 0) {
+                this.$('.empty-message').show();
+            }
+            else {
+                this.$('.empty-message').hide();
+            }
+        },
+
+        onRender: function() {
+            this.ui.title.html(this.options.title);
+
+            if (this.options.editable) {
+                this.deleteQueryRegion.show(new dialog.DeleteQueryDialog({
+                    collection: this.collection
+                }));
+            }
+            else {
+                this.ui.publicIndicator.hide();
+            }
+
+            this.$('.empty-message').html(this.options.emptyMessage);
+            this.checkForEmptyCollection();
+        }
+    });
+
+    return {
+        QueryList: QueryList
+    };
+
+});
