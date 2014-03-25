@@ -1,0 +1,8 @@
+<div class="arrow"></div>
+<h4 class="popover-title"><%= data.name %></h4>
+<div class="popover-content">
+    <p><%= data.description %></p>
+    <% if (data.fields) { %>
+        <p class=muted>Included fields: <%= data.fields %></p>
+    <% } %>
+</div>

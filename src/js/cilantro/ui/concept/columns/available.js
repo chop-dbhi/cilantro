@@ -8,6 +8,8 @@ define([
         template: 'concept/columns/available-item',
 
         events: {
+            'mouseover': 'triggerDetails',
+            'mouseout': 'triggerDetails',
             'click [data-action=add]': 'triggerAdd'
         },
 
@@ -20,6 +22,13 @@ define([
             event.preventDefault();
 
             this.model.trigger('columns:add', this.model);
+        },
+
+        triggerDetails: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.model.trigger('columns:detail', this.model, event);
         },
 
         enable: function() {

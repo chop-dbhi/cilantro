@@ -30,6 +30,7 @@ define [
     'tpl!templates/concept/info.html'
     'tpl!templates/concept/panel.html'
     'tpl!templates/concept/workspace.html'
+    'tpl!templates/concept/popover.html'
 
     'tpl!templates/context/panel.html'
     'tpl!templates/context/actions.html'

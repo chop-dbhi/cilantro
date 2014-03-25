@@ -84,6 +84,22 @@
         > .heading {
             cursor: default;
         }
+
+        .section .items {
+            padding-left: 10px;
+        }
+
+        li {
+            padding: 0 5px;
+
+            &:hover {
+                background-color: #eee;
+            }
+
+            button {
+                right: 5px;
+            }
+        }
     }
 
     .selected-columns {
