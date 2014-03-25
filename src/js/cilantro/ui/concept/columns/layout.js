@@ -1,13 +1,108 @@
 /* global define */
 
 define([
+    'jquery',
     'underscore',
     'backbone',
     'marionette',
     '../search',
     './available',
     './selected'
-], function(_, Backbone, Marionette, search, available, selected) {
+], function($, _, Backbone, Marionette, search, available, selected) {
+
+
+    var ConceptDetailsPopover = Marionette.ItemView.extend({
+        className: 'popover right',
+
+        template: 'concept/popover',
+
+        initialize: function() {
+            this.$el.css({
+                position: 'fixed',
+                zIndex: 1200,
+                minWidth: 300,
+                minHeight: 100
+            }).hide();
+        },
+
+        serializeData: function() {
+            var attrs = this.model.toJSON(),
+                fields = this.model.fields;
+
+            if (fields.length === 0) {
+                // Wait until the fields render in case there is no description
+                if (!attrs.description) {
+                    attrs.description = '<i class="icon-spinner icon-spin"></i>';
+                }
+            }
+            else {
+                // Use the first field's description if it exists
+                if (fields.length === 1) {
+                    if (!attrs.description) {
+                        attrs.description = fields.models[0].get('description');
+                    }
+                }
+                // Only show fields if more than one exists
+                else {
+                    attrs.fields = fields.map(function(model) {
+                        return model.get('name');
+                    }).join(', ');
+                }
+            }
+
+            // Fallback in case there are no details about the concept
+            if (!attrs.description && !attrs.fields) {
+                attrs.description = '<em>No description is available</em>';
+            }
+
+            return attrs;
+        },
+
+        onRender: function() {
+            if (this.model.fields.length === 0) {
+                this.listenTo(this.model.fields, 'reset', this.show);
+                this.model.fields.fetch({reset: true});
+            }
+        },
+
+        // Updates the popover with the new options
+        update: function(options) {
+            // In case it is still listening to the model or fields
+            this.stopListening();
+
+            this.options = options;
+            this.model = options.model;
+            this.show();
+        },
+
+        show: function() {
+            this.render();
+
+            if (this.shown()) {
+                this.$el.stop().animate({
+                    left: this.options.left,
+                    // center the vertical positioning..
+                    top: this.options.top - this.$el.outerHeight() / 2
+                }, 200);
+            }
+            // Show to calculate height
+            else {
+                this.$el.show().css({
+                    left: this.options.left,
+                    // center the vertical positioning..
+                    top: this.options.top - this.$el.outerHeight() / 2
+                }).fadeIn(200);
+            }
+        },
+
+        shown: function() {
+            return this.$el.is(':visible');
+        },
+
+        hide: function() {
+            this.$el.fadeOut(200);
+        }
+    });
 
 
     // Two-column layout representing the available columns on
@@ -24,6 +119,7 @@ define([
         template: 'concept/columns/layout',
 
         events: {
+            'click': 'hideDetailsPopover',
             'click [data-action=clear]': 'triggerRemoveAll'
         },
 
@@ -50,6 +146,8 @@ define([
                 throw new Error('concepts collection required');
             }
 
+            this.listenTo(this.data.concepts, 'columns:detail', this.handleDetailsPopover);
+
             // Local collection of selected concepts based on the bound `view`
             this.data.selected = new Backbone.Collection();
 
@@ -61,6 +159,45 @@ define([
             this.data.selected.on('columns:remove', function(model) {
                 this.remove(model);
             });
+        },
+
+        handleDetailsPopover: function(model, event) {
+            var _this = this, target = $(event.currentTarget);
+
+            clearTimeout(this._detailsDelay);
+
+            // If the popover is already visible, immediately animate to the next
+            // target, otherwise delay
+            if (event.type === 'mouseover') {
+                var timeout = this.popover.shown() ? 100 : 500;
+
+                this._detailsDelay = _.delay(function() {
+                    _this.showDetailsPopover(model, target);
+                }, timeout);
+            }
+            else if (event.type === 'mouseout') {
+                this._detailsDelay = _.delay(function() {
+                    _this.hideDetailsPopover(model, target);
+                }, 200);
+            }
+        },
+
+        showDetailsPopover: function(model, target) {
+            target = $(target);
+
+            var offset = target.offset();
+
+            this.popover.update({
+                model: model,
+                // center the vertical positioning..
+                top: offset.top + target.outerHeight() / 2,
+                left: offset.left + target.outerWidth()
+            });
+        },
+
+        hideDetailsPopover: function() {
+            if (!this.popover) return;
+            this.popover.hide();
         },
 
         resetSelected: function() {
@@ -115,6 +252,10 @@ define([
             this.search.show(searchRegion);
             this.available.show(availableRegion);
             this.selected.show(selectedRegion);
+
+            // Initialize a bare popover
+            this.popover = new ConceptDetailsPopover();
+            this.$el.append(this.popover.el);
 
             // If both collection are populated, reset the selected collection,
             // otherwise wait until they are reset.
