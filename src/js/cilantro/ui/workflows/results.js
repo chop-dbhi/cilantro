@@ -8,10 +8,8 @@ define([
     '../paginator',
     '../numbers',
     '../tables',
-    '../context',
     '../exporter',
-    '../query'
-], function($, _, Marionette, c, paginator, numbers, tables, context, exporter, query) {
+], function($, _, Marionette, c, paginator, numbers, tables, exporter) {
 
     var ResultCount = Marionette.ItemView.extend({
         tagName: 'span',
@@ -50,11 +48,9 @@ define([
      * to alternate formats.
      *
      * This view requires the following options:
-     *      - context: the session/active context model
      *      - view: the session/active view model
      *      - results: a Results collection that contains the tabular data
      *      - exporters: a collection of supported exporters
-     *      - queries: a collection of queries
      */
     var ResultsWorkflow = Marionette.Layout.extend({
         className: 'results-workflow',
@@ -77,8 +73,6 @@ define([
         pageRangePattern: /^[0-9]+(\.\.\.[0-9]+)?$/,
 
         ui: {
-            saveQuery: '.save-query-modal',
-            saveQueryToggle: '[data-toggle=save-query]',
             exportOptions: '.export-options-modal',
             exportProgress: '.export-progress-modal',
             toggleFiltersButton: '[data-toggle=context-panel]',
@@ -95,9 +89,9 @@ define([
             'click [data-toggle=export-options]': 'showExportOptions',
             'click [data-toggle=export-progress]': 'showExportProgress',
             'click #pages-text-ranges': 'selectPagesOption',
-            'click [data-toggle=save-query]': 'showSaveQuery',
-            'click [data-toggle=context-panel]': 'toggleContextPanelButtonClicked',
-            'click [data-toggle=columns-dialog]': 'showColumnsDialog'
+            'click [data-toggle=columns-dialog]': 'showColumnsDialog',
+            'click [data-toggle=query-dialog]': 'showQueryDialog',
+            'click [data-toggle=context-panel]': 'toggleContextPanel'
         },
 
         regions: {
@@ -106,7 +100,6 @@ define([
             paginator: '.paginator-region',
             exportTypes: '.export-options-modal .export-type-region',
             exportProgress: '.export-progress-modal .export-progress-region',
-            saveQueryModal: '.save-query-modal'
         },
 
         initialize: function() {
@@ -116,9 +109,6 @@ define([
             this.data = {};
             this.monitors = {};
 
-            if (!(this.data.context = this.options.context)) {
-                throw new Error('context model required');
-            }
             if (!(this.data.view = this.options.view)) {
                 throw new Error('view model required');
             }
@@ -127,9 +117,6 @@ define([
             }
             if (!(this.data.exporters = this.options.exporters)) {
                 throw new Error('exporters collection required');
-            }
-            if (!(this.data.queries = this.options.queries)) {
-                throw new Error('queries collection required');
             }
 
             this.data.results.on('request', this.showLoadingOverlay);
@@ -160,7 +147,7 @@ define([
             }
         },
 
-        toggleContextPanelButtonClicked: function() {
+        toggleContextPanel: function() {
             if (c.panels.context.isPanelClosed()) {
                 this.showContextPanel();
             }
@@ -451,12 +438,6 @@ define([
                 collection: this.data.exporters
             }));
 
-            this.saveQueryModal.show(new query.EditQueryDialog({
-                header: 'Save Query',
-                view: this.data.view,
-                context: this.data.context,
-                collection: this.data.queries
-            }));
 
             this.table.show(new tables.Table({
                 view: this.data.view,
@@ -491,10 +472,10 @@ define([
             c.dialogs.columns.open();
         },
 
-        showSaveQuery: function() {
+        showQueryDialog: function() {
             // Opens the query modal without passing a model which assumes a
             // new one will be created based on the current session.
-            this.saveQueryModal.currentView.open();
+            c.dialogs.query.open();
         }
     });
 
