@@ -7,8 +7,8 @@ define [
     'tpl!templates/welcome.html'
 
     'tpl!templates/accordian/group.html'
-    'tpl!templates/accordian/item.html'
     'tpl!templates/accordian/section.html'
+    'tpl!templates/accordian/item.html'
 
     'tpl!templates/base/error-overlay.html'
 
@@ -18,12 +18,13 @@ define [
     'tpl!templates/charts/chart.html'
     'tpl!templates/charts/editable-chart.html'
 
-    'tpl!templates/concept/columns-available-group.html'
-    'tpl!templates/concept/columns-available-section.html'
-    'tpl!templates/concept/columns-available.html'
-    'tpl!templates/concept/columns-selected.html'
-    'tpl!templates/concept/columns.html'
-    'tpl!templates/concept/columns-dialog.html'
+    'tpl!templates/concept/columns/available-group.html'
+    'tpl!templates/concept/columns/available-section.html'
+    'tpl!templates/concept/columns/available-item.html'
+    'tpl!templates/concept/columns/selected-item.html'
+    'tpl!templates/concept/columns/layout.html'
+    'tpl!templates/concept/columns/dialog.html'
+
     'tpl!templates/concept/error.html'
     'tpl!templates/concept/form.html'
     'tpl!templates/concept/info.html'
