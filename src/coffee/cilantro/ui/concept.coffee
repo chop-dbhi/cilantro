@@ -7,6 +7,7 @@ define [
     './concept/form'
     './concept/workspace'
     './concept/columns'
+    './concept/dialog'
 ], (_, mods...) ->
 
     _.extend {}, mods...

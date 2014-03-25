@@ -2,9 +2,10 @@ define [
     'underscore'
     'marionette'
     '../core'
+    '../base'
     './search'
     './index'
-], (_, Marionette, c, search, index) ->
+], (_, Marionette, c, base, search, index) ->
 
     class AvailableItem extends index.ConceptItem
         template: 'concept/columns-available'
@@ -103,12 +104,18 @@ define [
             collection.add(@model, at: index, silent: true)
 
 
+    class NoneSelectedItem extends base.EmptyView
+        message: 'No columns selected.'
+
+
     class SelectedColumns extends Marionette.CollectionView
         tagName: 'ul'
 
         className: 'selected-columns'
 
         itemView: SelectedItem
+
+        emptyView: NoneSelectedItem
 
         events:
             'sortupdate': 'triggerItemSort'
@@ -149,7 +156,7 @@ define [
         template: 'concept/columns'
 
         events:
-            'click .columns-remove-all-button': 'triggerRemoveAll'
+            'click [data-action=clear]': 'triggerRemoveAll'
 
         regions:
             search: '.search-region'
@@ -163,8 +170,10 @@ define [
 
         initialize: ->
             @data = {}
+
             if not (@data.view = @options.view)
                 throw new Error 'view required'
+
             if not (@data.concepts = @options.concepts)
                 throw new Error 'concepts collection required'
 
@@ -192,6 +201,7 @@ define [
                 collapsable: false
 
             @search.show new @regionViews.search
+                placeholder: 'Search available columns by name, description, or data value...'
                 collection: @data.concepts
                 handler: (query, resp) =>
                     @available.currentView.filter(query, resp)

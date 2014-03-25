@@ -23,6 +23,7 @@ define [
     'tpl!templates/concept/columns-available.html'
     'tpl!templates/concept/columns-selected.html'
     'tpl!templates/concept/columns.html'
+    'tpl!templates/concept/columns-dialog.html'
     'tpl!templates/concept/error.html'
     'tpl!templates/concept/form.html'
     'tpl!templates/concept/info.html'

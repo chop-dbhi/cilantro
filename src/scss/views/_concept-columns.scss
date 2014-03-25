@@ -1,4 +1,58 @@
 .concept-columns {
+    height: 100%;
+    position: relative;
+
+    .available-column {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 48%;
+
+        > * {
+            position: absolute;
+            left: 0;
+            right: 0;
+        }
+
+        .search-region {
+            top: 0px;
+        }
+
+        .available-region {
+            top: 40px;
+            bottom: 0;
+            overflow-y: auto;
+        }
+    }
+
+    .selected-column {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 48%;
+
+        > * {
+            position: absolute;
+            left: 0;
+            right: 0;
+        }
+
+        .toolbar {
+            top: 0px;
+
+            button {
+                float: right;
+            }
+        }
+
+        .selected-region {
+            top: 40px;
+            bottom: 0;
+            overflow-y: auto;
+        }
+    }
 
     .selected-columns, .available-columns {
         margin-left: 0;
@@ -10,7 +64,7 @@
             button {
                 position: absolute;
                 right: 0;
-                top: 3px;
+                top: 4px;
             }
 
             &.disabled {
@@ -22,24 +76,45 @@
         }
     }
 
+    .available-columns .group {
+        border: 0;
+        padding: 0;
+        background: inherit;
+
+        > .heading {
+            cursor: default;
+        }
+    }
+
     .selected-columns {
         list-style: none;
         margin-left: 0;
         cursor: move;
 
-        li:hover, .ui-sortable-helper, .placeholder {
+        li {
+            padding-right: 5px;
+            padding-left: 5px;
+
+            button {
+                right: 5px;
+            }
+        }
+
+        li:hover {
             background-color: #fcf8e3;
         }
 
         .ui-sortable-helper {
-            box-shadow: 0 2px 3px #ccc;
+            box-shadow: 0 1px 5px #ddd;
+            border-radius: 3px;
         }
 
         .placeholder {
-            height: 26px;
+            border: 2px dashed #aaa;
+            height: 22px;
         }
     }
-    
+
     .columns-remove-all-button {
         margin-top: 5px;
     }

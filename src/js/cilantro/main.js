@@ -39,12 +39,31 @@ require({
                 })
             };
 
+            c.dialogs = {
+                columns: new c.ui.ColumnsDialog({
+                    view: this.data.views.session,
+                    concepts: this.data.concepts.viewable
+                })
+            };
+
+            var elements = [];
+
             // Render and append panels in the designated main element
             // prior to starting the session and loading the initial workflow
-            c.panels.concept.render();
-            c.panels.context.render();
+            // Render and append element for insertion
+            $.each(c.panels, function(key, view) {
+                view.render();
+                elements.push(view.el);
+            });
 
-            $(c.config.get('main')).append(c.panels.concept.el, c.panels.context.el);
+            $.each(c.dialogs, function(key, view) {
+                view.render();
+                elements.push(view.el);
+            });
+
+            // Set the initial HTML with all the global views
+            var main = $(c.config.get('main'));
+            main.append.apply(main, elements);
 
             c.workflows = {
                 query: new c.ui.QueryWorkflow({
@@ -55,7 +74,6 @@ require({
                 results: new c.ui.ResultsWorkflow({
                     view: this.data.views.session,
                     context: this.data.contexts.session,
-                    concepts: this.data.concepts.viewable,
                     // The differences in these names are noted
                     results: this.data.preview,
                     exporters: this.data.exporter,
