@@ -2,9 +2,8 @@
 
 define([
     'underscore',
-    '../core',
     './base'
-], function(_, c, base) {
+], function(_, base) {
 
     var ExporterModel = base.Model.extend({
         idAttribute: 'type'
