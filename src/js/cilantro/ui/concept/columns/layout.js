@@ -81,6 +81,7 @@ define([
             if (this.shown()) {
                 this.$el.stop().animate({
                     left: this.options.left,
+                    // center the vertical positioning..
                     top: this.options.top - this.$el.outerHeight() / 2
                 }, 200);
             }
@@ -88,6 +89,7 @@ define([
             else {
                 this.$el.show().css({
                     left: this.options.left,
+                    // center the vertical positioning..
                     top: this.options.top - this.$el.outerHeight() / 2
                 }).fadeIn(200);
             }
@@ -187,6 +189,7 @@ define([
 
             this.popover.update({
                 model: model,
+                // center the vertical positioning..
                 top: offset.top + target.outerHeight() / 2,
                 left: offset.left + target.outerWidth()
             });
