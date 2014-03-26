@@ -149,7 +149,7 @@ define([
 
         // Renders the current state based on the collapsed flag
         renderState: function(options) {
-            if (this.collapsed) {
+            if (this.collapsed && this.options.collapsable) {
                 this.renderCollapsed(options);
             } else {
                 this.renderExpanded(options);
