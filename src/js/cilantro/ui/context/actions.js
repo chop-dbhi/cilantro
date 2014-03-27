@@ -12,7 +12,7 @@ define([
         template: 'context/actions',
 
         ui: {
-            removeAll: '[data-role=remove]'
+            removeAll: '[data-target=remove]'
         },
 
         events: {
