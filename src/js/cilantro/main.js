@@ -80,8 +80,7 @@ require({
                 results: new c.ui.ResultsWorkflow({
                     view: this.data.views.session,
                     // The differences in these names are noted
-                    results: this.data.preview,
-                    exporters: this.data.exporter,
+                    results: this.data.preview
                 })
             };
 
