@@ -40,6 +40,11 @@ require({
             };
 
             c.dialogs = {
+                exporter: new c.ui.ExporterDialog({
+                    // TODO rename data.exporter on session
+                    exporters: this.data.exporter
+                }),
+
                 columns: new c.ui.ConceptColumnsDialog({
                     view: this.data.views.session,
                     concepts: this.data.concepts.viewable
@@ -80,8 +85,7 @@ require({
                 results: new c.ui.ResultsWorkflow({
                     view: this.data.views.session,
                     // The differences in these names are noted
-                    results: this.data.preview,
-                    exporters: this.data.exporter,
+                    results: this.data.preview
                 })
             };
 

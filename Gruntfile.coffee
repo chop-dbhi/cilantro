@@ -278,6 +278,16 @@ module.exports = (grunt) ->
                                 tpl:
                                     variable: 'data'
 
+        amdcheck:
+            local:
+                options:
+                    removeUnusedDependencies: false
+
+                files: [
+                    expand: true
+                    src: ['<%= localDir %>/js/**/**/**/**/*.js']
+                ]
+
 
     grunt.loadNpmTasks 'grunt-contrib-jasmine'
     grunt.loadNpmTasks 'grunt-contrib-watch'
@@ -287,6 +297,7 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-contrib-copy'
     grunt.loadNpmTasks 'grunt-contrib-clean'
     grunt.loadNpmTasks 'grunt-symlink'
+    grunt.loadNpmTasks 'grunt-amdcheck'
 
     grunt.registerMultiTask 'serve', 'Run a Node server for testing', ->
         http = require('http')

@@ -7,9 +7,9 @@ define([
     '../core',
     '../paginator',
     '../numbers',
-    '../tables',
-    '../exporter',
-], function($, _, Marionette, c, paginator, numbers, tables, exporter) {
+    '../tables'
+], function($, _, Marionette, c, paginator, numbers, tables) {
+
 
     var ResultCount = Marionette.ItemView.extend({
         tagName: 'span',
@@ -36,11 +36,12 @@ define([
             }
         },
 
-        renderCount: function(model, count, options) {
+        renderCount: function(model, count) {
             numbers.renderCount(this.ui.count, count);
             this.ui.label.text('records');
         }
     });
+
 
     /*
      * The ResultsWorkflow provides an interface for previewing tabular data,
@@ -50,31 +51,13 @@ define([
      * This view requires the following options:
      *      - view: the session/active view model
      *      - results: a Results collection that contains the tabular data
-     *      - exporters: a collection of supported exporters
      */
     var ResultsWorkflow = Marionette.Layout.extend({
         className: 'results-workflow',
 
         template: 'workflows/results',
 
-        // In milliseconds
-        requestDelay: 2500,
-
-        // In milliseconds
-        monitorDelay: 500,
-
-        // Max time(ms) to monitor exports, 10 minutes
-        monitorTimeout: 600000,
-
-        numPendingDownloads: 0,
-
-        // Pattern to match user entered export page ranges against. Any ranges
-        // not matching this pattern will be considered invalid.
-        pageRangePattern: /^[0-9]+(\.\.\.[0-9]+)?$/,
-
         ui: {
-            exportOptions: '.export-options-modal',
-            exportProgress: '.export-progress-modal',
             toggleFiltersButton: '[data-toggle=context-panel]',
             toggleFiltersIcon: '[data-toggle=context-panel] i',
             toggleFiltersText: '[data-toggle=context-panel] span',
@@ -85,11 +68,8 @@ define([
         },
 
         events: {
-            'click .export-options-modal [data-save]': 'exportData',
-            'click [data-toggle=export-options]': 'showExportOptions',
-            'click [data-toggle=export-progress]': 'showExportProgress',
-            'click #pages-text-ranges': 'selectPagesOption',
             'click [data-toggle=columns-dialog]': 'showColumnsDialog',
+            'click [data-toggle=exporter-dialog]': 'showExporterDialog',
             'click [data-toggle=query-dialog]': 'showQueryDialog',
             'click [data-toggle=context-panel]': 'toggleContextPanel'
         },
@@ -97,26 +77,21 @@ define([
         regions: {
             count: '.count-region',
             table: '.table-region',
-            paginator: '.paginator-region',
-            exportTypes: '.export-options-modal .export-type-region',
-            exportProgress: '.export-progress-modal .export-progress-region',
+            paginator: '.paginator-region'
         },
 
         initialize: function() {
             // Bind for use as event handlers
-            _.bindAll(this, 'onPageScroll', 'startExport', 'checkExportStatus');
+            _.bindAll(this, 'onPageScroll');
 
             this.data = {};
-            this.monitors = {};
 
             if (!(this.data.view = this.options.view)) {
                 throw new Error('view model required');
             }
+
             if (!(this.data.results = this.options.results)) {
                 throw new Error('results collection required');
-            }
-            if (!(this.data.exporters = this.options.exporters)) {
-                throw new Error('exporters collection required');
             }
 
             this.data.results.on('request', this.showLoadingOverlay);
@@ -232,187 +207,6 @@ define([
             }
         },
 
-        selectPagesOption: function() {
-            this.$('#pages-radio-all').prop('checked', false);
-            this.$('#pages-radio-ranges').prop('checked', true);
-            this.$('#pages-text-ranges').val('');
-        },
-
-        changeExportStatus: function(title, newState) {
-            var statusContainer = this.$('.export-status-' + title + ' .span10');
-
-            statusContainer.children().hide();
-
-            switch(newState) {
-                case 'pending':
-                    statusContainer.find('.pending-container').show();
-                    break;
-                case 'downloading':
-                    statusContainer.find('.progress').show();
-                    break;
-                case 'error':
-                    statusContainer.find('.label-important').show();
-                    break;
-                case 'success':
-                    statusContainer.find('.label-success').show();
-                    break;
-                case 'timeout':
-                    statusContainer.find('.label-timeout').show();
-                    break;
-            }
-        },
-
-        onExportFinished: function(exportTypeTitle) {
-            this.numPendingDownloads--;
-
-            this.$('.export-progress-container .badge-info')
-                .html(this.numPendingDownloads);
-
-            if (this.hasExportErrorOccurred(exportTypeTitle)) {
-                this.changeExportStatus(exportTypeTitle, 'error');
-            }
-            else if (this.monitors[exportTypeTitle].execution_time > this.monitorTimeout) {
-                this.changeExportStatus(exportTypeTitle, 'timeout');
-            }
-            else {
-                this.changeExportStatus(exportTypeTitle, 'success');
-            }
-
-            // If all the downloads are finished, re-enable the export button.
-            if (this.numPendingDownloads === 0) {
-                this.$('[data-toggle=export-options]').prop('disabled', false);
-                this.$('.export-progress-container').hide();
-            }
-        },
-
-        hasExportErrorOccurred: function(exportTypeTitle) {
-            // Since we can't read the content-type of the iframe directly,
-            // we need to check to see if the body of the iframe is populated.
-            // If it is populated, then an error during export has occurred and
-            // the details of that error are contained in the iframe. If all
-            // went well, the iframe will have empty head and body elements
-            // because the content disposition was attachment.
-            return this.$('#export-download-' + exportTypeTitle)
-                .contents()[0].body.children.length !== 0;
-        },
-
-        checkExportStatus: function(exportTypeTitle) {
-            var monitor = this.monitors[exportTypeTitle];
-
-            monitor.execution_time = monitor.execution_time + this.monitorDelay;
-
-            var cookieName = 'export-type-' + exportTypeTitle.toLowerCase();
-
-            // Check if the download finished and the cookie was set.
-            if (c.utils.getCookie(cookieName) === 'complete') {
-                clearInterval(monitor.interval);
-                c.utils.setCookie(cookieName, null);
-                this.onExportFinished(exportTypeTitle);
-            }
-
-            // Check for a timeout, if we reached this point, we don't really
-            // know what is going on so assume we missed something and the
-            // download finished so take the best guess as to the result. Also,
-            // check for an error. If an error occurred then kill the monitor
-            // and send it to the completed handler.
-            else if ((monitor.execution_time > this.monitorTimeout) ||
-                     this.hasExportErrorOccurred(exportTypeTitle)) {
-
-                clearInterval(monitor.interval);
-                this.onExportFinished(exportTypeTitle);
-            }
-        },
-
-        startExport: function(exportType, pages) {
-            var title = this.$(exportType).attr('title');
-
-            this.changeExportStatus(title, 'downloading');
-
-            // Clear the cookie in case the Serrano version is new enough
-            // to be setting the cookie in response.
-            var cookieName = 'export-type-' + title.toLowerCase();
-            c.utils.setCookie(cookieName, null);
-
-            var url = this.$(exportType).attr('href');
-
-            if (url[url.length-1] != '/') url = '' + url + '/';
-
-            url = '' + url + pages;
-
-            var iframe = '<iframe id=export-download-' + title + ' src=' +
-                         url + ' style="display: none"></iframe>';
-            this.$('.export-iframe-container').append(iframe);
-
-            this.monitors[title] = {
-                'execution_time': 0,
-                'interval': setInterval(this.checkExportStatus, this.monitorDelay, title)
-            };
-        },
-
-        initializeExportStatusIndicators: function(selectedTypes) {
-            // Start by hiding all of them.
-            this.$('.export-status-container').children().hide();
-
-            for (var i = 0; i < selectedTypes.length; i++) {
-                this.$('.export-status-' + selectedTypes[i].title).show();
-            }
-        },
-
-        isPageRangeValid: function() {
-            if (this.$('input[name=pages-radio]:checked').val() === 'all') {
-                return true;
-            }
-
-            return this.pageRangePattern.test(this.$('#pages-text-ranges').val());
-        },
-
-        exportData: function(event) {
-            // Clear any of the old iframes. If we are exporting again, these
-            // downloads should all have finished based on the UI blocking
-            // during active exports.
-            this.$('.export-iframe-container').html('');
-
-            var selectedTypes = this.$('input[name=export-type-checkbox]:checked');
-
-            if (selectedTypes.length === 0) {
-                this.$('#export-error-message').html('An export type must be selected.');
-                this.$('.export-options-modal .alert-block').show();
-            }
-            else if (!this.isPageRangeValid()) {
-                this.$('#export-error-message').html('Page range is invalid. Must be a single page(example: 1) or a range of pages(example: 2...5).');
-                this.$('.export-options-modal .alert-block').show();
-            }
-            else {
-                this.numPendingDownloads = selectedTypes.length;
-
-                var pagesSuffix = '';
-                if (this.$('input[name=pages-radio]:checked').val() !== 'all') {
-                    pagesSuffix = this.$('#pages-text-ranges').val() + '/';
-                }
-
-                // Disable export button until the downloads finish.
-                this.$('[data-toggle=export-options]').prop('disabled', true);
-                this.$('.export-progress-container').show();
-                this.$('.export-progress-container .badge-info').html(this.numPendingDownloads);
-
-                this.ui.exportOptions.modal('hide');
-
-                this.initializeExportStatusIndicators(selectedTypes);
-
-                this.ui.exportProgress.modal('show');
-
-                // Introduce an artificial delay in between download requests
-                // to keep the browser from freaking out about too many
-                // simultaneous download requests.
-                for (var i = 0; i < selectedTypes.length; i++) {
-                    this.changeExportStatus(this.$(selectedTypes[i]).attr('title'), 'pending');
-
-                    setTimeout(this.startExport, i * this.requestDelay,
-                        selectedTypes[i], pagesSuffix);
-                }
-            }
-        },
-
         onRender: function() {
             $(document).on('scroll', this.onPageScroll);
 
@@ -430,20 +224,10 @@ define([
                 model: this.data.results
             }));
 
-            this.exportTypes.show(new exporter.ExportTypeCollection({
-                collection: this.data.exporters
-            }));
-
-            this.exportProgress.show(new exporter.ExportProgressCollection({
-                collection: this.data.exporters
-            }));
-
-
             this.table.show(new tables.Table({
                 view: this.data.view,
                 collection: this.data.results
             }));
-
 
             this.ui.navbarButtons.tooltip({
                 animation: false,
@@ -455,17 +239,8 @@ define([
             $(document).off('scroll', this.onPageScroll);
         },
 
-        showExportOptions: function() {
-            this.$('.export-options-modal .alert-block').hide();
-            this.ui.exportOptions.modal('show');
-
-            if (this.data.exporters.length === 0) {
-                this.$('.export-options-modal .btn-primary').prop('disabled', true);
-            }
-        },
-
-        showExportProgress: function() {
-            this.ui.exportProgress.modal('show');
+        showExporterDialog: function() {
+            c.dialogs.exporter.open();
         },
 
         showColumnsDialog: function() {

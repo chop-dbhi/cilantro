@@ -1,0 +1,36 @@
+<div class=modal-header>
+    <a class=close data-dismiss=modal><i class=icon-remove></i></a>
+    <h3>Exporter<small> Choose export options and pages</small></h3>
+</div>
+
+<div class=modal-body>
+    <div data-target=error class="alert alert-error alert-block hide"></div>
+
+    <div class=row-fluid>
+        <div class=span6>
+            <h4>Types</h4>
+
+            <div data-target="types"></div>
+        </div>
+
+        <div class=span6>
+            <h4>Pages</h4>
+
+            <label class=radio>
+                <input type=radio name=pages value=all checked> All pages
+            </label>
+
+            <label class=radio>
+                <input type=radio name=pages value=range> Single page or range
+                <input type=text name=page-range placeholder="e.g. 1, 1...4" disabled>
+            </label>
+        </div>
+    </div>
+
+    <div data-target="progress"></div>
+</div>
+
+<div class=modal-footer>
+    <button data-dismiss=modal class=btn>Close</button>
+    <button data-toggle=save class="btn btn-primary">Export</button>
+</div>
