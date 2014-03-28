@@ -73,7 +73,6 @@ define([
                 cookie: cookie,
                 time: 0
             });
-
         },
 
         start: function(options) {
@@ -231,7 +230,7 @@ define([
             monitorDelay: 200,
 
             // Max time(ms) to monitor exports, 10 minutes
-            monitorTimeout: 600000,
+            monitorTimeout: 600000
         },
 
         ui: {
