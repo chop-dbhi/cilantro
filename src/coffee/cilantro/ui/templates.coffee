@@ -32,6 +32,11 @@ define [
     'tpl!templates/concept/workspace.html'
     'tpl!templates/concept/popover.html'
 
+    'tpl!templates/export/dialog.html'
+    'tpl!templates/export/option.html'
+    'tpl!templates/export/batch.html'
+    'tpl!templates/export/progress.html'
+
     'tpl!templates/context/panel.html'
     'tpl!templates/context/actions.html'
     'tpl!templates/context/empty.html'
