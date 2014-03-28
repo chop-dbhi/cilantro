@@ -288,11 +288,34 @@ module.exports = (grunt) ->
                     src: ['<%= localDir %>/js/**/**/**/**/*.js']
                 ]
 
+        jshint:
+            src: [
+                '<%= srcDir %>/js/cilantro.js'
+                '<%= srcDir %>/js/cilantro/**/**/**.js'
+            ],
+            options:
+                camelcase: true,
+                immed: true,
+                indent: 4,
+                latedef: true,
+                noarg: true,
+                noempty: true,
+                undef: true,
+                unused: true,
+                trailing: true,
+                maxdepth: 3,
+                browser: true,
+                eqeqeq: true,
+                quotmark: true,
+                globals:
+                    define: true
+                    require: true
 
     grunt.loadNpmTasks 'grunt-contrib-jasmine'
     grunt.loadNpmTasks 'grunt-contrib-watch'
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-sass'
+    grunt.loadNpmTasks 'grunt-contrib-jshint'
     grunt.loadNpmTasks 'grunt-contrib-requirejs'
     grunt.loadNpmTasks 'grunt-contrib-copy'
     grunt.loadNpmTasks 'grunt-contrib-clean'
