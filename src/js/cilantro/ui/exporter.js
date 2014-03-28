@@ -71,6 +71,7 @@ define([
             this.model.set({
                 url: url,
                 cookie: cookie,
+                status: 'pending',
                 time: 0
             });
         },
@@ -150,8 +151,6 @@ define([
         renderStatus: function(model, value) {
             var html;
 
-            this.ui.cancel.hide();
-
             switch(value) {
                 case 'error':
                     html = '<span class="label label-important">Error</span>';
@@ -171,7 +170,10 @@ define([
                     break;
             }
 
+            this.ui.cancel.hide();
             this.ui.status.html(html);
+
+            this.model.set('done', true);
         }
     });
 
@@ -201,8 +203,12 @@ define([
                 .css('text-align', 'center');
 
             _.delay(function() {
-                _this.$el.slideUp(300, function() {
-                    _this.close();
+                _this.$el.slideUp({
+                    duration: 300,
+                    easing: 'easeInOutQuad',
+                    complete: function() {
+                        _this.close();
+                    }
                 });
             }, 2000);
         }
@@ -342,10 +348,13 @@ define([
             var batch = new Backbone.Collection(models);
 
             this.listenTo(batch, 'change:status', function() {
-                if (batch.where({status: 'loading'}).length === 0) {
+                if (batch.where({done: true}).length === batch.length) {
                     this.stopListening(batch);
                     this.ui.save.prop('disabled', false);
-                    progress.finish();
+
+                    _.delay(function() {
+                        progress.finish();
+                    }, 1000);
                 }
             });
 
