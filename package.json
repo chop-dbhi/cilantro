@@ -47,6 +47,7 @@
     "rjs-build-analysis": "0.0.3",
     "semver-utils": "~1.1.0",
     "shelljs": "~0.2.6",
-    "grunt-amdcheck": "^0.2.2"
+    "grunt-amdcheck": "^0.2.2",
+    "jshint-stylish": "^0.1.5"
   }
 }

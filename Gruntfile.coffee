@@ -55,7 +55,7 @@ module.exports = (grunt) ->
                 tasks: ['coffee:local']
                 files: ['<%= srcDir %>/coffee/**/*']
 
-            js:
+            copy:
                 tasks: ['copy:local']
                 files: [
                     '<%= srcDir %>/js/**/**/**/*'
@@ -289,10 +289,6 @@ module.exports = (grunt) ->
                 ]
 
         jshint:
-            src: [
-                '<%= srcDir %>/js/cilantro.js'
-                '<%= srcDir %>/js/cilantro/**/**/**.js'
-            ],
             options:
                 camelcase: true,
                 immed: true,
@@ -307,9 +303,33 @@ module.exports = (grunt) ->
                 browser: true,
                 eqeqeq: true,
                 quotmark: true,
+
                 globals:
                     define: true
                     require: true
+
+                reporter: require('jshint-stylish')
+
+                ignores: [
+                    '<%= srcDir %>/js/backbone.js'
+                    '<%= srcDir %>/js/bootstrap.js'
+                    '<%= srcDir %>/js/highcharts.js'
+                    '<%= srcDir %>/js/jquery.js'
+                    '<%= srcDir %>/js/json2.js'
+                    '<%= srcDir %>/js/loglevel.js'
+                    '<%= srcDir %>/js/marionette.js'
+                    '<%= srcDir %>/js/modernizr.js'
+                    '<%= srcDir %>/js/require.js'
+                    '<%= srcDir %>/js/text.js'
+                    '<%= srcDir %>/js/tpl.js'
+                    '<%= srcDir %>/js/underscore.js'
+                    '<%= srcDir %>/js/plugins/bootstrap-datepicker.js'
+                    '<%= srcDir %>/js/plugins/jquery-easing.js'
+                    '<%= srcDir %>/js/plugins/jquery-ui.js'
+                ],
+
+            src: ['<%= srcDir %>/js/**/**/**/**/*.js']
+
 
     grunt.loadNpmTasks 'grunt-contrib-jasmine'
     grunt.loadNpmTasks 'grunt-contrib-watch'
