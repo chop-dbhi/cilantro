@@ -1,8 +1,8 @@
 define [
     'backbone'
     'underscore'
-    './logger'
-], (Backbone, _, logger) ->
+    'loglevel'
+], (Backbone, _, loglevel) ->
 
     class Router extends Backbone.Router
         options:
@@ -42,7 +42,7 @@ define [
                         @_render(options, args...)
                         @_loaded.push(options.id)
                     , (err) ->
-                        logger.error(err)
+                        loglevel.error(err)
                     return
                 options._view = options.view
 

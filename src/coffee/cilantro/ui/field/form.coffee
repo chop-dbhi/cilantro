@@ -2,14 +2,14 @@ define [
     'underscore'
     'backbone'
     'marionette'
-    '../../logger'
+    'loglevel'
     '../../core'
     '../base'
     './info'
     './stats'
     './controls'
     '../charts'
-], (_, Backbone, Marionette, logger, c, base, info, stats, controls, charts) ->
+], (_, Backbone, Marionette, loglevel, c, base, info, stats, controls, charts) ->
 
     fieldIdAttr = (concept, field) ->
         "c#{ concept }f#{ field }"
@@ -221,7 +221,7 @@ define [
                     @createView(viewClass, options)
                 , (err) =>
                     @showErrorView(model)
-                    logger.debug(err)
+                    loglevel.debug(err)
             else
                 @createView(result.view or @itemView, options)
 

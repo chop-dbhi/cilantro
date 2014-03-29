@@ -3,11 +3,11 @@
 define([
     'underscore',
     'marionette',
-    '../../logger',
+    'loglevel',
     '../../core',
     '../base',
     '../controls'
-], function(_, Marionette, logger, c, base, controls) {
+], function(_, Marionette, loglevel, c, base, controls) {
 
     // Sets up a two-way binding between the view and context and
     // unbinds a previously bound context
@@ -74,7 +74,7 @@ define([
                     _this.renderControl(controlView, context, index, options);
                 }, function(err) {
                     _this.showErrorView();
-                    logger.debug(err);
+                    loglevel.debug(err);
                 });
             }
         },
