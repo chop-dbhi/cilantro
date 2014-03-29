@@ -192,6 +192,7 @@ module.exports = (grunt) ->
 
         requirejs:
             options:
+                mainConfigFile: '<%= srcDir %>/js/cilantro/main.js'
                 baseUrl: '.'
                 inlineText: true
                 preserveLicenseComments: false
@@ -200,11 +201,6 @@ module.exports = (grunt) ->
                 logLevel: 1
                 throwWhen:
                     optimize: true
-
-                # RequireJS plugin configs
-                config:
-                    tpl:
-                        variable: 'data'
 
                 modules: [
                     name: pkg.name
