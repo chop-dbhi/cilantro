@@ -259,20 +259,16 @@ module.exports = (grunt) ->
             local:
                 options:
                     templateOptions:
+                        requireConfigFile: '<%= localDir %>/js/cilantro/main.js'
                         requireConfig:
                             baseUrl: '<%= localDir %>/js'
-                            config:
-                                tpl:
-                                    variable: 'data'
 
             dist:
                 options:
                     templateOptions:
+                        requireConfigFile: '<%= distDir %>/js/cilantro/main.js'
                         requireConfig:
                             baseUrl: '<%= distDir %>/js'
-                            config:
-                                tpl:
-                                    variable: 'data'
 
         amdcheck:
             local:
