@@ -302,7 +302,6 @@ module.exports = (grunt) ->
                 maxdepth: 3,
                 browser: true,
                 eqeqeq: true,
-                quotmark: true,
 
                 globals:
                     define: true

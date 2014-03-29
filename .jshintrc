@@ -11,6 +11,5 @@
     "maxdepth": 3,
     "maxlen": 90,
     "browser": true,
-    "eqeqeq": true,
-    "quotmark": true
+    "eqeqeq": true
 }
