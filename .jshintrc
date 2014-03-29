@@ -10,5 +10,6 @@
     "trailing": true,
     "maxdepth": 3,
     "maxlen": 90,
-    "browser": true
+    "browser": true,
+    "eqeqeq": true
 }

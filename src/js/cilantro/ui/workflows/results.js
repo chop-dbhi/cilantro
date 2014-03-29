@@ -111,15 +111,11 @@ define([
         },
 
         showLoadingOverlay: function() {
-            if (this.isClosed != null && !this.isClosed) {
-                this.ui.loadingOverlay.show();
-            }
+            if (this.isClosed !== true) this.ui.loadingOverlay.show();
         },
 
         hideLoadingOverlay: function() {
-            if (this.isClosed != null && !this.isClosed) {
-                this.ui.loadingOverlay.hide();
-            }
+            if (this.isClosed !== true) this.ui.loadingOverlay.hide();
         },
 
         toggleContextPanel: function() {
@@ -168,9 +164,6 @@ define([
         },
 
         onPageScroll: function() {
-            // If the view isn't rendered yet, then don't bother.
-            if (this.isClosed == null || this.isClosed) return;
-
             var scrollPos = $(document).scrollTop();
 
             // Record the vertical offset of the masthead nav bar if we

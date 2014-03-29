@@ -1,3 +1,5 @@
+/* global define */
+
 define(['jquery'], function(jQuery) {
 
     var ajax = jQuery.ajax,
@@ -32,7 +34,8 @@ define(['jquery'], function(jQuery) {
     function dequeueRequest() {
         var args, options, promise;
         if ((args = requestQueue.shift())) {
-            options = args[0], promise = args[1];
+            options = args[0];
+            promise = args[1];
             sendRequest(options, promise);
         } else {
             requestPending = false;
@@ -51,7 +54,7 @@ define(['jquery'], function(jQuery) {
             promise.abort = function() {
                 var index =  requestQueue.indexOf(deferredRequest);
                 if (index > -1) {
-                    requestQueue.splice(index, 1); 
+                    requestQueue.splice(index, 1);
                 }
                 [].unshift.call(arguments, 'abort');
                 promise.rejectWith(promise, arguments);

@@ -11,7 +11,7 @@ define([
     var mods = Array.prototype.slice.call(arguments, 1);
 
     var setCookie = function(name, value) {
-        document.cookie = name + '=' + escape(value) + '; path=/';
+        document.cookie = name + '=' + window.escape(value) + '; path=/';
     };
 
     var getCookie = function(cname) {

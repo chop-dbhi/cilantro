@@ -11,6 +11,7 @@
  */
 
 define(function() {
+
     var suffixes = [
         [3, 'K'],
         [6, 'million'],
@@ -26,8 +27,12 @@ define(function() {
         [100, 'googol']
     ];
 
+    var parsable = function(value) {
+        return !(value === undefined || value === null || value === '');
+    };
+
     var toSuffixedNumber = function(value) {
-        if (value == null || value === '') return;
+        if (!parsable(value)) return;
 
         if (value < 1000) return toDelimitedNumber(value);
 
@@ -46,7 +51,7 @@ define(function() {
     };
 
     var toDelimitedNumber = function(value, delim) {
-        if (value == null || value === '') return;
+        if (!parsable(value)) return;
 
         if (delim === undefined) delim = ',';
 
@@ -71,7 +76,7 @@ define(function() {
     };
 
     var prettyNumber = function(value) {
-        if (value == null || value === '') return;
+        if (!parsable(value)) return;
 
         if (value !== 0) {
             // Small float
@@ -92,4 +97,5 @@ define(function() {
         toDelimitedNumber: toDelimitedNumber,
         prettyNumber: prettyNumber
     };
+
 });

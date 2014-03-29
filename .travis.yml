@@ -9,15 +9,15 @@ virtualenv:
 before_install:
     - sh bin/check_signoff.sh
 
-
 install:
+    - npm install -g grunt-cli
+    - npm install
+    - grunt jshint
+
+before_script:
     - git clone --branch demo git://github.com/cbmi/harvest-openmrs.git
     - pip install -r harvest-openmrs/requirements.txt
     - pip install uwsgi
-    - npm install -g grunt-cli
-    - npm install
-
-before_script:
     - uwsgi --http :8000 --chdir harvest-openmrs --wsgi-file wsgi.py &
 
 script:

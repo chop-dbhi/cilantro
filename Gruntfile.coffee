@@ -55,7 +55,7 @@ module.exports = (grunt) ->
                 tasks: ['coffee:local']
                 files: ['<%= srcDir %>/coffee/**/*']
 
-            js:
+            copy:
                 tasks: ['copy:local']
                 files: [
                     '<%= srcDir %>/js/**/**/**/*'
@@ -288,11 +288,53 @@ module.exports = (grunt) ->
                     src: ['<%= localDir %>/js/**/**/**/**/*.js']
                 ]
 
+        jshint:
+            options:
+                camelcase: true,
+                immed: true,
+                indent: 4,
+                latedef: true,
+                noarg: true,
+                noempty: true,
+                undef: true,
+                unused: true,
+                trailing: true,
+                maxdepth: 3,
+                browser: true,
+                eqeqeq: true,
+
+                globals:
+                    define: true
+                    require: true
+
+                reporter: require('jshint-stylish')
+
+                ignores: [
+                    '<%= srcDir %>/js/backbone.js'
+                    '<%= srcDir %>/js/bootstrap.js'
+                    '<%= srcDir %>/js/highcharts.js'
+                    '<%= srcDir %>/js/jquery.js'
+                    '<%= srcDir %>/js/json2.js'
+                    '<%= srcDir %>/js/loglevel.js'
+                    '<%= srcDir %>/js/marionette.js'
+                    '<%= srcDir %>/js/modernizr.js'
+                    '<%= srcDir %>/js/require.js'
+                    '<%= srcDir %>/js/text.js'
+                    '<%= srcDir %>/js/tpl.js'
+                    '<%= srcDir %>/js/underscore.js'
+                    '<%= srcDir %>/js/plugins/bootstrap-datepicker.js'
+                    '<%= srcDir %>/js/plugins/jquery-easing.js'
+                    '<%= srcDir %>/js/plugins/jquery-ui.js'
+                ],
+
+            src: ['<%= srcDir %>/js/**/**/**/**/*.js']
+
 
     grunt.loadNpmTasks 'grunt-contrib-jasmine'
     grunt.loadNpmTasks 'grunt-contrib-watch'
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-sass'
+    grunt.loadNpmTasks 'grunt-contrib-jshint'
     grunt.loadNpmTasks 'grunt-contrib-requirejs'
     grunt.loadNpmTasks 'grunt-contrib-copy'
     grunt.loadNpmTasks 'grunt-contrib-clean'
