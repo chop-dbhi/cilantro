@@ -216,6 +216,7 @@ module.exports = (grunt) ->
                         'highcharts'
                         'bootstrap'
                         'json2'
+                        'loglevel'
                     ]
                 ]
 
