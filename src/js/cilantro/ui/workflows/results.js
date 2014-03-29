@@ -94,8 +94,8 @@ define([
                 throw new Error('results collection required');
             }
 
-            this.data.results.on('request', this.showLoadingOverlay);
-            this.data.results.on('sync', this.hideLoadingOverlay);
+            this.listenTo(this.data.results, 'request', this.showLoadingOverlay);
+            this.listenTo(this.data.results, 'sync', this.hideLoadingOverlay);
 
             this.on('router:load', this.onRouterLoad);
             this.on('router:unload', this.onRouterUnload);
