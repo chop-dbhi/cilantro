@@ -1,4 +1,4 @@
-/*! loglevel - v0.4.0 - https://github.com/pimterry/loglevel - (c) 2013 Tim Perry - licensed MIT */
+/*! loglevel - v0.6.0 - https://github.com/pimterry/loglevel - (c) 2014 Tim Perry - licensed MIT */
 ;(function (undefined) {
     var undefinedType = "undefined";
 
@@ -32,15 +32,24 @@
             var method = console[methodName];
             if (method.bind === undefined) {
                 if (Function.prototype.bind === undefined) {
-                    return function() {
-                        Function.prototype.apply.apply(method, [console, arguments]);
-                    };
+                    return functionBindingWrapper(method, console);
                 } else {
-                    return Function.prototype.bind.call(console[methodName], console);
+                    try {
+                        return Function.prototype.bind.call(console[methodName], console);
+                    } catch (e) {
+                        // In IE8 + Modernizr, the bind shim will reject the above, so we fall back to wrapping
+                        return functionBindingWrapper(method, console);
+                    }
                 }
             } else {
                 return console[methodName].bind(console);
             }
+        }
+
+        function functionBindingWrapper(f, context) {
+            return function() {
+                Function.prototype.apply.apply(f, [context, arguments]);
+            };
         }
 
         var logMethods = [
@@ -51,9 +60,9 @@
             "error"
         ];
 
-        function clearMethods() {
+        function replaceLoggingMethods(methodFactory) {
             for (var ii = 0; ii < logMethods.length; ii++) {
-                self[logMethods[ii]] = noop;
+                self[logMethods[ii]] = methodFactory(logMethods[ii]);
             }
         }
 
@@ -73,7 +82,8 @@
         }
 
         function persistLevelIfPossible(levelNum) {
-            var levelName;
+            var localStorageFail = false,
+                levelName;
 
             for (var key in self.levels) {
                 if (self.levels.hasOwnProperty(key) && self.levels[key] === levelNum) {
@@ -83,11 +93,22 @@
             }
 
             if (localStorageAvailable()) {
-                window.localStorage['loglevel'] = levelName;
-            } else if (cookiesAvailable()) {
-                window.document.cookie = "loglevel=" + levelName + ";";
+                /*
+                 * Setting localStorage can create a DOM 22 Exception if running in Private mode
+                 * in Safari, so even if it is available we need to catch any errors when trying
+                 * to write to it
+                 */
+                try {
+                    window.localStorage['loglevel'] = levelName;
+                } catch (e) {
+                    localStorageFail = true;
+                }
             } else {
-                return;
+                localStorageFail = true;
+            }
+
+            if (localStorageFail && cookiesAvailable()) {
+                window.document.cookie = "loglevel=" + levelName + ";";
             }
         }
 
@@ -100,12 +121,16 @@
                 storedLevel = window.localStorage['loglevel'];
             }
 
-            if (!storedLevel && cookiesAvailable()) {
+            if (storedLevel === undefined && cookiesAvailable()) {
                 var cookieMatch = cookieRegex.exec(window.document.cookie) || [];
                 storedLevel = cookieMatch[1];
             }
 
-            self.setLevel(self.levels[storedLevel] || self.levels.WARN);
+            if (self.levels[storedLevel] === undefined) {
+                storedLevel = "WARN";
+            }
+
+            self.setLevel(self.levels[storedLevel]);
         }
 
         /*
@@ -122,21 +147,28 @@
                 persistLevelIfPossible(level);
 
                 if (level === self.levels.SILENT) {
-                    clearMethods();
+                    replaceLoggingMethods(function () {
+                        return noop;
+                    });
                     return;
                 } else if (typeof console === undefinedType) {
-                    clearMethods();
-                    throw "No console available for logging";
+                    replaceLoggingMethods(function (methodName) {
+                        return function () {
+                            if (typeof console !== undefinedType) {
+                                self.setLevel(level);
+                                self[methodName].apply(self, arguments);
+                            }
+                        };
+                    });
+                    return "No console available for logging";
                 } else {
-                    for (var ii = 0; ii < logMethods.length; ii++) {
-                        var methodName = logMethods[ii];
-
+                    replaceLoggingMethods(function (methodName) {
                         if (level <= self.levels[methodName.toUpperCase()]) {
-                            self[methodName] = realMethod(methodName);
+                            return realMethod(methodName);
                         } else {
-                            self[methodName] = noop;
+                            return noop;
                         }
-                    }
+                    });
                 }
             } else if (typeof level === "string" && self.levels[level.toUpperCase()] !== undefined) {
                 self.setLevel(self.levels[level.toUpperCase()]);
@@ -153,11 +185,7 @@
             self.setLevel(self.levels.SILENT);
         };
 
-        try {
-            loadPersistedLevel();
-        } catch (e) {
-            self.setLevel(self.levels.SILENT);
-        }
+        loadPersistedLevel();
         return self;
     }));
 })();

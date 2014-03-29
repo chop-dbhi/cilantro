@@ -192,6 +192,7 @@ module.exports = (grunt) ->
 
         requirejs:
             options:
+                mainConfigFile: '<%= srcDir %>/js/cilantro/main.js'
                 baseUrl: '.'
                 inlineText: true
                 preserveLicenseComments: false
@@ -200,11 +201,6 @@ module.exports = (grunt) ->
                 logLevel: 1
                 throwWhen:
                     optimize: true
-
-                # RequireJS plugin configs
-                config:
-                    tpl:
-                        variable: 'data'
 
                 modules: [
                     name: pkg.name
@@ -216,6 +212,7 @@ module.exports = (grunt) ->
                         'highcharts'
                         'bootstrap'
                         'json2'
+                        'loglevel'
                     ]
                 ]
 
@@ -234,7 +231,6 @@ module.exports = (grunt) ->
                     dir: 'dist/js'
                     optimize: 'uglify2'
                     removeCombined: true
-                    generateSourceMaps: false
 
 
         clean:
@@ -263,20 +259,16 @@ module.exports = (grunt) ->
             local:
                 options:
                     templateOptions:
+                        requireConfigFile: '<%= localDir %>/js/cilantro/main.js'
                         requireConfig:
                             baseUrl: '<%= localDir %>/js'
-                            config:
-                                tpl:
-                                    variable: 'data'
 
             dist:
                 options:
                     templateOptions:
+                        requireConfigFile: '<%= distDir %>/js/cilantro/main.js'
                         requireConfig:
                             baseUrl: '<%= distDir %>/js'
-                            config:
-                                tpl:
-                                    variable: 'data'
 
         amdcheck:
             local:
