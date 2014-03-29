@@ -11,6 +11,17 @@ require({
         tpl: {
             variable: 'data'
         }
+    },
+    shim: {
+        bootstrap: ['jquery'],
+        marionette: {
+            deps: ['backbone'],
+            exports: 'Marionette'
+        },
+        highcharts: {
+            deps: ['jquery'],
+            exports: 'Highcharts'
+        }
     }
 }, ['jquery', 'cilantro'], function($, c) {
 
