@@ -9,9 +9,7 @@ define([], function() {
      * version contains three points including major, minor and micro.
      */
     var cleanVersionString = function(version) {
-        if (version == null) {
-            version = '';
-        }
+        if (!version) version = '';
 
         var stripped = version.replace(/[abrf].*$/g, '');
         var fields = stripped.split('.');

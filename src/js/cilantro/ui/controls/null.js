@@ -22,7 +22,7 @@ define([
             this.on('ready', this.change);
         },
 
-        onRender: function (options) {
+        onRender: function () {
             if (this.options.isNullLabel) {
                 this.ui.nullOption.text(this.options.isNullLabel);
             }
@@ -36,7 +36,7 @@ define([
         },
 
         getValue: function () {
-            return this.ui.select.val() == "true";
+            return this.ui.select.val() === 'true';
         },
 
         setValue: function (value) {
