@@ -1,7 +1,7 @@
 /*!
  * TODC Bootstrap
  *
- * This CSS is intended to be used on top of Twitter Bootstrap, to theme
+ * This CSS is intended to be used on top of Bootstrap, to theme
  * it in the Google style.
  *
  * Constructed by Tim O'Donnell (http://github.com/todc)
@@ -382,7 +382,7 @@ select:focus:required:invalid:focus {
   display: none;
   float: left;
   min-width: 160px;
-  padding: 0 0 6px 0;
+  padding: 6px 0;
   margin: 1px 0 0;
   list-style: none;
   background-color: #ffffff;
@@ -1515,7 +1515,6 @@ select:focus:required:invalid:focus {
   -moz-border-radius: 0 2px 2px 0;
   border-radius: 0 2px 2px 0;
 }
-
 .navbar-inner {
   min-height: 30px;
 }
@@ -1602,7 +1601,7 @@ select:focus:required:invalid:focus {
   border-color: #040404 #040404 #000000;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #040404;
-  // Darken IE7 buttons by default so they stand out more given they won't have borders
+  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -1841,7 +1840,7 @@ select:focus:required:invalid:focus {
   border-color: #373737 #373737 #111111;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #373737;
-  // Darken IE7 buttons by default so they stand out more given they won't have borders
+  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
@@ -1967,7 +1966,7 @@ select:focus:required:invalid:focus {
   left: 50%;
   display: inline-block;
   margin-left: -8px;
-  // value should match border-width below
+  /* value should match border-width below */
 
   border-right: 8px solid transparent;
   border-bottom: 8px solid #d7d7d7;
@@ -1980,7 +1979,7 @@ select:focus:required:invalid:focus {
   left: 50%;
   display: inline-block;
   margin-left: -7px;
-  // value should match border-width below
+  /* value should match border-width below */
 
   border-right: 7px solid transparent;
   border-bottom: 7px solid #ffffff;
@@ -2158,7 +2157,7 @@ select:focus:required:invalid:focus {
   border-color: #373737 #373737 #111111;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #373737;
-  // Darken IE7 buttons by default so they stand out more given they won't have borders
+  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
