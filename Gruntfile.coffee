@@ -235,7 +235,6 @@ module.exports = (grunt) ->
                     dir: 'dist/js'
                     optimize: 'uglify2'
                     removeCombined: true
-                    generateSourceMaps: false
 
 
         clean:
