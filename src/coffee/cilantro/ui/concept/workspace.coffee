@@ -2,7 +2,7 @@ define [
     'underscore'
     'backbone'
     'marionette'
-    '../../logger'
+    'loglevel'
     '../core'
     '../base'
     '../welcome'
@@ -10,7 +10,7 @@ define [
     '../charts'
     './form'
     './info'
-], (_, Backbone, Marionette, logger, c, base, welcome, field, charts, form, info) ->
+], (_, Backbone, Marionette, loglevel, c, base, welcome, field, charts, form, info) ->
 
 
     resolveConceptFormOptions = (model) ->
@@ -130,7 +130,7 @@ define [
                     @createView(itemView, options)
                 , (err) =>
                     @showErrorView(model)
-                    logger.debug(err)
+                    loglevel.debug(err)
 
             else
                 @createView(result.view or @itemView, options)

@@ -4,10 +4,10 @@ define([
     'backbone',
     'marionette',
     'jquery',
+    'loglevel',
     './core',
-    './ui',
-    './logger'
-], function(Backbone, Marionette, $, c, ui, logger) {
+    './ui'
+], function(Backbone, Marionette, $, loglevel, c, ui) {
 
     // Set configuration options for corresponding APIs
     c.templates.set(c.config.get('templates', {}));
@@ -52,10 +52,10 @@ define([
 
     // Setup debugging facilities
     if (c.config.get('debug')) {
-        logger.setLevel('debug');
+        loglevel.setLevel('debug');
 
         c.on('all', function() {
-            logger.info.apply(logger.info, [].slice.call(arguments, 0));
+            loglevel.info.apply(loglevel.info, [].slice.call(arguments, 0));
         });
     }
 
@@ -64,7 +64,8 @@ define([
     $(window).on('beforeunload', function() {
         if (c.config.get('debug') || !$.hasPendingRequest()) return;
 
-        return "Wow, you're quick! Your data is being saved. It will only take a moment.";
+        return "Wow, you're quick! Your data is being saved. " +
+               "It will only take a moment.";
     });
 
     $(document).ajaxError(function(event, xhr, settings, exception) {

@@ -2,9 +2,10 @@ define [
     'underscore'
     'backbone'
     '../../core'
-    '../../evented'
     './nodes'
-], (_, Backbone, c, Evented, nodes) ->
+], (_, Backbone, c, nodes) ->
+
+    _.extend((class Evented)::, Backbone.Events)
 
     ###
     The context tree manager maintains two trees, `working` and `upstream`.
