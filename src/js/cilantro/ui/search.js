@@ -24,15 +24,18 @@ define([
         },
 
         events: {
-            'keyup @ui.input': 'triggerSearch'
+            'keyup @ui.input': '_triggerSearch'
         },
 
         constructor: function(options) {
+            // This event needs to be debounced before the call to the super
+            // constructor or the keyup event will not be mapped to any handler
+            // since _triggerSearch won't exist yet.
+            this._triggerSearch = _.debounce(this.triggerSearch, this.options.delay);
+
             Marionette.ItemView.prototype.constructor.call(this, options);
 
             this._query = '';
-
-            this.trggerSearch = _.debounce(this.triggerSearch, this.options.delay);
 
             // If this is triggered externally, ensure the input text reflects the
             // query.
