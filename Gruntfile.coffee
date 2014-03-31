@@ -255,6 +255,8 @@ module.exports = (grunt) ->
                 helpers: './specConfig.js'
                 keepRunner: true
                 template: require('grunt-template-jasmine-requirejs')
+                templateOptions:
+                    version: '<%= srcDir %>/js/require.js'
 
             local:
                 options:
