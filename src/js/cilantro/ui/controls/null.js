@@ -4,7 +4,7 @@ define([
     './base'
 ], function (base) {
 
-    //Null selector filtering on whether or not a field is null
+    // Null selector filtering on whether or not a field is null
     var NullSelector = base.Control.extend({
         template: 'controls/null/layout',
 

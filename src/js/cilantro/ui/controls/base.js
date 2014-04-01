@@ -1,4 +1,4 @@
-/* global define, console */
+/* global define */
 
 define([
     'jquery',
@@ -55,12 +55,6 @@ define([
             }
 
             throw new Error('Setter declared, but not defined for ' + key);
-        },
-
-        // Backwards compatibility
-        bindContext: function() {
-            var warn = console.warn || console.log;
-            warn('bindContext is deprecated and no longer required for controls');
         },
 
         // Controls call this to put this itself in a waiting state
@@ -167,13 +161,17 @@ define([
         },
 
         // Triggered any time the control contents have changed. Upstream, the
-        // context can be bound to this event and update itself as changes
+        // filter can be bound to this event and update itself as changes
         // occur.
         change: function() {
             this._changing = true;
             this.trigger('change', this, this.get());
-            this._changing = undefined;
+            delete this._changing;
         },
+
+        // Takes attributes and returns an error message if they are invalid
+        // for this control.
+        validate: function() {},
 
         // Placeholder no-op getter/setter functions for each attribute
         getConcept: noop,
