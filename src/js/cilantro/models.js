@@ -6,6 +6,7 @@ define([
     './models/field',
     './models/concept',
     './models/context',
+    './models/filters',
     './models/view',
     './models/paginator',
     './models/results',
