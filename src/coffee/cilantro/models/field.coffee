@@ -35,7 +35,7 @@ define [
         parse: ->
             @_cache = {}
             attrs = super
-            attrs.logical_type = getLogicalType(attrs)
+            attrs.type = getLogicalType(attrs)
             return attrs
 
         distribution: (handler, cache=true) ->

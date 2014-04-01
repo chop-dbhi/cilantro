@@ -1,4 +1,28 @@
 .field-form {
+     .actions-region {
+        @include clearfix;
+        padding-top: 10px;
+        margin-top: 10px;
+        border-top: 1px solid #ddd;
+
+        .alert {
+            margin-bottom: 0;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            width: 70%;
+            overflow: hidden;
+            box-shadow: none;
+        }
+
+        .btn {
+            float: right;
+            // Account for height discrepancy between alert and button
+            margin-bottom: 1px;
+        }
+    }
+
     &.condensed {
         .stats-region {
             display: none;

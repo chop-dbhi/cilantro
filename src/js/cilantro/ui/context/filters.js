@@ -3,34 +3,15 @@
 define([
     'underscore',
     'marionette',
-    '../core'
-], function(_, Marionette, c) {
+    '../base',
+    '../core',
+], function(_, Marionette, base, c) {
 
 
-    // Returns a flat list of values for `key` that is built by recursing
-    // over the `attrs.children` if present.
-    var flattenAttr = function(attrs, key, items) {
-        items = items || [];
+    var ContextFilter = Marionette.ItemView.extend({
+        className: 'context-filter',
 
-        if (!attrs) return items;
-
-        if (attrs[key]) items.push(attrs[key]);
-
-        // Recurse and flatten children
-        if (attrs.children) {
-            _.each(attrs.children, function(child) {
-                flattenAttr(child, key, items);
-            });
-        }
-
-        return items;
-    };
-
-
-    var ContextItem = Marionette.ItemView.extend({
-        className: 'context-item',
-
-        template: 'context/item',
+        template: 'context/filter',
 
         events: {
             'click .language': 'clickShow',
@@ -68,7 +49,7 @@ define([
         },
 
         clickRemove: function() {
-            if (this.model.remove()) {
+            if (this.model.unapply()) {
                 this.$el.fadeOut({
                     duration: 400,
                     easing: 'easeOutExpo'
@@ -79,11 +60,10 @@ define([
         // Toggle the enabled state of the node
         clickState: function(event) {
             event.preventDefault();
-
             var _this = this;
-
             _.defer(function() {
                 _this.model.toggleEnabled();
+                _this.model.apply();
             });
         },
 
@@ -102,7 +82,7 @@ define([
         },
 
         renderState: function() {
-            if (this.model.isEnabled()) {
+            if (this.model.get('enabled') !== false) {
                 this.renderEnabled();
             }
             else {
@@ -111,8 +91,7 @@ define([
         },
 
         renderLanguage: function() {
-            var text = flattenAttr(this.model.toJSON(), 'language').join(', ');
-            this.ui.language.html(text);
+            this.ui.language.html(this.model.get('language'));
         },
 
         showLoadView: function() {
@@ -133,8 +112,36 @@ define([
     });
 
 
+    var ContextNoFilters = base.EmptyView.extend({
+        template: 'context/empty',
+
+        ui: {
+            noFiltersResultsMessage: '.no-filters-results-workspace',
+            noFiltersQueryMessage: '.no-filters-query-workspace'
+        },
+
+        onRender: function() {
+            if (c.router.isCurrent('results')) {
+                this.ui.noFiltersQueryMessage.hide();
+            }
+            else if (c.router.isCurrent('query')) {
+                this.ui.noFiltersResultsMessage.hide();
+            }
+        }
+    });
+
+
+    var ContextFilters = Marionette.CollectionView.extend({
+        itemView: ContextFilter,
+
+        emptyView: ContextNoFilters
+    });
+
+
     return {
-        ContextItem: ContextItem
+        ContextFilter: ContextFilter,
+        ContextFilters: ContextFilters,
+        ContextNoFilters: ContextNoFilters
     };
 
 

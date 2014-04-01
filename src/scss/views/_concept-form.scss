@@ -5,37 +5,12 @@
     }
 
     .fields-region .field-form {
-        border-bottom: 1px dashed #ccc;
         padding: 10px 0;
 
         // No extra margins..
         &:last-child {
             margin-bottom: 0;
             border-bottom: none;
-        }
-    }
-
-    > .footer {
-        padding-top: 10px;
-        border-top: 1px dashed #ccc;
-
-        .alert {
-            margin-bottom: 0;
-            padding-top: 4px;
-            padding-bottom: 4px;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .actions {
-            text-align: right;
-
-            .btn {
-                @include inline-block;
-                margin-left: 5px;
-            }
         }
     }
 }
