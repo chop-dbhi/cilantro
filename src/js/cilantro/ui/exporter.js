@@ -149,7 +149,7 @@ define([
         },
 
         renderStatus: function(model, value) {
-            var html;
+            var html, done = true;
 
             switch(value) {
                 case 'error':
@@ -164,6 +164,8 @@ define([
                 case 'loading':
                     html = '<div class="label label-info">' +
                         '<i class="icon-spinner icon-spin"></i> Downloading...</span>';
+                    // I'm stil working, I promise I'll be done soon!
+                    done = false;
                     break;
                 case 'canceled':
                     html = '<span class="label label-warning">Canceled</span>';
@@ -172,8 +174,7 @@ define([
 
             this.ui.cancel.hide();
             this.ui.status.html(html);
-
-            this.model.set('done', true);
+            this.model.set('done', done);
         }
     });
 
