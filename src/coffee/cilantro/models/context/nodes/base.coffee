@@ -115,5 +115,7 @@ define [
         isEnabled: (options) ->
             @manager.isEnabled(@, options)
 
+        isRequired: (options) ->
+            @manager._isRequired(@, options)
 
     { ContextNodeError, ContextNodeModel }

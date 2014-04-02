@@ -256,15 +256,13 @@ define [
                     @save(u)
 
         clear: (options={}) ->
-            if (required = @_getRequired()).length
-                @_triggerRequired(required)
-                return false
-
-            @upstream.clear(reset: true)
-
-            @upstream.trigger('clear')
-            @working.trigger('clear')
-
+            toBeRemoved = []
+            @upstream.children.each (model) ->
+                if not (model.isRequired())
+                    model.clear()
+                    toBeRemoved.push model
+            for tbr in toBeRemoved
+                tbr.remove()
             if @upstream.hasChanged()
                 @save()
 
