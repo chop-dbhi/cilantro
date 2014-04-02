@@ -15,23 +15,17 @@ define([
      */
     var Context = base.Model.extend({
 
-        constructor: function(attrs, options) {
-            options = _.defaults({parse: true, reset: true}, options);
+        initialize: function(attrs, options) {
+            attrs = attrs || {};
 
             // Internal collection of all filters
-            this._filters = new filters.Filters();
+            this._filters = new filters.Filters(attrs.json,
+                _.defaults({parse: true}, options));
 
             // Public collection of filters that are applied
-            this.filters = new filters.Filters();
+            this.filters = new filters.Filters(attrs.json,
+                _.defaults({parse: true}, options));
 
-            // Define a debounced save method for handling rapid successions
-            // of [un]apply events.
-            this._save = _.debounce(this.save, 500);
-
-            base.Model.prototype.constructor.call(this, attrs, options);
-        },
-
-        initialize: function() {
             // Proxy events from individual nodes as they are altered
             this.listenTo(this._filters, {
                 'apply': this.apply,
@@ -45,6 +39,21 @@ define([
                 }
             });
 
+            // Watch for changes to the JSON attribute, update filters.
+            // On a reset, the internal filters are also set to reflect the state
+            // of the filters. Note, the below order is required so the internal
+            // filters can be compared with the updated "public" filters.
+            this.on('change:json', function(model, value, options) {
+                this.filters.set(value, _.defaults({parse: true}, options));
+
+                if (options.reset) {
+                    this._filters.set(value, _.defaults({
+                        parse: true,
+                        remove: false
+                    }, options));
+                }
+            });
+
             // Trigger Cilantro event when context is saved
             this.on('sync', function(model, attrs, options) {
                 options = options || {};
@@ -53,6 +62,10 @@ define([
                     c.trigger(c.CONTEXT_SYNCED, this, 'success');
                 }
             });
+
+            // Define a debounced save method for handling rapid successions
+            // of [un]apply events.
+            this._save = _.debounce(this.save, 500);
         },
 
         _apply: function(filter, options) {
@@ -163,25 +176,6 @@ define([
             }
             else {
                 attrs.json = null;
-            }
-
-            return attrs;
-        },
-
-        // On a reset, both filter collections are cleared. A non-reset parse
-        // will only update the public filters since that is what is synced
-        // with the server.
-        parse: function(attrs, options) {
-            if (!attrs) return;
-
-            if (options.reset) {
-                this._filters.reset(attrs.json, {parse: true});
-                this.filters.reset(attrs.json, {parse: true});
-            } else {
-                this.filters.set(attrs.json, {
-                    parse: true,
-                    remove: false
-                });
             }
 
             return attrs;

@@ -43,6 +43,64 @@ define(['cilantro'], function(c) {
 
         });
 
+        describe('set json', function() {
+
+            it('"soft" set should merge in the filters only', function() {
+                model.set('json', {
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        field: 1,
+                        operator: 'gt',
+                        value: 50
+                    }]
+                });
+
+                expect(model.filters.toJSON()).toEqual([{
+                    concept: 1,
+                    field: 1,
+                    operator: 'gt',
+                    value: 50
+                }]);
+
+                expect(model._filters.toJSON()).toEqual([{
+                    concept: 1,
+                    field: 1,
+                    operator: 'in',
+                    value: [1, 2]
+                }, {
+                    concept: 1,
+                    field: 2,
+                    operator: 'lt',
+                    value: 50
+                }]);
+            });
+
+            it('"hard" set should merge in the internal filters', function() {
+                model.set('json', {
+                    type: 'and',
+                    children: [{
+                        concept: 1,
+                        field: 1,
+                        operator: 'gt',
+                        value: 50
+                    }]
+                }, {reset: true});
+
+                expect(model._filters.toJSON()).toEqual([{
+                    concept: 1,
+                    field: 1,
+                    operator: 'gt',
+                    value: 50
+                }, {
+                    concept: 1,
+                    field: 2,
+                    operator: 'lt',
+                    value: 50
+                }]);
+            });
+        });
+
         describe('define', function() {
 
             it('creates a new internal filter', function() {
@@ -124,6 +182,7 @@ define(['cilantro'], function(c) {
                 filter = model.define({concept: 1, field: 3});
                 expect(model.hasFilterChanged(filter)).toBeUndefined();
             });
+
         });
 
     });

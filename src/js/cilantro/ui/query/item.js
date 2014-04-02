@@ -62,7 +62,9 @@ define([
         // and view, navigate to the results to view results
         openQuery: function() {
             this.data.view.save('json', this.model.get('view_json'));
-            this.data.context.save('json', this.model.get('context_json'), {reset: true});
+            this.data.context.save('json', this.model.get('context_json'), {
+                reset: true
+            });
             c.router.navigate('results', {trigger: true});
         },
 
