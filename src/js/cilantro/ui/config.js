@@ -30,11 +30,11 @@ define([
                                        model.get('type') + '.form');
 
         // Constructor
-        if (!viewClass &&_.isFunction(typeOptions)) {
+        if (!viewClass && _.isFunction(typeOptions)) {
             viewClass = typeOptions;
         }
         // Module name for async fetching
-        else if (!viewClassModule &&_.isString(typeOptions)) {
+        else if (!viewClassModule && _.isString(typeOptions)) {
             viewClassModule = typeOptions;
         }
         else {

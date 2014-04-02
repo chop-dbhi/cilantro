@@ -12,7 +12,7 @@ define([
         template: 'controls/range/layout',
 
         events: {
-            'keyup .range-lower,.range-upper': '_change',
+            'keyup .range-lower, .range-upper': '_change',
             'change .btn-select': '_change',
             'click .range-help-button': 'toggleHelpText'
         },
@@ -71,10 +71,8 @@ define([
             return value;
         },
 
-        // Tries to find and read the values of the stats models with the keys
-        // 'min' and 'max' lower this model's StatsCollection. After these values
-        // are read, the bounds will be updated if they need to be so that the
-        // min/max are reflected in the UI in the input boxes when needed.
+        // If available and applicable, the minimum and maximum values of the field
+        // distribution are used for display in the text inputs.
         readMinMaxStats: function() {
             var statsMin = this.model.stats.get('min'),
                 statsMax = this.model.stats.get('max');
@@ -146,10 +144,9 @@ define([
         // and lower bounds are left blank, null will be returned to invalidate
         // this range.
         getValue: function() {
-            var lower = this.getLowerBoundValue(),
+            var value,
+                lower = this.getLowerBoundValue(),
                 upper = this.getUpperBoundValue();
-
-            var value;
 
             if (!_.isUndefined(lower) && !_.isUndefined(upper)) {
                 value = [lower, upper];

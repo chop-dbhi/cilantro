@@ -333,7 +333,7 @@ define [
 
         validate: (attrs) ->
             if _.isUndefined(attrs.value) or attrs.value.length is 0
-                return 'Select at least value'
+                return 'Select at least one value'
 
 
     { InfographControl }

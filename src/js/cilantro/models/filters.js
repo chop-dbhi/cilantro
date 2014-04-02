@@ -15,7 +15,7 @@ define([
         return id;
     };
 
-    // A filter encapsulates a single context node. The attributes must tagged
+    // A filter encapsulates a single context node. The attributes must be tagged
     // with an identifier, either a `concept` id, `field` id or both.
     var Filter = Backbone.Model.extend({
         constructor: function(attrs, options) {

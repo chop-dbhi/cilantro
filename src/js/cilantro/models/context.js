@@ -96,7 +96,7 @@ define([
 
             // This can be useful for applying multiple filters and doing a
             // batch save of them. Since the handlers above are bound, all the
-            // filters that are unsynced will fire there events.
+            // filters that are unsynced will fire their events.
             if (options && options.save === false) return;
 
             this._save();

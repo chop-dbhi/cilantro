@@ -39,8 +39,8 @@ define([
     });
 
 
-    // Empty, placeholder view that *eventually* renders the actual. Controls
-    // may be loaded asynchronously which
+    // Placeholder view that *eventually* renders the actual control since
+    // the target control may need to load asynchronously.
     var FieldControl = Marionette.ItemView.extend({
 
         errorView: FieldControlError,

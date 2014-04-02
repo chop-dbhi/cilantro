@@ -17,7 +17,7 @@ define([
 
 
     // Some of the class properties here are mimicked after CollectionView
-    // since is managing the concept form views
+    // since it is managing the concept form views
     var ConceptWorkspace = Marionette.Layout.extend({
         className: 'concept-workspace',
 

@@ -284,7 +284,7 @@ define([
                 });
             }
 
-            return this.el;
+            return this;
         },
 
         // Renders an item.
