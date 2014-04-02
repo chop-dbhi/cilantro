@@ -1,10 +1,10 @@
 define [
     'underscore'
-    'backbone'
+    'marionette'
     './row'
-], (_, Backbone, row) ->
+], (_, Marionette, row) ->
 
-    class HeaderCell extends Backbone.View
+    class HeaderCell extends Marionette.ItemView
         tagName: 'th'
 
         constructor: (options) ->
@@ -82,7 +82,7 @@ define [
         itemView: HeaderCell
 
 
-    class Header extends Backbone.View
+    class Header extends Marionette.ItemView
         tagName: 'thead'
 
         render: ->
