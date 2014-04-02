@@ -5,12 +5,10 @@ define([
     'marionette',
     '../core',
     './item',
-    './dialog'
-], function(_, Marionette, c, item, dialog) {
+], function(_, Marionette, c, item) {
 
     var QueryList = Marionette.CompositeView.extend({
         itemView: item.QueryItem,
-
 
         itemViewContainer: '.items',
 
@@ -59,25 +57,14 @@ define([
                 throw new Error('view model required');
             }
 
-            // TODO refactor all of this.. should be a layout
-            this.editQueryRegion = this.options.editQueryRegion;
-            this.deleteQueryRegion = this.options.deleteQueryRegion;
-
             if (this.options.editable) {
                 this.on('itemview:showEditQueryModal', function(options) {
-                    this.editQueryRegion.currentView.open(options.model);
+                    c.dialogs.query.open(options.model);
                 });
 
                 this.on('itemview:showDeleteQueryModal', function(options) {
-                    this.deleteQueryRegion.currentView.open(options.model);
+                    c.dialogs.deleteQuery.open(options.model);
                 });
-
-                this.editQueryRegion.show(new dialog.EditQueryDialog({
-                    header: 'Edit Query',
-                    collection: this.collection,
-                    context: this.data.context,
-                    view: this.data.view
-                }));
             }
         },
 
@@ -124,14 +111,7 @@ define([
         onRender: function() {
             this.ui.title.html(this.options.title);
 
-            if (this.options.editable) {
-                this.deleteQueryRegion.show(new dialog.DeleteQueryDialog({
-                    collection: this.collection
-                }));
-            }
-            else {
-                this.ui.publicIndicator.hide();
-            }
+            if (!this.options.editable) this.ui.publicIndicator.hide();
 
             this.$('.empty-message').html(this.options.emptyMessage);
             this.checkForEmptyCollection();
