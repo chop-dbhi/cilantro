@@ -7,6 +7,8 @@
 #     concatentation
 # - `dist` - Final output for release purposes. This carries over to the master
 #     branch to be copied in the root of the repo.
+# - `cdn` - Final output for deployment on CDNs. This includes *only* Cilantro
+#     files, no source maps, and no third-party libraries.
 #
 # Each Grunt task has a target named `local` which performs copying,
 # compiling or symlinking in the `local` directory for development.
@@ -27,6 +29,17 @@ module.exports = (grunt) ->
         grunt.log.ok cmd
         shell.exec cmd
 
+    vendorModules = [
+        'jquery'
+        'backbone'
+        'underscore'
+        'marionette'
+        'highcharts'
+        'bootstrap'
+        'json2'
+        'loglevel'
+    ]
+
     grunt.initConfig
         pkg: pkg
 
@@ -35,6 +48,7 @@ module.exports = (grunt) ->
         localDir: 'local'
         buildDir: 'build'
         distDir: 'dist'
+        cdnDir: 'cdn'
 
         serve:
             forever:
@@ -48,7 +62,7 @@ module.exports = (grunt) ->
 
         watch:
             grunt:
-                tasks: ['jasmine:local:build']
+                tasks: ['local']
                 files: ['Gruntfile.coffee']
 
             coffee:
@@ -66,22 +80,20 @@ module.exports = (grunt) ->
 
             tests:
                 tasks: ['jasmine:local:build']
-                files: ['<%= specDir %>/**/*']
+                files: ['<%= specDir %>/**/**/**/*']
 
             sass:
                 tasks: ['sass:local']
-                files: ['<%= srcDir %>/scss/**/*']
+                files: ['<%= srcDir %>/scss/**/**/**/*']
 
 
         coffee:
             options:
                 bare: true
 
-            # Output to 'local' for development
             local:
                 options:
                     sourceMap: true
-
                 expand: true
                 cwd: '<%= srcDir %>/coffee'
                 dest: '<%= localDir %>/js'
@@ -89,7 +101,6 @@ module.exports = (grunt) ->
                 rename: (dest, src) ->
                     dest + '/' + src.replace('.coffee', '.js')
 
-            # Compiles files to the 'build' directory for distribution
             build:
                 expand: true
                 cwd: '<%= srcDir %>/coffee'
@@ -100,10 +111,13 @@ module.exports = (grunt) ->
 
 
         sass:
+            options:
+                sourcemap: true
+
             local:
                 options:
                     trace: true
-                    sourcemap: true
+                    style: 'expanded'
 
                 files:
                     '<%= localDir %>/css/style.css': '<%= srcDir %>/scss/style.scss'
@@ -116,6 +130,14 @@ module.exports = (grunt) ->
                 files:
                     '<%= distDir %>/css/style.css': '<%= srcDir %>/scss/style.scss'
 
+            cdn:
+                options:
+                    quiet: true
+                    sourcemap: false
+                    style: 'compressed'
+
+                files:
+                    '<%= cdnDir %>/css/style.css': '<%= srcDir %>/scss/style.scss'
 
         copy:
             local:
@@ -180,6 +202,13 @@ module.exports = (grunt) ->
                     dest: '<%= distDir %>'
                 ]
 
+            cdn:
+                files: [
+                    expand: true
+                    cwd: '<%= srcDir %>/img'
+                    src: ['checkmark.png']
+                    dest: '<%= cdnDir %>/img'
+                ]
 
         symlink:
             options:
@@ -196,7 +225,6 @@ module.exports = (grunt) ->
                 baseUrl: '.'
                 inlineText: true
                 preserveLicenseComments: false
-                generateSourceMaps: true
                 wrap: false
                 logLevel: 1
                 throwWhen:
@@ -204,19 +232,9 @@ module.exports = (grunt) ->
 
                 modules: [
                     name: pkg.name
-                    exclude: [
-                        'jquery'
-                        'backbone'
-                        'underscore'
-                        'marionette'
-                        'highcharts'
-                        'bootstrap'
-                        'json2'
-                        'loglevel'
-                    ]
+                    exclude: vendorModules
                 ]
 
-                # Post analysis of built files
                 done: (done, output) ->
                     dups = require('rjs-build-analysis').duplicates(output)
                     if dups.length > 0
@@ -227,24 +245,39 @@ module.exports = (grunt) ->
 
             dist:
                 options:
-                    appDir: 'build/js'
-                    dir: 'dist/js'
+                    appDir: '<%= buildDir %>/js'
+                    dir: '<%= distDir %>/js'
                     optimize: 'uglify2'
+                    generateSourceMaps: true
+                    removeCombined: false
+
+            cdn:
+                options:
+                    appDir: '<%= buildDir %>/js'
+                    dir: '<%= cdnDir %>/js'
+                    optimize: 'uglify2'
+                    generateSourceMaps: false
                     removeCombined: true
 
-
         clean:
-            local: ['local']
-            build: ['build']
-            dist: ['dist']
+            local: ['<%= localDir %>']
+            build: ['<%= buildDir %>']
+            dist: ['<%= distDir %>']
+            cdn: ['<%= cdnDir %>']
             postdist: [
                 '<%= distDir %>/js/templates'
             ]
+
+            postcdn: [
+                '<%= cdnDir %>/js/templates'
+                '<%= cdnDir %>/js/require.js'
+            ].concat(vendorModules.map (mod) ->
+                '<%= cdnDir %>/js/' + mod + '.js')
+
             release: [
                 '<%= localDir %>/js/build.txt'
-                '<%= localDir %>/js/**/**/**/**/*.map'
-                '<%= localDir %>/css/**/*.map'
                 '<%= distDir %>/js/build.txt'
+                '<%= cdnDir %>/js/build.txt'
             ]
 
 
@@ -311,7 +344,6 @@ module.exports = (grunt) ->
                     '<%= srcDir %>/js/json2.js'
                     '<%= srcDir %>/js/loglevel.js'
                     '<%= srcDir %>/js/marionette.js'
-                    '<%= srcDir %>/js/modernizr.js'
                     '<%= srcDir %>/js/require.js'
                     '<%= srcDir %>/js/text.js'
                     '<%= srcDir %>/js/tpl.js'
@@ -440,12 +472,23 @@ module.exports = (grunt) ->
         'clean:postdist'
     ]
 
+    grunt.registerTask 'cdn', 'Creates a build for CDN distribution', [
+        'clean:build'
+        'coffee:build'
+        'copy:build'
+        'clean:cdn'
+        'requirejs:cdn'
+        'sass:cdn'
+        'copy:cdn'
+        'clean:postcdn'
+    ]
+
     grunt.registerTask 'work', 'Performs the initial local build and starts a watch process', [
         'local'
         'watch'
     ]
 
-    grunt.registerTask 'test', 'Compiles local CoffeeScript files and uses Jasmine', [
+    grunt.registerTask 'test', 'Runs the headless test suite', [
         'coffee:local'
         'copy:local'
         'symlink'
@@ -541,11 +584,13 @@ module.exports = (grunt) ->
     grunt.registerTask 'release-help', 'Prints the post-release steps', ->
         grunt.log.ok 'Push the code and tags: git push && git push --tags'
         grunt.log.ok "Go to #{ pkg.homepage }/releases to update the release descriptions and upload the binaries"
+        grunt.log.ok 'The CDN-ready files have been updated'
 
     grunt.registerTask 'release', 'Builds the distribution files, creates the release binaries, and creates a Git tag', [
         'bump-final'
         'local'
         'dist'
+        'cdn'
         'clean:release'
         'release-binaries'
         'tag-release'
