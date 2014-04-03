@@ -24,7 +24,7 @@ define([
         },
 
         collectionEvents: {
-            'add remove reset apply unapply': 'renderRemoveAll'
+            'add remove reset change': 'renderRemoveAll'
         },
 
         serializeData: function() {
@@ -42,7 +42,12 @@ define([
         },
 
         renderRemoveAll: function() {
-            this.ui.removeAll.prop('disabled', !this.collection.length);
+            // Required filters cannot be removed, so filter them out
+            var models = this.collection.reject(function(model) {
+                return model.get('required') === true;
+            });
+
+            this.ui.removeAll.prop('disabled', !models.length);
         }
     });
 

@@ -3,11 +3,33 @@
 define([
     'underscore',
     'backbone',
+    'loglevel',
     '../core',
     './base',
     './filters'
-], function(_, Backbone, c, base, filters) {
+], function(_, Backbone, loglevel, c, base, filters) {
 
+    var getRequiredFilters = function() {
+        var lookups = [];
+
+        _.each(c.config.get('filters.required'), function(lookup)  {
+            lookups.push(lookup);
+        });
+
+        var concepts = c.config.get('query.concepts.required');
+
+        if (concepts) {
+            loglevel.warn('The "query.concepts.required" option is ' +
+                             'deprecated, use "filters.required" instead ' +
+                             'with fully qualified lookups.');
+
+            _.each(concepts, function(concept)  {
+                lookups.push({concept: concept});
+            });
+        }
+
+        return lookups;
+    };
 
     /*
      * The context model provides an interface for [un]applying filters. Filters
@@ -15,8 +37,14 @@ define([
      */
     var Context = base.Model.extend({
 
+        options: {
+            saveDelay: 300
+        },
+
         initialize: function(attrs, options) {
             attrs = attrs || {};
+
+            this.requiredFilters = getRequiredFilters();
 
             // Internal collection of all filters
             this._filters = new filters.Filters(attrs.json,
@@ -35,7 +63,7 @@ define([
             this.listenTo(this.filters, {
                 'unapply': this.unapply,
                 'change:enabled': function() {
-                    this.save();
+                    this._save();
                 }
             });
 
@@ -52,11 +80,24 @@ define([
                         remove: false
                     }, options));
                 }
+
+                // Add the `required` attribute to filters marked as such
+                this.filters.each(function(model) {
+                    if (this.isFilterRequired(model.attributes)) {
+                        model.set('required', true);
+                    }
+                    else {
+                        model.unset('required');
+                    }
+                }, this);
             });
 
             // Trigger Cilantro event when context is saved
             this.on('sync', function(model, attrs, options) {
                 options = options || {};
+
+                // Validate the context on sync
+                this.validate();
 
                 if (options.silent !== true) {
                     c.trigger(c.CONTEXT_SYNCED, this, 'success');
@@ -65,7 +106,37 @@ define([
 
             // Define a debounced save method for handling rapid successions
             // of [un]apply events.
-            this._save = _.debounce(this.save, 500);
+            this._save = _.debounce(this.save, this.options.saveDelay);
+        },
+
+        validate: function() {
+            var invalid = [];
+
+            _.each(this.requiredFilters, function(lookup) {
+                var reason, model = this.filters.findWhere(lookup);
+
+                if (!model) {
+                    reason = 'undefined';
+                } else if (!model.isEnabled()) {
+                    reason = 'disabled';
+                }
+
+                if (reason) {
+                    invalid.push(_.extend({reason: reason}, lookup));
+                }
+            }, this);
+
+            if (invalid.length) {
+                c.trigger(c.CONTEXT_INVALID, invalid);
+                return 'One or more filters are invalid';
+            }
+        },
+
+        // Only compare values for keys defined on the lookup
+        isFilterRequired: function(attrs) {
+            return _.any(this.requiredFilters, function(lookup) {
+                return _.isEqual(_.pick(attrs, _.keys(lookup)), lookup);
+            });
         },
 
         _apply: function(filter, options) {
@@ -74,6 +145,7 @@ define([
             // Filters are enabled by default. If a filter is previously disabled
             // and re-applied, it will be enabled.
             attrs.enabled = true;
+            attrs.required = this.isFilterRequired(attrs);
             delete attrs.language;
 
             // Add/merge public filter
@@ -122,6 +194,11 @@ define([
         _unapply: function(filter, options) {
             // Ensure only attributes are being added to prevent references
             var attrs = filter.toJSON({id: true});
+
+            if (this.isFilterRequired(attrs)) {
+                loglevel.debug('skipping unapplying required filter', attrs);
+                return;
+            }
 
             var model = this.filters.remove(attrs, options);
 

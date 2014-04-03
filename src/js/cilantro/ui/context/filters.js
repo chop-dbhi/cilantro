@@ -13,33 +13,26 @@ define([
 
         template: 'context/filter',
 
-        events: {
-            'click .language': 'clickShow',
-            'click .actions .remove': 'clickRemove',
-            'click .state': 'clickState',
-            'change .state input': 'clickState',
-            'click .state input': 'stopPropagation'
+        ui: {
+            actions: '[data-target=actions]',
+            loader: '[data-target=loader]',
+            remove: '[data-action=remove]',
+            enable: '[data-action=enable]',
+            description: '[data-target=description]',
+            required: '[data-target=required]'
         },
 
-        ui: {
-            loader: '.actions .icon-spinner',
-            actions: '.actions button',
-            state: '.state',
-            check: '.state input',
-            language: '.language'
+        events: {
+            'click': 'clickShow',
+            'click @ui.remove': 'clickRemove',
+            'click @ui.enable': 'toggleEnabled',
         },
 
         modelEvents: {
             request: 'showLoadView',
             sync: 'hideLoadView',
             error: 'hideLoadView',
-            change: 'renderLanguage',
-            'change:enabled': 'renderState'
-        },
-
-        stopPropagation: function(event) {
-            event.preventDefault();
-            event.stopPropagation();
+            change: 'render'
         },
 
         // Navigate to query page when a concept is triggered
@@ -49,36 +42,25 @@ define([
         },
 
         clickRemove: function() {
-            if (this.model.unapply()) {
-                this.$el.fadeOut({
-                    duration: 400,
-                    easing: 'easeOutExpo'
-                });
-            }
+            this.model.unapply();
         },
 
         // Toggle the enabled state of the node
-        clickState: function(event) {
-            event.preventDefault();
-            var _this = this;
-            _.defer(function() {
-                _this.model.toggleEnabled();
-                _this.model.apply();
-            });
+        toggleEnabled: function(event) {
+            event.stopPropagation();
+            this.model.toggleEnabled();
         },
 
         renderEnabled: function() {
             this.$el.removeClass('disabled');
-            this.ui.state.attr('title', 'Disable');
-            this.ui.check.prop('checked', true);
-            this.ui.check.attr('checked', true);
+            this.ui.enable.attr('title', 'Disable');
+            this.ui.enable.prop('checked', true);
         },
 
         renderDisabled: function() {
             this.$el.addClass('disabled');
-            this.ui.state.attr('title', 'Enable');
-            this.ui.check.prop('checked', false);
-            this.ui.check.attr('checked', false);
+            this.ui.enable.attr('title', 'Enable');
+            this.ui.enable.prop('checked', false);
         },
 
         renderState: function() {
@@ -90,23 +72,33 @@ define([
             }
         },
 
-        renderLanguage: function() {
-            this.ui.language.html(this.model.get('language'));
+        renderDescription: function() {
+            this.ui.description.html(this.model.get('language'));
         },
 
         showLoadView: function() {
             this.ui.loader.show();
-            this.ui.actions.hide();
+            this.ui.description.hide();
         },
 
         hideLoadView: function() {
             this.ui.loader.hide();
-            this.ui.actions.show();
+            this.ui.description.show();
         },
 
         onRender: function() {
-            this.ui.loader.hide();
-            this.renderLanguage();
+            // Required filters cannot be removed nor disabled
+            this.ui.actions.toggle(!this.model.get('required'));
+            this.ui.enable.toggle(!this.model.get('required'));
+            this.ui.required.toggle(this.model.get('required') === true);
+
+            this.ui.required.tooltip({
+                container: 'body',
+                placement: 'left',
+                delay: 500
+            });
+
+            this.renderDescription();
             this.renderState();
         }
     });
