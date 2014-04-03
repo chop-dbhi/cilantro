@@ -41,7 +41,8 @@ define([
             c.trigger(c.CONCEPT_FOCUS, this.model.get('concept'));
         },
 
-        clickRemove: function() {
+        clickRemove: function(event) {
+            event.stopPropagation();
             this.model.unapply();
         },
 
