@@ -190,6 +190,7 @@ define([
         renderFilter: function() {
             this.ui.apply.prop('disabled', false);
             this.ui.update.prop('disabled', true);
+            this.ui.state.hide();
 
             if (this.data.context.isFilterApplied(this.data.filter)) {
                 this.ui.apply.hide();
