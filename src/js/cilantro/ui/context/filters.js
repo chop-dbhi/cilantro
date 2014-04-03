@@ -121,10 +121,21 @@ define([
         },
 
         onRender: function() {
+            this.listenTo(c.router, 'route', this.toggleMessage);
+            this.toggleMessage();
+        },
+
+        onClose: function() {
+            this.stopListening(c.router);
+        },
+
+        toggleMessage: function() {
             if (c.router.isCurrent('results')) {
                 this.ui.noFiltersQueryMessage.hide();
+                this.ui.noFiltersResultsMessage.show();
             }
             else if (c.router.isCurrent('query')) {
+                this.ui.noFiltersQueryMessage.show();
                 this.ui.noFiltersResultsMessage.hide();
             }
         }
