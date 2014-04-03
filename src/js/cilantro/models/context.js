@@ -71,6 +71,10 @@ define([
         _apply: function(filter, options) {
             // Ensure only attributes are being added to prevent references
             var attrs = filter.toJSON({id: true});
+            // Filters are enabled by default. If a filter is previously disabled
+            // and re-applied, it will be enabled.
+            attrs.enabled = true;
+            delete attrs.language;
 
             // Add/merge public filter
             var model = this.filters.add(attrs, _.defaults({merge: true}, options));
