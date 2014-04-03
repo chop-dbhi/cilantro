@@ -69,6 +69,11 @@ define([
     var Filters = Backbone.Collection.extend({
         model: Filter,
 
+        constructor: function(models, options) {
+            options = _.defaults({parse: true}, options);
+            Backbone.Collection.prototype.constructor.call(this, models, options);
+        },
+
         sync: function() {},
 
         apply: function(options) {
@@ -94,14 +99,22 @@ define([
 
                 models = [];
 
-                if (attrs.field || attrs.concept) {
+                if (attrs.field) {
                     var id = this.model.prototype.generateId(attrs);
                     models.push(_.extend({id: id}, attrs));
                 }
 
-                // Bare branch, traverse children
+                // Bare branch or standalone concept; traverse children.
+                // Note: concept-level filters are not yet supported, so they
+                // need to be deconstructed to their containing fields. The
+                // will be augmented on the child if present.
                 else if (attrs.children) {
+                    var concept = attrs.concept;
+
                     _.each(attrs.children, function(child) {
+                        if (concept !== undefined) {
+                            child = _.extend({concept: concept}, child);
+                        }
                         models = models.concat(this.parse(child));
                     }, this);
                 }

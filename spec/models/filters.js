@@ -22,19 +22,6 @@ define(['underscore', 'cilantro'], function(_, c) {
             }
         },
 
-        // Note, bare concepts are not technically supported by the API,
-        // however there is no way to construct them in the UI and the
-        // server is free to reject it. Support may be added in the future
-        // so there is no reason to prevent support for it on the client.
-        {
-            count: 1,
-            attrs: {
-                concept: 1,
-                operator: 'in',
-                value: [1, 2]
-            }
-        },
-
         {
             count: 1,
             attrs:{
@@ -56,13 +43,13 @@ define(['underscore', 'cilantro'], function(_, c) {
         {
             count: 2,
             attrs: {
+                concept: 1,
                 type: 'and',
                 children: [{
-                    concept: 1,
+                    field: 1,
                     operator: 'in',
                     value: [1, 2]
                 }, {
-                    concept: 1,
                     field: 2,
                     operator: 'lt',
                     value: 50
