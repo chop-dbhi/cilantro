@@ -1,12 +1,13 @@
 /* global define */
 
 define([
+    'underscore',
     './cilantro/core',
     './cilantro/session',
     './cilantro/models',
     './cilantro/ui',
     './cilantro/setup'
-], function(c, session, models, ui) {
+], function(_, c, session, models, ui) {
 
     c.sessions = new session.SessionManager();
 
@@ -28,7 +29,7 @@ define([
     // immediately.
     c.ready = function(handler) {
         if (ready) {
-            handler();
+            if (handler) handler();
             return;
         }
 
@@ -41,7 +42,8 @@ define([
             if (ready) {
                 clearTimeout(timeoutId);
                 clearTimeout(intervalId);
-                handler();
+                c.trigger('ready', c);
+                if (handler) handler();
             }
         }, 15);
 
@@ -64,6 +66,14 @@ define([
     };
 
     this.cilantro = c;
+
+    // Bind early events on Cilantro namespace
+    _.each(c.config.get('events'), function(value, key) {
+        c.on(key, value);
+    });
+
+    c.trigger('init', c);
+
     return c;
 
 });
