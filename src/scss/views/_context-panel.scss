@@ -5,7 +5,7 @@
         top: 0;
     }
 
-    .tree-region {
+    .filters-region {
         overflow: auto;
         position: absolute;
         top: 40px;
@@ -30,23 +30,6 @@
         }
     }
 
-    &.loading {
-        .actions-region {
-            .count-label {
-                color: #aaa;
-            }
-            .icon-spinner {
-                display: inline;
-            }
-        }
-    }
-
-    .tree-region .disabled {
-        .language {
-            color: #ccc;
-        }
-    }
-
     .info-region {
         // Only a single route-based button is shown at a given time. This is
         // a fix to ensure the non-leftmost button does not contain a margin
@@ -56,39 +39,47 @@
         }
     }
 
-    .context-item {
-        @extend .clearfix;
+    .context-filter {
+        position: relative;
+        cursor: pointer;
 
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px dashed #ccc;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        margin-bottom: 5px;
+        // If the description is empty, ensure it does not collapse
+        min-height: 22px;
 
-        .language {
-            @include transition(color, 0.2s);
-            @extend a;
-            cursor: default;
+        // Variable left and right padding so description does not wrap
+        padding: 3px 34px 3px 24px;
+
+        [data-target=loader] {
+            text-align: center;
         }
 
-        .actions {
-            float: right;
-            font-size: 12px;
-            margin-left: 5px;
-            margin-bottom: 5px;
+        [data-action=enable], [data-target=required] {
+            position: absolute;
+            left: 5px;
+        }
 
-            .remove {
+        [data-action=required] {
+            left: 8px;
+        }
+
+        [data-target=description] {
+        }
+
+        [data-target=actions] {
+            position: absolute;
+            right: 5px;
+
+            [data-action=remove] {
                 color: rgb(180, 0, 0);
             }
         }
-    }
 
-    .branch-type {
-        color: #999;
-        font-weight: 500;
-        font-size: 0.85em;
-        font-variant: small-caps;
-    }
-
-    .branch-children {
-        margin-left: 0;
+        &.disabled {
+            color: #ccc;
+        }
     }
 }

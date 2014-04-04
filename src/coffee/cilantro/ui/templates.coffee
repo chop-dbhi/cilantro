@@ -39,10 +39,9 @@ define [
 
     'tpl!templates/context/panel.html'
     'tpl!templates/context/actions.html'
-    'tpl!templates/context/empty.html'
     'tpl!templates/context/info.html'
-    'tpl!templates/context/item.html'
-    'tpl!templates/context/tree.html'
+    'tpl!templates/context/empty.html'
+    'tpl!templates/context/filter.html'
 
     'tpl!templates/controls/infograph/bar.html'
     'tpl!templates/controls/infograph/layout.html'

@@ -6,9 +6,8 @@ define(['cilantro', 'cilantro/structs'], function(c, structs) {
         var frame, series, datum;
 
 		beforeEach(function() {
-            frame = new structs.Frame(null, null, {
-                url: 'http://localhost:8000/api/data/preview/'
-            });
+            frame = new structs.Frame(null, null);
+            frame.url = 'http://localhost:8000/api/data/preview/';
 
             frame.fetch();
 

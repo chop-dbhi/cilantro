@@ -9,18 +9,23 @@ define([
     '../controls'
 ], function(_, Marionette, loglevel, c, base, controls) {
 
-    // Sets up a two-way binding between the view and context and
-    // unbinds a previously bound context
-    var bindContext = function(view, context) {
-        if (!context) return;
+    // Sets up a two-way binding between the view and filter and
+    // unbinds a previously bound filter
+    var bindFilter = function(view, filter) {
+        if (!filter) return;
 
-        context.listenTo(view, 'change', function(view, attrs) {
-            context.set(attrs);
+        filter.listenTo(view, 'change', function(view, attrs) {
+            filter.set(attrs);
         });
 
-        view.listenTo(context, 'change', function(context) {
-            if (!this._changing) view.set(context.toJSON());
+        view.listenTo(filter, 'change', function(filter) {
+            if (!view._changing) view.set(filter.toJSON());
         });
+    };
+
+    var unbindFilter = function(view, filter) {
+        filter.stopListening(view);
+        view.stopListening(filter);
     };
 
 
@@ -34,44 +39,33 @@ define([
     });
 
 
-    // View of a collection of field controls
-    var FieldControls = Marionette.View.extend({
-        emptyView: LoadingFieldControls,
+    // Placeholder view that *eventually* renders the actual control since
+    // the target control may need to load asynchronously.
+    var FieldControl = Marionette.ItemView.extend({
 
         errorView: FieldControlError,
 
-        render: function() {
-            var _this = this;
+        template: function() {},
 
-            this.collection.each(function(model, index) {
-                _this.initControl(model, index);
-            });
+        // Get the class if it is registered, otherwise assume it is a module
+        // name to be loaded. If loaded asynchronously, the view will be
+        // rendered once loaded.
+        initialize: function() {
+            var viewClass = this.model.get('control');
 
-            return this.el;
-        },
+            viewClass = controls.get(viewClass) || viewClass;
 
-        // Initializes and then renders the control
-        initControl: function(model, index) {
-            var context = model.get('context');
-
-            var options = _.extend({}, {
-                model: model.get('model'),
-            }, model.get('options'));
-
-            // Get the registered control view is one exists
-            var control = model.get('control'),
-                controlView = controls.get(control);
-
-            // Constructor, create item otherwise assume `control` is a
-            // module name
-            if (_.isFunction(controlView)) {
-                this.renderControl(controlView, context, index, options);
-            } else {
+            if (_.isFunction(viewClass)) {
+                this.viewClass = viewClass;
+            }
+            else {
                 var _this = this;
-                // If control view is not defined, fallback to using the
-                // control id as the module path
-                require([controlView || control], function(controlView) {
-                    _this.renderControl(controlView, context, index, options);
+
+                require([
+                    viewClass
+                ], function(viewClass) {
+                    _this.viewClass = viewClass;
+                    _this.render();
                 }, function(err) {
                     _this.showErrorView();
                     loglevel.debug(err);
@@ -79,37 +73,57 @@ define([
             }
         },
 
-        renderControl: function(viewClass, context, index, options) {
-            var _this = this,
-                view = new viewClass(options);
+        onRender: function() {
+            if (!this.viewClass) return;
 
-            view.render();
+            this.view = new this.viewClass(this.model.toJSON());
+            this.view.render();
+            this.$el.html(this.view.el);
 
             // Before the control is declared ready, set the initial state of
-            // the control and bind the context for future changes.
-            view.on({
-                'beforeready': function() {
-                    this.set(context.toJSON());
-                    bindContext(this, context);
-                },
-                'error': function() {
-                    this.showErrorView();
-                }
+            // the control and bind the filter for future changes.
+            this.listenTo(this.view, {
+                beforeready: this.onControlBeforeReady,
+                error: this.onControlError
             });
 
-            // Declare this view is conditionally ready
-            view.ready(true);
+            // Declare this view to be *conditionally* ready. Read more
+            // in `cilantro/ui/controls/base`.
+            this.view.ready(true);
+        },
 
-            // Perform DOM operation as the last step in case the above
-            // deferred resolves immediately.
-            c.dom.insertAt(_this.$el, index, view.el);
+        // Clean up and unattach events on control
+        onBeforeClose: function() {
+            if (this.view) {
+                var filter = this.model.get('filter');
+                unbindFilter(this.view, filter);
+                this.view.close();
+            }
+        },
+
+        onControlBeforeReady: function() {
+            var filter = this.model.get('filter');
+            this.view.set(filter.toJSON());
+            bindFilter(this.view, filter);
+        },
+
+        onControlError: function() {
+            this.showErrorView();
         },
 
         showErrorView: function() {
-            var view = new this.errorView();
-            view.render();
-            this.$el.html(view.el);
+            this.view = new this.errorView(this.model.toJSON());
+            this.view.render();
+            this.$el.html(this.view.el);
         }
+    });
+
+
+    // View of a collection of field controls
+    var FieldControls = Marionette.CollectionView.extend({
+        itemView: FieldControl,
+
+        emptyView: LoadingFieldControls
     });
 
 

@@ -5,10 +5,10 @@ define([
     'marionette',
     '../base',
     '../core',
-    './tree',
+    './filters',
     './info',
     './actions'
-], function(_, Marionette, base, c, tree, info, actions) {
+], function(_, Marionette, base, c, filters, info, actions) {
 
 
     var ContextPanel = Marionette.Layout.extend({
@@ -28,17 +28,22 @@ define([
 
         regions: {
             info: '.info-region',
-            tree: '.tree-region',
+            filters: '.filters-region',
             actions: '.actions-region'
         },
 
         regionViews: {
             info: info.ContextInfo,
-            tree: tree.ContextTree,
+            filters: filters.ContextFilters,
             actions: actions.ContextActions
         },
 
         showLoadView: function() {
+            if (this._errorView) {
+                this._errorView.remove();
+                delete this._errorView;
+            }
+
             this.$el.addClass('loading');
         },
 
@@ -47,9 +52,11 @@ define([
         },
 
         showErrorView: function() {
-            // Show an overlay for the whole tree region
-            var view = new this.errorView({target: this.$el});
-            view.render();
+            if (this._errorView) return;
+
+            // Show an overlay for the whole filters region
+            this._errorView = new this.errorView({target: this.$el});
+            this._errorView.render();
         },
 
         onRender: function() {
@@ -61,17 +68,18 @@ define([
             });
 
             var actions = new this.regionViews.actions({
-                model: this.model
+                model: this.model,
+                collection: this.model.filters
             });
 
-            var tree = new this.regionViews.tree({
+            var filters = new this.regionViews.filters({
                 model: this.model,
-                collection: this.model.manager.upstream.children
+                collection: this.model.filters
             });
 
             this.info.show(info);
             this.actions.show(actions);
-            this.tree.show(tree);
+            this.filters.show(filters);
         },
 
         openPanel: function(options) {

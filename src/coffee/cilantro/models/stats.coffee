@@ -4,6 +4,8 @@ define [
 ], (_, Backbone) ->
 
     class StatModel extends Backbone.Model
+        idAttribute: 'key'
+
 
     class StatCollection extends Backbone.Collection
         model: StatModel

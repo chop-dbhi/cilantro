@@ -12,7 +12,7 @@ define([
         template: 'context/actions',
 
         ui: {
-            removeAll: '[data-target=remove]'
+            removeAll: '[data-action=remove]'
         },
 
         events: {
@@ -20,7 +20,11 @@ define([
         },
 
         modelEvents: {
-            'change': 'render'
+            'change:count': 'render'
+        },
+
+        collectionEvents: {
+            'add remove reset change': 'renderRemoveAll'
         },
 
         serializeData: function() {
@@ -30,11 +34,20 @@ define([
         },
 
         clickRemoveAll: function() {
-            this.model.manager.clear();
+            this.collection.unapply();
         },
 
         onRender: function() {
-            this.ui.removeAll.prop('disabled', !this.model.get('json'));
+            this.renderRemoveAll();
+        },
+
+        renderRemoveAll: function() {
+            // Required filters cannot be removed, so filter them out
+            var models = this.collection.reject(function(model) {
+                return model.get('required') === true;
+            });
+
+            this.ui.removeAll.prop('disabled', !models.length);
         }
     });
 

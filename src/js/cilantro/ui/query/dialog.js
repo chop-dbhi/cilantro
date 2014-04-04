@@ -62,9 +62,7 @@ define([
 
         open: function(model) {
             this.hideError();
-
             this.model = model;
-
             this.$el.modal('show');
         },
 

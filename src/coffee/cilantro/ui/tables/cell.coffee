@@ -1,9 +1,9 @@
 define [
-    'backbone'
-], (Backbone) ->
+    'marionette'
+], (Marionette) ->
 
 
-    class Cell extends Backbone.View
+    class Cell extends Marionette.View
         tagName: 'td'
 
         initialize: ->
