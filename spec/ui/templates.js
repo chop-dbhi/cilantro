@@ -1,8 +1,17 @@
-/* global define, describe, it, expect */
+/* global define, describe, afterEach, it, expect, waitsFor, runs */
 
 define(['cilantro', 'underscore', 'marionette'], function(c, _, Marionette) {
 
     describe('Templates', function() {
+
+        afterEach(function() {
+            // Clear custom templates
+            c.templates.clear();
+        });
+
+        it('should be ready by default', function() {
+            expect(c.templates.ready()).toBe(true);
+        });
 
         it('should be populated', function() {
             expect(c.templates).toBeDefined();
@@ -30,6 +39,15 @@ define(['cilantro', 'underscore', 'marionette'], function(c, _, Marionette) {
             expect(view.$('h1').text()).toEqual('Foobar');
         });
 
+        it('should allow for remote templates', function() {
+            c.templates.set('remote', '/spec/custom-template.js');
+            expect(c.templates.ready()).toBe(false);
+            waitsFor(c.templates.ready);
+
+            runs(function() {
+                expect(c.templates.get('remote')({name: 'World'})).toEqual('Hello World');
+            });
+        });
     });
 
 });

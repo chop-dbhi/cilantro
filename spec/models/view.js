@@ -1,8 +1,8 @@
-/* global define, describe, beforeEach, waitsFor, it, expect, runs */
+/* global define, describe, afterEach, beforeEach, waitsFor, it, expect, runs */
 
 define(['cilantro'], function(c) {
 
-    describe('View', function() {
+    describe('Views', function() {
 
         beforeEach(function() {
             c.sessions.open(c.config.get('url'));
@@ -10,53 +10,92 @@ define(['cilantro'], function(c) {
             waitsFor(function() { return c.data; });
         });
 
+        afterEach(function() {
+            c.sessions.close();
+        });
+
         it('should always define a default session', function() {
-            var model = c.data.views.getSession();
-            model.save(null, {wait: true});
-
-            expect(model).toBeDefined();
-
-            // Wait to run the remaining tests until this is saved
-            waitsFor(function() {
-                return model.id;
-            });
+            expect(c.data.views.session).toBeDefined();
+            expect(c.data.views.session.get('session')).toBe(true);
         });
 
         it('should support creating', function() {
-            var done;
+            var toggle;
 
             var model = c.data.views.create({}, {
-                wait: true,
                 success: function() {
-                    done = true;
+                    toggle = true;
                 }
             });
 
-            waitsFor(function() { return done; });
+            waitsFor(function() { return toggle; });
 
             runs(function() {
                 expect(model.id).toBeDefined();
-                model.destroy({wait: true});
             });
         });
 
         it('should support updating', function() {
-            var done, model = c.data.views.getSession();
+            var toggle, model;
 
-            model.save({name: 'Special', session: false}, {
-                wait: true,
-                success: function() {
-                    done = true;
-                }
+            waitsFor(function() {
+                return c.data.views.length > 1;
+            });
+
+            runs(function() {
+                model = c.data.views.at(1);
+
+                model.save({name: 'Special'}, {
+                    success: function() {
+                        toggle = true;
+                    }
+                });
             });
 
             waitsFor(function() {
-                return done;
+                return toggle;
             });
 
             runs(function() {
                 expect(model.get('name')).toEqual('Special');
-                model.destroy({wait: true});
+            });
+        });
+
+        it('should support deleting', function() {
+            var toggle, model;
+
+            waitsFor(function() {
+                return c.data.views.length > 1;
+            });
+
+            runs(function() {
+                model = c.data.views.at(1);
+
+                model.destroy({
+                    success: function() {
+                        toggle = true;
+                    }
+                });
+            });
+
+            waitsFor(function() {
+                return toggle;
+            });
+
+            runs(function() {
+                toggle = false;
+
+                model.fetch({
+                    error: function(model, xhr) {
+                        toggle = xhr.status;
+                    }
+                });
+            });
+
+            waitsFor(function() { return toggle; });
+
+            runs(function() {
+                expect(toggle).toEqual(404);
             });
         });
 
@@ -82,11 +121,11 @@ define(['cilantro'], function(c) {
                     {
                         concept: 1,
                         sort: 'asc',
-                        sort_index: 1
+                        sort_index: 1  // jshint ignore:line
                     }, {
                         concept: 2,
                         sort: 'desc',
-                        sort_index: 0
+                        sort_index: 0  // jshint ignore:line
                     }, {
                         concept: 3,
                     }
@@ -105,11 +144,11 @@ define(['cilantro'], function(c) {
                     {
                         concept: 3,
                         sort: 'asc',
-                        sort_index: 1
+                        sort_index: 1  // jshint ignore:line
                     }, {
                         concept: 1,
                         sort: 'desc',
-                        sort_index: 0
+                        sort_index: 0  // jshint ignore:line
                     }, {
                         concept: 2,
                     }

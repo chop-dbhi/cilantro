@@ -27,8 +27,8 @@ define([
         views: models.ViewCollection,
         preview: models.Results,
         exporter: models.ExporterCollection,
-        queries: models.QueryCollection,
-        public_queries: models.QueryCollection  // jshint ignore:line
+        queries: models.Queries,
+        public_queries: models.Queries  // jshint ignore:line
     };
 
 
@@ -155,6 +155,7 @@ define([
                 if ((Collection = collectionLinkMap[name])) {
                     this.data[name] = new Collection();
                     this.data[name].url = link.href;
+                    this.data[name].fetch({reset: true});
                 }
             }, this);
 
@@ -231,7 +232,6 @@ define([
                 })
                 .done(function(resp, status, xhr) {
                     _this.opened = true;
-                    _this.response = resp;
                     _this._opening.resolveWith(_this, [_this, resp, status, xhr]);
                 })
                 .fail(function(xhr, status, error) {
@@ -244,7 +244,6 @@ define([
 
         // Closing a session will remove the cached data and require it to be
         // opened again.
-        // TODO: unload router views?
         close: function() {
             this.end();
             this.opening = this.opened = false;
@@ -252,10 +251,10 @@ define([
             // Reset all collections to deference models
             _.each(this.data, function(collection) {
                 collection.reset();
+                delete collection.url;
             });
 
             delete this._opening;
-            delete this.response;
             delete this.data;
         },
 
@@ -267,11 +266,6 @@ define([
             if (!this.opened) throw new Error('Session must be opened before loaded');
 
             this.started = true;
-
-            // Fetch collection data
-            _.each(this.data, function(collection) {
-                collection.fetch({reset: true});
-            });
 
             if (routes) this.router.register(routes);
 
@@ -384,6 +378,7 @@ define([
             if (this.active) {
                 var session = this.active;
                 delete this.active;
+                this.remove(session);
                 session.close();
                 this.trigger(events.SESSION_CLOSED, session);
             }
@@ -399,8 +394,9 @@ define([
 
     return _.extend({
         SessionManager: SessionManager,
-        Session: Session
-    }, events);
+        Session: Session,
+        events: events
+    });
 
 
 });

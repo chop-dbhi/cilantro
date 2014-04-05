@@ -49,11 +49,6 @@ define [
                 @_parseLinks(attrs._links)
             return attrs
 
-    class SynclessModel extends Model
-        sync: ->
-
-    class SynclessCollection extends Collection
-        sync: ->
 
     # Base collection class that is session-aware. A session is always
     # created on initialization which enables immediately binding to the
@@ -101,4 +96,4 @@ define [
         getSession: ->
             @session
 
-    { Model, Collection, SynclessModel, SynclessCollection, SessionCollection }
+    { Model, Collection, SessionCollection }

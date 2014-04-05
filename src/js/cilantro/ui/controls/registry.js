@@ -80,6 +80,10 @@ define([
         // Returns a boolean denoting if all AMD-based controls have been loaded.
         ready: function() {
             return pendingRemotes === 0;
+        },
+
+        clear: function() {
+            customControls = {};
         }
     };
 

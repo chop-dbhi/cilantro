@@ -1,65 +1,78 @@
-/* global define, describe, beforeEach, it, expect, waitsFor, runs */
+/* global define, describe, beforeEach, it, expect, waitsFor */
 
-define(['jquery', 'cilantro/session'], function($, session) {
+define(['cilantro', 'cilantro/session'], function(c, session) {
 
     describe('Session', function() {
-        var s;
+        var s, url = c.config.get('url');
 
         beforeEach(function() {
             s = new session.Session({
-                url: 'http://localhost:8000/api/'
+                url: url
             });
         });
 
-        it('initial state', function() {
-            expect(s.get('url')).toBe('http://localhost:8000/api/');
+        it('init', function() {
+            expect(s.get('url')).toBe(url);
             expect(s.isValid()).toBe(true);
             expect(s.opened).toBe(false);
             expect(s.opening).toBe(false);
             expect(s.started).toBe(false);
         });
 
-        it('open', function() {
-            s.open();
-            expect(s.opening).toBe(true);
+        describe('Cycle', function() {
+            beforeEach(function() {
+                s.open();
 
-            waitsFor(function() {
-                return s.opened;
-            }, 500);
+                waitsFor(function() {
+                    return s.opened;
+                });
+            });
 
-            runs(function() {
+            it('open', function() {
                 expect(s.opening).toBe(false);
                 expect(s.opened).toBe(true);
-                expect(s.response).toBeDefined();
                 expect(s.error).toBeUndefined();
                 expect(s.title).toBeDefined();
                 expect(s.version).toBeDefined();
                 expect(s.data).toBeDefined();
+                expect(s.router).toBeDefined();
+
                 for (var key in s.data) {
                     expect(s.data[key].url).toBeDefined();
                 }
-                expect(s.router).toBeDefined();
-            });
-        });
-
-        it('start', function() {
-            var that;
-            s.open().done(function() {
-                that = this;
             });
 
-            waitsFor(function() {
-                return s.opened;
-            }, 500);
-
-            runs(function() {
-                // Ensure the context of the promise is the session itself
-                expect(that).toBe(s);
+            it('start', function() {
                 s.start({
                     pushState: false,
                     hashChange: true
                 });
+                expect(s.started).toBe(true);
             });
+
+            it('end', function() {
+                s.start({
+                    pushState: false,
+                    hashChange: true
+                });
+                s.end();
+                expect(s.started).toBe(false);
+                expect(s.router._routes).toEqual({});
+            });
+
+            it('close', function() {
+                var data = s.data;
+                s.close();
+
+                expect(s.data).toBeUndefined();
+                expect(s.opened).toBe(false);
+
+                for (var key in s.data) {
+                    expect(data[key].length).toEqual(0);
+                    expect(data[key].url).toBeUndefined();
+                }
+            });
+
         });
 
     });

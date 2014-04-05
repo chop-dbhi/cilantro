@@ -1,36 +1,38 @@
-/* global define, describe, it, expect, waitsFor, runs, beforeEach */
+/* global define, describe, it, expect, waitsFor, runs, beforeEach, afterEach */
 
-define(['cilantro/session'], function(session) {
+define(['cilantro'], function(c) {
 
-    var url = 'http://localhost:8000/api/';
-
-    describe('SessionManager', function() {
-        var manager, triggered;
+    describe('Session Manager', function() {
+        var triggered, url = c.config.get('url');
 
         beforeEach(function() {
-            manager = new session.SessionManager();
             triggered = [];
 
-            manager.on('all', function(event) {
+            c.listenTo(c.sessions, 'all', function(event) {
                 if (/^session:/.test(event)) {
                     triggered.push(event);
                 }
             });
         });
 
+        afterEach(function() {
+            c.stopListening(c.sessions);
+            c.sessions.close();
+        });
+
         it('open', function() {
-            manager.open(url);
+            c.sessions.open(url);
 
             waitsFor(function() {
-                return !manager.pending;
+                return !c.sessions.pending;
             });
 
             runs(function() {
-                expect(manager.length).toEqual(1);
-                expect(manager.active.opened).toBe(true);
+                expect(c.sessions.length).toEqual(1);
+                expect(c.sessions.active.opened).toBe(true);
                 expect(triggered).toEqual([
-                    session.SESSION_OPENING,
-                    session.SESSION_OPENED
+                    c.SESSION_OPENING,
+                    c.SESSION_OPENED
                 ]);
 
             });
@@ -39,51 +41,52 @@ define(['cilantro/session'], function(session) {
                 // Opening it again does trigger the session since it is
                 // already open
                 triggered = [];
-                manager.open(url);
+                c.sessions.open(url);
             });
 
             waitsFor(function() {
-                return !manager.pending;
+                return !c.sessions.pending;
             });
 
             runs(function() {
-                expect(manager.length).toEqual(1);
+                expect(c.sessions.length).toEqual(1);
                 expect(triggered).toEqual([]);
             });
         });
 
         it('close', function() {
-            manager.open(url);
+            c.sessions.open(url);
 
             waitsFor(function() {
-                return !manager.pending;
+                return !c.sessions.pending;
             });
 
             runs(function() {
-                manager.close();
+                c.sessions.close();
                 expect(triggered).toEqual([
-                    session.SESSION_OPENING,
-                    session.SESSION_OPENED,
-                    session.SESSION_CLOSED
+                    c.SESSION_OPENING,
+                    c.SESSION_OPENED,
+                    c.SESSION_CLOSED
                 ]);
-                expect(manager.active).toBeUndefined();
+                expect(c.sessions.active).toBeUndefined();
             });
         });
 
         it('fail', function() {
-            manager.open('http://localhost:8000/api2/');
+            c.sessions.open('http://localhost:8000/api2/');
 
             waitsFor(function() {
-                return !manager.pending;
+                return !c.sessions.pending;
             });
 
             runs(function() {
                 expect(triggered).toEqual([
-                    session.SESSION_OPENING,
-                    session.SESSION_ERROR
+                    c.SESSION_OPENING,
+                    c.SESSION_ERROR
                 ]);
             });
         });
+
     });
 
 });
