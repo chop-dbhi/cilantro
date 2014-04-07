@@ -230,6 +230,21 @@ define([
             // Do not merge into existing models since the collection contains
             // additional state (which would be removed due to the merge).
             this.collection.set(value, {merge: false});
+        },
+
+        validate: function() {
+            var invalid = [];
+
+            this.collection.each(function(value) {
+                if (!value.get('valid')) {
+                    invalid.push(value.get('label'));
+                }
+            });
+
+            if (invalid.length) {
+                return 'Remove the following invalid labels then click ' +
+                       '&quot;Apply Filter&quot; again: ' + invalid.join(', ');
+            }
         }
 
     });
