@@ -89,7 +89,6 @@ define([
 
         onRender: function() {
             $(this.options.target)
-                .css('position', 'relative')
                 .append(this.$el);
         }
     });
