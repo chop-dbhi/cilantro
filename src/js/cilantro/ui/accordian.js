@@ -209,9 +209,9 @@ define([
 
     return {
         Accordian: Accordian,
-        Group: Group,
-        Section: Section,
-        Item: Item
+        AccordianGroup: Group,
+        AccordianSection: Section,
+        AccordianItem: Item
     };
 
 });

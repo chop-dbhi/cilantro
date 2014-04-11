@@ -8,7 +8,7 @@ define([
 ], function(Backbone, c, base, accordian) {
 
 
-    var ConceptItem  = accordian.Item.extend({
+    var ConceptItem  = accordian.AccordianItem.extend({
         events: {
             'click a': 'click'
         },
@@ -29,7 +29,7 @@ define([
     });
 
 
-    var ConceptSection = accordian.Section.extend({
+    var ConceptSection = accordian.AccordianSection.extend({
         itemView: ConceptItem,
 
         filter: function(query, models) {
@@ -53,7 +53,7 @@ define([
     });
 
 
-    var ConceptGroup = accordian.Group.extend({
+    var ConceptGroup = accordian.AccordianGroup.extend({
         itemView: ConceptSection,
 
         filter: function(query, models) {
