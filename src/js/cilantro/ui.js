@@ -4,7 +4,7 @@
 define([
     'underscore',
     './ui/core',
-    './ui/accordian',
+    './ui/accordion',
     './ui/base',
     './ui/button',
     './ui/charts',

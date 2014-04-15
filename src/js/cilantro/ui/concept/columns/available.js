@@ -84,7 +84,7 @@ define([
     var AvailableColumns = index.ConceptIndex.extend({
         itemView: AvailableGroup,
 
-        className: 'available-columns accordian'
+        className: 'available-columns accordion'
     });
 
 

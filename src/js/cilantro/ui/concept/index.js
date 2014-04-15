@@ -4,11 +4,11 @@ define([
     'backbone',
     '../core',
     '../base',
-    '../accordian'
-], function(Backbone, c, base, accordian) {
+    '../accordion'
+], function(Backbone, c, base, accordion) {
 
 
-    var ConceptItem  = accordian.AccordianItem.extend({
+    var ConceptItem  = accordion.AccordionItem.extend({
         events: {
             'click a': 'click'
         },
@@ -29,7 +29,7 @@ define([
     });
 
 
-    var ConceptSection = accordian.AccordianSection.extend({
+    var ConceptSection = accordion.AccordionSection.extend({
         itemView: ConceptItem,
 
         filter: function(query, models) {
@@ -53,7 +53,7 @@ define([
     });
 
 
-    var ConceptGroup = accordian.AccordianGroup.extend({
+    var ConceptGroup = accordion.AccordionGroup.extend({
         itemView: ConceptSection,
 
         filter: function(query, models) {
@@ -91,8 +91,8 @@ define([
     });
 
 
-    var ConceptIndex = accordian.Accordian.extend({
-        className: 'concept-index accordian',
+    var ConceptIndex = accordion.Accordion.extend({
+        className: 'concept-index accordion',
 
         itemView: ConceptGroup,
 
