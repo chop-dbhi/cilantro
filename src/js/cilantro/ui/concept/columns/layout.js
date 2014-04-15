@@ -146,15 +146,15 @@ define([
                 throw new Error('concepts collection required');
             }
 
-            this.listenTo(this.data.concepts, 'columns:detail', this.handleDetailsPopover);
+            this.listenTo(this.data.concepts, 'columns:detail',
+                this.handleDetailsPopover);
 
             // Local collection of selected concepts based on the bound `view`
             this.data.selected = new Backbone.Collection();
 
             // Listen the columns events on the models
-            this.data.selected.listenTo(this.data.concepts, 'columns:add', function(model) {
-                this.add(model);
-            });
+            this.data.selected.listenTo(this.data.concepts, 'columns:add',
+                function(model) { this.add(model); });
 
             this.data.selected.on('columns:remove', function(model) {
                 this.remove(model);
