@@ -11,9 +11,9 @@ define([
     'tpl!templates/search.html',
     'tpl!templates/welcome.html',
 
-    'tpl!templates/accordian/group.html',
-    'tpl!templates/accordian/section.html',
-    'tpl!templates/accordian/item.html',
+    'tpl!templates/accordion/group.html',
+    'tpl!templates/accordion/section.html',
+    'tpl!templates/accordion/item.html',
 
     'tpl!templates/base/error-overlay.html',
 

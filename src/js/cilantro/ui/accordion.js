@@ -9,7 +9,7 @@ define([
     var Item = Marionette.ItemView.extend({
         tagName: 'li',
 
-        template: 'accordian/item'
+        template: 'accordion/item'
     });
 
 
@@ -18,7 +18,7 @@ define([
 
         itemView: Item,
 
-        template: 'accordian/section',
+        template: 'accordion/section',
 
         itemViewContainer: '.items',
 
@@ -43,7 +43,7 @@ define([
     var Group = Marionette.CompositeView.extend({
         className: 'group',
 
-        template: 'accordian/group',
+        template: 'accordion/group',
 
         itemView: Section,
 
@@ -182,8 +182,8 @@ define([
     });
 
 
-    var Accordian = Marionette.CollectionView.extend({
-        className: 'accordian',
+    var Accordion = Marionette.CollectionView.extend({
+        className: 'accordion',
 
         itemView: Group,
 
@@ -208,10 +208,10 @@ define([
 
 
     return {
-        Accordian: Accordian,
-        AccordianGroup: Group,
-        AccordianSection: Section,
-        AccordianItem: Item
+        Accordion: Accordion,
+        AccordionGroup: Group,
+        AccordionSection: Section,
+        AccordionItem: Item
     };
 
 });
