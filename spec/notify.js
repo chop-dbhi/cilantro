@@ -3,6 +3,7 @@
 define(['cilantro/ui/notify'], function(notify) {
 
     var stream = new notify.Notifications();
+    stream.render();
 
     stream.$el.appendTo('body').css({
         position: 'fixed',

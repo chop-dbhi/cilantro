@@ -18,7 +18,7 @@ before_script:
     - git clone --branch demo git://github.com/cbmi/harvest-openmrs.git
     - pip install -r harvest-openmrs/requirements.txt
     - pip install uwsgi
-    - uwsgi --http :8000 --chdir harvest-openmrs --wsgi-file wsgi.py &
+    - uwsgi --master --enable-threads --http :8000 --chdir harvest-openmrs --wsgi-file wsgi.py &
 
 script:
     - grunt test --verbose

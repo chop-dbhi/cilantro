@@ -2,12 +2,12 @@
 
 define(['cilantro', 'cilantro/structs'], function(c, structs) {
 
-    describe('Structures', function() {
+    describe('Structs', function() {
         var frame, series, datum;
 
 		beforeEach(function() {
             frame = new structs.Frame(null, null);
-            frame.url = 'http://localhost:8000/api/data/preview/';
+            frame.url = c.config.get('url') + 'data/preview/';
 
             frame.fetch();
 

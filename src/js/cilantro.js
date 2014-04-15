@@ -9,6 +9,8 @@ define([
     './cilantro/setup'
 ], function(_, c, session, models, ui) {
 
+    _.extend(c, session.events);
+
     c.sessions = new session.SessionManager();
 
     // Attach containers of models and ui (views) components
@@ -16,10 +18,16 @@ define([
     c.ui = ui;
 
     // Keep the current session and router reference up-to-date
-    c.sessions.on(session.SESSION_OPENED, function(session) {
+    c.sessions.on(c.SESSION_OPENED, function(session) {
         c.session = session;
         c.router = session.router;
         c.data = session.data;
+    });
+
+    c.sessions.on(c.SESSION_CLOSED, function() {
+        delete c.session;
+        delete c.router;
+        delete c.data;
     });
 
     var ready = false;

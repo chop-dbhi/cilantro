@@ -1,18 +1,18 @@
-/* global define, describe, beforeEach, it, expect, waitsFor */
+/* global define, describe, beforeEach, afterEach, it, expect, waitsFor */
 
 define(['cilantro'], function(c) {
 
-    describe('Concept', function() {
-        var collection;
-
+    describe('Concepts', function() {
         beforeEach(function() {
-            collection = new c.models.Concepts();
-            collection.url = 'http://localhost:8000/api/concepts/';
-            collection.fetch();
+            c.sessions.open(c.config.get('url'));
 
             waitsFor(function() {
-                return collection.length > 0;
+                return c.data && c.data.concepts.length > 0;
             });
+        });
+
+        afterEach(function() {
+            c.sessions.close();
         });
 
         describe('ConceptIndex', function() {
@@ -20,7 +20,7 @@ define(['cilantro'], function(c) {
 
             beforeEach(function() {
                 view = new c.ui.ConceptIndex({
-                    collection: collection
+                    collection: c.data.concepts
                 });
             });
 

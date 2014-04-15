@@ -3,3 +3,5 @@ var cilantro = {
     root: '/_SpecRunner.html',
     debug: true
 };
+
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
