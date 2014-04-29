@@ -56,8 +56,14 @@ define([
             return model;
         },
 
-        showItem: function(model) {
-            model = this._ensureModel(model);
+        showItem: function(id) {
+            var model = this._ensureModel(id);
+
+            // Unknown or private model
+            if (!model) {
+                loglevel.debug('unknown workspace concept: ' + (id.id || id));
+                return;
+            }
 
             // Already being shown
             if (this.currentView && this.currentView.model.id === model.id) return;
