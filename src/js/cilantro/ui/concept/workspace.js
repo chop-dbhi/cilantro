@@ -65,6 +65,8 @@ define([
                 return;
             }
 
+            c.router.navigate('query', {trigger: true});
+
             // Already being shown
             if (this.currentView && this.currentView.model.id === model.id) return;
 

@@ -37,7 +37,6 @@ define([
 
         // Navigate to query page when a concept is triggered
         clickShow: function() {
-            c.router.navigate('query', {trigger: true});
             c.trigger(c.CONCEPT_FOCUS, this.model.get('concept'));
         },
 
