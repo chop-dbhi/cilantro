@@ -59,7 +59,7 @@ define [
             @jsonToFacets(attrs.json)
             return attrs
 
-        jsonToFacets: (json) ->
+        jsonToFacets: (json={}) ->
             # Implies this is an array of object, set directly. This is for
             # forwards compatibility.
             if _.isArray(json)
