@@ -74,7 +74,7 @@ define([
                 }
 
                 if (match) {
-                    this.session.set(match);
+                    this.session.set(match, options);
                     models.splice(i, 1);
                     break;
                 }
