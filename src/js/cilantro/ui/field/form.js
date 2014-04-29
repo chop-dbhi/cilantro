@@ -188,7 +188,7 @@ define([
         },
 
         renderFilter: function() {
-            this.ui.apply.prop('disabled', false);
+            this.ui.apply.prop('disabled', true);
             this.ui.update.prop('disabled', true);
             this.ui.state.hide();
 
@@ -208,12 +208,19 @@ define([
                 });
 
                 if (this.data.context.hasFilterChanged(this.data.filter, keys)) {
-                    this.ui.update.prop('disabled', false);
+                    if (this.data.filter.get('value').length > 0) {
+                        this.ui.apply.prop('disabled', false);
+                        this.ui.update.prop('disabled', false);
+                    }
                 }
             }
             else {
                 this.ui.apply.show();
                 this.ui.update.hide();
+                if ('value' in this.data.filter.attributes && 
+                    this.data.filter.get('value').length > 0) {
+                    this.ui.apply.prop('disabled', false);
+                }
             }
         },
 
