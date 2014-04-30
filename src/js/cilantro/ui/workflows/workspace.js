@@ -14,8 +14,6 @@ define([
         regions: {
             queries: '.query-region',
             publicQueries: '.public-query-region',
-            editQueryRegion: '.save-query-modal',
-            deleteQueryRegion: '.delete-query-modal'
         },
 
         regionViews: {
@@ -54,8 +52,6 @@ define([
 
         onRender: function() {
             var queryView = new this.regionViews.queries({
-                editQueryRegion: this.editQueryRegion,
-                deleteQueryRegion: this.deleteQueryRegion,
                 collection: this.data.queries,
                 context: this.data.context,
                 view: this.data.view,
