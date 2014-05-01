@@ -31,10 +31,17 @@ define(function() {
         return !(value === undefined || value === null || value === '');
     };
 
-    var toSuffixedNumber = function(value) {
+    var toSuffixedNumber = function(value, threshold) {
         if (!parsable(value)) return;
 
-        if (value < 1000) return toDelimitedNumber(value);
+        // If our number is less than the set threshold,
+        // do not proceed with rounding or making it pretty
+        if (value < 1000 && threshold === null) {
+            return toDelimitedNumber(value);
+        }
+        else if (value <= threshold){
+            return value;
+        }
 
         var exp, suffix, largeNum, newValue;
         for (var i = 0; i < suffixes.length; i++) {
@@ -75,7 +82,7 @@ define(function() {
         return text;
     };
 
-    var prettyNumber = function(value) {
+    var prettyNumber = function(value, threshold) {
         if (!parsable(value)) return;
 
         if (value !== 0) {
@@ -89,7 +96,7 @@ define(function() {
             }
         }
 
-        return toSuffixedNumber(value);
+        return toSuffixedNumber(value, threshold);
     };
 
     return {

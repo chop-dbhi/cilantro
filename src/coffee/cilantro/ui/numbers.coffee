@@ -9,5 +9,5 @@ define [
         if not count?
             $el.html(fallback)
         else
-            $el.html(c.utils.prettyNumber(count))
-                .attr('title', c.utils.toDelimitedNumber(count))
+            $el.html(c.utils.prettyNumber(count, c.config.get('threshold')))
+                           .attr('title', c.utils.toDelimitedNumber(count))
