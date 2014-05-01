@@ -3,7 +3,8 @@
 define([
     'underscore',
     'marionette',
-], function(_, Marionette) {
+    '../core'
+], function(_, Marionette, c) {
 
     var DeleteQueryDialog = Marionette.ItemView.extend({
         className: 'modal hide',
@@ -152,7 +153,14 @@ define([
             // of model put to prevent re-opening with a new instance
             var model = this.model, _this = this;
 
-            this.model.save(attrs).fail(function() {
+            this.model.save(attrs).done(function() {
+                c.notify({
+                    header: 'Saved',
+                    level: 'info',
+                    timeout: 5000,
+                    message: 'Successfully saved your query'
+                });
+            }).fail(function() {
                 _this.open(model);
 
                 // TODO evaluate the error and customize the message, e.g. don't
@@ -162,6 +170,7 @@ define([
             });
 
             this.close();
+
         },
 
         onRender: function() {
