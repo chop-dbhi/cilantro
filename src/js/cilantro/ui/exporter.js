@@ -249,7 +249,8 @@ define([
 
         events: {
             'click @ui.save': 'exportData',
-            'click @ui.pageOption': 'togglePageOption'
+            'click @ui.pageOption': 'togglePageOption',
+            'click [data-action=change-columns]': 'changeColumnsClicked'
         },
 
         regions: {
@@ -310,6 +311,10 @@ define([
             return pageRangePattern.test(this.getPageRange());
         },
 
+        changeColumnsClicked: function() {
+            c.dialogs.columns.open();
+        },
+
         validate: function() {
             var errors = [];
 
@@ -317,11 +322,16 @@ define([
             var options = this.getSelectedOptions();
 
             if (this.pageRangeSelected() && !this.isPageRangeValid()) {
-                errors.push('The page range entered is invalid. it must be a ' +
-                            'single page, e.g. 1, or a range of pages, e.g. 2...5.');
+                errors.push('<p>The page range entered is invalid. It must be a ' +
+                            'single page, e.g. 1, or a range of pages, e.g. 2...5.</p>');
             }
             if (options.length === 0) {
-                errors.push('An export type must be selected.');
+                errors.push('<p>An export type must be selected.</p>');
+            }
+            if (c.data.views.session.facets.length === 0){
+                errors.push('<p>One or more columns must be selected. Click ' +
+                            '<a data-action=change-columns>here</a> to select '+
+                            'columns.</p>');
             }
             return errors;
         },
@@ -341,7 +351,7 @@ define([
 
             // Show a list of errors if they exist
             if (errors.length) {
-                this.ui.error.html(errors.join('<br><br>')).show();
+                this.ui.error.html(errors).show();
                 return;
             }
 
