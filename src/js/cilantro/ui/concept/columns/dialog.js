@@ -17,8 +17,12 @@ define([
             'click [data-dismiss]': 'cancel'
         },
 
+        ui: {
+             error: '[data-target=error]'
+        },
+
         regions: {
-            body: '.modal-body'
+            body: '.concept-columns-region'
         },
 
         regionViews: {
@@ -62,12 +66,21 @@ define([
         },
 
         save: function() {
-            this.data.view.facets.reset(this.columns.selectedToFacets());
+            this.ui.error.hide();
+            var facets = this.columns.selectedToFacets();
+
+            if (facets.length === 0) {
+                this.ui.error.html('<p>You must select one or more columns.</p>').show();
+                return;
+            }
+
+            this.data.view.facets.reset(facets);
             this.data.view.save();
             this.close();
         },
 
         open: function() {
+            this.ui.error.hide();
             this.$el.modal('show');
         },
 
