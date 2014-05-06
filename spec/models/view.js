@@ -82,21 +82,6 @@ define(['cilantro'], function(c) {
                 return toggle;
             });
 
-            runs(function() {
-                toggle = false;
-
-                model.fetch({
-                    error: function(model, xhr) {
-                        toggle = xhr.status;
-                    }
-                });
-            });
-
-            waitsFor(function() { return toggle; });
-
-            runs(function() {
-                expect(toggle).toEqual(404);
-            });
         });
 
         describe('Facets', function() {
