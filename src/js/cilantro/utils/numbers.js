@@ -36,7 +36,7 @@ define(function() {
 
         // If our number is less than the set threshold,
         // do not proceed with rounding or making it pretty
-        if (value < 1000 && threshold === null) {
+        if (value < 1000 && (threshold === null || threshold === undefined)) {
             return toDelimitedNumber(value);
         }
         else if (value <= threshold){
