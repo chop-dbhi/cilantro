@@ -29,7 +29,8 @@ define([
 
         serializeData: function() {
             var attrs = _.clone(this.model.attributes);
-            attrs.prettyCount = c.utils.prettyNumber(attrs.count, c.config.get('threshold'));
+            attrs.prettyCount = c.utils.prettyNumber(
+                attrs.count, c.config.get('threshold'));
             return attrs;
         },
 

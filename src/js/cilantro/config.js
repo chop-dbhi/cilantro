@@ -42,13 +42,14 @@ define([
 
         // Convenience option: Credentials for the default session
         credentials: null,
+
         /*
          * Threshold for showing counts of results as rounded and/or
-         * prefixed numbers. set this threshold to be a number and if the
+         * prefixed numbers. Set this threshold to be a number and if the
          * displayed counts are less than the threshold, there will be no
-         * rounding and the count will be displayed as is (precise).
+         * rounding and the count will be displayed as is(precise).
          */
-         threshold: null,
+        threshold: null,
 
 
         /*
