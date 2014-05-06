@@ -69,7 +69,7 @@ define(['cilantro'], function(c) {
             });
 
             runs(function() {
-                model = c.data.views.at(1);
+                model = c.data.views.findWhere({session: false});
 
                 model.destroy({
                     success: function() {
