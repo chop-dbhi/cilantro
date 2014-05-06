@@ -90,11 +90,16 @@ define([
     // Derives a template id from the template's path. This is an internal
     // function that assumes the base directory is under templates/
     var pathToId = function(name) {
-        // Remove leading slash and/or templates dir prefix, strip extension
+        // Remove leading slash
         if (name.charAt(0) === '/') {
             name = name.substr(1);
         }
-        return name.replace(/^templates\//, '').replace(/\.html$/, '');
+
+        // Remove relative paths
+        name = name.replace(/\.\.\//g, '');
+
+        // Remove templates prefix, strip extension
+        return name.replace(/templates\//, '').replace(/\.html$/, '');
     };
 
     // Registers all built-in templates using the augmented _moduleName from
