@@ -90,7 +90,10 @@ define([
     // Derives a template id from the template's path. This is an internal
     // function that assumes the base directory is under templates/
     var pathToId = function(name) {
-        // Remove templates dir prefix, strip extension
+        // Remove leading slash and/or templates dir prefix, strip extension
+        if (name.charAt(0) === '/') {
+            name = name.substr(1);
+        }
         return name.replace(/^templates\//, '').replace(/\.html$/, '');
     };
 
@@ -115,7 +118,14 @@ define([
         require([
             module
         ], function(func) {
-            customTemplates[id] = func;
+            // No id, anonymous function, assume loaded via the tpl! plugin
+            if (!id) {
+                id = func;
+                func = null;
+            }
+
+            _set(id, func);
+
             pendingRemotes--;
         }, function(err) {
             loglevel.debug(err);
@@ -125,6 +135,20 @@ define([
 
     // Handles the case when the registered function is *not* a function.
     var _set = function(id, func) {
+        // Assume template loaded via the tpl! plugin
+        if (typeof id === 'function') {
+            func = id;
+            if (!func._moduleName) {
+                throw new Error('cannot register anonymous template');
+            }
+            id = pathToId(func._moduleName);
+        }
+        // Assume bare id is a remote path
+        else if (!func) {
+            func = id;
+            id = null;
+        }
+
         switch (typeof func) {
             case 'function':
                 customTemplates[id] = func;
@@ -148,7 +172,7 @@ define([
         set: function(id, func) {
             if (typeof id === 'object') {
                 _.each(id, function(func, key) {
-                    _set(key, func);
+                    this.set(key, func);
                 });
             }
             else {

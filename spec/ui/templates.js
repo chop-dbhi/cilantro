@@ -48,6 +48,16 @@ define(['cilantro', 'underscore', 'marionette'], function(c, _, Marionette) {
                 expect(c.templates.get('remote')({name: 'World'})).toEqual('Hello World');
             });
         });
+
+        it('should allow for remote templates via tpl!', function() {
+            c.templates.set('tpl!/spec/custom-template.html');
+            waitsFor(c.templates.ready);
+
+            runs(function() {
+                expect(c.templates.get('spec/custom-template')({name: 'World'}))
+                    .toEqual('Hello World\n');  // trailing newline from text! plugin
+            });
+        });
     });
 
 });
