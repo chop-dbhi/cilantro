@@ -18,7 +18,7 @@ define([
         },
 
         ui: {
-             error: '[data-target=error]'
+            error: '[data-target=error]'
         },
 
         regions: {
