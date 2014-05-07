@@ -146,6 +146,10 @@ define([
 
         searchPaginator: SearchPaginator,
 
+        events: {
+            'click [data-action=clear]': 'clearValues'
+        },
+
         regions: {
             search: '.search-region',
             paginator: '.paginator-region',
@@ -208,6 +212,10 @@ define([
             this.browse.show(browseRegion);
             this.paginator.show(paginatorRegion);
             this.values.show(valuesRegion);
+        },
+
+        clearValues: function() {
+           this.values.currentView.clear();
         },
 
         getField: function() {
