@@ -226,7 +226,7 @@ define([
 
         validate: function(attrs) {
             // One of the bounds must be defined
-            if (_.isUndefined(attrs.value)) {
+            if (_.isUndefined(attrs.value) || _.isNull(attrs.value)) {
                 return 'A lower or upper value must be defined';
             }
 
