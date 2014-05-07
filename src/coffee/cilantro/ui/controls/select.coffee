@@ -92,6 +92,10 @@ define [
         setValue: (value) ->
             @ui.items.val(value)
 
+        validate: (attrs) ->
+            if _.isNull(attrs.value) or _.isUndefined(attrs.value)
+                return 'An option must be selected'
+
 
     class MultiSelectionList extends SingleSelectionList
         onCollectionSync: ->
@@ -116,6 +120,10 @@ define [
         setValue: (values=[]) ->
             @collection.each (model) ->
                 model.set('selected', model.get('value') in values)
+
+        validate: (attrs) ->
+            if not attrs.value or not attrs.value.length
+                return 'At least one option must be selected'
 
 
     { SingleSelectionList, MultiSelectionList }

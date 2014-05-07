@@ -187,20 +187,6 @@ define([
             this.chart.show(new this.regionViews.chart(options));
         },
 
-        _isValueValid: function(value) {
-            // Since values can be arrays(range control, search control, etc.)
-            // and single values(range control, single selection control, etc.)
-            // we need to check that the value is either a non-empty array or
-            // a non-null single value to be considered valid and enable the
-            // buttons.
-            if (_.isArray(value)) {
-                return !_.isEmpty(value);
-            }
-            else {
-                return value !== null && value !== undefined;
-            }
-        },
-
         renderFilter: function() {
             this.ui.apply.prop('disabled', true);
             this.ui.update.prop('disabled', true);
@@ -222,7 +208,7 @@ define([
                 });
 
                 if (this.data.context.hasFilterChanged(this.data.filter, keys)) {
-                    if (this._isValueValid(this.data.filter.get('value'))) {
+                    if (this.validateFilter({silent: true})) {
                         this.ui.apply.prop('disabled', false);
                         this.ui.update.prop('disabled', false);
                     }
@@ -231,13 +217,15 @@ define([
             else {
                 this.ui.apply.show();
                 this.ui.update.hide();
-                if (this._isValueValid(this.data.filter.get('value'))) {
+                if (this.validateFilter({silent: true})) {
                     this.ui.apply.prop('disabled', false);
                 }
             }
         },
 
-        validateFilter: function() {
+        validateFilter: function(options) {
+            options = _.extend({}, options);
+
             var message,
                 messages = [],
                 attrs = this.data.filter.toJSON();
@@ -252,7 +240,9 @@ define([
 
             if (messages.length) {
                 this.validationErrors = messages;
-                this.ui.state.html(messages.join('<br>')).show();
+                if (!options.silent) {
+                    this.ui.state.html(messages.join('<br>')).show();
+                }
                 return false;
             }
 
