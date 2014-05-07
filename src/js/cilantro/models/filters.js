@@ -32,6 +32,15 @@ define([
             return generateId(attrs);
         },
 
+        clear: function(options) {
+            // Do not unset required fields
+            var attrs = _.clone(this.attributes);
+            delete attrs.id;
+            delete attrs.field;
+            delete attrs.concept;
+            this.set(attrs, _.defaults({unset: true}, options));
+        },
+
         // No syncing, i.e. no request, sync, error
         sync: function() {},
 

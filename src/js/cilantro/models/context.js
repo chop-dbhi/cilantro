@@ -145,10 +145,18 @@ define([
             // Filters are enabled by default. If a filter is previously disabled
             // and re-applied, it will be enabled.
             attrs.required = this.isFilterRequired(attrs);
-            delete attrs.language;
 
-            // Add/merge public filter
-            var model = this.filters.add(attrs, _.defaults({merge: true}, options));
+            // Add/update public filter
+            var model = this.filters.get(attrs.id);
+
+            // Clear previous attributes if model exists
+            if (model) {
+                model.clear({silent: true});
+                model.set(attrs);
+            }
+            else {
+                model = this.filters.add(attrs, options);
+            }
 
             // Silently enable the model, otherwise this will trigger a save
             // TODO refactor?
