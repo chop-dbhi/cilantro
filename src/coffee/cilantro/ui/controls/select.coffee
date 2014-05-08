@@ -17,7 +17,14 @@ define [
             'change:selected': 'render'
 
         onRender: ->
-            @$el.text(@model.get('label'))
+            label = @model.get('label')
+            if label is ''
+                @$el.text('(empty)')
+            else if label is 'null'
+                @$el.text('(null)')                    
+            else
+                @$el.text(label)
+
             @$el.attr('value', @model.get('value'))
             @$el.attr('selected', @model.get('selected'))
 

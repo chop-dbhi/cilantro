@@ -79,7 +79,8 @@ define([
         ui: {
             actions: '.actions',
             addButton: '.add-item-button',
-            removeButton: '.remove-item-button'
+            removeButton: '.remove-item-button',
+            label: '.value-label'
         },
 
         events: {
@@ -121,6 +122,11 @@ define([
 
         onRender: function() {
             this.setState();
+            if (this.ui.label.html() === '') {
+                this.ui.label.html('(empty)');
+            } else if (this.ui.label.html() === 'null') {
+                this.ui.label.html('(null)');
+            }
         }
     });
 
