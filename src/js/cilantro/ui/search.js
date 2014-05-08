@@ -24,22 +24,24 @@ define([
         },
 
         events: {
-            'keyup @ui.input': '_triggerSearch'
+            'input @ui.input': '_triggerSearch'
         },
 
         constructor: function(options) {
+            options = options || {};
+
+            var delay = options.delay || _.result(this, 'options').delay;
+
             // This event needs to be debounced before the call to the super
             // constructor or the keyup event will not be mapped to any handler
             // since _triggerSearch won't exist yet.
-            this._triggerSearch = _.debounce(this.triggerSearch, this.options.delay);
+            this._triggerSearch = _.debounce(this.triggerSearch, delay);
 
             Marionette.ItemView.prototype.constructor.call(this, options);
 
-            this._query = '';
-
-            // If this is triggered externally, ensure the input text reflects the
-            // query.
-            this.on('search', this.renderInputText);
+            // If this is triggered externally, ensure the input text reflects
+            // the query.
+            this.on('search', this.renderInputValue);
 
             // If a search method is supplied, bind it to the search event
             if (this.search) this.on('search', this.search);
@@ -59,25 +61,16 @@ define([
             });
         },
 
-        renderInputText: function(query) {
-            if (this.ui.input.val() !== query) {
-                this._query = query;
-                this.ui.input.val(query);
-            }
+        renderInputValue: function(value) {
+            // Prevent setting the input when triggering itself
+            if (!this._triggering) this.ui.input.val(value);
         },
 
-        triggerSearch: function(event) {
-            // No bubbling of submit events
-            event.stopImmediatePropagation();
-
-            var query = this.ui.input.val().trim();
-
-            // Prevent redundant queries
-            if (query === this._query) return;
-
-            this._query = query;
-
+        triggerSearch: function() {
+            var query = this.ui.input.val();
+            this._triggering = true;
             this.trigger('search', query);
+            this._triggering = false;
         }
     });
 
