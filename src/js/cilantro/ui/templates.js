@@ -62,6 +62,10 @@ define([
 
     'tpl!templates/controls/null/layout.html',
 
+    'tpl!templates/controls/text/layout.html',
+    'tpl!templates/controls/text/preview-list.html',
+    'tpl!templates/controls/text/preview-item.html',
+
     'tpl!templates/field/form-condensed.html',
     'tpl!templates/field/form.html',
     'tpl!templates/field/info.html',

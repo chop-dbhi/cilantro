@@ -9,7 +9,8 @@ define([
     './controls/search',
     './controls/infograph',
     './controls/registry',
-    './controls/null'
+    './controls/null',
+    './controls/text'
 ], function(_) {
 
     // Modules to be mixed-in with exports
