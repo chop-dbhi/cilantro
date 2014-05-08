@@ -7,6 +7,29 @@ define([
     '../core',
 ], function(_, Marionette, base, c) {
 
+    var flattenLanguage = function(attrs, toks) {
+        if (!attrs) return '';
+        if (!toks) toks = [];
+
+        toks.push('<ul>');
+
+        if (attrs.language) {
+            toks.push('<li>' + attrs.language + '</li>');
+        }
+        else if (attrs.type && attrs.children.length) {
+            toks.push('<li><small>' + attrs.type.toUpperCase() + '</small>');
+
+            _.each(attrs.children, function(child) {
+                flattenLanguage(child, toks);
+            });
+
+            toks.push('</li>');
+        }
+
+        toks.push('</ul>');
+
+        return toks.join('');
+    };
 
     var ContextFilter = Marionette.ItemView.extend({
         className: 'context-filter',
@@ -73,7 +96,8 @@ define([
         },
 
         renderDescription: function() {
-            this.ui.description.html(this.model.get('language'));
+            var text = flattenLanguage(this.model.attributes);
+            this.ui.description.html(text);
         },
 
         showLoadView: function() {
