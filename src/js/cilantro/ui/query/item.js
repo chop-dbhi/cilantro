@@ -4,8 +4,9 @@ define([
     'underscore',
     'marionette',
     '../base',
-    '../core'
-], function(_, Marionette, base, c) {
+    '../core',
+    '../context/filters'
+], function( _, Marionette, base, c, filters) {
 
     var LoadingQueryItem = base.LoadView.extend({
         align: 'left'
@@ -24,7 +25,8 @@ define([
             owner: '.owner',
             nonOwner: '.non-owner',
             shareCount: '.share-count',
-            publicIcon: '.public-icon'
+            publicIcon: '.public-icon',
+            filterList: '[data-target=filter-column-list]'
         },
 
         events: {
@@ -76,6 +78,46 @@ define([
             this.trigger('showDeleteQueryModal', this.model);
         },
 
+        showQueryDetails: function() {
+            var columns = [];
+
+            /*
+             * When the session.defaults.data.preview setting is being used,
+             * the view is overridden when making request to the preview endpoint
+             * so displaying the columns will not be useful. If this setting
+             * does not exist, then display the columns under a saved query.
+             */
+            if (!c.config.get('session.defaults.data.preview')) {
+                // Retrieve the columns selected
+                var concepts = this.model.view.facets.map(function(model) {
+                    return c.data.concepts.get(model.get('concept')).get('name');
+                });
+
+                if (concepts) {
+                    columns.push('<ul><li><strong>Columns:</strong><ul>');
+                    for (var i in concepts) {
+                        columns.push('<li>' + concepts[i] + '</li>');
+                    }
+                    columns.push('</ul></li></ul>');
+                }
+            }
+
+            var fullList = [];
+
+            // Flatten the filters to deal with nested filters
+            var list = filters.flattenLanguage(this.model.context.attributes.json);
+
+            fullList.push('<ul><li><strong>Filters:</strong>');
+
+            // Replace the surrounding <ul></ul> tags. These cause unnecessary
+            // nesting when put within our filter list
+            fullList.push(list.replace(/(^<ul>|<\/ul>$)/, ''));
+            fullList.push('</li></ul>');
+            fullList.push(columns.join(''));
+
+            this.ui.filterList.html(fullList.join(''));
+        },
+
         onRender: function() {
             if (this.options.editable && this.model.get('public')) {
                 this.ui.publicIcon.removeClass('hidden');
@@ -105,6 +147,8 @@ define([
                 this.ui.nonOwner.hide();
                 this.ui.owner.hide();
             }
+
+            this.showQueryDetails();
         }
     });
 

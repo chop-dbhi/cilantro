@@ -7,7 +7,7 @@ define([
     '../core',
 ], function(_, Marionette, base, c) {
 
-    var flattenLanguage = function(attrs, toks) {
+    var flattenLanguage = function(attrs, toks, type) {
         if (!attrs) return '';
         if (!toks) toks = [];
 
@@ -17,10 +17,12 @@ define([
             toks.push('<li>' + attrs.language + '</li>');
         }
         else if (attrs.type && attrs.children.length) {
-            toks.push('<li><small>' + attrs.type.toUpperCase() + '</small>');
+            if (type) {
+                toks.push('<li><small>' + attrs.type.toUpperCase() + '</small>');
+            }
 
             _.each(attrs.children, function(child) {
-                flattenLanguage(child, toks);
+                flattenLanguage(child, toks, type);
             });
 
             toks.push('</li>');
@@ -168,7 +170,8 @@ define([
     return {
         ContextFilter: ContextFilter,
         ContextFilters: ContextFilters,
-        ContextNoFilters: ContextNoFilters
+        ContextNoFilters: ContextNoFilters,
+        flattenLanguage: flattenLanguage
     };
 
 

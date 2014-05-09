@@ -51,17 +51,15 @@ define([
         },
 
         onRender: function() {
-            var queryView = new this.regionViews.queries({
+            this.queryView = new this.regionViews.queries({
                 collection: this.data.queries,
                 context: this.data.context,
                 view: this.data.view,
                 editable: true
             });
 
-            this.queries.show(queryView);
-
             if (c.isSupported('2.2.0')) {
-                var publicQueryView = new this.regionViews.publicQueries({
+                this.publicQueryView = new this.regionViews.publicQueries({
                     collection: this.data.publicQueries,
                     context: this.data.context,
                     view: this.data.view,
@@ -83,12 +81,15 @@ define([
                 this.listenTo(this.data.queries, 'sync', function() {
                     this.data.publicQueries.fetch({reset: true});
                 });
-
-                // We explicitly set the editable option to false below because
-                // users should not be able to edit the public queries
-                // collection.
-                this.publicQueries.show(publicQueryView);
             }
+
+            this.listenTo(c.data.concepts, 'reset', function() {
+                this.queries.show(this.queryView);
+
+                if (this.publicQueries) {
+                    this.publicQueries.show(this.publicQueryView);
+                }
+            });
         }
     });
 
