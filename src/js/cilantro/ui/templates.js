@@ -182,7 +182,7 @@ define([
             if (typeof id === 'object') {
                 _.each(id, function(func, key) {
                     this.set(key, func);
-                });
+                }, this);
             }
             else {
                 _set(id, func);
