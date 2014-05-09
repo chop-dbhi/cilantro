@@ -58,6 +58,26 @@ define(['cilantro', 'underscore', 'marionette'], function(c, _, Marionette) {
                     .toEqual('Hello World\n');  // trailing newline from text! plugin
             });
         });
+
+        it('should support an array', function() {
+            c.templates.set(['tpl!/spec/custom-template.html']);
+            waitsFor(c.templates.ready);
+
+            runs(function() {
+                expect(c.templates.get('spec/custom-template')).toBeDefined();
+            });
+        });
+
+        it('should support an object', function() {
+            c.templates.set({
+                foobar: 'tpl!/spec/custom-template.html'
+            });
+            waitsFor(c.templates.ready);
+
+            runs(function() {
+                expect(c.templates.get('foobar')).toBeDefined();
+            });
+        });
     });
 
 });

@@ -179,7 +179,15 @@ define([
 
         // Sets a template in cache.
         set: function(id, func) {
-            if (typeof id === 'object') {
+            if (_.isArray(id)) {
+                _.each(id, function(func) {
+                    this.set(func);
+                }, this);
+            }
+            else if (_.isFunction(id)) {
+                _set(id);
+            }
+            else if (_.isObject(id)) {
                 _.each(id, function(func, key) {
                     this.set(key, func);
                 }, this);
