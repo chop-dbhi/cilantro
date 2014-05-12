@@ -1,0 +1,9 @@
+<div class=actions>
+    <button class='btn btn-mini add-item-button'><i class='icon-plus text-success'></i></button>
+    <button class='btn btn-mini hide remove-item-button'><i class='icon-minus text-error'></i></button>
+</div>
+<% if (data.url) { %>
+    <a class=value-label href='<%= data.url %>'><%= data.label %></a>
+<% } else { %>
+    <span class=value-label><%= data.label %></span>
+<% } %>

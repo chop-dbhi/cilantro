@@ -10,6 +10,13 @@ define([
     '../constants'
 ], function($, _, Marionette, base, c, models, constants) {
 
+    var ValueItem = Marionette.ItemView.extend({
+        className: 'value-item',
+
+        template: 'values/item'
+    });
+
+
     // Interface for representing a user-defined/selected list of values
     // in a textarea (one per line). In majority of cases, values
     // correspond to the labels, but in certain cases, the underlying
@@ -108,6 +115,7 @@ define([
     });
 
     return {
+        ValueItem: ValueItem,
         ValueList: ValueList
     };
 

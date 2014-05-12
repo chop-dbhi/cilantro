@@ -10,7 +10,8 @@ define([
     './controls/infograph',
     './controls/registry',
     './controls/null',
-    './controls/text'
+    './controls/text',
+    './controls/vocab'
 ], function(_) {
 
     // Modules to be mixed-in with exports
