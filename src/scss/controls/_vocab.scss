@@ -1,0 +1,42 @@
+.vocab-control {
+    .search input {
+        margin-bottom: 0;
+    }
+
+    .vocab-path .path-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+        display: inline-block;
+        width: 84%;
+    }
+
+    .vocab-bucket {
+        margin-bottom: 20px;
+
+        .value-list {
+            min-height: 26px;
+
+            border: 1px solid #ccc;
+
+            .value-item:last-child {
+                margin-bottom: 0;
+            }
+
+        }
+
+        &.empty {
+            .value-list {
+                border: 1px dashed #aaa;
+            }
+        }
+
+        .placeholder {
+            min-height: 26px;
+            margin-bottom: 0;
+            background-color: lightyellow;
+        }
+
+    }
+}

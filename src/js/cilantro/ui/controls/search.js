@@ -10,7 +10,7 @@ define([
     '../paginator',
     '../values',
     '../search'
-], function($, _, Marionette, base, models, constants, paginator, values, search) {
+], function($, _, Marionette, controls, models, constants, paginator, values, search) {
 
     // Single page of values
     var SearchPageModel = models.Page.extend({
@@ -36,39 +36,19 @@ define([
         initialize: function(items, options) {
             options = options || {};
             this.field = options.field;
+            this.currentUrl = null;
             models.Paginator.prototype.initialize.call(this, items, options);
         },
 
         url: function() {
-            var url = this.field.links.values;
+            var url = this.currentUrl || this.field.links.values;
+
             if (this.urlParams) {
                 url = url + '?' + $.param(this.urlParams);
             }
             return url;
         }
     });
-
-
-    // View for querying field values
-    var ValueSearch = search.Search.extend({
-        className: 'field-search search',
-
-        initialize: function() {
-            search.Search.prototype.initialize.call(this);
-            this.paginator = this.options.paginator;
-        },
-
-        search: function(query) {
-            if (query) {
-                this.options.paginator.urlParams = {query: query};
-            } else {
-                this.paginator.urlParams = null;
-            }
-
-            this.paginator.refresh();
-        }
-    });
-
 
     // Single search result item
     var SearchItem = Marionette.ItemView.extend({
@@ -139,7 +119,7 @@ define([
     });
 
 
-    var SearchControl = base.ControlLayout.extend({
+    var SearchControl = controls.ControlLayout.extend({
         className: 'field-value-search',
 
         template: 'controls/search/layout',
@@ -158,7 +138,7 @@ define([
         },
 
         regionViews: {
-            search: ValueSearch,
+            search: search.Search,
             paginator: paginator.Paginator,
             browse: SearchPageRoll,
             values: values.ValueList
@@ -190,9 +170,11 @@ define([
         onRender: function() {
             var searchRegion = new this.regionViews.search({
                 model: this.model,
-                paginator: this.valuesPaginator,
                 placeholder: 'Search ' + this.model.get('plural_name') + '...'
             });
+
+            // Listen to search events
+            this.listenTo(searchRegion, 'search', this.handleSearch);
 
             var browseRegion = new this.regionViews.browse({
                 collection: this.valuesPaginator,
@@ -214,8 +196,13 @@ define([
             this.values.show(valuesRegion);
         },
 
+        handleSearch: function(query) {
+            this.paginator.urlParams = query ? {query: query} : null;
+            this.paginator.refresh();
+        },
+
         clearValues: function() {
-           this.values.currentView.clear();
+            this.values.currentView.clear();
         },
 
         getField: function() {
@@ -278,7 +265,6 @@ define([
 
     return {
         SearchControl: SearchControl,
-        ValueSearch: ValueSearch,
         SearchItem: SearchItem,
         SearchPage: SearchPage,
         SearchPageRoll: SearchPageRoll,
