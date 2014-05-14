@@ -25,6 +25,14 @@
             }
         }
 
+        @media (min-width: 1200px) {
+            .navbar-inner {
+                .tooltip {
+                    visibility: hidden;
+               }
+            }
+        }
+
         .navbar-inner {
             padding-left: 5px;
             padding-right: 5px;
