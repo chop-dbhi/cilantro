@@ -55,6 +55,7 @@ define [
 
         ui:
             bar: '.bar'
+            barLabel: '.bar-label'
 
         events:
             'click': 'toggleSelected'
@@ -79,6 +80,10 @@ define [
 
         onRender: ->
             @setSelected(@model, !!@model.get('selected'))
+            if @ui.barLabel.html() is ''
+                @ui.barLabel.html('(empty)')
+            if @ui.barLabel.html() is 'null'
+                @ui.barLabel.html('(null)')
 
         # Returns the percentage of the value's count relative to the 'total'
         getPercentage: ->
