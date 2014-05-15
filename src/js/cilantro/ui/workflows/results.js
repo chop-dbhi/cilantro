@@ -235,16 +235,19 @@ define([
            * endpoint so the data(order aside) shown in the results table will not be
            * affected by the columns(or lack thereof) the user has chosen.
            */
-            if (this.data.view.facets.length === 0 &&
-                    !c.config.get('session.defaults.data.preview')) {
-                c.notify({
-                    header: 'No Columns Selected: ',
-                    level: 'warning',
-                    timeout: false,
-                    message: 'No data can be displayed. Click the "Change Columns" ' +
-                             'button on the toolbar to select columns to display.'
-                });
-            }
+           this.listenTo(this.data.view.facets, 'reset', function() {
+                if (this.data.view.facets.length === 0 &&
+                        !c.config.get('session.defaults.data.preview')) {
+                    c.notify({
+                        header: 'No Columns Selected: ',
+                        level: 'warning',
+                        timeout: false,
+                        message: 'No data can be displayed. Click the "Change ' +
+                                 'Columns" button on the toolbar to select ' +
+                                 'columns to display.'
+                    });
+                }
+            });
         },
 
         onClose: function() {
