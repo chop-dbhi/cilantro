@@ -8,7 +8,12 @@
     </p>
 <% } %>
 
-<p class=name><%= data.name %></p>
+<p class=name>
+    <%= data.name %>
+    <% if (data.unit) { %>
+        <small class=unit><%= data.unit %></small>
+    <% } %>
+</p>
 
 <% if (data.description) { %>
     <div class="description ellipsis">
