@@ -3,31 +3,44 @@
         .title {
             display: inline;
         }
+
         div {
             display: inline;
             float: right;
         }
     }
     .items {
-        div {
+        > div {
             border-bottom: 1px solid rgba(0.0, 0.0, 0.0, 0.1);
-            padding: 5px 0;
+            margin-top: 3px;
 
             span {
                 min-height: 0;
             }
         }
+
+        div:last-child {
+            border-bottom: 0px;
+        }
+
+        ul {
+            margin: 0px 40px;
+        }
+
         .public-icon-container {
             border: 0;
             display: inline;
             width: 12px;
         }
+
         .name-label {
             float: left;
         }
+
         .owner, .non-owner {
             float: right;
         }
+
         .edit-query, .delete-query {
             width: 60px;
         }

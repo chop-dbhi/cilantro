@@ -1,14 +1,18 @@
-<span class='name-label'>
-    <div class='public-icon-container'>
-        <i class='public-icon icon-external-link-sign hidden'></i>
-    </div>
-    <a class='shared-query-name' href="#"><%= data.name %></a>
-</span>
-<span class='owner'>
-    <button data-toggle=edit-query-modal class='edit-query btn btn-mini'><i class=icon-edit></i> Edit</button>
-    <button data-toggle=delete-query-modal class='delete-query btn btn-mini'><i class=icon-trash></i> Delete</button>
-    <i class='icon-group share-count'> (<%= data.shared_users.length %>) </i>
-</span>
-<span class='non-owner'>
-    shared by <em><%= data.user.username %></em>
-</span>
+<div>
+    <span class='name-label'>
+        <div class='public-icon-container'>
+            <i class='public-icon icon-external-link-sign hidden'></i>
+        </div>
+        <a class='shared-query-name' href="#"><%= data.name %></a>
+    </span>
+    <span class='owner'>
+        <button data-toggle=edit-query-modal class='edit-query btn btn-mini'><i class=icon-edit></i> Edit</button>
+        <button data-toggle=delete-query-modal class='delete-query btn btn-mini'><i class=icon-trash></i> Delete</button>
+        <i class='icon-group share-count'> (<%= data.shared_users.length %>) </i>
+    </span>
+    <span class='non-owner'>
+        shared by <em><%= data.user.username %></em>
+    </span>
+    <br>
+    <div class='filter-column-list' data-target='filter-column-list'></div>
+</div>
