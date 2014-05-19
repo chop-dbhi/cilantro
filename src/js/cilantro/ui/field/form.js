@@ -91,9 +91,6 @@ define([
             }
 
             this.data.filter = options.filter;
-
-            Marionette.bindEntityEvents(this, this.data.filter,
-                Marionette.getOption(this, 'filterEvents'));
         },
 
         onRender: function() {
@@ -107,6 +104,9 @@ define([
             if (this.options.chart && this.model.links.distribution) this.renderChart();
 
             this.renderFilter();
+
+            Marionette.bindEntityEvents(this, this.data.filter,
+                Marionette.getOption(this, 'filterEvents'));
         },
 
         renderInfo: function() {
