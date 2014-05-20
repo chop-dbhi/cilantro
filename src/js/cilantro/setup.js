@@ -69,20 +69,28 @@ define([
     });
 
     $(document).ajaxError(function(event, xhr, settings, exception) {
-        // Status of 0 is an aborted request which is usually intentional
-        // by the app or from a page reload.
-        // An empty exception value is an unknown error which usually
-        // means the server is unavailable
-        if (xhr.status === 0 || exception) return;
+        // A statusText value of 'abort' is an aborted request which is 
+        // usually intentional by the app or from a page reload.
+        if (xhr.statusText === 'abort') return;
 
+        var message = '';
+        
+        if (xhr.status === 0 && exception === '') {
+            // An empty exception value is an unknown error which usually
+            // means the server is unavailable.
+            message = 'The application is no longer responding.';
+        } else {
+            // General purpose error message
+            message = 'There is a communication problem with the server. ' +
+                '<a href="#" onclick="location.reload()">Refreshing</a> ' +
+                'the page may help.';
+        }
         c.notify({
             timeout: null,
             dismissable: false,
             level: 'error',
             header: 'Uh oh.',
-            message: 'There is a communication problem with the server. ' +
-                '<a href="#" onclick="location.reload()">Refreshing</a> ' +
-                'the page may help.'
+            message: message
         });
     });
 
