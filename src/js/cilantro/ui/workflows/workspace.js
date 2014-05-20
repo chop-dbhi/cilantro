@@ -51,15 +51,17 @@ define([
         },
 
         onRender: function() {
-            this.queryView = new this.regionViews.queries({
+            var queryView = new this.regionViews.queries({
                 collection: this.data.queries,
                 context: this.data.context,
                 view: this.data.view,
                 editable: true
             });
 
+            this.queries.show(queryView);
+
             if (c.isSupported('2.2.0')) {
-                this.publicQueryView = new this.regionViews.publicQueries({
+                var publicQueryView = new this.regionViews.publicQueries({
                     collection: this.data.publicQueries,
                     context: this.data.context,
                     view: this.data.view,
@@ -72,6 +74,11 @@ define([
                                   "to all users and cause it to be listed here."
                 });
 
+                // We explicitly set the editable option to false below because
+                // users should not be able to edit the public queries
+                // collection.
+                this.publicQueries.show(publicQueryView);
+
                 // When the queries are synced we need to manually update the
                 // public queries collection so that any changes to public
                 // queries are reflected there. Right now, this is done lazily
@@ -81,13 +88,14 @@ define([
                 this.listenTo(this.data.queries, 'sync', function() {
                     this.data.publicQueries.fetch({reset: true});
                 });
+
             }
 
             this.listenTo(c.data.concepts, 'reset', function() {
-                this.queries.show(this.queryView);
+                this.queries.show(queryView);
 
                 if (this.publicQueries) {
-                    this.publicQueries.show(this.publicQueryView);
+                    this.publicQueries.show(publicQueryView);
                 }
             });
         }
