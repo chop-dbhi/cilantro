@@ -45,8 +45,6 @@ define([
     var Values = Backbone.Collection.extend({
         model: Value,
 
-        comparator: 'label',
-
         options: {
             check: true
         },
