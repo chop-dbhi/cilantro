@@ -7,28 +7,31 @@ define([
     '../core',
 ], function(_, Marionette, base, c) {
 
-    var flattenLanguage = function(attrs, toks, type) {
+    var flattenLanguage = function(attrs, toks, type, wrap) {
         if (!attrs) return '';
         if (!toks) toks = [];
+        if (wrap !== false) wrap = true;
 
-        toks.push('<ul>');
+        if (wrap) toks.push('<ul>');
 
         if (attrs.language) {
             toks.push('<li>' + attrs.language + '</li>');
         }
         else if (attrs.type && attrs.children.length) {
             if (type) {
-                toks.push('<li><small>' + attrs.type.toUpperCase() + '</small>');
+                toks.push('<li><small>' + attrs.type.toUpperCase() + '</small><ul>');
             }
 
             _.each(attrs.children, function(child) {
-                flattenLanguage(child, toks, type);
+                flattenLanguage(child, toks, type, false);
             });
 
-            toks.push('</li>');
+            if (type) {
+                toks.push('</ul></li>');
+            }
         }
 
-        toks.push('</ul>');
+        if (wrap) toks.push('</ul>');
 
         return toks.join('');
     };
