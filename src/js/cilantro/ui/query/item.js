@@ -109,18 +109,20 @@ define([
         },
 
         renderDetails: function() {
-            var html = [];
+            var html = ['<div class=row-fluid><div class=span6>'];
 
-            html.push('<h5>Filters</h5>');
+            html.push('<h6>Filters</h6>');
 
             var json = this.model.context.get('json');
 
             if (!json || _.isEmpty(json)) {
-                html.push('<em>No filters were specified for this query.</em>');
+                html.push('<p class=muted>No filters were specified for this query.</p>');
             }
             else {
                 filters.flattenLanguage(json, html);
             }
+
+            html.push('</div><div class=span6>');
 
             /*
              * When the session.defaults.data.preview setting is being used,
@@ -129,10 +131,10 @@ define([
              * does not exist, then display the columns under a saved query.
              */
             if (!c.config.get('session.defaults.data.preview')) {
-                html.push('<h5>Columns</h5>');
+                html.push('<h6>Columns</h6>');
 
                 if (!this.model.view.facets.length) {
-                    html.push('<em>No columns were selected this query.</em>');
+                    html.push('<p class=muted>No columns were selected this query.</p>');
                 }
                 else {
                     html.push('<ul>');
@@ -142,8 +144,11 @@ define([
                         var name = c.data.concepts.get(model.get('concept')).get('name'),
                             sort = model.get('sort');
 
-                        if (sort) {
-                            html.push('<li>' + name + ' <em class=muted>' + sort + '</em></li>');
+                        if (sort === 'asc') {
+                            html.push('<li>' + name + ' <i class=icon-caret-up title="Ascending Order"></i></li>');
+                        }
+                        else if (sort === 'desc') {
+                            html.push('<li>' + name + ' <i class=icon-caret-down title="Descending Order"></i></li>');
                         }
                         else {
                             html.push('<li>' + name + '</li>');
@@ -153,6 +158,8 @@ define([
                     html.push('</ul>');
                 }
             }
+
+            html.push('</div></div>');
 
             this.ui.details.html(html.join(''));
         },
