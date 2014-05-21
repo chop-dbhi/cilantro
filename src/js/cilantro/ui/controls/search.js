@@ -203,8 +203,8 @@ define([
         },
 
         handleSearch: function(query) {
-            this.paginator.urlParams = query ? {query: query} : null;
-            this.paginator.refresh();
+            this.valuesPaginator.urlParams = query ? {query: query} : null;
+            this.valuesPaginator.refresh();
         },
 
         clearValues: function() {
