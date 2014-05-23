@@ -105,13 +105,13 @@ define([
                 operator = this.operatorSelect.getSelection(),
                 reverse = operator !== 'range';
 
-            if (lower && upper) {
+            if (lower !== '' && upper !== '') {
                 operator = operator;
             }
-            else if (lower) {
+            else if (lower !== '') {
                 operator = reverse ? 'lte' : 'gte';
             }
-            else if (upper) {
+            else if (upper !== '') {
                 operator = reverse ? 'gte' : 'lte';
             }
             else {
@@ -148,13 +148,13 @@ define([
                 lower = this.getLowerBoundValue(),
                 upper = this.getUpperBoundValue();
 
-            if (!_.isUndefined(lower) && !_.isUndefined(upper)) {
+            if (lower !== '' && upper !== '') {
                 value = [lower, upper];
             }
-            else if (!_.isUndefined(lower)) {
+            else if (lower !== '') {
                 value = lower;
             }
-            else if (!_.isUndefined(upper)) {
+            else if (upper !== '') {
                 value = upper;
             }
             else {
