@@ -100,9 +100,132 @@ define([
             }
         },
 
+        // Function for handeling values which are not of from the 'range'
+        // operator. This function creates an appropriate language to represent
+        // the values.
+        parseValues: function(values, operator) {
+            var text= [];
+            // If the # of values are greater than this threshold, do not show
+            // them all.
+            var THRESHOLD = 5;
+
+            if (values.length === 1) {
+                text.push('<span style="color:blue">' + values[0] + '</span>');
+            }
+
+            else if (values.length < THRESHOLD) {
+                for (var i=0; i < values.length-1; i++) {
+                    text.push('<span style="color:blue">' + values[i] + ',' +
+                              '</span>');
+                }
+                // In case of an exclusion operator, end the list of values with
+                // 'nor'.
+                if (operator.indexOf('-') < 0) text.push('or');
+                else text.push('nor');
+
+                text.push('<span style="color:blue">' + values[values.length-1] +
+                          '</span>');
+            }
+            // In the case # of values exceeds Threshold, do not display them all.
+            else {
+                for (var k=0; k<3; k++) {
+                    text.push('<span style="color:blue">' + values[k] + ',' +
+                              '</span>');
+                }
+
+                if (operator.indexOf('-') < 0) text.push('... or');
+                else text.push('... nor');
+
+                text.push('<span style="color:blue">' + values[values.length-1] +
+                          '</span>');
+            }
+
+            return text.join(' ');
+        },
+
         renderDescription: function() {
-            var text = flattenLanguage(this.model.attributes);
-            this.ui.description.html(text);
+            // This dictionary maps operators to their simple language representation.
+            // renderDescription creates the language to be displayed as the filter
+            // description.
+            var simpleLanguage = {
+                'in': 'is',
+                '-in': 'not',
+                'exact': 'is',
+                'range': 'between',
+                '-range':'not between',
+                'gt': '>',
+                'gte': '>=',
+                'lt': '<',
+                'lte': '<='
+            };
+
+            var noise = ['!', '?'];
+
+            var text = [];
+            var values = this.model.attributes.value;
+
+            // In the case of some values being represented as id's, cleanedValues
+            // will provide their text representation.
+            var cleanedValues = this.model.attributes.cleaned_value; // jshint ignore:line
+            var operator = this.model.attributes.operator;
+            var fieldName = '';
+
+            // If the fields have been found, get the fieldName from them. Else
+            // split the language at the operator to retrive it.
+            if (c.data.fields.get(this.model.get('field'))) {
+                fieldName = c.data.fields.get(this.model.get('field')).get('name');
+            }
+            else {
+                // Splits the language at the operator and retrives the fieldName
+                // which is always to the left of the operator.
+                fieldName =
+                    this.model.attributes.language.split([simpleLanguage[operator]])[0];
+            }
+
+            // Remove ? and ! from the end of field names
+            for (var n in noise) {
+                fieldName = fieldName.replace(noise[n], '');
+            }
+
+            text.push('<ul><li>');
+            // Bold the fieldName
+            text.push('<strong>'+fieldName+'</strong>');
+
+            if (operator === 'range' || operator === '-range') {
+                text.push(simpleLanguage[operator]);
+                text.push('<span style="color:blue">' + values[0] + '</span> and ' +
+                          '<span style="color:blue">' + values[1] + '</span>');
+            }
+            else if (operator === 'in' || operator === '-in') {
+                text.push(simpleLanguage[operator]);
+
+                if (cleanedValues) {
+                    text.push(this.parseValues(cleanedValues, operator));
+                }
+                // In the case that cleanedValues don't exist, we use the regular
+                // raw values.
+                else {
+                    if (typeof values[0] === 'object') {
+                        text.push(this.parseValues(_.pluck(values, 'label'), operator));
+                    }
+                    else {
+                        text.push(this.parseValues(values, operator));
+                    }
+                }
+            }
+            else if (operator === 'exact') {
+                text.push(simpleLanguage[operator]);
+                text.push('<span style="color:blue">' + cleanedValues + '</span>');
+            }
+            // Handles greater than, less then etc.
+            else {
+                text.push(simpleLanguage[operator]);
+                text.push('<span style="color:blue">' + values[0] + '</span>');
+            }
+
+            text.push('</li></ul>');
+
+            this.ui.description.html(text.join(' '));
         },
 
         showLoadView: function() {
