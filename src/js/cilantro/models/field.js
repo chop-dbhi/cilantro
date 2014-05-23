@@ -54,12 +54,12 @@ define([
         distribution: function(handler, cache) {
             if (cache !== false) cache = true;
 
-            if (this.links.distribution === null) {
+            if (this.links.distribution === undefined) {
                 handler();
                 return;
             }
 
-            if (cache && (this._cache.distribution !== null)) {
+            if (cache && (this._cache.distribution !== undefined)) {
                 handler(this._cache.distribution);
             }
             else {
@@ -68,7 +68,9 @@ define([
                     url: this.links.distribution,
                     dataType: 'json',
                     success: function(resp) {
-                        _this._cache.distribution = cache ? resp : null;
+                        if (cache) {
+                            _this._cache.distribution = resp;
+                        }
                         return handler(resp);
                     }
                 });
@@ -110,7 +112,7 @@ define([
             }
 
             // Use cache if available.
-            if (cache && (this._cache.values !== null)) {
+            if (cache && (this._cache.values !== undefined)) {
                 deferred.resolve(this._cache.values);
             }
             else {
