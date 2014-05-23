@@ -10,17 +10,27 @@ define([
         comparator: 'page_num',
 
         refresh: function() {
-            if (!this.pending) {
-                this.pending = true;
+            var url = _.result(this, 'url');
 
-                var _this = this;
-                this.fetch({
-                    reset: true
-                }).done(function() {
-                    delete _this.pending;
-                    _this.setCurrentPage(_this.models[0].id);
-                });
+            if (this.pending) {
+                // Request already being made, otherwise abort
+                if (url === this.pending.url) return;
+
+                this.pending.abort();
             }
+
+            var _this = this;
+
+            this.pending = this.fetch({
+                reset: true
+            }).done(function() {
+                delete _this.pending;
+                _this.setCurrentPage(_this.models[0].id);
+            });
+
+            // This is a deferred and does not contain any of the
+            // ajax settings, so we set the url for later reference.
+            this.pending.url = url;
         },
 
         // Parses the initial fetch which is a single page, resets if necessary
