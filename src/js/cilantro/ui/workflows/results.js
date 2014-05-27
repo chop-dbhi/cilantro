@@ -227,14 +227,14 @@ define([
                 placement: 'bottom'
             });
 
-          /*
-           * If the user's view is empty, show them a notification explaining why no data
-           * is being displayed. The notification is not shown when the
-           * 'session.defaults.data.preview' config option is present. When that option
-           * is being used, the view is overridden when making requests to the preview
-           * endpoint so the data(order aside) shown in the results table will not be
-           * affected by the columns(or lack thereof) the user has chosen.
-           */
+            /*
+             * If the user's view is empty, show them a notification explaining
+             * why no data is being displayed. The notification is not shown when the
+             * 'session.defaults.data.preview' config option is present. When that option
+             * is being used, the view is overridden when making requests to the preview
+             * endpoint so the data(order aside) shown in the results table will not be
+             * affected by the columns(or lack thereof) the user has chosen.
+             */
            this.listenTo(this.data.view.facets, 'reset', function() {
                 if (this.data.view.facets.length === 0 &&
                         !c.config.get('session.defaults.data.preview')) {

@@ -145,10 +145,12 @@ define([
                             sort = model.get('sort');
 
                         if (sort === 'asc') {
-                            html.push('<li>' + name + ' <i class=icon-caret-up title="Ascending Order"></i></li>');
+                            html.push('<li>' + name + ' <i class=icon-caret-up ' +
+                                      'title="Ascending Order"></i></li>');
                         }
                         else if (sort === 'desc') {
-                            html.push('<li>' + name + ' <i class=icon-caret-down title="Descending Order"></i></li>');
+                            html.push('<li>' + name + ' <i class=icon-caret-down ' +
+                                      'title="Descending Order"></i></li>');
                         }
                         else {
                             html.push('<li>' + name + '</li>');
