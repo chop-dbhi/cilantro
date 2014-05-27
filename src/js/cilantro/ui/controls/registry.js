@@ -12,7 +12,8 @@ define([
     './null',
     './text',
     './vocab'
-], function(_, loglevel, c, date, number, search, select, infograph, nullSelector, text, vocab) {
+], function(_, loglevel, c, date, number, search, select, infograph, nullSelector,
+            text, vocab) {
 
     var defaultControls = {
         infograph: infograph.InfographControl,

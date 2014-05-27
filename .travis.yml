@@ -11,10 +11,11 @@ before_install:
 
 install:
     - npm install -g grunt-cli
+    - npm install jshint
     - npm install
-    - grunt jshint
 
 before_script:
+    - jshint src/js/cilantro
     - git clone --branch demo git://github.com/cbmi/harvest-openmrs.git
     - pip install -r harvest-openmrs/requirements.txt
     - pip install uwsgi
