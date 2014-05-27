@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "coffee-script": "~1.7.1",
-    "requirejs": "~2.1.11",
     "grunt": "~0.4.4",
+    "grunt-amdcheck": "^0.2.2",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-coffee": "~0.10.1",
     "grunt-contrib-copy": "~0.5.0",
@@ -45,10 +45,11 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-symlink": "~0.4.0",
     "grunt-template-jasmine-requirejs": "~0.1.10",
+    "jshint": "^2.5.1",
+    "jshint-stylish": "^0.1.5",
+    "requirejs": "~2.1.11",
     "rjs-build-analysis": "0.0.3",
     "semver-utils": "~1.1.0",
-    "shelljs": "~0.2.6",
-    "grunt-amdcheck": "^0.2.2",
-    "jshint-stylish": "^0.1.5"
+    "shelljs": "~0.2.6"
   }
 }

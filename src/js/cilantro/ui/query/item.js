@@ -144,15 +144,18 @@ define([
                         var name = c.data.concepts.get(model.get('concept')).get('name'),
                             sort = model.get('sort');
 
+                        html.push('<li>' + name);
+
                         if (sort === 'asc') {
-                            html.push('<li>' + name + ' <i class=icon-caret-up title="Ascending Order"></i></li>');
+                            html.push(' <i class=icon-caret-up ' +
+                                      'title="Ascending Order"></i>');
                         }
                         else if (sort === 'desc') {
-                            html.push('<li>' + name + ' <i class=icon-caret-down title="Descending Order"></i></li>');
+                            html.push(' <i class=icon-caret-down ' +
+                                      'title="Descending Order"></i>');
                         }
-                        else {
-                            html.push('<li>' + name + '</li>');
-                        }
+
+                        html.push('</li>');
                     });
 
                     html.push('</ul>');
