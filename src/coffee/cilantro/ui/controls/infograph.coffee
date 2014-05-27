@@ -63,7 +63,9 @@ define [
         modelEvents:
             'change:selected': 'setSelected'
             'change:visible': 'setVisible'
-            'change:excluded': 'setExcluded'
+
+        initialize: ->
+            @listenTo(@model.collection, 'change:excluded', @onExcludedChange)
 
         serializeData: ->
             attrs = @model.toJSON()
@@ -93,8 +95,8 @@ define [
         toggleSelected: (event) ->
             @model.set('selected', not @model.get('selected'))
 
-        setExcluded: (model, value) ->
-            @$el.toggleClass('excluded', value)
+        onExcludedChange: =>
+            @$el.toggleClass('excluded', @model.get('excluded'))
 
         # Sets the selected state of the bar. If the bar is filtered,
         # deselecting it will hide the bar from view.
@@ -269,9 +271,19 @@ define [
             return
 
         excludeCheckboxChanged: ->
+            # If we don't set this to silent, then the change event for each
+            # model will also be called on the collection. This will result in
+            # an unnecessary number of change handler calls for this control.
             @collection.each (model) =>
-                model.set('excluded', @ui.excludeCheckbox.prop('checked'))
-            @collection.trigger('change')
+                model.set('excluded', @ui.excludeCheckbox.prop('checked'), {silent: true})
+
+            # Be polite and broadcast an event to alert the bars that the
+            # inclusion/exclusion status has changed and that they should now
+            # update accordingly. This is necessary since we silenced the event
+            # that would normally occur when we explicity set the excluded
+            # attribute above.
+            @collection.trigger('change:excluded')
+
             return
 
 
