@@ -32,7 +32,8 @@ define(['jquery'], function($) {
             var param = search[i].split('=');
 
             if (param[0]) {
-                params[param[0]] = window.decodeURIComponent(param[1]);
+                // Reverse what jQuery parametize logic
+                params[param[0]] = decodeURIComponent(param[1].replace('+', ' '));
             }
         }
 
