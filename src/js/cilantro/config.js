@@ -9,7 +9,7 @@ define([
     var defaultOptions = {
         // Run in debug mode to turn off various behaviors that impede
         // development and increase logging output to the console.
-        debug: false,
+        debug: true,
 
         // The root URL to the application. If falsy, default is '/'
         root: '/',

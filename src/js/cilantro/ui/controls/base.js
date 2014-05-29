@@ -166,6 +166,7 @@ define([
         change: function() {
             this._changing = true;
             this.trigger('change', this, this.get());
+            console.log("change triggered!");
             delete this._changing;
         },
 
