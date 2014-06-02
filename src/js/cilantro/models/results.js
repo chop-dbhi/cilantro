@@ -83,7 +83,7 @@ define([
                     options.cache = false;
                 }
 
-                return structs.FrameArray.prototype.fetch.call(this, arguments);
+                return structs.FrameArray.prototype.fetch.call(this, options);
             }
             else {
                 // If the results aren't dirty or the workspace isn't open then
