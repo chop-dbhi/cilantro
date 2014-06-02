@@ -105,6 +105,43 @@ define([
     // Mix-in paginator functionality for results.
     _.extend(Results.prototype, paginator.PaginatorMixin);
 
+    // Override the default getPage behavior to respect the preview config
+    // options. Without this, requests for different pages will not use the
+    // view set in the config option and will use the session view instead
+    // resulting in disparity between the first page and all other pages.
+    Results.prototype.getPage = function(num, options) {
+        if (!options) options = {};
+
+        if (!this.hasPage(num)) return;
+
+        var model = this.get(num);
+        if (!model && options.load !== false) {
+            model = new this.model({
+                page_num: num       // jshint ignore:line
+            });
+
+            model.pending = true;
+            this.add(model);
+
+            var fetchOptions = {},
+                data;
+            if ((data = c.config.get('session.defaults.data.preview')) !== null) {
+                fetchOptions.type = 'POST';
+                fetchOptions.contentType = 'application/json';
+                fetchOptions.data = JSON.stringify(data);
+            }
+            model.fetch(fetchOptions).done(function() {
+                delete model.pending;
+            });
+        }
+
+        if (model && options.active !== false) {
+            this.setCurrentPage(num);
+        }
+
+        return model;
+    };
+
     // Set the custom model for this Paginator.
     Results.prototype.model = ResultsPage;
 
