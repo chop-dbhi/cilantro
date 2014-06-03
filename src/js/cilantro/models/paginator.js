@@ -16,7 +16,9 @@ define([
                 // Request already being made, otherwise abort
                 if (url === this.pending.url) return;
 
-                this.pending.abort();
+                if (this.pending.abort) {
+                    this.pending.abort();
+                }
             }
 
             var _this = this;
