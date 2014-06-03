@@ -144,6 +144,21 @@ define([
         },
 
         renderDescription: function() {
+            // The cleanedValues will be used to prettify the language.
+            // In the case of some values being represented as id's, cleanedValues
+            // will provide their text representation.
+            var cleanedValues = this.model.attributes.cleaned_value; // jshint ignore:line
+
+            // cleanedValues is a property returned by the latest version of
+            // avocado. If this property is not present, then the latest version
+            // is not installed on this app. Thus, do not attempt to prettify the
+            // filter display nor simplify the language.
+            if (cleanedValues === undefined) {
+                var attrs = this.model.attributes;
+                this.ui.description.html(flattenLanguage(attrs));
+                return;
+            }
+
             // This dictionary maps operators to their simple language representation.
             // renderDescription creates the language to be displayed as the filter
             // description.
@@ -164,9 +179,6 @@ define([
             var text = [];
             var values = this.model.attributes.value;
 
-            // In the case of some values being represented as id's, cleanedValues
-            // will provide their text representation.
-            var cleanedValues = this.model.attributes.cleaned_value; // jshint ignore:line
             var operator = this.model.attributes.operator;
             var fieldName = '';
 
