@@ -55,8 +55,6 @@ define [
             chartType = 'scatter'
         else if yEnum
             chartType = 'scatter'
-        else if xType is 'datetime' or yType is 'datetime'
-            chartType = 'line'
         else
             chartType = 'column'
 
