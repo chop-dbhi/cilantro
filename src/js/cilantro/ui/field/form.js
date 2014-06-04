@@ -53,9 +53,9 @@ define([
         },
 
         filterEvents: {
-            'applied': 'renderFilter',
-            'unapplied': 'renderFilter',
-            'change': 'renderFilter'
+            'applied': 'validateFilter',
+            'unapplied': 'validateFilter',
+            'change': 'validateFilter'
         },
 
         regions: {
@@ -103,7 +103,7 @@ define([
             if (this.options.controls) this.renderControls();
             if (this.options.chart && this.model.links.distribution) this.renderChart();
 
-            this.renderFilter();
+            this.validateFilter();
 
             Marionette.bindEntityEvents(this, this.data.filter,
                 Marionette.getOption(this, 'filterEvents'));
@@ -188,11 +188,15 @@ define([
         },
 
         renderFilter: function() {
+            this.ui.state.hide();
             this.ui.apply.prop('disabled', true);
             this.ui.update.prop('disabled', true);
-            this.ui.state.hide();
 
-            if (this.data.context.isFilterApplied(this.data.filter)) {
+            var isApplied = this.data.context.isFilterApplied(this.data.filter),
+                isValid = !this.isEmpty && !this.validationErrors;
+
+            // Swap buttons
+            if (isApplied) {
                 this.ui.apply.hide();
                 this.ui.update.show();
 
@@ -208,47 +212,48 @@ define([
                 });
 
                 if (this.data.context.hasFilterChanged(this.data.filter, keys)) {
-                    if (this.validateFilter({silent: true})) {
-                        this.ui.apply.prop('disabled', false);
+                    if (isValid) {
                         this.ui.update.prop('disabled', false);
+                    }
+                    else if (this.validationErrors) {
+                        this.ui.state.html(this.validationErrors.join('<br>')).show();
                     }
                 }
             }
             else {
                 this.ui.apply.show();
                 this.ui.update.hide();
-                if (this.validateFilter({silent: true})) {
+
+                if (isValid) {
                     this.ui.apply.prop('disabled', false);
+                }
+                else if (!this.isEmpty && this.validationErrors) {
+                    this.ui.state.html(this.validationErrors.join('<br>')).show();
                 }
             }
         },
 
-        validateFilter: function(options) {
-            options = _.extend({}, options);
-
-            var message,
+        validateFilter: function() {
+            var empty,
+                message,
                 messages = [],
                 attrs = this.data.filter.toJSON();
 
             // Children are proxies to the control..
             this.controls.currentView.children.each(function(proxy) {
-                if (proxy.view) {
-                    message = proxy.view.validate(attrs);
-                    if (message) messages.push(message);
-                }
+                if (!proxy.view) return;
+                message = proxy.view.validate(attrs);
+                if (message) messages.push(message);
+                // It is assume controls are not returning a conflicting result.
+                empty = proxy.view.isEmpty(attrs);
             });
 
-            if (messages.length) {
-                this.validationErrors = messages;
-                if (!options.silent) {
-                    this.ui.state.html(messages.join('<br>')).show();
-                }
-                return false;
-            }
+            this.isEmpty = empty;
+            this.validationErrors = messages.length ? messages : null;
 
-            this.validationErrors = null;
-            this.ui.state.text('').hide();
-            return true;
+            this.renderFilter();
+
+            return !this.validationErrors && !this.isEmpty;
         },
 
         applyFilter: function(event) {

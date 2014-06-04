@@ -502,8 +502,14 @@ define([
             // Do not remove values in case they are new since the set
             // has occurred.
             this.selectedValues.set(values, {remove: false});
-        }
+        },
 
+        isEmpty: function(attrs) {
+            // If children are defined than more than one operator is
+            // in use which means values have been selected.
+            if (attrs.children) return false;
+            return controls.ControlLayout.prototype.isEmpty.call(this, attrs);
+        }
     });
 
     return {
