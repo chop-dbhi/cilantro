@@ -148,17 +148,14 @@ define([
                 lower = this.getLowerBoundValue(),
                 upper = this.getUpperBoundValue();
 
-            if (lower !== '' && upper !== '') {
+            if (_.exists(lower) && _.exists(upper)) {
                 value = [lower, upper];
             }
-            else if (lower !== '') {
+            else if (_.exists(lower)) {
                 value = lower;
             }
-            else if (upper !== '') {
+            else if (_.exists(upper)) {
                 value = upper;
-            }
-            else {
-                value = null;
             }
 
             return value;
