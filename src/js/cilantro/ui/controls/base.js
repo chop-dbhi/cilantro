@@ -173,6 +173,19 @@ define([
         // for this control.
         validate: function() {},
 
+        // Takes attributes and returns a boolean to whether a value is set.
+        isEmpty: function(attrs) {
+            if (_.isUndefined(attrs.value) || _.isNull(attrs.value)) {
+                return true;
+            }
+
+            if (_.isArray(attrs.value) && !attrs.value.length) {
+                return true;
+            }
+
+            return false;
+        },
+
         // Placeholder no-op getter/setter functions for each attribute
         getConcept: noop,
         getField: noop,
