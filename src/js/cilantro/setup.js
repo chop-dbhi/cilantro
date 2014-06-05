@@ -1,13 +1,14 @@
 /* global define */
 
 define([
+    'underscore',
     'backbone',
     'marionette',
     'jquery',
     'loglevel',
     './core',
     './ui'
-], function(Backbone, Marionette, $, loglevel, c, ui) {
+], function(_, Backbone, Marionette, $, loglevel, c, ui) {
 
     // Set configuration options for corresponding APIs
     c.templates.set(c.config.get('templates', {}));
@@ -30,6 +31,11 @@ define([
             template = defaultCompileTemplate(template);
         }
         return template;
+    };
+
+    // See http://documentcloud.github.io/underscore-contrib/#exists
+    _.exists = function(value) {
+        return !_.isUndefined(value) && !_.isNull(value);
     };
 
     // Initialize notification stream and append it to the body
@@ -69,12 +75,12 @@ define([
     });
 
     $(document).ajaxError(function(event, xhr, settings, exception) {
-        // A statusText value of 'abort' is an aborted request which is 
+        // A statusText value of 'abort' is an aborted request which is
         // usually intentional by the app or from a page reload.
         if (xhr.statusText === 'abort') return;
 
         var message = '';
-        
+
         if (xhr.status === 0 && exception === '') {
             // An empty exception value is an unknown error which usually
             // means the server is unavailable.
