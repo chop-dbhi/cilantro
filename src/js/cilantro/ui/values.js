@@ -33,7 +33,7 @@ define([
         collectionEvents: {
             'add': 'reloadText',
             'remove': 'reloadText',
-            'reset': 'clearText'
+            'reset': 'reloadText'
         },
 
         ui: {
@@ -45,8 +45,8 @@ define([
             this.collection.reset();
         },
 
-        clearText: function() {
-            this.ui.textarea.val('');
+        events: {
+            'input propertychange @ui.textarea': '_parseText',
         },
 
         initialize: function() {
@@ -102,15 +102,7 @@ define([
             // Basically, this prevents the text from changing while the user
             // is editing it. The sorting will only happen when items are
             // explicitly added to the collection.
-            this.collection.set(models, {sort: false});
-        },
-
-        onRender: function() {
-            var _this = this;
-
-            this.ui.textarea.on('input propertychange', function() {
-                _this._parseText();
-            });
+            this.collection.reset(models, {sort: false});
         }
     });
 
