@@ -68,7 +68,11 @@ define([
     // Relies on the jquery-ajax-queue plugin to supply this method.
     // This ensures data is not silently lost
     $(window).on('beforeunload', function() {
-        if (c.config.get('debug') || !$.hasPendingRequest()) return;
+        if (c.config.get('debug') || !$.hasPendingRequest()) {
+            // Turn off ajax error handling to prevent unwanted notifications displaying
+            $(document).off('ajaxError');
+            return;
+        }
 
         return "Wow, you're quick! Your data is being saved. " +
                "It will only take a moment.";
