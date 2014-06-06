@@ -208,7 +208,7 @@ define([
         },
 
         clearValues: function() {
-            this.values.currentView.clear();
+            this.collection.reset();
         },
 
         getField: function() {
@@ -258,8 +258,7 @@ define([
             });
 
             if (invalid.length) {
-                return 'Remove the following invalid labels then click ' +
-                       '&quot;Apply Filter&quot; again: ' + invalid.join(', ');
+                return 'The following values are invalid: ' + invalid.join(', ');
             }
 
             if (attrs && (!attrs.value || !attrs.value.length)) {
