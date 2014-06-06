@@ -241,8 +241,8 @@ define([
             });
 
             if (pending) {
-                return 'The values are being checked, please wait a few ' +
-                       'seconds then click &quot;Apply Filter&quot; again.';
+                return 'The entered ' + this.model.get('plural_name') +
+                       ' are being validated.';
             }
 
             // Get a list of labels for all the elements in the collection that
@@ -258,7 +258,8 @@ define([
             });
 
             if (invalid.length) {
-                return 'The following values are invalid: ' + invalid.join(', ');
+                return 'The following ' + this.model.get('plural_name') +
+                       ' are invalid: <pre>' + invalid.join('\n') + '</pre>';
             }
 
             if (attrs && (!attrs.value || !attrs.value.length)) {
