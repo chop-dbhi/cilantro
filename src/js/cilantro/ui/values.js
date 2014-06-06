@@ -31,9 +31,9 @@ define([
         // Listen for collection events to update the textarea to match
         // the values
         collectionEvents: {
-            'add': 'reloadText',
-            'remove': 'reloadText',
-            'reset': 'reloadText'
+            'add': '_reloadText',
+            'remove': '_reloadText',
+            'reset': '_reloadText'
         },
 
         ui: {
@@ -45,12 +45,11 @@ define([
             this.collection.reset();
         },
 
-        events: {
-            'input propertychange @ui.textarea': '_parseText',
-        },
-
         initialize: function() {
+            _.bindAll(this, 'parseText', 'reloadText');
+
             this._parseText = _.debounce(this.parseText, constants.INPUT_DELAY);
+            this._reloadText = _.debounce(this.reloadText, constants.INPUT_DELAY);
         },
 
         // Load labels in textarea
@@ -103,6 +102,10 @@ define([
             // is editing it. The sorting will only happen when items are
             // explicitly added to the collection.
             this.collection.reset(models, {sort: false});
+        },
+
+        onRender: function() {
+            this.ui.textarea.on('input propertychange', this._parseText);
         }
     });
 
