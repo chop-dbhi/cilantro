@@ -130,8 +130,11 @@ define([
             setTimeout(function() {
                 if (loc) {
                     window.location = location;
-                } else {
-                    window.location.reload();
+                }
+                else {
+                    // `true` argument forces a fetch from the server rather
+                    // than using local cache.
+                    window.location.reload(true);
                 }
             }, 5000);
         },
