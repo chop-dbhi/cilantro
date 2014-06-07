@@ -289,6 +289,8 @@ define([
             if (!(this.data.context = this.options.context)) {
                 throw new Error('context required');
             }
+
+            this._children = [];
         },
 
         render: function() {
@@ -301,6 +303,18 @@ define([
             }
 
             return this;
+        },
+
+        close: function() {
+            if (this.isClosed) return;
+
+            var view;
+
+            while ((view = this._children.pop())) {
+                view.close();
+            }
+
+            Marionette.View.prototype.close.call(this);
         },
 
         // Renders an item.
@@ -350,6 +364,7 @@ define([
             try {
                 var view = new viewClass(options);
                 view.render();
+                this._children.push(view);
                 c.dom.insertAt(this.$el, options.index, view.el);
             }
             catch (err) {
@@ -361,6 +376,7 @@ define([
         showErrorView: function(model) {
             var view = new this.errorView({model: model});
             view.render();
+            this._children.push(view);
             this.$el.html(view.el);
         }
     });
