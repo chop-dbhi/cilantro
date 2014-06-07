@@ -68,7 +68,7 @@ define([
             c.router.navigate('query', {trigger: true});
 
             // Already being shown
-            if (this.currentView && this.currentView.model.id === model.id) return;
+            if (this.currentView.model && this.currentView.model.id === model.id) return;
 
             var options = {
                 model: model,
@@ -116,8 +116,7 @@ define([
             var view = new this.errorView({
                 model: model
             });
-            this.currentView = view;
-            this.main.show(view);
+            this.setView(view);
         },
 
         setView: function(view) {
@@ -127,7 +126,7 @@ define([
 
         onRender: function() {
             var main = new this.regionViews.main();
-            this.main.show(main);
+            this.setView(main);
         }
     });
 

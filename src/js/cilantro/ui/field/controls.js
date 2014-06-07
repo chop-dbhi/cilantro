@@ -20,7 +20,7 @@ define([
         });
 
         view.listenTo(filter, 'change', function(filter) {
-            if (!view._changing) view.set(filter.toJSON());
+            view.set(filter.toJSON());
         });
     };
 

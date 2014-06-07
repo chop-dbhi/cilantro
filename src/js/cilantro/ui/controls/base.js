@@ -118,6 +118,8 @@ define([
         // is passed, it's toJSON method is called to returned the underlying
         // attributes of the model.
         set: function(key, value, options) {
+            if (this._changing) return;
+
             var attrs;
 
             // Shift arguments
