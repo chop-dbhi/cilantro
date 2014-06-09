@@ -41,7 +41,7 @@ define ->
                 shadow: false
                 borderWidth: 0
                 borderColor: '#4b8cf7'
-                turboThreshold: 5500
+                turboThreshold: 0
                 animation:
                     duration: 400
                 color: '#777'
