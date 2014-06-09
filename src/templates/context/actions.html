@@ -1,19 +1,19 @@
 <div class=pull-right>
-    <button data-action=remove class="btn btn-danger btn-mini" title="Remove All Filters" disabled><i class="icon-remove icon-white"></i></button>
+    <button data-action=remove class='btn btn-danger btn-mini' title='Remove All Filters' disabled><i class='icon-remove icon-white'></i></button>
 </div>
 
 <div class=count-label>
+    <span data-target=loading-message class=hide>Calculating...<i class='icon-spinner icon-spin'></i></span>
     <% if (data.count == null) { %>
-        <span class=count>All</span>
+        <span data-target=count>All</span>
     <% } else { %>
-        <span class=count title="<%= data.count %>"><%= data.prettyCount %></span>
+        <span data-target=count title='<%= data.count %>'><%= data.prettyCount %></span>
     <% } %>
-    <span class=units>
+    <span data-target=units>
         <% if (data.count == 1) { %>
             <%= data.object_name %>
         <% } else { %>
             <%= data.object_name_plural %>
         <% } %>
     </span>
-    <i class="icon-spinner icon-spin hide"></i>
 </div>
