@@ -69,7 +69,7 @@ define([
                 this.renderState();
             } else if (show) {
                 this.$el.show();
-                this.renderExpanded();
+                this.expand();
             } else {
                 this.$el.hide();
             }
