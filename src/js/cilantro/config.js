@@ -51,6 +51,11 @@ define([
          */
         threshold: null,
 
+        /*
+         * Threshold for the max number of values that will be displayed in
+         * a filter on the context panel before they are hidden with ellipses.
+         */
+        maxFilterDisplayValues: 4,
 
         /*
          * Timeouts

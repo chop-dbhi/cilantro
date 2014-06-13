@@ -5,7 +5,8 @@ define([
     'marionette',
     '../base',
     '../core',
-], function(_, Marionette, base, c) {
+    '../../utils/numbers'
+], function(_, Marionette, base, c, numbers) {
 
     var flattenLanguage = function(attrs, toks, type, wrap) {
         if (!attrs) return '';
@@ -63,6 +64,23 @@ define([
             change: 'render'
         },
 
+        // This dictionary maps operators to their simple language representation.
+        // renderDescription creates the language to be displayed as the filter
+        // description. The first value in the array is the simple language
+        // shortening. The second is the value present in the default language.
+        simpleLanguage : {
+            'in': ['is', 'is'],
+            '-in': ['not', 'is not'],
+            'exact': ['is', 'is'],
+            'range': ['between', 'is between'],
+            '-range': ['not between', 'is not between'],
+            'isnull': ['is', 'is'],
+            'gt': ['>', 'is greater'],
+            'gte': ['>=', 'is greater than or equal to'],
+            'lt': ['<', 'is less'],
+            'lte': ['<=', 'is less than or equal to']
+        },
+
         // Navigate to query page when a concept is triggered
         clickShow: function() {
             c.trigger(c.CONCEPT_FOCUS, this.model.get('concept'));
@@ -100,9 +118,139 @@ define([
             }
         },
 
+        // Function for handling values which are not from the 'range'
+        // operator. This function creates an appropriate language to represent
+        // the values.
+        parseValue: function(value, operator) {
+            var i, text = [];
+
+            if (!_.isArray(value)) {
+                return '<span class=filter-value>' + value.label + '</span>';
+            }
+
+            // If the # of values are greater than this threshold, do not show
+            // them all.
+            var THRESHOLD = c.config.get('maxFilterDisplayValues');
+            value = _.pluck(value, 'label');
+
+            if (value.length === 1) {
+                return '<span class=filter-value>' + value[0] + '</span>';
+            }
+
+            if (value.length < THRESHOLD) {
+                // In the case of more than one values, construct a string in
+                // the form [fieldname] is [value1], [value2] or [value3] etc.
+                for (i = 0; i < value.length - 1; i++) {
+                    text.push('<span class=filter-value>' + value[i] + ',' +
+                              '</span>');
+                }
+
+                // In case of an exclusion operator, end the list of values with
+                // 'nor'.
+                if (operator.charAt(0) === '-') {
+                    text.push('nor');
+                }
+                else {
+                    text.push('or');
+                }
+
+                text.push('<span class=filter-value>' + value[value.length - 1] +
+                          '</span>');
+            }
+            // In the case # of values exceeds Threshold hide them.
+            else {
+                text.push('<span class=filter-value>' + value[0] + ',' + '</span>');
+                text.push('<span class=filter-value>' + value[1] + ',' + '</span>');
+
+                var tail = value.length - THRESHOLD;
+
+                if (operator.indexOf('-') < 0) {
+                    text.push('...(' + tail + ' more) or');
+                }
+                else {
+                    text.push('...(' + tail + ' more) nor');
+                }
+
+                text.push('<span class=filter-value>' + value[value.length - 1] +
+                          '</span>');
+            }
+
+            return text.join(' ');
+        },
+
         renderDescription: function() {
-            var text = flattenLanguage(this.model.attributes);
-            this.ui.description.html(text);
+            var attrs = this.model.toJSON();
+
+            // The cleanedValue will be used to prettify the language.
+            // In the case of some values being represented as ids, cleanedValue
+            // will provide their text representation.
+            var cleanedValue = attrs.cleaned_value; // jshint ignore:line
+
+            // cleanedValue is a property returned by Avocado versions 2.3.5 and above.
+            // If this property is not present, then the latest version
+            // is not installed on this app. Thus, do not attempt to prettify the
+            // filter display nor simplify the language.
+            if (cleanedValue === undefined) {
+                this.ui.description.html(flattenLanguage(attrs));
+                return;
+            }
+
+            var text = [],
+                values = attrs.value,
+                operator = attrs.operator,
+                fieldName = '';
+
+            // If the fields have been found, get the fieldName from them. Else
+            // split the language at the operator to retrive it.
+            if (c.data.fields.get(attrs.get('field'))) {
+                fieldName = c.data.fields.get(attrs.get('field')).get('name');
+            }
+            else {
+                // Splits the language at the operator and retrives the fieldName
+                // which is always to the left of the operator.
+                fieldName =
+                    attrs.language.split(
+                            this.simpleLanguage[operator][1])[0];
+            }
+
+            // Remove ? and ! from the end of field names
+            fieldName = fieldName.replace(/[!?]$/g, '');
+
+            text.push('<ul><li>');
+
+            text.push('<strong>' + fieldName + '</strong>');
+
+            if (operator === 'range' || operator === '-range') {
+                text.push(this.simpleLanguage[operator][0]);
+                var val1 = values[0];
+                var val2 = values[1];
+
+                // Prettify Numbers
+                if (_.isNumber(val1) && _.isNumber(val2)) {
+                    val1 = numbers.toDelimitedNumber(val1);
+                    val2 = numbers.toDelimitedNumber(val2);
+                }
+
+                text.push('<span class=filter-value>' + val1 + '</span> and ' +
+                          '<span class=filter-value>' + val2 + '</span>');
+            }
+            else if (operator === 'in' || operator === '-in') {
+                text.push(this.simpleLanguage[operator][0]);
+                text.push(this.parseValue(cleanedValue, operator));
+            }
+            else if (operator === 'exact') {
+                text.push(this.simpleLanguage[operator][0]);
+                text.push('<span class=filter-value>' + cleanedValue + '</span>');
+            }
+            // Handles greater than, less than etc.
+            else {
+                text.push(this.simpleLanguage[operator][0]);
+                text.push(this.parseValue(cleanedValue, operator));
+            }
+
+            text.push('</li></ul>');
+
+            this.ui.description.html(text.join(' '));
         },
 
         showLoadView: function() {
