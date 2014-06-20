@@ -58,11 +58,8 @@ define([
         },
 
         cancel: function() {
-            var _this = this;
-
-            _.delay(function() {
-                _this.columns.resetSelected();
-            }, 25);
+            this.columns.resetSelected();
+            this.render();
         },
 
         save: function() {
