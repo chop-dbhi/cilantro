@@ -63,6 +63,8 @@ define([
             _.delay(function() {
                 _this.columns.resetSelected();
             }, 25);
+
+            this.render();
         },
 
         save: function() {
