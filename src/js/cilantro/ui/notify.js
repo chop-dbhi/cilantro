@@ -41,6 +41,10 @@ define([
         dismiss: function() {
             // Clear the timer if set
             clearTimeout(this._dismissTimer);
+
+            // Raise an event to let the notification collection know we have
+            // been closed so that it can remove this notification from the collection.
+            this.trigger('close');
         },
 
         hold: function() {
@@ -61,7 +65,14 @@ define([
 
             var _this = this;
             this._dismissTimer = setTimeout(function() {
-                _this.$el.fadeOut();
+                _this.$el.fadeOut(function() {
+                    // Raise an event to let the notification collection know we
+                    // have been closed so that it can remove this notification
+                    // from the collection. This is executed in the callback for
+                    // fadeOut so the animation finishes before the close event
+                    // is triggered.
+                    _this.trigger('close');
+                });
             }, timeout);
         },
 
@@ -99,13 +110,29 @@ define([
 
             Marionette.CollectionView.prototype.constructor.call(this, options);
 
-            _.bindAll(this, 'notify');
+            this.on('itemview:close', this.onNotificationClosed);
+
+            _.bindAll(this, 'notify', 'onNotificationClosed');
+        },
+
+        onNotificationClosed: function(args) {
+            this.collection.remove(args.model, {silent: true});
         },
 
         notify: function(attrs) {
             // Handle shorthand notation with only a message
             if (typeof attrs === 'string') {
                 attrs = {message: attrs};
+            }
+
+            // Prevent duplicate messages from being displayed
+            var searchAttrs = {
+                header: attrs.header,
+                message: attrs.message
+            };
+
+            if (this.collection.findWhere(searchAttrs)) {
+                return;
             }
 
             // Manually construct to prevent server-side requests
