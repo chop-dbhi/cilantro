@@ -97,7 +97,7 @@ define([
         }
         c.notify({
             timeout: null,
-            dismissable: false,
+            dismissable: true,
             level: 'error',
             header: 'Uh oh.',
             message: message
