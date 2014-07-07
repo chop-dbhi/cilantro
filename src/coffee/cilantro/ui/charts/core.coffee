@@ -76,8 +76,8 @@ define [
                 message: 'No data is available for charting'
             @$el.html(view.render().el)
 
-        onChartLoaded: ->
-            $('.load-view').remove()
+        onChartLoaded: =>
+            @$el.find('.load-view').remove()
 
         renderChart: (options) ->
             view = new @loadView
