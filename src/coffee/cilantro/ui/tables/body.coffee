@@ -13,6 +13,14 @@ define [
 
         itemView: row.Row
 
+        initialize: ->
+            offset = 0
+            for field, i in $('.navbar-fixed-top')
+                offset += field.clientHeight
+
+            @$el.css('top', offset)
+            @$el.css('position', 'absolute')
+
         itemViewOptions: (model, index) =>
             _.defaults
                 collection: model.data

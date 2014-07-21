@@ -25,6 +25,10 @@ define [
             'change:currentpage': 'showCurrentPage'
 
         initialize: ->
+            @listenTo(this, 'render', @resize, @)
+            _.bindAll(this, 'resize')
+            $(window).resize(this.resize)
+
             @header = new header.Header _.defaults
                 collection: @collection.indexes
             , @options
@@ -43,6 +47,29 @@ define [
                     @$el.hide()
                 else
                     @$el.show()
+
+        resize: ->
+            tbody = $('tbody')
+            if tbody.height() > 0
+                for field, i in @$el.children()
+                    rows = field.rows
+                    for row in rows
+                        colls = row.cells
+                        width = $(document).width()/colls.length
+                        for coll in colls
+                            $(coll).css('width', width)
+                            $(coll).css('max-width', width)
+
+                offset = tbody.height() +
+                parseInt(tbody.css('top').replace('px',''))
+
+                #Statically position bootstrap-responsive elements
+                if $(document).width() > 979
+                    $('#footer').offset({top:offset})
+                    tbody.css('position','absolute')
+                else
+                    $('#footer').css('position','static')
+                    tbody.css('position','static')
 
         showCurrentPage: (model, num, options) ->
             @children.each (view) ->

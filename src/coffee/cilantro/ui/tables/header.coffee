@@ -85,6 +85,15 @@ define [
     class Header extends Marionette.ItemView
         tagName: 'thead'
 
+        initialize: ->
+            offset = 0
+            for field, i in $('.navbar-fixed-top')
+                offset += field.clientHeight
+
+            @$el.css('top', offset)
+            @$el.css('background-color', 'white')
+            @$el.addClass('navbar-fixed-top')
+
         render: ->
             row = new HeaderRow _.extend {}, @options,
                 collection: @collection
