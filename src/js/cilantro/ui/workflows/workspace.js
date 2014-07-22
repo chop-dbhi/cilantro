@@ -12,8 +12,8 @@ define([
         template: 'workflows/workspace',
 
         regions: {
-            queries: '.query-region',
-            publicQueries: '.public-query-region',
+            queries: '[data-target=query-region]',
+            publicQueries: '[data-target=public-query-region]',
         },
 
         regionViews: {

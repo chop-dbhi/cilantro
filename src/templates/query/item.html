@@ -1,15 +1,15 @@
 <span class='owner'>
-    <button data-toggle=edit-query-modal class='btn btn-mini edit-query'><i class=icon-pencil></i> Edit</button>
-    <button data-toggle=delete-query-modal class='btn btn-mini delete-query'><i class='icon-remove text-error'></i> Delete</button>
-    <i class='public-icon icon-external-link-sign muted' title='Private query'></i>
-    <i class='icon-group share-count muted' title='Not shared'> <strong><%= data.shared_users.length %></strong></i>
+    <button data-toggle=edit-query-modal class='btn btn-mini'><i class=icon-pencil></i> Edit</button>
+    <button data-toggle=delete-query-modal class='btn btn-mini'><i class='icon-remove text-error'></i> Delete</button>
+    <i class='icon-external-link-sign muted' data-target=public-icon title='Private query'></i>
+    <i class='icon-group muted' data-target='share-count' title='Not shared'> <strong><%= data.shared_users.length %></strong></i>
 </span>
 
 <span class='non-owner'>
     shared by <em><%= data.user.username %></em>
 </span>
 
-<span class='name-label'>
+<span>
     <a data-target='query' href='#'><%= data.name %></a>
     <a data-target=toggle-details href=#>Show details</a>
 </span>

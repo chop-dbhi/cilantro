@@ -16,9 +16,9 @@ define [
         loadView: ChartLoading
 
         ui:
-            chart: '.chart'
+            chart: '[data-target=chart]'
             heading: '.heading'
-            status : '.heading .status'
+            status : '.heading [data-target=status]'
 
         showLoadView: ->
             (view = new @loadView).render()

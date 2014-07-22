@@ -285,8 +285,8 @@ define([
         template: 'context/empty',
 
         ui: {
-            noFiltersResultsMessage: '.no-filters-results-workspace',
-            noFiltersQueryMessage: '.no-filters-query-workspace'
+            noFiltersResultsMessage: '[data-target=no-filters-results-workspace]',
+            noFiltersQueryMessage: '[data-target=no-filters-query-workspace]'
         },
 
         onRender: function() {

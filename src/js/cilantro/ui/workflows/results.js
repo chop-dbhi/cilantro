@@ -19,7 +19,7 @@ define([
         template: 'count',
 
         ui: {
-            count: '.count',
+            count: '[data-target=count]',
             label: '.count-label'
         },
 

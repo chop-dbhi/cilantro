@@ -9,13 +9,13 @@ define [
         template: 'charts/editable-chart'
 
         events: _.extend
-            'click .fullsize': 'toggleExpanded'
+            'click @ui.toggleExpanded': 'toggleExpanded'
         , dist.FieldChart::events
 
         ui: _.extend
             toolbar: '.btn-toolbar'
-            fullsizeToggle: '.fullsize'
-            form: '.editable'
+            toggleExpanded: '[data-target=toggle-expanded'
+            form: '[data-target=editable]'
             xAxis: '[name=x-Axis]'
             yAxis: '[name=y-Axis]'
             series: '[name=series]'
@@ -153,14 +153,14 @@ define [
             if @chart then @chart.setSize chartWidth, null, false
 
         expand: ->
-            @$fullsizeToggle.children('i')
+            @$toggleExpanded.children('i')
                 .removeClass('icon-resize-small')
                 .addClass('icon-resize-full')
             @$el.addClass 'expanded'
             @resize()
 
         contract: ->
-            @$fullsizeToggle.children('i')
+            @$toggleExpanded.children('i')
                 .removeClass('icon-resize-full')
                 .addClass('icon-resize-small')
             @$el.removeClass 'expanded'

@@ -28,7 +28,7 @@ define([
         errorView: ConceptError,
 
         regions: {
-            main: '.main-region'
+            main: '[data-target=main-region]'
         },
 
         regionViews: {
