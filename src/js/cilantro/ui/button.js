@@ -80,26 +80,19 @@ define([
         },
 
         constructor: function(options) {
-            var choices;
-
             if (!options) options = {};
 
-            choices = options.collection;
+            var choices = options.collection;
+
             if (!(choices instanceof Backbone.Collection)) {
                 // Convert from flat list of values into objects
                 if (choices && typeof choices[0] !== 'object') {
-                    choices = (function() {
-                        var results = [];
-
-                        for (var i = 0; i < choices.length; i++) {
-                            results.push({
-                                value: choices[i],
-                                label: choices[i]
-                            });
-                        }
-
-                        return results;
-                    })();
+                    choices = _.map(choices, function(choice) {
+                        return {
+                            value: choice,
+                            label: choice
+                        };
+                    });
                 }
 
                 options.collection = new Backbone.Collection(choices);
@@ -147,7 +140,7 @@ define([
 
         onRender: function() {
             if (/^(small|large|mini)$/.test(this.options.size)) {
-                this.ui.toggle.addClass("btn-" + this.options.size);
+                this.ui.toggle.addClass('btn-' + this.options.size);
             }
 
             this.ui.toggle.dropdown();

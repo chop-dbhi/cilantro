@@ -4,8 +4,9 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    './base'
-], function($, _, Marionette, base) {
+    './base',
+    '../constants'
+], function($, _, Marionette, base, constants) {
 
     var EmptyPage = base.EmptyView.extend({
         message: 'No page results'
@@ -16,14 +17,10 @@ define([
     });
 
     // Set of pagination links that are used to control/navigation the bound
-    // model.
-    //
-    // The model is assumed to implement the 'paginator protocol', see
+    // model. The model is assumed to implement the 'paginator protocol', see
     // cilantro/models/paginator.
     var Paginator = Marionette.ItemView.extend({
         template: 'paginator',
-
-        requestDelay: 250,
 
         className: 'paginator',
 
@@ -43,30 +40,30 @@ define([
         },
 
         events: {
-            'click [data-page=first]': 'requestChangePage',
-            'click [data-page=prev]': 'requestChangePage',
-            'click [data-page=next]': 'requestChangePage',
-            'click [data-page=last]': 'requestChangePage'
+            'click [data-page]': 'requestChangePage'
         },
 
         initialize: function() {
-            this._changePage = _.debounce(this.changePage, this.requestDelay);
+            this._changePage = _.debounce(this.changePage, constants.REQUEST_DELAY);
         },
 
         onRender: function() {
             // The tooltip call MUST be done before the render calls below or
             // the tooltip options set here will not be respected because some
             // of the buttons will be disabled.
-            this.ui.buttons.tooltip({animation: false, placement: 'bottom'});
+            this.ui.buttons.tooltip({
+                animation: false,
+                placement: 'bottom'
+            });
 
             if (!this.model.pageIsLoading()) {
                 this.renderPageCount(this.model, this.model.getPageCount());
-                this.renderCurrentPage.apply(this, [this.model].concat(
-                    Array.prototype.slice.call(
-                        this.model.getCurrentPageStats())));            }
+                var args = [this.model].concat(this.model.getCurrentPageStats());
+                this.renderCurrentPage.apply(this, args);
+            }
         },
 
-        renderPageCount: function(model, value, options) {  // jshint ignore:line
+        renderPageCount: function(model, value) {
             this.ui.pageCount.text(value);
         },
 
@@ -92,16 +89,16 @@ define([
 
         changePage: function(newPage) {
             switch (newPage) {
-                case "first":
+                case 'first':
                     return this.model.getFirstPage();
-                case "prev":
+                case 'prev':
                     return this.model.getPreviousPage();
-                case "next":
+                case 'next':
                     return this.model.getNextPage();
-                case "last":
+                case 'last':
                     return this.model.getLastPage();
                 default:
-                    throw new Error("Unknown paginator direction: " + newPage);
+                    throw new Error('Unknown paginator direction: ' + newPage);
             }
         },
 
@@ -158,9 +155,8 @@ define([
             if (this.options.list) {
                 return this.listView;
             }
-            else {
-                return this.itemView;
-            }
+
+            return this.itemView;
         },
 
         listViewOptions: function(item) {
