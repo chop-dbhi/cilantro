@@ -3,29 +3,29 @@
 </div>
 
 <div class=modal-body>
-    <div class="alert alert-error hide"></div>
-    <form class="form-inline">
-        <div class="control-group row-fluid">
+    <div class='alert alert-error hide'></div>
+    <form class='form-inline'>
+        <div class='control-group row-fluid'>
             <label class=control-label>Name</label>
             <div class=controls>
-                <input type=text class="query-name span12" placeholder="Query name (required)..." />
+                <input type=text class=span12 name='query-name' placeholder='Query name (required)...' />
             </div>
         </div>
-        <div class="control-group row-fluid">
+        <div class='control-group row-fluid'>
             <label class=control-label>Description</label>
             <div class=controls>
-                <input type=text class="query-description span12" placeholder="Additional description or details (optional)..." />
+                <input type=text class=span12 name='query-description' placeholder='Additional description or details (optional)...' />
             </div>
         </div>
-        <div class="checkbox">
+        <div class='checkbox'>
             <label>
-                <input type=checkbox name='query-publicity' class="query-publicity" />Should this query be publicly available to all users?
+                <input type=checkbox name='query-publicity' />Should this query be publicly available to all users?
             </label>
         </div>
-        <div class="control-group row-fluid">
+        <div class='control-group row-fluid'>
             <label class=control-label>Share</label>
             <div class=controls>
-                <textarea rows=6 class="query-emails span12" placeholder="Enter the email addresses or usernames of the users to share this query with. Separate multiple entries using a comma (optional)..."></textarea>
+                <textarea rows=6 class=span12 name=query-emails placeholder='Enter the email addresses or usernames of the users to share this query with. Separate multiple entries using a comma (optional)...'></textarea>
             </div>
         </div>
     </form>
@@ -33,5 +33,5 @@
 
 <div class=modal-footer>
     <button data-dismiss=modal class=btn>Cancel</button>
-    <button data-save class="btn btn-primary">Save</button>
+    <button data-save class='btn btn-primary'>Save</button>
 </div>

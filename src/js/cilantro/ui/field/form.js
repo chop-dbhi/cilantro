@@ -61,8 +61,8 @@ define([
         regions: {
             info: '.info-region',
             stats: '.stats-region',
-            chart: '.chart-region',
-            controls: '.controls-region'
+            chart: '[data-target=chart-region]',
+            controls: '[data-target=controls-region]'
         },
 
         regionViews: {

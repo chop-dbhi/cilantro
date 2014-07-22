@@ -1,11 +1,11 @@
 <div class=query-list>
-    <div class=header>
-        <h4 class='title'></h4>
+    <div>
+        <h4 data-target=title></h4>
     </div>
-    <div class="empty-message"></div>
-    <div class="loading-indicator hide">
-        <i class="icon-spinner icon-spin"></i> Loading...
+    <div data-target=empty-message></div>
+    <div class=hide data-target=loading-message>
+        <i class='icon-spinner icon-spin'></i> Loading...
     </div>
-    <div class="alert alert-danger error-message hide">There was a problem retrieving the queries. Please reload the page to try to reload the queries.</div>
+    <div class='alert alert-danger hide' data-target=error-message>There was a problem retrieving the queries. Please reload the page to try to reload the queries.</div>
     <div class=items></div>
 </div>
