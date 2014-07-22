@@ -99,9 +99,11 @@ define([
             // Overflow hidden is enforced, toggle normally
             if (this.ui.description.hasClass('ellipsis')) {
                 if (!this.descriptionOverflows()) return;
+                this.ui.descriptionToggle.text('read less');
                 this.ui.description.removeClass('ellipsis');
             }
             else {
+                this.ui.descriptionToggle.text('read more');
                 this.ui.description.addClass('ellipsis');
             }
         }
