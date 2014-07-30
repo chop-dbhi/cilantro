@@ -14,7 +14,7 @@ define [
 
         ui: _.extend
             toolbar: '.btn-toolbar'
-            toggleExpanded: '[data-target=toggle-expanded'
+            toggleExpanded: '[data-action=toggle-expanded]'
             form: '[data-target=editable]'
             xAxis: '[name=x-Axis]'
             yAxis: '[name=y-Axis]'
