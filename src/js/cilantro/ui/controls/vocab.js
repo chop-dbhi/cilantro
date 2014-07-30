@@ -320,11 +320,11 @@ define([
         },
 
         regions: {
-            paginator: '.paginator-region',
-            search: '.search-region',
+            paginator: '[data-target=.paginator-region]',
+            search: '[data-target=.search-region]',
             path: '[data-target=path-region]',
             browse: '[data-target=browse-region]',
-            buckets: '.buckets-region'
+            buckets: '[data-target=.buckets-region]'
         },
 
         regionViews: {
