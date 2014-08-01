@@ -81,9 +81,6 @@ define([
         },
 
         initialize: function() {
-            // Bind for use as event handlers
-            _.bindAll(this, 'onPageScroll');
-
             this.data = {};
 
             if (!(this.data.view = this.options.view)) {
@@ -111,7 +108,12 @@ define([
         },
 
         showLoadingOverlay: function() {
-            if (this.isClosed !== true) this.ui.loadingOverlay.show();
+            if (this.isClosed !== true) {
+                this.ui.loadingOverlay.show();
+
+                // Render above all but navbar-inverse @ 1030.
+                this.ui.loadingOverlay.css('z-index', '1029');
+            }
         },
 
         hideLoadingOverlay: function() {
@@ -163,45 +165,9 @@ define([
             this.ui.toggleFiltersText.html('Show Filters');
         },
 
-        onPageScroll: function() {
-            var scrollPos = $(document).scrollTop();
-
-            // Record the vertical offset of the masthead nav bar if we
-            // haven't done so already. This is used in scroll calculations.
-            if (this.navbarVerticalOffset === undefined) {
-                this.navbarVerticalOffset = this.ui.navbar.offset().top;
-            }
-
-            // If there is already something fixed to the top, record the
-            // height of it so we can account for it in our scroll
-            // calculations later.
-            if (this.topNavbarHeight === undefined) {
-                var topElement = $('.navbar-fixed-top');
-                if (topElement.length > 0) {
-                    this.topNavbarHeight = topElement.height();
-                }
-                else {
-                    this.topNavbarHeight = 0;
-                }
-            }
-
-            if (this.ui.navbar.hasClass('navbar-fixed-top')) {
-                if (scrollPos < (this.navbarVerticalOffset - this.topNavbarHeight)) {
-                    // Remove the results navbar from the top.
-                    this.ui.navbar.removeClass('navbar-fixed-top');
-                }
-            }
-            else {
-                if (scrollPos >= (this.navbarVerticalOffset - this.topNavbarHeight)) {
-                    // Move the results navbar to the top.
-                    this.ui.navbar.css('top', this.topNavbarHeight);
-                    this.ui.navbar.addClass('navbar-fixed-top');
-                }
-            }
-        },
-
         onRender: function() {
-            $(document).on('scroll', this.onPageScroll);
+            this.ui.navbar.css('top', $('.navbar-fixed-top').height());
+            this.ui.navbar.addClass('navbar-fixed-top');
 
             // Remove unsupported features from view/
             if (!c.isSupported('2.1.0')) {
