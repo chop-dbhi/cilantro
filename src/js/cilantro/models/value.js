@@ -68,7 +68,7 @@ define([
             var models = this.where({valid: null, pending: false});
 
             // Nothing to check
-            if (!models.length) return;
+            if (!models.length || !this.url) return;
 
             // Mark the models as pending to prevent redundant validation
             _.each(models, function(model) {

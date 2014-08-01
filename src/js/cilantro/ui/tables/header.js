@@ -1,10 +1,11 @@
 /* global define */
 
 define([
+    'jquery',
     'underscore',
     'marionette',
     './row'
-], function(_, Marionette, row) {
+], function($, _, Marionette, row) {
 
     var HeaderCell = Marionette.ItemView.extend({
         tagName: 'th',
@@ -115,6 +116,17 @@ define([
 
             this.$el.html(row.el);
             row.render();
+
+            var offset = 0;
+
+            $('.navbar-fixed-top').each(function() {
+                offset += this.clientHeight;
+            });
+
+            this.$el.css('top', offset);
+            this.$el.css('background-color', 'white');
+            this.$el.addClass('navbar-fixed-top');
+
             return this;
         }
     });

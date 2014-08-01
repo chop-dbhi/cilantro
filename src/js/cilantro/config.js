@@ -137,8 +137,8 @@ define([
          * Precedence hierarchy:
          *
          * - defaults: default options for the component
-         * - types: specific to concept type, overrides defaults
-         * - instances: specific to a concept instance, overrides types
+         * - types: specific to field type, overrides defaults
+         * - instances: specific to a field instance, overrides types
          *
          */
 
