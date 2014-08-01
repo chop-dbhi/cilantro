@@ -125,13 +125,19 @@ define([
             var i, text = [];
 
             if (!_.isArray(value)) {
-                return '<span class=filter-value>' + value.label + '</span>';
+                if (typeof value.label !== 'undefined') {
+                    value = value.label;
+                }
+                return '<span class=filter-value>' + value + '</span>';
             }
 
             // If the # of values are greater than this threshold, do not show
             // them all.
             var THRESHOLD = c.config.get('maxFilterDisplayValues');
-            value = _.pluck(value, 'label');
+
+            if (typeof value[0] === 'object') {
+                value = _.pluck(value, 'label');
+            }
 
             if (value.length === 1) {
                 return '<span class=filter-value>' + value[0] + '</span>';
@@ -181,29 +187,38 @@ define([
         renderDescription: function() {
             var attrs = this.model.toJSON();
 
-            // The cleanedValue will be used to prettify the language.
-            // In the case of some values being represented as ids, cleanedValue
-            // will provide their text representation.
-            var cleanedValue = attrs.cleaned_value; // jshint ignore:line
-
-            // cleanedValue is a property returned by Avocado versions 2.3.5 and above.
-            // If this property is not present, then the latest version
-            // is not installed on this app. Thus, do not attempt to prettify the
-            // filter display nor simplify the language.
-            if (cleanedValue === undefined) {
+           /*
+            * styleFilters is a feature supported by Avocado versions 2.3.5 and above.
+            * If this property is not present, then the latest version
+            * is not installed on this app.
+            * In this case, (or in the case of not watching styled filters,
+            * set this setting to false.
+            */
+            if (!c.config.get('styleFilters')) {
                 this.ui.description.html(flattenLanguage(attrs));
                 return;
             }
 
+           /*
+            * The cleanedValue will be used to prettify the language.
+            * In the case of some values being represented as ids, cleanedValue
+            * will provide their text representation.
+            */
+            var cleanedValue = attrs.cleaned_value; // jshint ignore:line
+
             var text = [],
-                values = attrs.value,
+                value = attrs.value,
                 operator = attrs.operator,
                 fieldName = '';
 
+            if (typeof cleanedValue === 'undefined'){
+                cleanedValue = value;
+            }
+
             // If the fields have been found, get the fieldName from them. Else
             // split the language at the operator to retrive it.
-            if (c.data.fields.get(attrs.get('field'))) {
-                fieldName = c.data.fields.get(attrs.get('field')).get('name');
+            if (c.data.fields.get(attrs.field)) {
+                fieldName = c.data.fields.get(attrs.field).get('name');
             }
             else {
                 // Splits the language at the operator and retrives the fieldName
@@ -222,8 +237,8 @@ define([
 
             if (operator === 'range' || operator === '-range') {
                 text.push(this.simpleLanguage[operator][0]);
-                var val1 = values[0];
-                var val2 = values[1];
+                var val1 = value[0];
+                var val2 = value[1];
 
                 // Prettify Numbers
                 if (_.isNumber(val1) && _.isNumber(val2)) {
@@ -237,10 +252,6 @@ define([
             else if (operator === 'in' || operator === '-in') {
                 text.push(this.simpleLanguage[operator][0]);
                 text.push(this.parseValue(cleanedValue, operator));
-            }
-            else if (operator === 'exact') {
-                text.push(this.simpleLanguage[operator][0]);
-                text.push('<span class=filter-value>' + cleanedValue + '</span>');
             }
             // Handles greater than, less than etc.
             else {
