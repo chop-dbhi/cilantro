@@ -95,13 +95,19 @@ define([
                 '<a href="#" onclick="location.reload()">Refreshing</a> ' +
                 'the page may help.';
         }
-        c.notify({
-            timeout: null,
-            dismissable: true,
-            level: 'error',
-            header: 'Uh oh.',
-            message: message
-        });
+
+        // This notification might be shown in harvest apps that have both a
+        // title page and a login requirement. This statement ensures the
+        // notification is only shown after the user logs in.
+        if (document.body.innerText.indexOf('Login') < -1) {
+            c.notify({
+                timeout: null,
+                dismissable: true,
+                level: 'error',
+                header: 'Uh oh.',
+                message: message
+            });
+        }
     });
 
     // Route based on the URL
