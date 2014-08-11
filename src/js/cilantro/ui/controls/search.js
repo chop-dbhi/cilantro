@@ -58,14 +58,14 @@ define([
 
         ui: {
             actions: '.actions',
-            addButton: '.add-item-button',
-            removeButton: '.remove-item-button',
+            addButton: '[data-action=add-item]',
+            removeButton: '[data-action=remove-item]',
             label: '.value-label'
         },
 
         events: {
-            'click .add-item-button': 'addItem',
-            'click .remove-item-button': 'removeItem'
+            'click @ui.addButton': 'addItem',
+            'click @ui.removeButton': 'removeItem'
         },
 
         constructor: function(options) {
@@ -139,7 +139,7 @@ define([
         regions: {
             search: '.search-region',
             paginator: '.paginator-region',
-            browse: '.browse-region',
+            browse: '[data-target=browse-region]',
             values: '.values-region'
         },
 

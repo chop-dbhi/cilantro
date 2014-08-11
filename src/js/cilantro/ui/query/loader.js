@@ -12,8 +12,8 @@ define([
         template: 'query/loader',
 
         ui: {
-            loadingMessage: '.loading-message',
-            errorMessage: '.error-message'
+            loadingMessage: '[data-target=loading-message]',
+            errorMessage: '[data-target=error-message]'
         },
 
         initialize: function() {

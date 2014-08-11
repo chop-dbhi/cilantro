@@ -16,7 +16,7 @@ define([
         },
 
         events: {
-            'click .delete-query-button': 'deleteQuery'
+            'click [data-action=delete-query]': 'deleteQuery'
         },
 
         ui: {
@@ -89,10 +89,10 @@ define([
         ui: {
             header: '.modal-header h4',
             alert: '.alert',
-            name: '.query-name',
-            description: '.query-description',
-            email: '.query-emails',
-            publicity: '.query-publicity'
+            name: 'input[name=query-name]',
+            description: 'input[name=query-description]',
+            email: 'textarea[name=query-emails]',
+            publicity: 'input[name=query-publicity]'
         },
 
         initialize: function() {
