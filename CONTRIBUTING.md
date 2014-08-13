@@ -35,10 +35,6 @@ This DCO simply certifies that the code you are submitting abides by the clauses
 - Branches are used to isolate development and ensure clear and concise intent of the code. Always do your work in a branch off the `master` branch. This will be a mirror of the work-in-progres (WIP) branch for the current major version, e.g. `2.x`. Name the branch after the issue and number, e.g. `issue-123`. If there is no issue number, [please create one first](https://github.com/cbmi/cilantro/issues/) before starting your work.
 - If working on existing files, ensure the coding style is kept consistent with the code around it. If creating new files or you are unsure of a pattern or preference please consult the [style guides](https://github.com/cbmi/style-guides/).
 
-## Source Code
-
-All code up to version 2.2.11 has been done in CoffeeScript, however the decision has been made to port over code to JavaScript. All new code is to be written in JavaScript and any heavy refactors of existing files should be done in JavaScript.
-
 ### JSHint
 
 The repository has a `.jshintrc` file that will enforce certain rules and conventions on the JavaScript source code. Files should not have any JSHint errors warnings when being committed. Most likely [there is a plugin](http://www.jshint.com/install/) you can install for your favorite editor to show errors after each save to the file.

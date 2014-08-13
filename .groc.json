@@ -1,4 +1,3 @@
 {
-    "index": "README.md",
-    "glob": ["src/coffee/**/**/**/**/**/*.coffee"]
+    "index": "README.md"
 }

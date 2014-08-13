@@ -72,12 +72,7 @@ module.exports = function(grunt) {
         watch: {
             grunt: {
                 tasks: ['local'],
-                files: ['Gruntfile.coffee']
-            },
-
-            coffee: {
-                tasks: ['coffee:local'],
-                files: ['<%= srcDir %>/coffee/**/*']
+                files: ['Gruntfile.js']
             },
 
             copy: {
@@ -98,38 +93,6 @@ module.exports = function(grunt) {
             sass: {
                 tasks: ['sass:local'],
                 files: ['<%= srcDir %>/scss/**/**/**/*']
-            }
-        },
-
-        coffee: {
-            options: {
-                bare: true
-            },
-
-            local: {
-                options: {
-                    sourceMap: true
-                },
-
-                expand: true,
-                cwd: '<%= srcDir %>/coffee',
-                dest: '<%= localDir %>/js',
-                src: '**/*.coffee',
-
-                rename: function(dest, src) {
-                    return dest + '/' + src.replace('.coffee', '.js');
-                }
-            },
-
-            build: {
-                expand: true,
-                cwd: '<%= srcDir %>/coffee',
-                dest: '<%= buildDir %>/js',
-                src: '**/*.coffee',
-
-                rename: function(dest, src) {
-                    return dest + '/' + src.replace('.coffee', '.js');
-                }
             }
         },
 
@@ -432,7 +395,6 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
@@ -555,7 +517,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('local', 'Creates a build for local development and testing', [
         'sass:local',
-        'coffee:local',
         'copy:local',
         'symlink',
         'jasmine:local:build'
@@ -563,7 +524,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('dist', 'Creates a build for distribution', [
         'clean:build',
-        'coffee:build',
         'copy:build',
         'clean:dist',
         'requirejs:dist',
@@ -574,7 +534,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('cdn', 'Creates a build for CDN distribution', [
         'clean:build',
-        'coffee:build',
         'copy:build',
         'clean:cdn',
         'requirejs:cdn',
@@ -593,7 +552,6 @@ module.exports = function(grunt) {
     );
 
     grunt.registerTask('test', 'Runs the headless test suite', [
-        'coffee:local',
         'copy:local',
         'symlink',
         'serve:jasmine',
