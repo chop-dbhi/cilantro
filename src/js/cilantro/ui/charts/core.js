@@ -1,4 +1,4 @@
-/* define global */
+/* global define */
 
 define([
     'jquery',

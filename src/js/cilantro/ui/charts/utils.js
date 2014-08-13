@@ -226,15 +226,17 @@ define([
             // Multiple series
             if (seriesList[1]) {
                 formatterFunc = function () {
-                    return '<h5>' + this.series.name + '</h5><br /><b>' + xName + ':</b>' +
-                        this.series.xAxis.categories[this.point.x] + '<br /><b>' + yName +
-                        ':</b>' + this.series.yAxis.categories[this.point.y];
+                    return '<h5>' + this.series.name + '</h5><br /><b>' + xName +
+                           ':</b>' + this.series.xAxis.categories[this.point.x] +
+                           '<br /><b>' + yName + ':</b>' +
+                           this.series.yAxis.categories[this.point.y];
                 };
             }
             else {
                 formatterFunc = function() {
-                    return '<b>' + xName + ':</b>' + this.series.xAxis.categories[this.point.x] +
-                        '<br /><b>' + yName + ':</b>' + this.series.yAxis.categories[this.point.y];
+                    return '<b>' + xName + ':</b>' +
+                           this.series.xAxis.categories[this.point.x] + '<br /><b>' +
+                           yName + ':</b>' + this.series.yAxis.categories[this.point.y];
                 };
             }
         }
@@ -242,15 +244,17 @@ define([
             // Multiple series
             if (seriesList[1]) {
                formatterFunc = function() {
-                    return '<h5>' + this.series.name + '</h5><br /><b>' + xName + ':</b>' +
-                        this.series.xAxis.categories[this.point.x] + '<br /><b>' +
-                        yName + ':</b>' + Highcharts.numberFormat(parseFloat(this.y));
+                    return '<h5>' + this.series.name + '</h5><br /><b>' + xName +
+                           ':</b>' + this.series.xAxis.categories[this.point.x] +
+                           '<br /><b>' + yName + ':</b>' +
+                           Highcharts.numberFormat(parseFloat(this.y));
                 };
             }
             else {
                 formatterFunc = function() {
-                    return '<b>' + xName + ':</b>' + this.series.xAxis.categories[this.point.x] +
-                        '<br /><b>' + yName + ':</b>' + Highcharts.numberFormat(parseFloat(this.y));
+                    return '<b>' + xName + ':</b>' +
+                           this.series.xAxis.categories[this.point.x] + '<br /><b>' +
+                           yName + ':</b>' + Highcharts.numberFormat(parseFloat(this.y));
                 };
             }
         }
@@ -258,15 +262,17 @@ define([
             // Multiple series
             if (seriesList[1]) {
                 formatterFunc = function() {
-                    return '<h5>' + this.series.name + '</h5><br /><b>' + xName + ':</b>' +
-                        Highcharts.numberFormat(parseFloat(this.x)) + '<br /><b>' +
-                        yName + ':</b>' + Highcharts.numberFormat(parseFloat(this.y));
+                    return '<h5>' + this.series.name + '</h5><br /><b>' + xName +
+                           ':</b>' + Highcharts.numberFormat(parseFloat(this.x)) +
+                           '<br /><b>' + yName + ':</b>' +
+                           Highcharts.numberFormat(parseFloat(this.y));
                 };
             }
             else {
                 formatterFunc = function() {
-                    return '<b>' + xName + ':</b>' + Highcharts.numberFormat(parseFloat(this.x)) +
-                        '<br /><b>' + yName + ':</b>' + Highcharts.numberFormat(parseFloat(this.y));
+                    return '<b>' + xName + ':</b>' +
+                           Highcharts.numberFormat(parseFloat(this.x)) + '<br /><b>' +
+                           yName + ':</b>' + Highcharts.numberFormat(parseFloat(this.y));
                 };
             }
         }

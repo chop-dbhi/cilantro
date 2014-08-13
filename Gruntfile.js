@@ -397,6 +397,7 @@ module.exports = function(grunt) {
                 unused: true,
                 trailing: true,
                 maxdepth: 3,
+                maxlen: 90,
                 browser: true,
                 eqeqeq: true,
 
