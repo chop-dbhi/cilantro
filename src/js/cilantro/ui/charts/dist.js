@@ -108,7 +108,12 @@ define([
                 function(resp) {
                     if (_this.isClosed) return;
 
+                    resp.data = _.sortBy(resp.data, function(element) {
+                        return element.values[0];
+                    });
+
                     var options = _this.getChartOptions(resp);
+
                     if (resp.size) {
                         _this.renderChart(options);
                     }
