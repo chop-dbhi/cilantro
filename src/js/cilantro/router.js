@@ -3,7 +3,7 @@
 /*
 Router requirements:
 - Shared "main" area
-    - Workflows (pages) are hidden rather than closed
+    - Pages are hidden rather than closed
 
 
 var router = new Backbone.Router({

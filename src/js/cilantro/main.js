@@ -39,7 +39,7 @@ require({
         c.sessions.open(options).then(function() {
 
             // Panels are defined in their own namespace since they shared
-            // across workflows
+            // across pages.
             c.panels = {
                 concept: new c.ui.ConceptPanel({
                     collection: this.data.concepts.queryable
@@ -73,7 +73,7 @@ require({
             var elements = [];
 
             // Render and append panels in the designated main element
-            // prior to starting the session and loading the initial workflow
+            // prior to starting the session and loading the initial page. 
             // Render and append element for insertion
             $.each(c.panels, function(key, view) {
                 view.render();
@@ -89,13 +89,13 @@ require({
             var main = $(c.config.get('main'));
             main.append.apply(main, elements);
 
-            c.workflows = {
-                query: new c.ui.QueryWorkflow({
+            c.pages = {
+                query: new c.ui.QueryPage({
                     context: this.data.contexts.session,
                     concepts: this.data.concepts.queryable
                 }),
 
-                results: new c.ui.ResultsWorkflow({
+                results: new c.ui.ResultsPage({
                     view: this.data.views.session,
                     // The differences in these names are noted
                     results: this.data.preview
@@ -106,16 +106,16 @@ require({
             var routes = [{
                 id: 'query',
                 route: 'query/',
-                view: c.workflows.query
+                view: c.pages.query
             }, {
                 id: 'results',
                 route: 'results/',
-                view: c.workflows.results
+                view: c.pages.results
             }];
 
             // Workspace supported as of 2.1.0
             if (c.isSupported('2.1.0')) {
-                c.workflows.workspace = new c.ui.WorkspaceWorkflow({
+                c.pages.workspace = new c.ui.WorkspacePage({
                     queries: this.data.queries,
                     context: this.data.contexts.session,
                     view: this.data.views.session,
@@ -125,13 +125,13 @@ require({
                 routes.push({
                     id: 'workspace',
                     route: 'workspace/',
-                    view: c.workflows.workspace
+                    view: c.pages.workspace
                 });
             }
 
             // Query URLs supported as of 2.2.0
             if (c.isSupported('2.2.0')) {
-                c.workflows.queryload = new c.ui.QueryLoader({
+                c.pages.queryload = new c.ui.QueryLoader({
                     queries: this.data.queries,
                     context: this.data.contexts.session,
                     view: this.data.views.session
@@ -140,7 +140,7 @@ require({
                 routes.push({
                     id: 'query-load',
                     route: 'results/:query_id/',
-                    view: c.workflows.queryload
+                    view: c.pages.queryload
                 });
             }
 

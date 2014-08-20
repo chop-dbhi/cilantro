@@ -14,10 +14,10 @@ define([
     './ui/exporter',
     './ui/field',
     './ui/notify',
+    './ui/pages',
     './ui/paginator',
     './ui/query',
-    './ui/tables',
-    './ui/workflows'
+    './ui/tables'
 ], function(_) {
 
     // Note, the ui/core module is intentially left out

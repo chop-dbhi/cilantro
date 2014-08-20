@@ -88,9 +88,9 @@ define([
     'tpl!templates/values/item.html',
     'tpl!templates/values/list.html',
 
-    'tpl!templates/workflows/query.html',
-    'tpl!templates/workflows/results.html',
-    'tpl!templates/workflows/workspace.html'
+    'tpl!templates/pages/query.html',
+    'tpl!templates/pages/results.html',
+    'tpl!templates/pages/workspace.html'
 
 ], function(_, loglevel) {
 
