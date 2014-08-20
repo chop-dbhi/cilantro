@@ -44,7 +44,7 @@ define([
 
 
     /*
-     * The ResultsWorkflow provides an interface for previewing tabular data,
+     * The ResultsPage provides an interface for previewing tabular data,
      * mechanisms for customizing the view, and a method for exporting data
      * to alternate formats.
      *
@@ -52,18 +52,18 @@ define([
      *      - view: the session/active view model
      *      - results: a Results collection that contains the tabular data
      */
-    var ResultsWorkflow = Marionette.Layout.extend({
-        className: 'results-workflow',
+    var ResultsPage = Marionette.Layout.extend({
+        className: 'results-page',
 
-        template: 'workflows/results',
+        template: 'pages/results',
 
         ui: {
             toggleFiltersButton: '[data-toggle=context-panel]',
             toggleFiltersIcon: '[data-toggle=context-panel] i',
             toggleFiltersText: '[data-toggle=context-panel] span',
-            navbar: '.results-workflow-navbar',
+            navbar: '.results-page-navbar',
             resultsContainer: '.results-container',
-            navbarButtons: '.results-workflow-navbar button',
+            navbarButtons: '.results-page-navbar button',
             loadingOverlay: '.loading-overlay'
         },
 
@@ -237,6 +237,6 @@ define([
 
     return {
         ResultCount: ResultCount,
-        ResultsWorkflow: ResultsWorkflow
+        ResultsPage : ResultsPage
     };
 });

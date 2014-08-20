@@ -7,7 +7,7 @@ define([
 ], function(Marionette, c, concept) {
 
     /*
-    The QueryWorkflow provides an interface for navigating and viewing
+    The QueryPage provides an interface for navigating and viewing
     concepts that are deemed 'queryable'. This includes browsing the
     available concepts in the index, viewing details about the
     concept in the workspace as well as adding or modifying filters,
@@ -17,10 +17,10 @@ define([
     - concepts: a collection of concepts that are deemed queryable
     - context: the session/active context model
     */
-    var QueryWorkflow = Marionette.Layout.extend({
-        className: 'query-workflow',
+    var QueryPage = Marionette.Layout.extend({
+        className: 'query-page',
 
-        template: 'workflows/query',
+        template: 'pages/query',
 
         regions: {
             workspace: '.concept-workspace-region'
@@ -64,7 +64,7 @@ define([
 
 
     return {
-        QueryWorkflow: QueryWorkflow
+        QueryPage : QueryPage
     };
 
 });

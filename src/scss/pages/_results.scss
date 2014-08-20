@@ -1,9 +1,9 @@
-.results-workflow {
+.results-page {
     @include transition(margin-right, 0.3s);
 
     padding: 0 10px;
 
-    .results-workflow-navbar {
+    .results-page-navbar {
         margin-bottom: 0px;
 
         &.navbar-fixed-top {
@@ -42,7 +42,7 @@
     &.panel-open {
         margin-right: $panel-outer-width;
 
-        .results-workflow-navbar.navbar-fixed-top {
+        .results-page-navbar.navbar-fixed-top {
             right: $panel-outer-width;
         }
     }

@@ -2,9 +2,9 @@
 
 define([
     'underscore',
-    './workflows/query',
-    './workflows/results',
-    './workflows/workspace'
+    './pages/query',
+    './pages/results',
+    './pages/workspace'
 ], function(_) {
 
     var mods = [].slice.call(arguments, 1);

@@ -6,10 +6,10 @@ define([
     '../query'
 ], function(Marionette, c, query) {
 
-    var WorkspaceWorkflow = Marionette.Layout.extend({
-        className: 'workspace-workflow',
+    var WorkspacePage = Marionette.Layout.extend({
+        className: 'workspace-page',
 
-        template: 'workflows/workspace',
+        template: 'pages/workspace',
 
         regions: {
             queries: '.query-region',
@@ -42,9 +42,9 @@ define([
                 throw new Error('view model required');
             }
 
-            // When this workflow is loaded, toggle shared components
+            // When this page is loaded, toggle shared components.
             this.on('router:load', function() {
-                // Fully hide the panel; do not leave an edge to show/hide
+                // Fully hide the panel; do not leave an edge to show/hide.
                 c.panels.context.closePanel({full: true});
                 c.panels.concept.closePanel({full: true});
             });
@@ -103,7 +103,7 @@ define([
 
 
     return {
-        WorkspaceWorkflow: WorkspaceWorkflow
+        WorkspacePage : WorkspacePage
     };
 
 });
