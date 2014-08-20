@@ -125,7 +125,7 @@ define([
         },
 
         onRender: function() {
-            var main = new this.regionViews.main();
+            var main = new this.regionViews.main({context: this.data.context});
             this.setView(main);
         }
     });
