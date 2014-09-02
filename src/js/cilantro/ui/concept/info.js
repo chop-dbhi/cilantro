@@ -15,13 +15,14 @@ define([
         ui: {
             name: '.name',
             category: '.category',
+            categoryLink: '[data-target=category-link]',
             description: '.description',
             descriptionText: '.description .text',
             descriptionToggle: '.description .toggle'
         },
 
         events: {
-            'click .category-link': 'onCategoryLinkClick',
+            'click @ui.categoryLink': 'onCategoryLinkClick',
             'click @ui.descriptionToggle': 'toggleDescription'
         },
 

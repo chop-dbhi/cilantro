@@ -233,13 +233,13 @@ define([
 
         ui: {
             actions: '.actions',
-            addButton: '.add-item-button',
-            removeButton: '.remove-item-button'
+            addButton: '[data-action=add-item]',
+            removeButton: '[data-action=remove-item]'
         },
 
         events: {
-            'click .add-item-button': 'addItem',
-            'click .remove-item-button': 'removeItem'
+            'click @ui.addButton': 'addItem',
+            'click @ui.removeButton': 'removeItem'
         },
 
         constructor: function(options) {
@@ -311,8 +311,8 @@ define([
 
         events: {
             'click [data-action=clear]': 'clearValues',
-            'click .browse-region a': 'triggerDescend',
-            'click .path-region button': 'triggerAscend'
+            'click [data-target=browse-region] a': 'triggerDescend',
+            'click [data-target=path-region] button': 'triggerAscend'
         },
 
         options: {
@@ -320,11 +320,11 @@ define([
         },
 
         regions: {
-            paginator: '.paginator-region',
-            search: '.search-region',
-            path: '.path-region',
-            browse: '.browse-region',
-            buckets: '.buckets-region'
+            paginator: '[data-target=.paginator-region]',
+            search: '[data-target=.search-region]',
+            path: '[data-target=path-region]',
+            browse: '[data-target=browse-region]',
+            buckets: '[data-target=.buckets-region]'
         },
 
         regionViews: {

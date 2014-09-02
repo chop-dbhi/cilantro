@@ -24,8 +24,8 @@ define([
         ui: {
             owner: '.owner',
             nonOwner: '.non-owner',
-            shareCount: '.share-count',
-            publicIcon: '.public-icon',
+            shareCount: '[data-target=share-count]',
+            publicIcon: '[data-target=public-icon]',
             details: '[data-target=details]',
             toggleDetails: '[data-target=toggle-details]',
             actions: '.owner button'

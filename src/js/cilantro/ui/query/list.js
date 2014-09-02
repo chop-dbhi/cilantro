@@ -25,8 +25,11 @@ define([
         },
 
         ui: {
-            title: '.title',
-            publicIndicator: '.header > div'
+            title: '[data-target=title]',
+            publicIndicator: '.header > div',
+            loadingMessage: '[data-target=loading-message]',
+            emptyMessage: '[data-target=empty-message]',
+            errorMessage: '[data-target=error-message]'
         },
 
         collectionEvents: {
@@ -69,8 +72,8 @@ define([
         },
 
         _refreshList: function() {
-            this.$('.error-message').hide();
-            this.$('.loading-indicator').hide();
+            this.ui.errorMessage.hide();
+            this.ui.loadingMessage.hide();
             this.checkForEmptyCollection();
         },
 
@@ -84,15 +87,15 @@ define([
         },
 
         onCollectionError: function() {
-            this.$('.empty-message').hide();
-            this.$('.error-message').show();
-            this.$('.loading-indicator').hide();
+            this.ui.emptyMessage.hide();
+            this.ui.errorMessage.show();
+            this.ui.loadingMessage.hide();
         },
 
         onCollectionRequest: function() {
-            this.$('.empty-message').hide();
-            this.$('.error-message').hide();
-            this.$('.loading-indicator').show();
+            this.ui.emptyMessage.hide();
+            this.ui.errorMessage.hide();
+            this.ui.loadingMessage.show();
         },
 
         onCollectionSync: function() {
@@ -101,10 +104,10 @@ define([
 
         checkForEmptyCollection: function() {
             if (this.collection.length === 0) {
-                this.$('.empty-message').show();
+                this.ui.emptyMessage.show();
             }
             else {
-                this.$('.empty-message').hide();
+                this.ui.emptyMessage.hide();
             }
         },
 
@@ -113,7 +116,7 @@ define([
 
             if (!this.options.editable) this.ui.publicIndicator.hide();
 
-            this.$('.empty-message').html(this.options.emptyMessage);
+            this.ui.emptyMessage.html(this.options.emptyMessage);
             this.checkForEmptyCollection();
         }
     });

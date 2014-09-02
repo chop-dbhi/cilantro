@@ -71,7 +71,7 @@ define ([
 
         ui: {
             bar: '.bar',
-            barLabel: '.bar-label'
+            barLabel: '[data-target=bar-label]'
         },
 
         events: {
@@ -397,7 +397,7 @@ define ([
         },
 
         regions: {
-            bars: '.bars-region',
+            bars: '[data-target=bars-region]',
             toolbar: '.toolbar-region'
         },
 

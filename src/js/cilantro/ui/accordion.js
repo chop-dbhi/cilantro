@@ -47,7 +47,7 @@ define([
 
         itemView: Section,
 
-        itemViewContainer: '.sections',
+        itemViewContainer: '[data-target=sections]',
 
         itemSectionItems: 'items',
 

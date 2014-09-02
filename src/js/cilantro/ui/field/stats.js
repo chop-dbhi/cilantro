@@ -71,8 +71,8 @@ define ([
         template: 'field/stats',
 
         regions: {
-            values: '.stats-values',
-            chart: '.stats-chart'
+            values: '[data-target=stats-values]',
+            chart: '[data-target=stats-chart]'
         },
 
         onRender: function() {
