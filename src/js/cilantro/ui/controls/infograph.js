@@ -22,20 +22,13 @@ define ([
 
     // Model with minimal parsing for unpacking the source value contained
     // with an array.
-    var BarModel = Backbone.Model.extend({
-        parse: function(attrs) {
-            attrs.value = attrs.values[0];
-            return attrs;
-        }
-    });
+    var BarModel = Backbone.Model.extend({ });
 
-    /*
-     * Collection of models representing the distribution data. Includes
-     * a method for sorting models by an attriute. If the attribute is
-     * prefixed with a hyphen '-', the sort will be reversed (descending).
-     * This triggers the 'sort' event unless the 'silent' option is true.
-     */
-     var BarCollection = Backbone.Collection.extend({
+    // Collection of models representing the distribution data. Includes
+    // a method for sorting models by an attriute. If the attribute is
+    // prefixed with a hyphen '-', the sort will be reversed (descending).
+    // This triggers the 'sort' event unless the 'silent' option is true.
+    var BarCollection = Backbone.Collection.extend({
         model: BarModel,
 
         comparator: function(model) {
@@ -92,7 +85,6 @@ define ([
 
         serializeData: function() {
             var attrs = this.model.toJSON();
-            attrs.value = attrs.values[0];
 
             var percentage = this.getPercentage();
             attrs.width = percentage;
@@ -182,10 +174,29 @@ define ([
             this.wait();
 
             var _this = this;
+
             // Fetch the field distribution, do not cache
-            this.model.distribution(function(resp) {
-                _this.collection.reset(resp.data, {parse: true});
-                _this.ready();
+            this.model.distribution(function(dist) {
+                _this.model.values({'limit': 0}, function(resp) {
+                    var valueLabels = {};
+
+                    _.each(resp.values, function(item) {
+                        valueLabels[item.value] = item.label;
+                    });
+
+                    var models = _.map(dist.data, function(item) {
+                        var value = item.values[0];
+
+                        return {
+                            count: item.count,
+                            value: value,
+                            label: valueLabels[value]
+                        };
+                    });
+
+                    _this.collection.reset(models);
+                    _this.ready();
+                });
             });
         },
 
@@ -304,21 +315,21 @@ define ([
 
             switch (this.sortDirection) {
                 case '-count':
-                   this.ui.sortValueHeader.html('Value <i class=icon-sort></i>');
-                   this.ui.sortCountHeader.html('Count <i class=icon-sort-down></i>');
-                   break;
+                    this.ui.sortValueHeader.html('Value <i class=icon-sort></i>');
+                    this.ui.sortCountHeader.html('Count <i class=icon-sort-down></i>');
+                    break;
                 case 'count':
-                   this.ui.sortValueHeader.html('Value <i class=icon-sort></i>');
-                   this.ui.sortCountHeader.html('Count <i class=icon-sort-up></i>');
-                   break;
+                    this.ui.sortValueHeader.html('Value <i class=icon-sort></i>');
+                    this.ui.sortCountHeader.html('Count <i class=icon-sort-up></i>');
+                    break;
                 case '-value':
-                   this.ui.sortValueHeader.html('Value <i class=icon-sort-down></i>');
-                   this.ui.sortCountHeader.html('Count <i class=icon-sort></i>');
-                   break;
+                    this.ui.sortValueHeader.html('Value <i class=icon-sort-down></i>');
+                    this.ui.sortCountHeader.html('Count <i class=icon-sort></i>');
+                    break;
                 case 'value':
-                   this.ui.sortValueHeader.html('Value <i class=icon-sort-up></i>');
-                   this.ui.sortCountHeader.html('Count <i class=icon-sort></i>');
-                   break;
+                    this.ui.sortValueHeader.html('Value <i class=icon-sort-up></i>');
+                    this.ui.sortCountHeader.html('Count <i class=icon-sort></i>');
+                    break;
             }
 
             this.collection.sortModelsBy(this.sortDirection);
