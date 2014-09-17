@@ -279,7 +279,9 @@ define([
             // When the page loses focus, stop pinging, resume when visibility is regained
             this.listenTo(c, {
                 visible: this.startPing,
-                hidden: this.stopPing
+                hidden: this.stopPing,
+                focus: this.startPing,
+                blur: this.stopPing
             });
 
             if (!c.isSupported(c.getSerranoVersion())) {
