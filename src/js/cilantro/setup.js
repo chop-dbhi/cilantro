@@ -196,4 +196,14 @@ define([
             window.onfocus = window.onblur = onchange;
     }
 
+    // Handlers for the window blur/focus events to support tracking. The
+    // primary use of these events is to toggle pinging the server when the
+    // window goes out of focus.
+    window.onblur = function() {
+        c.trigger('blur');
+    };
+
+    window.onfocus = function() {
+        c.trigger('focus');
+    };
 });
