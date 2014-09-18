@@ -173,7 +173,16 @@ define([
         },
 
         onRender: function() {
-            this.renderDetails();
+            // The details requires the concepts to be loaded. This checks
+            // based on existence, otherwise waits until they sync.
+            if (c.data.concepts.length) {
+                this.renderDetails();
+            }
+            else {
+                this.listenTo(c.data.concepts, 'sync', function() {
+                    this.renderDetails();
+                });
+            }
 
             // Short-circuit render if not editable
             if (!this.options.editable) {
