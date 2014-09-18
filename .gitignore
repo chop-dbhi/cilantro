@@ -8,7 +8,6 @@
 local
 build
 dist
-cdn
 components
 css/style.css
 css/vocab/

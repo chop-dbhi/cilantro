@@ -639,7 +639,7 @@ module.exports = function(grunt) {
     );
 
     grunt.registerTask('tag-release', 'Create a release on master', function() {
-        run('git add bower.json package.json src/js/cilantro/core.js');
+        run('git add bower.json package.json src/js/cilantro/core.js cdn/');
         run("git commit -s -m '" + pkg.version + " Release'");
         run('git tag ' + pkg.version);
     });
@@ -673,7 +673,6 @@ module.exports = function(grunt) {
             grunt.log.ok('Push the code and tags: git push && git push --tags');
             grunt.log.ok('Go to ' + pkg.homepage + '/releases to update the ' +
                          'release descriptions and upload the binaries.');
-            grunt.log.ok('The CDN-ready files have been updated');
         }
     );
 
