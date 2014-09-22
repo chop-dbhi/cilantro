@@ -7,7 +7,7 @@ define([
     '../../constants'
 ], function(_, base, button, constants) {
 
-    // A generic control for entering an inclusive or exclusive range
+    // A generic control for entering an inclusive or exclusive range.
     var RangeControl = base.Control.extend({
         template: 'controls/range/layout',
 
@@ -139,6 +139,10 @@ define([
             return this.ui.upperBound.val();
         },
 
+        exists: function(value) {
+            return _.exists(value) && value !== '';
+        },
+
         // Use the filled state of the upper/lower bound inputs to create the
         // value range or explicit value for this control. If both the upper
         // and lower bounds are left blank, null will be returned to invalidate
@@ -148,13 +152,13 @@ define([
                 lower = this.getLowerBoundValue(),
                 upper = this.getUpperBoundValue();
 
-            if (_.exists(lower) && _.exists(upper)) {
+            if (this.exists(lower) && this.exists(upper)) {
                 value = [lower, upper];
             }
-            else if (_.exists(lower)) {
+            else if (this.exists(lower)) {
                 value = lower;
             }
-            else if (_.exists(upper)) {
+            else if (this.exists(upper)) {
                 value = upper;
             }
 
@@ -217,11 +221,15 @@ define([
         },
 
         // Override set method due to the dependency of the operator
-        // when setting the value
+        // when setting the value.
         set: function(attrs) {
+            // If this control is in the middle of a change, don't bother
+            // trying to set anything here.
+            if (this._changing) return;
+
             this.setOperator(attrs.operator);
 
-            // Reset values prior to setting
+            // Reset values prior to setting.
             this.setUpperBoundValue();
             this.setLowerBoundValue();
 
@@ -242,12 +250,12 @@ define([
         },
 
         validate: function(attrs) {
-            // One of the bounds must be defined
+            // One of the bounds must be defined.
             if (_.isUndefined(attrs.value) || _.isNull(attrs.value)) {
                 return 'A lower or upper value must be defined';
             }
 
-            // The first value should not be greater than the second
+            // The first value should not be greater than the second.
             if (_.isArray(attrs.value) && attrs.value[0] > attrs.value[1]) {
                 return 'The lower bound cannot be greater than the upper';
             }
