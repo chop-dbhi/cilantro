@@ -1,11 +1,10 @@
 /* global define */
 
 define([
-    'jquery',
     'underscore',
     'marionette',
     './row'
-], function($, _, Marionette, row) {
+], function(_, Marionette, row) {
 
     var HeaderCell = Marionette.ItemView.extend({
         tagName: 'th',
@@ -111,42 +110,11 @@ define([
     var Header = Marionette.ItemView.extend({
         tagName: 'thead',
 
-        resize: function() {
-            if(this.row.children.length > 0) {
-                var width = $(document).width() / this.row.children.length;
-                this.row.children.each(function(cell) {
-                    cell.$el.css('width', width);
-                    cell.$el.css('max-width', width);
-                });
-            }
-        },
-
         render: function() {
             var row = new HeaderRow(this.options);
 
-            this.row = row;
             this.$el.html(row.el);
-
-            this.listenTo(row, 'render', this.resize, this);
-            _.bindAll(this, 'resize');
-            $(window).resize(this.resize);
-
             row.render();
-
-            var offset = 0;
-
-            $('.navbar-fixed-top').each(function() {
-                offset += this.clientHeight;
-            });
-
-            this.$el.css('top', offset);
-            this.$el.css('background-color', 'white');
-            this.$el.css('border-bottom', '1px solid #dddddd');
-
-            // Display below filters @ z-index of 100.
-            this.$el.css('z-index', '99');
-            this.$el.addClass('navbar-fixed-top');
-
             return this;
         }
     });
