@@ -1,12 +1,13 @@
 /* global define */
 
 define([
+    'jquery',
     'underscore',
     'marionette',
     '../base',
     '../core',
     '../context/filters'
-], function( _, Marionette, base, c, filters) {
+], function($, _, Marionette, base, c, filters) {
 
     var LoadingQueryItem = base.LoadView.extend({
         align: 'left'
@@ -79,12 +80,24 @@ define([
             event.preventDefault();
             event.stopPropagation();
 
-            this.data.view.save('json', this.model.get('view_json'));
-            this.data.context.save('json', this.model.get('context_json'), {
-                reset: true
+            $.when(
+                this.data.view.save('json', this.model.get('view_json')),
+                this.data.context.save('json', this.model.get('context_json'), {
+                    reset: true
+                })
+            ).done(function() {
+                c.router.navigate('results', {trigger: true});
+            }).fail(function() {
+                c.notify({
+                    timeout: null,
+                    dismissable: true,
+                    level: 'error',
+                    header: 'Error Opening Query',
+                    message: 'An error occurred when opening the query. ' +
+                             'Click on the link again to try to open the ' +
+                             'query again.'
+                });
             });
-
-            c.router.navigate('results', {trigger: true});
         },
 
         showEditQueryModal: function() {
