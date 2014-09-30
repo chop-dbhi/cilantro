@@ -15,16 +15,40 @@ define([
 ], function(_, loglevel, c, date, number, search, select, infograph, nullSelector,
             text, vocab) {
 
+    /*
+     * TODO: Remove old keys(see list in below comment) for the 3.0 release as
+     * removing them during current renaming process is a breaking change. These
+     * key/value pairs should be removed in the 3.0 release:
+     *
+     *      infograph: infograph.InfographControl,
+     *      number: number.NumberControl,
+     *      date: date.DateControl,
+     *      search: search.SearchControl,
+     *      singleSelectionList: select.SingleSelectionList,
+     *      multiSelectionList: select.MultiSelectionList,
+     *      nullSelector: nullSelector.NullSelector,
+     *      text: text.TextControl,
+     *      vocab: vocab.VocabControl
+     */
     var defaultControls = {
         infograph: infograph.InfographControl,
+        infoBars: infograph.InfographControl,
         number: number.NumberControl,
+        numberRange: number.NumberControl,
         date: date.DateControl,
+        dateRange: date.DateControl,
         search: search.SearchControl,
+        valueSearch: search.SearchControl,
         singleSelectionList: select.SingleSelectionList,
+        singleValueSelect: select.SingleSelectionList,
         multiSelectionList: select.MultiSelectionList,
+        multiValueSelect: select.MultiSelectionList,
         nullSelector: nullSelector.NullSelector,
+        nullValueCheckbox: nullSelector.NullSelector,
         text: text.TextControl,
-        vocab: vocab.VocabControl
+        freeTextInput: text.TextControl,
+        vocab: vocab.VocabControl,
+        vocabSearch: vocab.VocabControl
     };
 
     var customControls = {};
