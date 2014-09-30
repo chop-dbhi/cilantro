@@ -11,6 +11,10 @@ define([
 
         template: 'workflows/workspace',
 
+        ui: {
+            loadingOverlay: '.loading-overlay'
+        },
+
         regions: {
             queries: '.query-region',
             publicQueries: '.public-query-region',
@@ -47,6 +51,20 @@ define([
                 // Fully hide the panel; do not leave an edge to show/hide
                 c.panels.context.closePanel({full: true});
                 c.panels.concept.closePanel({full: true});
+            });
+
+            // Query items, when clicked, will update the view and the context
+            // for the user and then, when that is done, will navigate to the
+            // Results page. Instead of listening here for both the view and
+            // the context sync events, we can simply hide the loading view
+            // on the router unload event which the query item will trigger
+            // when it uses the router to navigate to the Results page.
+            this.on('router:unload', function() {
+                this.ui.loadingOverlay.hide();
+            });
+
+            this.listenTo(this.data.view, 'request', function() {
+                this.ui.loadingOverlay.show();
             });
         },
 
