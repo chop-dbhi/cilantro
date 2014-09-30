@@ -1,0 +1,15 @@
+.loading-overlay {
+    background: rgba(255, 255, 255, 0.7);
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+    padding: 50px;
+
+    // Move this overlay above everything else. If this is not set, it
+    // will render above most things but it will render behind other
+    // elements, like Bootstrap buttons for example.
+    z-index: 1;
+}
