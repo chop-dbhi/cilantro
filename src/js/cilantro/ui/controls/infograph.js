@@ -442,7 +442,7 @@ define ([
             var proxyFunc = function(method) {
                 _this[method] = function() {
                     var thisControl = _this.barsControl;
-                    return thisControl[method].call(thisControl, arguments);
+                    return thisControl[method].apply(thisControl, arguments);
                 };
 
                 return _this[method];
