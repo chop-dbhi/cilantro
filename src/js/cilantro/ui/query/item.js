@@ -159,7 +159,11 @@ define([
 
                     // Retrieve the columns selected
                     this.model.view.facets.each(function(model) {
-                        var name = c.data.concepts.get(model.get('concept')).get('name'),
+                        var concept = c.data.concepts.get(model.get('concept'));
+
+                        if (concept === undefined) return;
+
+                        var name = concept.get('name'),
                             sort = model.get('sort');
 
                         html.push('<li>' + name);
