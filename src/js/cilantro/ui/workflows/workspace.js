@@ -62,10 +62,6 @@ define([
             this.on('router:unload', function() {
                 this.ui.loadingOverlay.hide();
             });
-
-            this.listenTo(this.data.view, 'request', function() {
-                this.ui.loadingOverlay.show();
-            });
         },
 
         onRender: function() {
@@ -118,6 +114,10 @@ define([
                 if (this.publicQueries) {
                     this.publicQueries.show(publicQueryView);
                 }
+            });
+
+            this.listenTo(this.data.view, 'request', function() {
+                this.ui.loadingOverlay.show();
             });
         }
     });
