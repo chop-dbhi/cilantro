@@ -107,6 +107,9 @@ define([
                     this.data.publicQueries.fetch({reset: true});
                 });
 
+                this.listenTo(this.data.queries, 'destroy', function(model) {
+                    this.data.publicQueries.remove(model);
+                });
             }
 
             this.listenTo(c.data.concepts, 'reset', function() {

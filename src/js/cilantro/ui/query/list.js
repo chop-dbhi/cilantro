@@ -33,7 +33,8 @@ define([
             sync: 'onCollectionSync',
             error: 'onCollectionError',
             request: 'onCollectionRequest',
-            destroy: 'onCollectionDestroy'
+            destroy: '_refreshList',
+            remove: '_refreshList'
         },
 
         itemViewOptions: function(model, index) {
@@ -72,15 +73,6 @@ define([
             this.$('.error-message').hide();
             this.$('.loading-indicator').hide();
             this.checkForEmptyCollection();
-        },
-
-        // When a model is destroyed, it does not call sync on the collection
-        // but it does trigger a destroy event on the collection. That is the
-        // reason for this separate handler. When a query is deleted, we will
-        // get the request event and then destroy event, there will never be
-        // a sync event in the case a user deleting a query.
-        onCollectionDestroy: function() {
-            this._refreshList();
         },
 
         onCollectionError: function() {
