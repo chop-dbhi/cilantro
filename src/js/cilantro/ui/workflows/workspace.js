@@ -51,6 +51,7 @@ define([
                 // Fully hide the panel; do not leave an edge to show/hide
                 c.panels.context.closePanel({full: true});
                 c.panels.concept.closePanel({full: true});
+                this.ui.loadingOverlay.hide();
             });
 
             // Query items, when clicked, will update the view and the context

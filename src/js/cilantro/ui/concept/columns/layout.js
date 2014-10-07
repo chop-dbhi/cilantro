@@ -211,8 +211,8 @@ define([
             });
         },
 
-        // Maps the selected concepts to the exists facets collection. This ensures
-        // other attributes such as sort order are preserved.
+        // Maps the selected concepts to the exists facets collection. This
+        // ensures other attributes such as sort order are preserved.
         selectedToFacets: function() {
             var _this = this;
 
