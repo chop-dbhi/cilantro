@@ -127,7 +127,6 @@ define([
     var _SeriesArray = Backbone.Collection.extend({
         constructor: function(attrs, indexes, options) {
             this.indexes = indexes;
-            Backbone.Collection.prototype.constructor.call(this, attrs, options);
 
             var _this = this;
 
@@ -136,6 +135,8 @@ define([
             };
 
             this.model.prototype = Series.prototype;
+
+            Backbone.Collection.prototype.constructor.call(this, attrs, options);
         }
     });
 
