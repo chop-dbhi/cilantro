@@ -36,7 +36,7 @@ define([
             this.hideError();
 
             // Re-open on failure and display error message. Closure reference
-            // of model put to prevent re-opening with a new instance
+            // of model put to prevent re-opening with a new instance.
             var model = this.model, _this = this;
 
             this.model.destroy().fail(function() {
@@ -92,7 +92,9 @@ define([
             name: '.query-name',
             description: '.query-description',
             email: '.query-emails',
-            publicity: '.query-publicity'
+            publicity: '.query-publicity',
+            emailMessageContainer: '[data-target=email-message-container]',
+            emailMessage: '[data-target=email-message]'
         },
 
         initialize: function() {
@@ -118,21 +120,22 @@ define([
         saveQuery: function() {
             this.hideError();
 
-            // Make sure the name is valid, everything else can be left blank
+            // Make sure the name is valid, everything else can be left blank.
             if (!this.ui.name.val()) {
                 this.showError('Please supply a name for the query');
                 return;
             }
 
-            // Extract data from form and session
+            // Extract data from form and session.
             var attrs = {
                 name: this.ui.name.val(),
                 description: this.ui.description.val(),
                 usernames_or_emails: this.ui.email.val(), // jshint ignore:line
-                public: this.ui.publicity.prop('checked')
+                public: this.ui.publicity.prop('checked'),
+                message: this.ui.emailMessage.val()
             };
 
-            // Create a new model if not defined
+            // Create a new model if not defined.
             if (!this.model) {
                 this.model = new this.collection.model();
 
@@ -144,13 +147,13 @@ define([
                 attrs.view_json = this.data.view.toJSON().json; // jshint ignore:line
             }
 
-            // Don't stomp on model's collection if it already exists in one
+            // Don't stomp on model's collection if it already exists in one.
             if (!this.model.collection) {
                 this.collection.add(this.model);
             }
 
             // Re-open on failure and display error message. Closure reference
-            // of model put to prevent re-opening with a new instance
+            // of model put to prevent re-opening with a new instance.
             var model = this.model, _this = this;
 
             this.model.save(attrs).done(function() {
@@ -187,15 +190,16 @@ define([
             this.hideError();
             this.model = model;
 
-            var name, description, emails, publicity;
+            var name, description, emails, publicity, message;
 
             // Repopulate modal with model attributes, otherwise initialize
-            // with defaults
+            // with defaults.
             if (model) {
                 name = this.model.get('name');
                 description = this.model.get('description');
                 emails = _.pluck(this.model.get('shared_users'), 'email').join(', ');
                 publicity = this.model.get('public');
+                message = this.model.get('message');
             }
             else {
                 // Remove timezone info from the current date and then use it as
@@ -206,13 +210,19 @@ define([
                 description = '';
                 emails = '';
                 publicity = false;
+                message = '';
             }
 
-            // Reset form fields
+            if (c.isSupported('2.3.7')) {
+                this.ui.emailMessageContainer.removeClass('hide');
+            }
+
+            // Reset form fields.
             this.ui.name.val(name);
             this.ui.description.val(description);
             this.ui.email.val(emails);
             this.ui.publicity.prop('checked', publicity);
+            this.ui.emailMessage.val(message);
 
             this.$el.modal('show');
         },
