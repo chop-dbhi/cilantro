@@ -88,14 +88,9 @@ define([
          * Keys represent the names of the controls and the value is either
          * a control class or a module name (that will be fetched on demand).
          *
-         * Built-in controls:
-         * - infograph: cilantro/ui/controls/infograph
-         * - number: cilantro/ui/controls/number
-         * - date: cilantro/ui/controls/date
-         * - search: cilantro/ui/controls/search
-         * - singleSelectionList: cilantro/ui/controls/select
-         * - multiSelectionList: cilantro/ui/controls/select
-         * - nullSelector: cilantro/ui/controls/null
+         * The default controls can be found near the top of:
+         *
+         *      cilantro/js/ui/controls/registry.js
          */
 
         controls: {},
