@@ -230,7 +230,8 @@ define([
         setValue: function(value) {
             // Do not merge into existing models since the collection contains
             // additional state (which would be removed due to the merge).
-            this.collection.set(value, {merge: false});
+            this.collection.set(value, {merge: false, silent: true});
+            this.collection.trigger('reset');
         },
 
         validate: function(attrs) {
