@@ -3,16 +3,17 @@
 define([
     'underscore',
     './models/base',
-    './models/field',
     './models/concept',
     './models/context',
-    './models/filters',
-    './models/view',
-    './models/paginator',
-    './models/results',
     './models/exporter',
+    './models/field',
+    './models/filters',
+    './models/paginator',
     './models/query',
-    './models/value'
+    './models/results',
+    './models/stats',
+    './models/value',
+    './models/view'
 ], function(_) {
 
     var mods = [].slice.call(arguments, 1);

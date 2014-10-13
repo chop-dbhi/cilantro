@@ -28,7 +28,8 @@ define([
         preview: models.Results,
         exporter: models.ExporterCollection,
         queries: models.Queries,
-        public_queries: models.Queries  // jshint ignore:line
+        public_queries: models.Queries,  // jshint ignore:line
+        stats: models.Stats
     };
 
 
