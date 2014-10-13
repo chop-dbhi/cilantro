@@ -1,10 +1,25 @@
 .field-value-search {
-    .paginator {
-        text-align: right;
-    }
     .toolbar {
         .btn-danger {
             float: right;
+        }
+
+        .exclude-container {
+            margin-top: 5px;
+            border-top: 1px solid #c9c9c9;
+        }
+
+        .exclude-checkbox {
+            padding: 0px;
+            margin: 0px;
+            width: 12px;
+            height: 12px;
+        }
+
+        .exclude-label {
+            margin-left: 5px;
+            font-size: 13px;
+            vertical-align: middle;
         }
     }
 }
