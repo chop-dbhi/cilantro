@@ -1,0 +1,32 @@
+.data-summary-region {
+    thead th {
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+            background-color: #eee;
+        }
+
+        .icon-sort-up, .icon-sort-down {
+            position: absolute;
+            right: 8px;
+            top: 12px;
+        }
+
+        &.desc {
+            .icon-sort-up {
+                display: none;
+            }
+        }
+
+        &.asc {
+            .icon-sort-down {
+                display: none;
+            }
+        }
+
+        &:first-child {
+            border-left: 1px solid #ddd;
+        }
+    }
+}

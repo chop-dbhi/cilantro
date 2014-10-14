@@ -85,6 +85,9 @@ define([
     'tpl!templates/query/list.html',
     'tpl!templates/query/loader.html',
 
+    'tpl!templates/stats/count-item.html',
+    'tpl!templates/stats/count-list.html',
+
     'tpl!templates/values/item.html',
     'tpl!templates/values/list.html',
 

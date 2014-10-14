@@ -3,8 +3,9 @@
 define([
     'marionette',
     '../core',
-    '../query'
-], function(Marionette, c, query) {
+    '../query',
+    '../stats'
+], function(Marionette, c, query, stats) {
 
     var WorkspaceWorkflow = Marionette.Layout.extend({
         className: 'workspace-workflow',
@@ -16,13 +17,15 @@ define([
         },
 
         regions: {
-            queries: '.query-region',
+            dataSummary: '.data-summary-region',
             publicQueries: '.public-query-region',
+            queries: '.query-region'
         },
 
         regionViews: {
-            queries: query.QueryList,
-            publicQueries: query.QueryList
+            dataSummary: stats.CountList,
+            publicQueries: query.QueryList,
+            queries: query.QueryList
         },
 
         initialize: function() {
@@ -44,6 +47,12 @@ define([
 
             if (!(this.data.view = this.options.view)) {
                 throw new Error('view model required');
+            }
+
+            if (c.isSupported('2.3.6')) {
+                if (!(this.data.stats = this.options.stats)) {
+                    throw new Error('stats model required');
+                }
             }
 
             // When this workflow is loaded, toggle shared components
@@ -107,6 +116,14 @@ define([
                 this.listenTo(this.data.queries, 'destroy', function(model) {
                     this.data.publicQueries.remove(model);
                 });
+            }
+
+            if (c.isSupported('2.3.6')) {
+                var dataSummaryView = new this.regionViews.dataSummary({
+                    collection: this.data.stats.counts
+                });
+
+                this.dataSummary.show(dataSummaryView);
             }
 
             this.listenTo(c.data.concepts, 'reset', function() {

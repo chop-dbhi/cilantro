@@ -119,7 +119,8 @@ require({
                     queries: this.data.queries,
                     context: this.data.contexts.session,
                     view: this.data.views.session,
-                    public_queries: this.data.public_queries  // jshint ignore:line
+                    public_queries: this.data.public_queries,  // jshint ignore:line
+                    stats: this.data.stats
                 });
 
                 routes.push({
