@@ -43,7 +43,6 @@ define([
             this.ui.statsTable.hide();
         },
 
-
         handleSort: function(event) {
             if (!this.collection.length) return;
 
