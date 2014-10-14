@@ -1,12 +1,16 @@
 .field-value-search {
     .toolbar {
+        .page-numbers {
+            float: right;
+            padding: 0px;
+        }
+
         .btn-danger {
             float: right;
         }
 
         .exclude-container {
-            margin-top: 5px;
-            border-top: 1px solid #c9c9c9;
+            display: inline-block;
         }
 
         .exclude-checkbox {
