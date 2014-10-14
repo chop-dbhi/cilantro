@@ -1,13 +1,19 @@
 <div class=row-fluid>
     <div class='span6'>
-        <div class=toolbar>
-            <button type=button data-action=clear class='btn btn-mini btn-danger'>
-                <i class='icon-remove icon-white'></i>Clear
-            </button>
-            <div class=paginator-region></div>
-        </div>
+        <div class='toolbar paginator-region'></div>
         <div class=search-region></div>
         <div class=browse-region></div>
     </div>
-    <div class='span6 values-region'></div>
+    <div class=span6>
+        <div class=toolbar>
+            <div class=exclude-container>
+                <input class=exclude-checkbox type=checkbox name=exclude />
+                <span class=exclude-label>Exclude selected values</span>
+            </div>
+            <button type=button data-action=clear class='btn btn-mini btn-danger'>
+                <i class='icon-remove icon-white'></i>Clear
+            </button>
+        </div>
+        <div class=values-region></div>
+   </div>
 </div>

@@ -133,7 +133,8 @@ define([
         searchPaginator: SearchPaginator,
 
         events: {
-            'click [data-action=clear]': 'clearValues'
+            'click [data-action=clear]': 'clearValues',
+            'change [name=exclude]': 'change'
         },
 
         regions: {
@@ -148,6 +149,10 @@ define([
             paginator: paginator.Paginator,
             browse: SearchPageRoll,
             values: values.ValueList
+        },
+
+        ui: {
+            excludeCheckbox: '[name=exclude]'
         },
 
         initialize: function() {
@@ -215,10 +220,21 @@ define([
             if (this.model) return this.model.id;
         },
 
-        // This is currently always an 'in', however 'not in' may be
-        // desirable as well.
         getOperator: function() {
+            if (this.ui.excludeCheckbox.prop('checked')) {
+                return '-in';
+            }
+
             return 'in';
+        },
+
+        setOperator: function(operator) {
+            if (operator === '-in') {
+                this.ui.excludeCheckbox.prop('checked', true);
+            }
+            else {
+                this.ui.excludeCheckbox.prop('checked', false);
+            }
         },
 
         // Returns an array of objects with value and label attributes.
