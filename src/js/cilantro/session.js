@@ -28,7 +28,8 @@ define([
         preview: models.Results,
         exporter: models.ExporterCollection,
         queries: models.Queries,
-        public_queries: models.Queries  // jshint ignore:line
+        public_queries: models.Queries,  // jshint ignore:line
+        stats: models.Stats
     };
 
 
@@ -251,10 +252,19 @@ define([
             this.end();
             this.opening = this.opened = false;
 
-            // Reset all collections to deference models
-            _.each(this.data, function(collection) {
-                collection.reset();
-                delete collection.url;
+            // Reset all session data to deference models.
+            _.each(this.data, function(item) {
+                // Can't guarantee that all the session data elements are
+                // collections so check for reset before calling it to avoid
+                // calling reset on models.
+                if (item.reset) {
+                    item.reset();
+                }
+                else {
+                    item.clear();
+                }
+
+                delete item.url;
             });
 
             delete this._opening;
