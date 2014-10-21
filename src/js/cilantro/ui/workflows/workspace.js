@@ -1,11 +1,13 @@
 /* global define */
 
 define([
+    'jquery',
+    'backbone',
     'marionette',
     '../core',
     '../query',
     '../stats'
-], function(Marionette, c, query, stats) {
+], function($, Backbone, Marionette, c, query, stats) {
 
     var WorkspaceWorkflow = Marionette.Layout.extend({
         className: 'workspace-workflow',
@@ -118,12 +120,19 @@ define([
                 });
             }
 
-            if (c.isSupported('2.3.6')) {
+            var showStats = c.config.get('statsModelsList') === null ||
+                            c.config.get('statsModelsList').length > 0;
+            if (c.isSupported('2.3.6') && showStats) {
                 var dataSummaryView = new this.regionViews.dataSummary({
-                    collection: this.data.stats.counts
+                    collection: this.data.stats.counts,
+                    statsModelsList: c.config.get('statsModelsList')
                 });
 
                 this.dataSummary.show(dataSummaryView);
+            }
+            else {
+                $(this.dataSummary.el).empty();
+                $(this.queries.el).detach().appendTo(this.dataSummary.el);
             }
 
             this.listenTo(c.data.concepts, 'reset', function() {

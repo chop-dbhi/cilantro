@@ -2,8 +2,9 @@
 
 define([
     'jquery',
+    'underscore',
     'marionette'
-], function($, Marionette) {
+], function($, _, Marionette) {
 
     var CountItem = Marionette.ItemView.extend({
         tagName: 'tr',
@@ -30,7 +31,22 @@ define([
         collectionEvents: {
             'sort': '_renderChildren',
             'request': 'showLoader',
-            'reset': 'hideLoader'
+            'reset': 'onCollectionReset'
+        },
+
+        onCollectionReset: function() {
+            this.hideLoader();
+
+            if (this.options.statsModelsList !== null) {
+                var _this = this;
+
+                var summaryCollection = _.filter(this.collection.models, function(count) {
+                    var appModel = count.get('app_name') + '.' + count.get('model_name');
+                    return _this.options.statsModelsList.indexOf(appModel) !== -1;
+                });
+
+                this.collection.reset(summaryCollection, {silent: true});
+            }
         },
 
         hideLoader: function() {

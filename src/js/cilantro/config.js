@@ -52,6 +52,28 @@ define([
         threshold: null,
 
         /*
+         * A list of values used to determine which models are shown in the
+         * stats table on the Workspace page. When this value is null, there is
+         * no filtering done and all models will be listed in the table. When
+         * this value is the empty list([]), then the control itself will not
+         * be shown. Finally, when this list contains values, only the stat
+         * values with values in this list will be shown.
+         *
+         * NOTE: Values in this list must be of the format app_name.model_name,
+         * so, for example, if I wanted to include just a couple models I might
+         * set this list to:
+         *
+         *      statsModelsList = [
+         *          'diagnoses.diagnosis',
+         *          'drugs.drug'
+         *      ];
+         *
+         * And all models except Diagnosis from the diagnoses app and Drug from
+         * the drugs app will be ignored.
+         */
+        statsModelsList: null,
+
+        /*
          * Threshold for the max number of values that will be displayed in
          * a filter on the context panel before they are hidden with ellipses.
          */
