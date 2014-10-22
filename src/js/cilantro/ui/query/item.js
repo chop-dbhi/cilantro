@@ -204,8 +204,14 @@ define([
             // Short-circuit render if not editable
             if (!this.options.editable) {
                 this.ui.publicIcon.hide();
-                this.ui.nonOwner.hide();
                 this.ui.owner.hide();
+
+                // If we are not the owner and the owner is unknown, hide the
+                // shared by information as it will only lead to confusion.
+                if (!this.model.get('user')) {
+                    this.ui.nonOwner.hide();
+                }
+
                 return;
             }
 
