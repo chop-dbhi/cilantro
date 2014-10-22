@@ -103,7 +103,7 @@ define([
 
                     // Handle redirect
                     if (error === 'FOUND') {
-                        this.timeout(xhr.getResponseHeader('Location'));
+                        _this.timeout(xhr.getResponseHeader('Location'));
                     }
                 }
             });
