@@ -130,7 +130,7 @@ define([
             // Auto-refresh after some time
             setTimeout(function() {
                 if (loc) {
-                    window.location = location;
+                    window.location = loc;
                 }
                 else {
                     // `true` argument forces a fetch from the server rather
