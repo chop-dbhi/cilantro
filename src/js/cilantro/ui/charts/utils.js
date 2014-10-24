@@ -41,14 +41,27 @@ define([
         xEnum = xField.get('enumerable') ||
             xField.get('simple_type') === 'boolean';
 
-        xType = xField.get('simple_type') === 'date' ? 'datetime' : 'linear';
+        if (xField.get('simple_type') === 'date' ||
+                xField.get('simple_type') === 'datetime') {
+            xType = 'datetime';
+        }
+        else {
+            xType = 'linear';
+        }
 
         if (yField) {
             yName = yField.get('name');
             yEnum = yField.get('enumerable') ||
                 yField.get('simple_type') === 'boolean';
 
-            yType = yField.get('simple_type') === 'date' ? 'datetime' : 'linear';
+
+            if (yField.get('simple_type') === 'date' ||
+                    yField.get('simple_type') === 'datetime') {
+                yType = 'datetime';
+            }
+            else {
+                yType = 'linear';
+            }
         }
         else {
             yName = 'Frequency';
