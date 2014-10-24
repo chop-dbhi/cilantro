@@ -11,11 +11,23 @@ define([
         ui: {
             select: '[data-target=null-selector]',
             nullOption: '[data-target=null-option]',
-            notNullOption: '[data-target=not-null-option]'
+            notNullOption: '[data-target=not-null-option]',
+            filterHelp: '.filter-help'
         },
 
         events: {
-            'change [data-target=null-selector]': 'change'
+            'change [data-target=null-selector]': 'change',
+            'change': 'showFilterHelp'
+        },
+
+        showFilterHelp: function() {
+           var language = {
+                'true': ' is null',
+                'false': ' is not null'
+           };
+           var attrName = this.model.attributes.name;
+
+           this.ui.filterHelp.text(attrName + language[this.getValue()]);
         },
 
         initialize: function () {

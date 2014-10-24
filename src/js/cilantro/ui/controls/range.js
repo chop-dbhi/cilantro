@@ -14,6 +14,7 @@ define([
         events: {
             'keyup .range-lower, .range-upper': '_change',
             'change .btn-select': '_change',
+            'change': 'showFilterHelp',
             'click .range-help-button': 'toggleHelpText'
         },
 
@@ -21,11 +22,42 @@ define([
             operatorSelect: '.btn-select',
             lowerBound: '.range-lower',
             upperBound: '.range-upper',
+            rangeHelper: '.range-helper',
             help: '.help-block'
         },
 
         initialize: function() {
             this._change = _.debounce(this.change, constants.INPUT_DELAY);
+            this.showFilterHelp = _.debounce(this.showFilterHelp,
+                constants.INPUT_DELAY);
+        },
+
+        showFilterHelp: function() {
+            var lower = this.ui.lowerBound.val();
+            var upper = this.ui.upperBound.val();
+
+            var language = base.ControlLanguage;
+
+            var operator = this.getOperator();
+
+            var attrName = this.model.attributes.name;
+
+            if (lower && upper) {
+                this.ui.rangeHelper.text(
+                        attrName + language[operator] +
+                        lower + ' and ' + upper);
+            }
+            else if (lower) {
+                this.ui.rangeHelper.text(
+                        attrName + language[operator]+ lower);
+            }
+            else if (upper) {
+                this.ui.rangeHelper.text(
+                        attrName + language[operator] + upper);
+            }
+            else {
+                this.ui.rangeHelper.text('');
+            }
         },
 
         onRender: function() {

@@ -10,6 +10,19 @@ define([
 
     var noop = function() {};
 
+    var ControlLanguage = {
+        'in': ' is ',
+        '-in': ' not ',
+        'exact': ' is ',
+        'range': ' is between ',
+        '-range': ' is not between ',
+        'isnull': ' is ',
+        'gt': ' is greater than ',
+        'gte': ' is greater than or equal to ',
+        'lt': ' is less than ',
+        'lte': ' is less than or equal to '
+    };
+
     var ControlViewMixin = {
         className: 'control',
 
@@ -221,6 +234,7 @@ define([
         ControlCollectionView: ControlCollectionView,
         ControlCompositeView: ControlCompositeView,
         ControlLayout: ControlLayout,
+        ControlLanguage: ControlLanguage,
         Control: ControlLayout // backwards compatibility
     };
 
