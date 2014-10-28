@@ -86,6 +86,17 @@ define([
         styleFilters: false,
 
         /*
+         * Option for enabling prefetching of pages in paginators. By default,
+         * this is false which means no prefetching is done. Setting this to
+         * a number will prefetch that number of pages(assuming they are
+         * available) in each direction. For example, if you set this value
+         * to 2 and you are on the first page, the 2nd and 3rd pages will be
+         * prefetched. If you were on page 7, pages 5, 6 and 8, 9 will be
+         * prefetched.
+         */
+        prefetch: 5,
+
+        /*
          * Timeouts
          *
          * Timeouts for various components in Cilantro.
@@ -93,7 +104,6 @@ define([
         timeouts: {
             control: 10000
         },
-
 
         /*
          * Templates

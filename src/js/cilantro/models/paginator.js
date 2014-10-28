@@ -87,6 +87,14 @@ define([
             this.previousPageNum = this.currentPageNum;
             this.currentPageNum = num;
 
+            var prefetch = c.config.get('prefetch');
+            if (prefetch !== false && prefetch > 0) {
+                for (var i = 1; i <= prefetch; i++) {
+                    this.getPage(num - i, {active: false});
+                    this.getPage(num + i, {active: false});
+                }
+            }
+
             return this.trigger.apply(this, ['change:currentpage', this].concat(
                 [].slice.call(this.getCurrentPageStats())));
         },
@@ -100,7 +108,17 @@ define([
 
             if (!this.hasPage(num)) return;
 
+            var prefetch = c.config.get('prefetch');
             var model = this.get(num);
+
+            // If the model is already resolved and we were prefetching then
+            // trigger the add event since we were silencing it during the
+            // initial fetch call. We only want to add the model once so we
+            // check that is hasn't been added already.
+            if (model && prefetch !== false && !model.pending && !model.added) {
+                this.trigger('add', model);
+                model.added = true;
+            }
             if (!model && options.load !== false) {
                 model = new this.model({
                     page_num: num       // jshint ignore:line
@@ -109,7 +127,18 @@ define([
                 model.pending = true;
                 this.add(model);
 
-                model.fetch().done(function() {
+                var _this = this;
+                var fetchOptions = {
+                    silent: c.config.get('prefetch') !== false
+                };
+                model.fetch(fetchOptions).done(function() {
+                    // If we are on this models page then we need to let
+                    // everyone know this model is now available.
+                    if (_this.currentPageNum === model.id &&
+                            prefetch !== false) {
+                        _this.trigger('add', model);
+                        model.added = true;
+                    }
                     delete model.pending;
                 });
             }
