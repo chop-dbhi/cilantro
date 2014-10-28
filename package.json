@@ -1,6 +1,6 @@
 {
   "name": "cilantro",
-  "version": "2.3.8",
+  "version": "2.4.0-beta",
   "license": "BSD",
   "description": "Client library for Serrano-compatible APIs",
   "homepage": "https://github.com/cbmi/cilantro",
