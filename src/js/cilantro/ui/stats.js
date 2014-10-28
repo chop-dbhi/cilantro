@@ -9,7 +9,19 @@ define([
     var CountItem = Marionette.ItemView.extend({
         tagName: 'tr',
 
-        template: 'stats/count-item'
+        template: 'stats/count-item',
+
+        templateHelpers: function() {
+            var name = this.model.get('verbose_name');
+
+            if (this.model.get('count') > 1) {
+                name = this.model.get('verbose_name_plural');
+            }
+
+            return {
+                displayName: name
+            };
+        }
     });
 
     var CountList = Marionette.CompositeView.extend({
