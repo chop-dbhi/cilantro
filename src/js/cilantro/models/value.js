@@ -3,9 +3,8 @@
 define([
     'underscore',
     'backbone',
-    '../structs',
     '../constants'
-], function(_, Backbone, structs, constants) {
+], function(_, Backbone, constants) {
 
     // Represents a value as defined in a query condition. For a given list of
     // values, a value can not be specified twice, so it is treated
