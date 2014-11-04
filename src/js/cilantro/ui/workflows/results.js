@@ -203,12 +203,6 @@ define([
         onRender: function() {
             $(document).on('scroll', this.onPageScroll);
 
-            // Remove unsupported features from view/
-            if (!c.isSupported('2.1.0')) {
-                this.ui.saveQueryToggle.remove();
-                this.ui.saveQuery.remove();
-            }
-
             this.paginator.show(new paginator.Paginator({
                 model: this.data.results
             }));

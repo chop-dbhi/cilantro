@@ -65,28 +65,13 @@ define([
         },
 
         initialize: function() {
-            var limit;
-
             this.wait();
 
             if (!this.collection) {
                 this.collection = new Backbone.Collection();
 
-                // This is a hack to prevent a 500 error that occurs in
-                // Serrano prior to 2.3.1 if limit is set to 0. The assumption
-                // here is that if this type of control is being used for
-                // selecting a value, it is unlikely to be rendering a large
-                // number of values due to its poor usability. The field search
-                // control is more appropriate for a large number of values.
-                if (c.isSupported('2.3.1')) {
-                    limit = 0;
-                }
-                else {
-                    limit = 1000;
-                }
-
                 var _this = this;
-                this.model.values({limit: limit}).done(function(resp) {
+                this.model.values({limit: 0}).done(function(resp) {
                     _this.collection.reset(resp.values);
                     return _this.ready();
                 });

@@ -99,6 +99,20 @@ require({
                     view: this.data.views.session,
                     // The differences in these names are noted
                     results: this.data.preview
+                }),
+
+                workspace: new c.ui.WorkspaceWorkflow({
+                    queries: this.data.queries,
+                    context: this.data.contexts.session,
+                    view: this.data.views.session,
+                    public_queries: this.data.public_queries,  // jshint ignore:line
+                    stats: this.data.stats
+                }),
+
+                queryload: new c.ui.QueryLoader({
+                    queries: this.data.queries,
+                    context: this.data.contexts.session,
+                    view: this.data.views.session
                 })
             };
 
@@ -111,41 +125,17 @@ require({
                 id: 'results',
                 route: 'results/',
                 view: c.workflows.results
+            }, {
+                id: 'workspace',
+                route: 'workspace/',
+                view: c.workflows.workspace
+            }, {
+                id: 'query-load',
+                route: 'results/:query_id/',
+                view: c.workflows.queryload
             }];
 
-            // Workspace supported as of 2.1.0
-            if (c.isSupported('2.1.0')) {
-                c.workflows.workspace = new c.ui.WorkspaceWorkflow({
-                    queries: this.data.queries,
-                    context: this.data.contexts.session,
-                    view: this.data.views.session,
-                    public_queries: this.data.public_queries,  // jshint ignore:line
-                    stats: this.data.stats
-                });
-
-                routes.push({
-                    id: 'workspace',
-                    route: 'workspace/',
-                    view: c.workflows.workspace
-                });
-            }
-
-            // Query URLs supported as of 2.2.0
-            if (c.isSupported('2.2.0')) {
-                c.workflows.queryload = new c.ui.QueryLoader({
-                    queries: this.data.queries,
-                    context: this.data.contexts.session,
-                    view: this.data.views.session
-                });
-
-                routes.push({
-                    id: 'query-load',
-                    route: 'results/:query_id/',
-                    view: c.workflows.queryload
-                });
-            }
-
-            // Register routes and start the session
+            // Register routes and start the session.
             this.start(routes);
         });
 

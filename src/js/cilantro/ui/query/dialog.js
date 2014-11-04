@@ -213,9 +213,7 @@ define([
                 message = '';
             }
 
-            if (c.isSupported('2.3.7')) {
-                this.ui.emailMessageContainer.removeClass('hide');
-            }
+            this.ui.emailMessageContainer.removeClass('hide');
 
             // Reset form fields.
             this.ui.name.val(name);

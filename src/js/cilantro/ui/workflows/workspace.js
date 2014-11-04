@@ -33,10 +33,8 @@ define([
         initialize: function() {
             this.data = {};
 
-            if (c.isSupported('2.2.0')) {
-                if (!(this.data.publicQueries = this.options.public_queries)) {  // jshint ignore:line
-                    throw new Error('public queries collection required');
-                }
+            if (!(this.data.publicQueries = this.options.public_queries)) {  // jshint ignore:line
+                throw new Error('public queries collection required');
             }
 
             if (!(this.data.queries = this.options.queries)) {
@@ -51,10 +49,8 @@ define([
                 throw new Error('view model required');
             }
 
-            if (c.isSupported('2.3.6')) {
-                if (!(this.data.stats = this.options.stats)) {
-                    throw new Error('stats model required');
-                }
+            if (!(this.data.stats = this.options.stats)) {
+                throw new Error('stats model required');
             }
 
             // When this workflow is loaded, toggle shared components
@@ -86,43 +82,41 @@ define([
 
             this.queries.show(queryView);
 
-            if (c.isSupported('2.2.0')) {
-                var publicQueryView = new this.regionViews.publicQueries({
-                    collection: this.data.publicQueries,
-                    context: this.data.context,
-                    view: this.data.view,
-                    title: 'Public Queries',
-                    emptyMessage: "There are no public queries. You can create a " +
-                                  "new, public query by navigating to the 'Results'" +
-                                  "page and clicking on the 'Save Query...' button. " +
-                                  "While filling out the query form, you can mark " +
-                                  "the query as public which will make it visible " +
-                                  "to all users and cause it to be listed here."
-                });
+            var publicQueryView = new this.regionViews.publicQueries({
+                collection: this.data.publicQueries,
+                context: this.data.context,
+                view: this.data.view,
+                title: 'Public Queries',
+                emptyMessage: "There are no public queries. You can create a " +
+                              "new, public query by navigating to the 'Results'" +
+                              "page and clicking on the 'Save Query...' button. " +
+                              "While filling out the query form, you can mark " +
+                              "the query as public which will make it visible " +
+                              "to all users and cause it to be listed here."
+            });
 
-                // We explicitly set the editable option to false below because
-                // users should not be able to edit the public queries
-                // collection.
-                this.publicQueries.show(publicQueryView);
+            // We explicitly set the editable option to false below because
+            // users should not be able to edit the public queries
+            // collection.
+            this.publicQueries.show(publicQueryView);
 
-                // When the queries are synced we need to manually update the
-                // public queries collection so that any changes to public
-                // queries are reflected there. Right now, this is done lazily
-                // rather than checking if the changed model is public or had
-                // its publicity changed. If this becomes too slow we can
-                // perform these checks but for now this is snappy enough.
-                this.listenTo(this.data.queries, 'sync', function() {
-                    this.data.publicQueries.fetch({reset: true});
-                });
+            // When the queries are synced we need to manually update the
+            // public queries collection so that any changes to public
+            // queries are reflected there. Right now, this is done lazily
+            // rather than checking if the changed model is public or had
+            // its publicity changed. If this becomes too slow we can
+            // perform these checks but for now this is snappy enough.
+            this.listenTo(this.data.queries, 'sync', function() {
+                this.data.publicQueries.fetch({reset: true});
+            });
 
-                this.listenTo(this.data.queries, 'destroy', function(model) {
-                    this.data.publicQueries.remove(model);
-                });
-            }
+            this.listenTo(this.data.queries, 'destroy', function(model) {
+                this.data.publicQueries.remove(model);
+            });
 
             var showStats = c.config.get('statsModelsList') === null ||
                             c.config.get('statsModelsList').length > 0;
-            if (c.isSupported('2.3.6') && showStats) {
+            if (showStats) {
                 var dataSummaryView = new this.regionViews.dataSummary({
                     collection: this.data.stats.counts,
                     statsModelsList: c.config.get('statsModelsList')

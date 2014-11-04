@@ -76,16 +76,7 @@ define([
                 var model = this.collection.get(label);
 
                 if (!model) {
-                    // 2.3.2 correctly supports validating against the label.
-                    // Prior to this, only the value is supported for validation.
-                    if (c.isSupported('2.3.2')) {
-                        model = {label: label};
-                    }
-                    else {
-                        model = {value: label};
-                        loglevel.warn('Serrano 2.3.2+ is required for proper ' +
-                             'validation of search values');
-                    }
+                    model = {label: label};
                 }
 
                 models.push(model);
