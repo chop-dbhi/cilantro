@@ -21,8 +21,8 @@ define([
         },
 
         parse: function(resp, options) {
-            this.items.reset(resp.values, options);
-            delete resp.values;
+            this.items.reset(resp.items, options);
+            delete resp.items;
             return resp;
         }
     });

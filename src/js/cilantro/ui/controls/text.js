@@ -467,8 +467,7 @@ define([
 
     var PreviewCollection = Backbone.Collection.extend({
         parse: function(resp) {
-            // Handle both variations..
-            return resp.objects || resp.values;
+            return resp.items;
         }
     });
 

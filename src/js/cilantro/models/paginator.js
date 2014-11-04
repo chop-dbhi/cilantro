@@ -49,7 +49,7 @@ define([
             this.trigger('change:pagesize', this, this.perPage);
             this.numPages = resp.num_pages; // jshint ignore:line
             this.trigger('change:pagecount', this, this.numPages);
-            this.objectCount = resp.object_count;   // jshint ignore:line
+            this.objectCount = resp.item_count;   // jshint ignore:line
             this.trigger('change:objectcount', this, this.objectCount);
             this.currentPageNum = null;
             this.setCurrentPage(resp.page_num); // jshint ignore:line
