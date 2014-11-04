@@ -21,8 +21,8 @@ define([
         // normally despite the version number received from the server, the user
         // will be warned if no version number is found or if it is less than this
         // minimum to prepare them in the case of missing or broken functionality.
-        minSerranoVersion: '2.0.16',
-        maxSerranoVersion: '2.3.11',
+        minSerranoVersion: '2.4.0',
+        maxSerranoVersion: '2.4.0',
 
         // Returns the current session's Serrano version. If there is no
         // active session or version defined, the absolute minimum is returned.
