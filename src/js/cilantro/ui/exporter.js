@@ -53,7 +53,7 @@ define([
         },
 
         getExportUrl: function() {
-            var url = this.model.get('href');
+            var url = this.model.get('uri');
 
             if (url.charAt(url.length - 1) !== '/') {
                 url += '/';

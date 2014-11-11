@@ -186,6 +186,7 @@ define([
 
         url: function() {
             var url = _.result(this.collection, 'url');
+
             return c.utils.alterUrlParams(url, {
                 page: this.id,
                 per_page: this.collection.perPage   // jshint ignore:line

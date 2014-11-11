@@ -54,7 +54,7 @@ define([
         distribution: function(handler, cache) {
             if (cache !== false) cache = true;
 
-            if (this.links.distribution === undefined) {
+            if (!this.links.distribution) {
                 handler();
                 return;
             }

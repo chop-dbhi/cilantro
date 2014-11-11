@@ -2,49 +2,98 @@
 
 define([
     'underscore',
-    'backbone'
-], function(_, Backbone) {
+    'backbone',
+    '../utils'
+], function(_, Backbone, utils) {
 
-    // Base model for Cilantro. Data for models commonly contain a
-    // `_links` attribute which is parsed to be made accessible for
-    // consumers.
+    // Base model for Cilantro.
     var Model = Backbone.Model.extend({
         constructor: function(attrs, options) {
             options = _.defaults({parse: true}, options);
             this.links = {};
 
             Backbone.Model.prototype.constructor.call(this, attrs, options);
-            this.on('change:_links', this._parseLinks);
         },
 
         url: function() {
             if (this.isNew()) {
                 return Backbone.Model.prototype.url.call(this);
             }
+
             return this.links.self;
         },
 
-        _parseLinks: function(model, attrs) {
-            var links = {};
-
-            _.each(attrs, function(link, name) {
-                links[name] = link.href;
-            });
-
-            model.links = links;
+        _parseLinks: function(model, xhr) {
+            model.links = utils.getLinks(xhr);
         },
 
-        parse: function(attrs) {
-            if (attrs && attrs._links) {
-                this._parseLinks(this, attrs._links);
+        parse: function(attrs, options) {
+            if (this.collection) {
+                _.extend(
+                    this.links,
+                    utils.getLinksFromTemplates(attrs, this.collection.linkTemplates)
+                );
             }
 
-            return attrs;
+            return Backbone.Model.prototype.parse.call(this, attrs, options);
+        },
+
+        sync: function(method, model, options) {
+            var success = options.success,
+                _this = this;
+
+            options.success = function(resp, status, xhr) {
+                _this._parseLinks(model, xhr);
+
+                if (success) success(resp, status, xhr);
+            };
+
+            return Backbone.Model.prototype.sync.call(
+                this, method, model, options);
         }
     });
 
     var Collection = Backbone.Collection.extend({
-        model: Model
+        model: Model,
+
+        constructor: function(attrs, options) {
+            options = _.defaults({parse: true}, options);
+            this.links = {};
+
+            Backbone.Collection.prototype.constructor.call(this, attrs, options);
+
+            this.on('reset', this._updateModelLinks, this);
+        },
+
+        _updateModelLinks: function() {
+            var templates = this.linkTemplates;
+
+            _.each(this.models, function(model) {
+                _.extend(
+                    model.links,
+                    utils.getLinksFromTemplates(model, templates)
+                );
+            });
+        },
+
+        _parseLinks: function(collection, xhr) {
+            collection.links = utils.getLinks(xhr);
+            collection.linkTemplates = utils.getLinkTemplates(xhr);
+        },
+
+        sync: function(method, collection, options) {
+            var success = options.success,
+                _this = this;
+
+            options.success = function(resp, status, xhr) {
+                _this._parseLinks(collection, xhr);
+
+                if (success) success(resp, status, xhr);
+            };
+
+            return Backbone.Collection.prototype.sync.call(
+                this, method, collection, options);
+        }
     });
 
     // Base collection class that is session-aware. A session is always
@@ -56,12 +105,12 @@ define([
             this.session = this.add({session: true});
         },
 
-        // Prevent deferencing the session
+        // Prevent deferencing the session.
         reset: function(models, options) {
             options = options || {};
             models = models || [];
 
-            // Search for session model, merge into existing and remove it
+            // Search for session model, merge into existing and remove it.
             var model, match;
 
             for (var i = 0; i < models.length; i++) {

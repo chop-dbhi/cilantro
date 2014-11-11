@@ -140,6 +140,24 @@ define([
             }, 5000);
         },
 
+        _parseLinks: function(model, xhr) {
+            models.Model.prototype._parseLinks.call(this, model, xhr);
+
+            var Collection;
+
+            // Iterate over the available resource links and initialize
+            // the corresponding collection with the URL.
+            this.data = {};
+
+            _.each(model.links, function(url, name) {
+                if ((Collection = collectionLinkMap[name])) {
+                    this.data[name] = new Collection();
+                    this.data[name].url = url;
+                    this.data[name].fetch({reset: true});
+                }
+            }, this);
+        },
+
         parse: function(attrs) {
             attrs = attrs || {};
 
@@ -148,20 +166,6 @@ define([
 
             // Version of the API
             this.version = attrs.version;
-
-            // Iterate over the available resource links and initialize
-            // the corresponding collection with the URL
-            this.data = {};
-
-            var Collection;
-
-            _.each(attrs._links, function(link, name) {
-                if ((Collection = collectionLinkMap[name])) {
-                    this.data[name] = new Collection();
-                    this.data[name].url = link.href;
-                    this.data[name].fetch({reset: true});
-                }
-            }, this);
 
             // Define router with the main element and app root based on
             // the global configuration
