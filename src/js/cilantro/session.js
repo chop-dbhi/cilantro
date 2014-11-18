@@ -294,7 +294,10 @@ define([
                 blur: this.stopPing
             });
 
-            if (!c.isSupported(c.getSerranoVersion())) {
+            // Only show the unsupported warning when debug mode is enabled
+            // as this message is confusing to general users and is meant more
+            // for developers.
+            if (c.config.get('debug') && !c.isSupported(c.getSerranoVersion())) {
                 c.notify({
                     header: 'Serrano Version Unsupported',
                     level: 'warning',
