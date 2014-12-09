@@ -3,8 +3,9 @@
 define([
     'underscore',
     'backbone',
+    'loglevel',
     '../utils'
-], function(_, Backbone, utils) {
+], function(_, Backbone, loglevel, utils) {
 
     // Base model for Cilantro.
     var Model = Backbone.Model.extend({
@@ -13,6 +14,22 @@ define([
             this.links = {};
 
             Backbone.Model.prototype.constructor.call(this, attrs, options);
+
+            // TODO: Should this be limited to listening to those attributes
+            // that are in link templates on the collection?
+            if (this.collection) {
+                this.on('change', function() {
+                    // TODO: Common method for this since it's similar to what is
+                    // in parse()?
+                    if (this.collection) {
+                        _.extend(
+                            this.links,
+                            utils.getLinksFromTemplates(
+                                this, this.collection.linkTemplates)
+                        );
+                    }
+                }, this);
+            }
         },
 
         url: function() {
@@ -53,6 +70,61 @@ define([
         }
     });
 
+    var StatModel = Model.extend({
+        constructor: function(attrs, options) {
+            Model.prototype.constructor.call(this, attrs, options);
+
+            this.parent = {};
+
+            if (!(this.parent = attrs.parent)) {
+                throw new Error('parent model required');
+            }
+
+            this.listenTo(this.parent, 'request', this.onParentRequest);
+            this.listenTo(this.parent, 'sync', this.onParentSync);
+
+            if (this.parent.collection) {
+                this.listenTo(this.parent.collection, 'reset', this.onParentReset);
+            }
+        },
+
+        onParentRequest: function() {},
+
+        onParentReset: function() {
+            this.fetch();
+        },
+
+        onParentSync: function() {
+            this.fetch();
+        },
+
+        url: function() {
+            if (!this.parent.id && this.parent.collection) {
+                return this.parent.collection.links.self;
+            }
+            else if (this.parent.links.stats) {
+                return this.parent.links.stats;
+            }
+            else {
+                throw new Error('Stat supported model has no stats URL defined.');
+            }
+        }
+    });
+
+    var StatsSupportedModel = Model.extend({
+        statModel: StatModel,
+
+        constructor: function(attrs, options) {
+            if (!this.statModel) {
+                throw new Error('statModel must be defined');
+            }
+
+            Model.prototype.constructor.call(this, attrs, options);
+
+            this.stats = new this.statModel({parent: this});
+        }
+    });
+
     var Collection = Backbone.Collection.extend({
         model: Model,
 
@@ -61,19 +133,6 @@ define([
             this.links = {};
 
             Backbone.Collection.prototype.constructor.call(this, attrs, options);
-
-            this.on('reset', this._updateModelLinks, this);
-        },
-
-        _updateModelLinks: function() {
-            var templates = this.linkTemplates;
-
-            _.each(this.models, function(model) {
-                _.extend(
-                    model.links,
-                    utils.getLinksFromTemplates(model, templates)
-                );
-            });
         },
 
         _parseLinks: function(collection, xhr) {
@@ -161,6 +220,8 @@ define([
 
     return {
         Model: Model,
+        StatModel: StatModel,
+        StatsSupportedModel: StatsSupportedModel,
         Collection: Collection,
         SessionCollection: SessionCollection
     };
