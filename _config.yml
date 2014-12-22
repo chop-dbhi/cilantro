@@ -3,7 +3,7 @@ title: 'Cilantro'
 subtitle: 'Official client for The Harvest Stack'
 
 # URL to source code, used in _includes/footer.html
-codeurl: 'https://github.com/cbmi/cilantro'
+codeurl: 'https://github.com/chop-dbhi/cilantro'
 
 # Default categories (in order) to appear in the navigation
 sections: [
@@ -21,7 +21,7 @@ baseurl: ''
 permalink: none
 
 # Syntax highlighting
-pygments: true
+highlighter: 'pygments'
 
 # Since these are pages, it doesn't really matter
 future: true
