@@ -1,6 +1,8 @@
 # Contributing
 
-First off, thank you for considering a contribution! Before you submit any code, please read the following Developer's Certificate of Origin (DCO):
+First off, thank you for considering a contribution!
+
+Before you submit any code, please read the following Developer's Certificate of Origin (DCO):
 
 ```
 By making a contribution to the Cilantro project ("Project"),
@@ -31,43 +33,37 @@ This DCO simply certifies that the code you are submitting abides by the clauses
 
 ## Logistics
 
-- If you do not have write access to the repo (i.e. not a core contributor), create a fork of Cilantro
-- Branches are used to isolate development and ensure clear and concise intent of the code. Always do your work in a branch off the `master` branch. This will be a mirror of the work-in-progres (WIP) branch for the current major version, e.g. `2.x`. Name the branch after the issue and number, e.g. `issue-123`. If there is no issue number, [please create one first](https://github.com/cbmi/cilantro/issues/) before starting your work.
-- If working on existing files, ensure the coding style is kept consistent with the code around it. If creating new files or you are unsure of a pattern or preference please consult the [style guides](https://github.com/cbmi/style-guides/).
+- If you do not have write access to the repo (i.e. not a core contributor), create a fork
+- Branches are used to isolate development and ensure clear and concise intent of the code.
+- Always do your work in a branch off the `master` branch.
+- Leave a comment on the issue you want to work on to get a conversation started.
+- Issues marked with [status:help-wanted](https://github.com/chop-dbhi/cilantro/labels/status%3Ahelp-wanted) are isolated issues that are good for new contributors.
+- Or, [create a new issue](https://github.com/chop-dbhi/cilantro/issues/) if you have a question or idea.
+- Name the branch after the issue number you are working on, e.g. `issue-123`.
+- Ensure the coding style matches the code in the repository. Consult our [style guides](https://github.com/chop-dbhi/style-guides/) if you are unsure.
 
 ### JSHint
 
 The repository has a `.jshintrc` file that will enforce certain rules and conventions on the JavaScript source code. Files should not have any JSHint errors warnings when being committed. Most likely [there is a plugin](http://www.jshint.com/install/) you can install for your favorite editor to show errors after each save to the file.
 
-## Modules
+## Dependencies
 
-The Cilantro codebase is broken up into individual modules using the [Asynchronouse Module Definition (AMD)](https://github.com/amdjs/amdjs-api/wiki/AMD). [RequireJS](http://requirejs.org/) is for it's rich feature set, it's die-hard [author](http://jrburke.com/), and it's powerful optimizer [r.js](https://github.com/jrburke/r.js).
+- Node + NPM
+- Ruby + Sass
 
-### Module _Aggregator_
+## Setup
 
-Cilantro has the convention of keeping modules small (under ~200 lines) and putting them under their directory. For example, if a module named `views.js` grew too large in size, we follow the pattern:
+```bash
+# Clone the cilantro repo or a fork; go into the directory
+git clone git@github.com/chop-dbhi/cilantro.git && cd cilantro
 
-- Create a directory named after the module, i.e. `views`
-- Break up module's contents into separate modules under the directory
-- Replace the contents of the module using the following template
+# Installs the dev depenencies including Grunt
+npm install
 
-```javascript
-define([
-    'underscore',
-    './views/mod1',
-    './views/mod2'
-], function(_, /* mods... */) {
-
-    // Get the slice of arguments that represent the modules
-    // (after underscore)
-    var mods = [].slice.call(arguments, 1);
-
-    // Merge the mods into an empty object that will be exported
-    return _.extend.apply(_, [{}].concat(mods));
-});
+# Run Grunt 'work' task to perform the initial compilation of .scss files, it
+# finishes by starting a `watch` process.
+grunt work
 ```
-
-Whatever each module exports, it will be _aggregated_ into a single object which is representative of the original module's content. This is a transparent change for other modules that depend on the `views` module, but ensures maintainability when a module gets too large.
 
 ## Testing
 
@@ -108,14 +104,65 @@ define(['cilantro'], function(c) {
 
 ### Live Server
 
-Some tests requires a live server of the OpenMRS Harvest demo running at `http://localhost:8000`. To install and setup the demo (only needed once) simply do:
+Most of the tests requires a live server of the OpenMRS Harvest demo running at `http://localhost:8000`. To install and setup the demo (only needed once) simply do:
 
 ```
 virtualenv harvest-openmrs-env
 cd harvest-openmrs-env
 source bin/activate
-git clone --branch demo git://github.com/cbmi/harvest-openmrs.git
+git clone --branch demo git://github.com/chop-dbhi/harvest-openmrs.git
 cd harvest-openmrs
 pip install -r requirements.txt
 python bin/manage.py runserver
 ```
+
+To run the tests, simply do:
+
+```bash
+grunt test
+```
+
+## Distribution
+
+Distribution builds should only be created off the `develop` branch. This:
+
+- Bumps the version to the final, e.g. `2.0.3-beta` to `2.0.3`
+- Tags a release
+- Freshly compiles and optimizes code
+- Creates zip and tarball binaries
+- Prints instructions to push and upload it to GitHub
+- Bumps the patch version, e.g. `2.0.3` to `2.0.4-beta`
+
+```bash
+grunt release
+```
+
+## Patterns
+
+### Modules
+
+The Cilantro codebase is broken up into individual modules using the [Asynchronouse Module Definition (AMD)](https://github.com/amdjs/amdjs-api/wiki/AMD). [RequireJS](http://requirejs.org/) is for it's rich feature set, it's die-hard [author](http://jrburke.com/), and it's powerful optimizer [r.js](https://github.com/jrburke/r.js).
+
+Modules should be kept small (under ~500 lines). Most of the time modules can be broken up into smaller modules in a directory named after itself. For example, if a module named `views.js` grew too large in size, we follow the pattern:
+
+- Create a directory named after the module, i.e. `views`
+- Break up module's contents into separate modules under the directory
+- Replace the contents of the module using the following template
+
+```javascript
+define([
+    'underscore',
+    './views/mod1',
+    './views/mod2'
+], function(_, /* mods... */) {
+
+    // Get the slice of arguments that represent the modules
+    // (after underscore)
+    var mods = [].slice.call(arguments, 1);
+
+    // Merge the mods into an empty object that will be exported
+    return _.extend.apply(_, [{}].concat(mods));
+});
+```
+
+Whatever each module exports, it will be _aggregated_ into a single object which is representative of the original module's content. This is a transparent change for other modules that depend on the `views` module, but ensures maintainability when a module gets too large.
