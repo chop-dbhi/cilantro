@@ -227,7 +227,7 @@ define([
             this.ui.publicIcon.tooltip({
                 html: true,
                 animation: false,
-                placement: 'right',
+                placement: 'left',
                 container: 'body'
             });
 
@@ -245,7 +245,7 @@ define([
                 this.ui.shareCount.tooltip({
                     html: true,
                     animation: false,
-                    placement: 'right',
+                    placement: 'left',
                     container: 'body'
                 });
             }
