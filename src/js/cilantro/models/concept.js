@@ -8,6 +8,21 @@ define([
     './field'
 ], function(_, Backbone, c, base, field) {
 
+    var embedConceptFields = function(fields) {
+        return _.map(fields, function(cf) {
+            // Get the bare field and add the concept field data.
+            // TODO this appears backwards..
+            var f = c.data.fields.findWhere({id: cf.pk});
+
+            f.set({
+                'alt_name': cf.alt_name,     // jshint ignore:line
+                'alt_plural_name': cf.alt_plural_name    // jshint ignore:line
+            });
+
+            return f;
+        });
+    };
+
 
     var Concept = base.Model.extend({
         constructor: function() {
@@ -15,35 +30,29 @@ define([
             base.Model.prototype.constructor.apply(this, arguments);
         },
 
-        initialize: function() {
-            base.Model.prototype.initialize.call(this, arguments);
-
-            // Fetch the field data the first time a concept receives focus
-            c.on(c.CONCEPT_FOCUS, function(id) {
-                if (this.id !== id) return;
-
-                if (this.fields.length === 0) {
-                    this.fields.fetch({reset: true});
-                }
-            }, this);
-        },
-
         parse: function(resp, options) {
             base.Model.prototype.parse.call(this, resp, options);
 
-            var _this = this;
-
-            // Set the endpoint for related fields
-            this.fields.url = function() {
-                return _this.links.fields;
-            };
-
-            // Should only be falsy on a PUT request
+            // Should only be falsy on a PUT request.
             if (!resp) return;
 
-            // Response has the fields data embedded
+            // Response has the IDs of the fields for this concept. We need to
+            // retrieve the fields from the local list based on the IDs in
+            // the response.
             if (resp.fields) {
-                this.fields.set(resp.fields, options);
+                var fields = resp.fields;
+
+                if (c.data.fields.length) {
+                    fields = embedConceptFields(fields);
+                    this.fields.set(fields, options);
+                }
+                else {
+                    this.listenToOnce(c.data.fields, 'sync', function() {
+                        fields = embedConceptFields(fields);
+                        this.fields.set(fields, options);
+                    });
+                }
+
                 delete resp.fields;
             }
 
