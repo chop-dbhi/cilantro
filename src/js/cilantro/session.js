@@ -72,7 +72,8 @@ define([
         },
 
         startPing: function() {
-            // Only if the ping endpoint is available and has a non-falsy ping interval
+            // Only if the ping endpoint is available and has a non-falsy ping
+            // interval.
             if (this.links.ping && this.options.ping && !this._ping) {
                 this.ping();
                 this._ping = setInterval(this.ping, this.options.ping);
@@ -127,7 +128,7 @@ define([
                 level: 'warning'
             });
 
-            // Auto-refresh after some time
+            // Auto-refresh after some time.
             setTimeout(function() {
                 if (loc) {
                     window.location = loc;
@@ -161,24 +162,24 @@ define([
         parse: function(attrs) {
             attrs = attrs || {};
 
-            // Title of the API
+            // Title of the API.
             this.title = attrs.title;
 
-            // Version of the API
+            // Version of the API.
             this.version = attrs.version;
 
             // Define router with the main element and app root based on
-            // the global configuration
+            // the global configuration.
             this.router = new router.Router({
                 main: c.config.get('main'),
                 root: c.config.get('root')
             });
 
-            // Register pre-defined routes
+            // Register pre-defined routes.
             var routes = this.get('routes');
 
             if (routes) {
-                // String indicates external module, load and register
+                // String indicates external module, load and register.
                 if (typeof routes === 'string') {
                     var _this = this;
 
@@ -203,10 +204,10 @@ define([
         // credentials supplied as JSON. A successful response will _ready_
         // the session for use.
         open: function() {
-            // Session already opened or opening, return a promise
+            // Session already opened or opening, return a promise.
             if (this.opened || this.opening) return this._opening.promise();
 
-            // Ensure the session is valid before opening
+            // Ensure the session is valid before opening.
             if (!this.isValid()) throw new Error(this.validationError);
 
             // Set state and create deferred that will be used for creating
@@ -221,7 +222,7 @@ define([
                 dataType: 'json'
             };
 
-            // If credentials switch to POST and add the credentials
+            // If credentials switch to POST and add the credentials.
             var credentials = this.get('credentials');
 
             if (credentials) {
@@ -277,7 +278,8 @@ define([
 
         // Starts/enables the session.
         start: function(routes, options) {
-            // Already started, return false denoting the start was not successful
+            // Already started, return false denoting the start was not
+            // successful.
             if (this.started) return false;
 
             if (!this.opened) throw new Error('Session must be opened before loaded');
@@ -286,11 +288,12 @@ define([
 
             if (routes) this.router.register(routes);
 
-            // Start the router history
+            // Start the router history.
             this.router.start(options);
             this.startPing();
 
-            // When the page loses focus, stop pinging, resume when visibility is regained
+            // When the page loses focus, stop pinging, resume when visibility
+            // is regained.
             this.listenTo(c, {
                 visible: this.startPing,
                 hidden: this.stopPing,
@@ -324,18 +327,18 @@ define([
 
 
     // Keeps track of sessions as they are created and switched between.
-    // The `pending` property references any session that is currently loading and will be
-    // made the active once finished. The `active` property references the
-    // currently active session if one exists.
+    // The `pending` property references any session that is currently loading
+    // and will be made the active once finished. The `active` property
+    // references the currently active session if one exists.
     var SessionManager = Backbone.Collection.extend({
         _switch: function(session) {
             if (this.active === session) return;
             delete this.pending;
 
-            // End the current active session
+            // End the current active session.
             this.close();
 
-            // Set session as active and start it
+            // Set session as active and start it.
             this.active = session;
             this.trigger(events.SESSION_OPENED, session);
         },
@@ -351,7 +354,7 @@ define([
                 options.url = url;
             }
 
-            // Get or create the session
+            // Get or create the session.
             var session = this.get(options.url);
 
             if (!session) {
@@ -359,7 +362,7 @@ define([
                 this.add(session);
             }
 
-            // Ensure redundant calls are not being made
+            // Ensure redundant calls are not being made.
             if (session !== this.active && session !== this.pending) {
                 this.pending = session;
                 this.trigger(events.SESSION_OPENING, session);
@@ -382,7 +385,7 @@ define([
                     _this.pending = null;
 
                     // Select to the appropriate channel to publish on depending
-                    // if it's a forbidden, unauthorized, or general error
+                    // if it's a forbidden, unauthorized, or general error.
                     var event;
 
                     if (xhr.statusCode === 401 || xhr.statusCode === 403) {
@@ -395,7 +398,7 @@ define([
                 });
         },
 
-        // Closes the current sessions and publishes a message
+        // Closes the current sessions and publishes a message.
         close: function() {
             if (this.active) {
                 var session = this.active;
@@ -406,7 +409,7 @@ define([
             }
         },
 
-        // Closes the current session and clears all sessions
+        // Closes the current session and clears all sessions.
         clear: function() {
             this.close();
             this.reset();
