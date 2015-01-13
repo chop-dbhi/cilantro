@@ -52,6 +52,14 @@ define([
                 );
             }
 
+            // 2.3.x Backwards compatibility for resources that were not ported
+            // to using the Link header.
+            if (attrs && attrs._links) {
+                _.each(attrs._links, function(link, name) {
+                    this.links[name] = link.href;
+                }, this);
+            }
+
             return Backbone.Model.prototype.parse.call(this, attrs, options);
         },
 
