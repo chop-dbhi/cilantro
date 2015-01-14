@@ -5,29 +5,29 @@ define([
     './base'
 ], function(_, base) {
 
-    var parseTitle = function(attrs) {
-        if (!attrs.href) return 'Untitled';
+    var parseTitle = function(uri) {
+        if (!uri) return 'Untitled';
 
         // If the title isn't there, do our best to get something meaningful
-        // from the href attribute.
-        var href = attrs.href, fields;
+        // from the uri attribute.
+        var fields;
 
-        // Check if a trailing slash exists
-        if (href.charAt(href.length - 1) === '/') {
-            fields = href.substr(0, href.length-1).split('/');
+        // Check if a trailing slash exists.
+        if (uri.charAt(uri.length - 1) === '/') {
+            fields = uri.substr(0, uri.length-1).split('/');
         }
         else {
-            fields = href.split('/');
+            fields = uri.split('/');
         }
 
-        // Use the segment of the path as the title
+        // Use the segment of the path as the title.
         if (fields.length > 0) {
             return fields[fields.length - 1].toUpperCase();
         }
 
-        // If we couldn't get the title from the href then use the whole
-        // href property to try to give some context to the title.
-        return 'Untitled ' + href;
+        // If we couldn't get the title from the uri then use the whole
+        // uri property to try to give some context to the title.
+        return 'Untitled ' + uri;
     };
 
 
@@ -39,16 +39,17 @@ define([
     var ExporterCollection = base.Collection.extend({
         model: ExporterModel,
 
-        parse: function(resp) {
+        parse: function() {
             var models = [];
 
-            _.each(resp._links, function(attrs, type) {
-                // Ignore the exporter endpoint itself
-                if (type !== 'self') {
-                    attrs = _.extend({type: type}, attrs);
-                    if (!attrs.title) attrs.title = parseTitle(attrs);
-                    models.push(attrs);
-                }
+            _.each(this.links, function(uri, type) {
+                if (type === 'self') return;
+
+                models.push({
+                    type: type,
+                    uri: uri,
+                    title: parseTitle(uri)
+                });
             });
 
             return models;

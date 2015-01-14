@@ -35,8 +35,7 @@ define([
      * The context model provides an interface for [un]applying filters. Filters
      * are uniquely identified by field, concept, or both.
      */
-    var Context = base.Model.extend({
-
+    var Context = base.StatsSupportedModel.extend({
         options: {
             saveDelay: 300
         },
@@ -92,21 +91,23 @@ define([
                 }, this);
             });
 
-            // Trigger Cilantro event when context is saved
-            this.on('sync', function(model, attrs, options) {
-                options = options || {};
-
-                // Validate the context on sync
-                this.validate();
-
-                if (options.silent !== true) {
-                    c.trigger(c.CONTEXT_SYNCED, this, 'success');
-                }
-            });
+            this.on('sync', this.onSync);
 
             // Define a debounced save method for handling rapid successions
             // of [un]apply events.
             this._save = _.debounce(this.save, this.options.saveDelay);
+        },
+
+        onSync: function(model, resp, options) {
+            // Trigger Cilantro event when context is saved
+            options = options || {};
+
+            // Validate the context on sync
+            this.validate();
+
+            if (options.silent !== true) {
+                c.trigger(c.CONTEXT_SYNCED, this, 'success');
+            }
         },
 
         validate: function() {

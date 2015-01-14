@@ -30,23 +30,20 @@ define([
     };
 
     var FieldModel = base.Model.extend({
-        constructor: function() {
-            base.Model.prototype.constructor.apply(this, arguments);
-
-            var _this = this;
-            if (this.links.stats) {
-                this.stats = new stats.StatCollection();
-                this.stats.url = function() {
-                    return _this.links.stats;
-                };
-            }
-        },
-
         parse: function() {
             this._cache = {};
 
             var attrs = base.Model.prototype.parse.apply(this, arguments);
             attrs.type = getLogicalType(attrs);
+
+
+            var _this = this;
+            if (attrs.stats_capable) {   // jshint ignore:line
+                this.stats = new stats.StatCollection();
+                this.stats.url = function() {
+                    return _this.links.stats;
+                };
+            }
 
             return attrs;
         },
@@ -54,7 +51,7 @@ define([
         distribution: function(handler, cache) {
             if (cache !== false) cache = true;
 
-            if (this.links.distribution === undefined) {
+            if (!this.links.distribution) {
                 handler();
                 return;
             }

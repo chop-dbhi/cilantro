@@ -7,8 +7,11 @@ define([
     './view'
 ], function(base, c, context, view) {
 
+    var QueryStats = base.Model.extend({});
 
-    var Query = base.Model.extend({
+    var Query = base.StatsSupportedModel.extend({
+        statModel: QueryStats,
+
         constructor: function(attrs, options) {
             attrs = attrs || {};
 

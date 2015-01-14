@@ -23,8 +23,6 @@ define([
         },
 
         modelEvents: {
-            'change:count': 'render',
-            'sync': 'showCount',
             'request': 'showLoad'
         },
 
@@ -32,10 +30,17 @@ define([
             'add remove reset': 'renderRemoveAll'
         },
 
+        initialize: function() {
+            this.model.stats.on('sync', this.showCount, this);
+        },
+
         serializeData: function() {
             var attrs = _.clone(this.model.attributes);
+
+            attrs.count = this.model.stats.get('count');
             attrs.prettyCount = c.utils.prettyNumber(
                 attrs.count, c.config.get('threshold'));
+
             return attrs;
         },
 
@@ -57,6 +62,7 @@ define([
             this.ui.count.show();
             this.ui.units.show();
             this.ui.loading.hide();
+            this.render();
         },
 
         renderRemoveAll: function() {
