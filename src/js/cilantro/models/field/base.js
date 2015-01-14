@@ -74,6 +74,32 @@ define([
             }
         },
 
+        dimensions: function(handler, cache) {
+            if (cache !== false) cache = true;
+
+            if (!this.links.dimensions) {
+                handler();
+                return;
+            }
+
+            if (cache && (this._cache.dimensions !== undefined)) {
+                handler(this._cache.dimensions);
+            }
+            else {
+                var _this = this;
+                Backbone.ajax({
+                    url: this.links.dimensions.uri,
+                    dataType: 'json',
+                    success: function(resp) {
+                        if (cache) {
+                            _this._cache.dimensions = resp;
+                        }
+                        return handler(resp);
+                    }
+                });
+            }
+        },
+
         values: function(params, handler, cache) {
             if (cache !== false) cache = true;
 

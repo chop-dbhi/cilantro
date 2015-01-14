@@ -113,12 +113,12 @@ define ([
             }
         },
 
-        // Returns the percentage of the value's count relative to the 'total'
+        // Returns the percentage of the value's count relative to the 'total'.
         getPercentage: function() {
             return (this.model.get('count') / this.options.total) * 100;
         },
 
-        // Toggle the selected state of the bar
+        // Toggle the selected state of the bar.
         toggleSelected: function() {
             this.model.set('selected', !this.model.get('selected'));
         },
@@ -175,32 +175,14 @@ define ([
 
             var _this = this;
 
-            // Fetch the field distribution, do not cache
+            // Fetch the field distribution, do not cache.
             this.model.distribution(function(dist) {
-                _this.model.values({'limit': 0}, function(resp) {
-                    var valueLabels = {};
-
-                    _.each(resp.values, function(item) {
-                        valueLabels[item.value] = item.label;
-                    });
-
-                    var models = _.map(dist.data, function(item) {
-                        var value = item.values[0];
-
-                        return {
-                            count: item.count,
-                            value: value,
-                            label: valueLabels[value]
-                        };
-                    });
-
-                    _this.collection.reset(models);
-                    _this.ready();
-                });
+                _this.collection.reset(dist);
+                _this.ready();
             });
         },
 
-        // Sums the total count across all values
+        // Sums the total count across all values.
         calcTotal: function() {
             var total = 0,
                 counts = this.collection.pluck('count');
@@ -227,9 +209,10 @@ define ([
         },
 
         getOperator: function() {
-            // Since all selected bars are either included or excluded, the presence
-            // of a single excluded bar in those selected means that we should be
-            // using the exclusive operator. Otherwise, return the inclusive operator.
+            // Since all selected bars are either included or excluded, the
+            // presence of a single excluded bar in those selected means that
+            // we should be using the exclusive operator. Otherwise, return
+            // the inclusive operator.
             if (this.collection.where({excluded: true}).length > 0) {
                 return '-in';
             }
@@ -246,7 +229,7 @@ define ([
         setValue: function(values) {
             if (!values) values = [];
 
-            // Toggle the selection based on the presence values
+            // Toggle the selection based on the presence values.
             this.collection.each(function(model) {
                 var value = model.get('value');
                 model.set('selected', values.indexOf(value) >= 0);
@@ -274,8 +257,8 @@ define ([
         template: 'controls/infograph/toolbar',
 
         events: {
-            // Note, that no delay is used since it is working with the local list
-            // of values so the filtering can keep up.
+            // Note, that no delay is used since it is working with the local
+            // list of values so the filtering can keep up.
             'keyup [name=filter]': 'filterBars',
             'click [name=invert]': 'invertSelection',
             'click .sort-value-header, .sort-count-header': 'sortBy',
@@ -342,7 +325,7 @@ define ([
             this.ui.sortCountHeader.toggle(show);
         },
 
-        // Filters the bars given a text string or via an event from the input
+        // Filters the bars given a text string or via an event from the input.
         filterBars: function(event) {
             var text;
 
@@ -437,7 +420,7 @@ define ([
             });
 
             var _this = this;
-            // Proxy all control-based operations to the bars
+            // Proxy all control-based operations to the bars.
             var methods = ['set', 'get', 'when', 'ready', 'wait'];
             var proxyFunc = function(method) {
                 _this[method] = function() {
@@ -467,7 +450,7 @@ define ([
         },
 
         toggleToolbar: function() {
-            // Not yet rendered, this will be called again in onRender
+            // Not yet rendered, this will be called again in onRender.
             if (!this.toolbar.currentView) return;
 
             this.toolbar.currentView.toggle(

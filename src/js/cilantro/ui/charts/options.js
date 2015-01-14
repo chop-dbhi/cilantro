@@ -29,11 +29,11 @@ define([], function() {
             formatter: function () {
                 if (this.point.values) {
                     var html = [];
-                    html.push('<strong>' + this.series.xAxis.axisTitle.text +
-                              '</strong>:');
-                    html.push(this.point.values[0] + '<br>');
-                    html.push('<strong>' + this.series.yAxis.axisTitle.text +
-                              '</strong>:');
+                    html.push(
+                        '<b>' + this.series.xAxis.axisTitle.text + '</b>: ');
+                    html.push(this.point.values[0].label + '<br>');
+                    html.push(
+                        '<b>' + this.series.yAxis.axisTitle.text + '</b>: ');
                     html.push(this.y);
                     return html.join('');
                 }
