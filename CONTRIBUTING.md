@@ -55,7 +55,7 @@ The repository has a `.jshintrc` file that will enforce certain rules and conven
 
 ```bash
 # Clone the cilantro repo or a fork; go into the directory
-git clone git@github.com/chop-dbhi/cilantro.git && cd cilantro
+git clone git@github.com:chop-dbhi/cilantro.git && cd cilantro
 
 # Installs the dev depenencies including Grunt
 npm install
