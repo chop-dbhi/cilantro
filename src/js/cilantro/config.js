@@ -84,6 +84,12 @@ define([
          * concept names, operators and values to make filters more readable.
          */
         styleFilters: false,
+        
+        /* 
+        * Automatically refresh count statistics for context when filters
+        * change.
+        */
+        distinctCountAutoRefresh: true,
 
         /*
          * Timeouts
