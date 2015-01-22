@@ -92,6 +92,10 @@ define([
             });
 
             this.on('sync', this.onSync);
+            
+            if (!c.config.get('distinctCountAutoRefresh')) {
+                this.stats.stopListening(this, 'sync');
+            }
 
             // Define a debounced save method for handling rapid successions
             // of [un]apply events.

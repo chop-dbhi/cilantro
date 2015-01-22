@@ -90,20 +90,24 @@ define([
 
             this.listenTo(this.parent, 'request', this.onParentRequest);
             this.listenTo(this.parent, 'sync', this.onParentSync);
+        },
 
-            if (this.parent.collection) {
-                this.listenTo(this.parent.collection, 'reset', this.onParentReset);
+        onParentRequest: function() {
+            // if the parent make a request and we are
+            // waiting for a stat response, it will be
+            // stale when it arrives
+            if (this.xhr) {
+                this.xhr.abort();
+                this.xhr = null;
             }
         },
 
-        onParentRequest: function() {},
-
         onParentReset: function() {
-            this.fetch();
+            this.xhr = this.fetch();
         },
 
         onParentSync: function() {
-            this.fetch();
+            this.xhr = this.fetch();
         },
 
         url: function() {
@@ -116,6 +120,11 @@ define([
             else {
                 throw new Error('Stat supported model has no stats URL defined.');
             }
+        },
+
+        manualFetch: function() {
+           this.xhr = this.fetch();
+           return this.xhr;
         }
     });
 
@@ -127,9 +136,13 @@ define([
                 throw new Error('statModel must be defined');
             }
 
+            this.stats = new this.statModel({parent: this});
+
             Model.prototype.constructor.call(this, attrs, options);
 
-            this.stats = new this.statModel({parent: this});
+            if (this.collection) {
+                this.stats.listenTo(this.collection, 'reset', this.stats.onParentReset);
+            }
         }
     });
 

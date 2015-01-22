@@ -15,15 +15,19 @@ define([
             removeAll: '[data-action=remove]',
             count: '[data-target=count]',
             units: '[data-target=units]',
-            loading: '[data-target=loading-message]'
+            loading: '[data-target=loading-message]',
+            refresh: '[data-action=refresh]'
         },
 
         events: {
-            'click @ui.removeAll': 'clickRemoveAll'
+            'click @ui.removeAll': 'clickRemoveAll',
+            'click @ui.refresh': 'refreshCount'
         },
 
         modelEvents: {
-            'request': 'showLoad'
+            'request': 'showLoad',
+            'sync': 'enableRefreshButton',
+            'change': 'disableRefreshButton'
         },
 
         collectionEvents: {
@@ -41,6 +45,8 @@ define([
             attrs.prettyCount = c.utils.prettyNumber(
                 attrs.count, c.config.get('threshold'));
 
+            attrs.showDistinctButton = !c.config.get('distinctCountAutoRefresh');
+
             return attrs;
         },
 
@@ -55,7 +61,9 @@ define([
         showLoad: function() {
             this.ui.count.hide();
             this.ui.units.hide();
-            this.ui.loading.show();
+            if (c.config.get('distinctCountAutoRefresh')) {
+                this.ui.loading.show();
+            }
         },
 
         showCount: function() {
@@ -63,6 +71,15 @@ define([
             this.ui.units.show();
             this.ui.loading.hide();
             this.render();
+        },
+        
+        enableRefreshButton: function() {
+            this.ui.refresh.removeProp('disabled');
+        },
+        
+        disableRefreshButton: function() {
+            this.ui.refresh.prop('disabled', true);
+            this.ui.loading.hide();
         },
 
         renderRemoveAll: function() {
@@ -72,6 +89,12 @@ define([
             });
 
             this.ui.removeAll.prop('disabled', !models.length);
+        },
+
+        refreshCount:function(){
+           this.model.stats.manualFetch();
+           this.ui.refresh.prop('disabled', true);
+           this.ui.loading.show();
         }
     });
 
