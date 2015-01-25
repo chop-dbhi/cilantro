@@ -64,14 +64,17 @@ define([
             navbar: '.results-workflow-navbar',
             resultsContainer: '.results-container',
             navbarButtons: '.results-workflow-navbar button',
-            loadingOverlay: '.loading-overlay'
+            loadingOverlay: '[data-target=results-loading-message]',
+            canceledQueryMessage: '[data-target=canceled-query-message]'
         },
 
         events: {
             'click [data-toggle=columns-dialog]': 'showColumnsDialog',
             'click [data-toggle=exporter-dialog]': 'showExporterDialog',
             'click [data-toggle=query-dialog]': 'showQueryDialog',
-            'click [data-toggle=context-panel]': 'toggleContextPanel'
+            'click [data-toggle=context-panel]': 'toggleContextPanel',
+            'click [data-action=cancel-query]': 'handleCancelQuery',
+            'click [data-action=retry-query]': 'handleRetryQuery'
         },
 
         regions: {
@@ -110,12 +113,41 @@ define([
             this.data.results.trigger('workspace:unload');
         },
 
+        handleCancelQuery: function(event) {
+            event.preventDefault();
+            this.data.results.cancel();
+            this.showCanceledQueryMessage();
+        },
+
+        handleRetryQuery: function(event) {
+            event.preventDefault();
+            // Hideous..
+            this.data.results.markAsDirty();
+            this.data.results.fetch();
+        },
+
+        showCanceledQueryMessage: function() {
+            this.hideLoadingOverlay();
+            this.ui.canceledQueryMessage.show();
+            this.table.$el.hide();
+        },
+
+        hideCanceledQueryMessage: function() {
+            this.ui.canceledQueryMessage.hide();
+            this.table.$el.show();
+        },
+
         showLoadingOverlay: function() {
-            if (this.isClosed !== true) this.ui.loadingOverlay.show();
+            if (this.isClosed !== true) {
+                this.hideCanceledQueryMessage();
+                this.ui.loadingOverlay.show();
+            }
         },
 
         hideLoadingOverlay: function() {
-            if (this.isClosed !== true) this.ui.loadingOverlay.hide();
+            if (this.isClosed !== true) {
+                this.ui.loadingOverlay.hide();
+            }
         },
 
         toggleContextPanel: function() {

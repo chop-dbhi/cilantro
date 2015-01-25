@@ -19,8 +19,23 @@
     </div>
 </div>
 
-<div class='loading-overlay hide'>
+<div class='overlay hide' data-target=results-loading-message>
     <h4><i class='icon-spinner icon-spin'></i> Loading Results</h4>
+
+    <p><em>Query taking too long?</em></p>
+    <button class='btn btn-default btn-lg' data-action='cancel-query'>Cancel Query</button>
+</div>
+
+<div class='hide' data-target='canceled-query-message'>
+    <h4>Query Canceled</h4>
+
+    <p>Some queries take more time than others to process. Here are two simple things you can try:</p>
+    <ul>
+        <li><strong>Reduce column variability.</strong> If the columns you've selected cross many domains, it takes longer to merge all that data together into results. Try removing <a data-toggle=columns-dialog href=#>one or two columns</a>.</li>
+        <li><strong>Increase specificity of filters.</strong> Adding filters increases the specificity of the query which decreases the number of possible results. This means there is less total data to process. Try <a data-route=query href=#>adding or changing a filter</a> to increase the specificity of the query.</li>
+    </ul>
+
+    <p>Want to retry the query? <button class='btn btn-primary' data-action=retry-query>Retry Query</button></p>
 </div>
 
 <div class=table-region></div>
