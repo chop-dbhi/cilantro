@@ -1,7 +1,4 @@
 <div class=pull-right>
-    <% if (data.showDistinctButton) { %>
-    <button data-action=refresh class='btn btn-info btn-mini' title='Retrieve Distinct Count' disabled><i class='icon-refresh icon-white'></i></button>
-    <% } %>
     <button data-action=remove class='btn btn-danger btn-mini' title='Remove All Filters' disabled><i class='icon-remove icon-white'></i></button>
 </div>
 
@@ -19,4 +16,5 @@
             <%= data.object_name_plural %>
         <% } %>
     </span>
+    <button data-action=refresh class='btn btn-warning btn-mini hide' title='Refresh Count'><i class='icon-refresh icon-white'></i></button>
 </div>

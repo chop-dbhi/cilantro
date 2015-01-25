@@ -26,8 +26,7 @@ define([
 
         modelEvents: {
             'request': 'showLoad',
-            'sync': 'enableRefreshButton',
-            'change': 'disableRefreshButton'
+            'sync': 'enableRefreshButton'
         },
 
         collectionEvents: {
@@ -45,8 +44,6 @@ define([
             attrs.prettyCount = c.utils.prettyNumber(
                 attrs.count, c.config.get('threshold'));
 
-            attrs.showDistinctButton = !c.config.get('distinctCountAutoRefresh');
-
             return attrs;
         },
 
@@ -59,9 +56,9 @@ define([
         },
 
         showLoad: function() {
-            this.ui.count.hide();
-            this.ui.units.hide();
             if (c.config.get('distinctCountAutoRefresh')) {
+                this.ui.count.hide();
+                this.ui.units.hide();
                 this.ui.loading.show();
             }
         },
@@ -72,13 +69,14 @@ define([
             this.ui.loading.hide();
             this.render();
         },
-        
+
         enableRefreshButton: function() {
-            this.ui.refresh.removeProp('disabled');
+            this.ui.refresh.show();
+            this.$el.addClass('muted');
         },
-        
-        disableRefreshButton: function() {
-            this.ui.refresh.prop('disabled', true);
+
+        hideRefreshButton: function() {
+            this.ui.refresh.hide();
             this.ui.loading.hide();
         },
 
@@ -91,10 +89,13 @@ define([
             this.ui.removeAll.prop('disabled', !models.length);
         },
 
-        refreshCount:function(){
-           this.model.stats.manualFetch();
-           this.ui.refresh.prop('disabled', true);
-           this.ui.loading.show();
+        refreshCount:function() {
+            this.model.stats.manualFetch();
+            this.$el.removeClass('muted');
+            this.ui.refresh.hide();
+            this.ui.count.hide();
+            this.ui.units.hide();
+            this.ui.loading.show();
         }
     });
 
