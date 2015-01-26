@@ -106,6 +106,13 @@ define([
 
             this.iframe.remove();
             this.model.set('status', 'canceled');
+
+            // Send DELETE request to cancel the backend processing.
+            $.ajax({
+                type: 'DELETE',
+                url: this.getExportUrl(),
+                contentType: 'application/json'
+            });
         },
 
         check: function() {
@@ -172,7 +179,6 @@ define([
                     break;
             }
 
-            this.ui.cancel.hide();
             this.ui.status.html(html);
             this.model.set('done', done);
         }

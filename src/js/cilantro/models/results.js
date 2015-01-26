@@ -2,11 +2,12 @@
 
 define([
     'underscore',
+    'backbone',
     '../core',
     '../constants',
     '../structs',
     './paginator'
-], function(_, c, constants, structs, paginator) {
+], function(_, Backbone, c, constants, structs, paginator) {
 
     var ResultsPage = structs.Frame.extend({
         idAttribute: 'page_num',
@@ -61,6 +62,21 @@ define([
         markAsDirty: function() {
             this.isDirty = true;
             this._refresh();
+        },
+
+        cancel: function() {
+            // Abort the request so handlers are not triggered.
+            if (this.pending) {
+                if (this.pending.abort) this.pending.abort();
+                delete this.pending;
+            }
+
+            // Send a DELETE request to the server to cancel the backend process.
+            return Backbone.ajax({
+                type: 'delete',
+                url: _.result(this, 'url'),
+                contentType: 'application/json'
+            });
         },
 
         fetch: function(options) {

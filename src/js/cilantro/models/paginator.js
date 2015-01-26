@@ -45,16 +45,18 @@ define([
                 });
             }
 
-            this.perPage = resp.per_page;   // jshint ignore:line
-            this.trigger('change:pagesize', this, this.perPage);
-            this.numPages = resp.num_pages; // jshint ignore:line
-            this.trigger('change:pagecount', this, this.numPages);
-            this.objectCount = resp.item_count;   // jshint ignore:line
-            this.trigger('change:objectcount', this, this.objectCount);
-            this.currentPageNum = null;
-            this.setCurrentPage(resp.page_num); // jshint ignore:line
+            if (resp) {
+                this.perPage = resp.per_page;   // jshint ignore:line
+                this.trigger('change:pagesize', this, this.perPage);
+                this.numPages = resp.num_pages; // jshint ignore:line
+                this.trigger('change:pagecount', this, this.numPages);
+                this.objectCount = resp.item_count;   // jshint ignore:line
+                this.trigger('change:objectcount', this, this.objectCount);
+                this.currentPageNum = null;
+                this.setCurrentPage(resp.page_num); // jshint ignore:line
 
-            return [resp];
+                return [resp];
+            }
         },
 
         // Ensures `num` is within the bounds
