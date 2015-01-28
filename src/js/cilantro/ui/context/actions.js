@@ -71,13 +71,10 @@ define([
         },
 
         enableRefreshButton: function() {
-            this.ui.refresh.show();
-            this.$el.addClass('muted');
-        },
-
-        hideRefreshButton: function() {
-            this.ui.refresh.hide();
-            this.ui.loading.hide();
+            if (!c.config.get('distinctCountAutoRefresh')) {
+                this.$el.addClass('muted');
+                this.ui.refresh.show();
+            }
         },
 
         renderRemoveAll: function() {
