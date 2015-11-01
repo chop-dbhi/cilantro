@@ -2,8 +2,10 @@
 
 define([
     'underscore',
-    './base'
-], function(_, base) {
+    '../core',
+    '../utils',
+    './base',
+], function(_, c, utils, base) {
 
     var parseTitle = function(uri) {
         if (!uri) return 'Untitled';
@@ -36,6 +38,9 @@ define([
     });
 
 
+    var AsyncExporterCollection = base.Collection.extend({});
+
+
     var ExporterCollection = base.Collection.extend({
         model: ExporterModel,
 
@@ -57,8 +62,11 @@ define([
     });
 
     return {
-        ExporterModel: ExporterModel,
-        ExporterCollection: ExporterCollection
+        ExporterCollection: utils.chooseByRequestType(
+            AsyncExporterCollection,
+            ExporterCollection,
+            c.config.get('useAsyncRequests')
+        )
     };
 
 });

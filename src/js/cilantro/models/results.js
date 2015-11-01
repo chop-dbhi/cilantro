@@ -6,8 +6,10 @@ define([
     '../core',
     '../constants',
     '../structs',
+    '../utils',
+    './base',
     './paginator'
-], function(_, Backbone, c, constants, structs, paginator) {
+], function(_, Backbone, c, constants, structs, utils, base, paginator) {
 
     var ResultsPage = structs.Frame.extend({
         idAttribute: 'page_num',
@@ -161,8 +163,14 @@ define([
     // Set the custom model for this Paginator.
     Results.prototype.model = ResultsPage;
 
+    var AsyncResults = base.Collection.extend({});
+
     return {
-        Results: Results
+        Results: utils.chooseByRequestType(
+            AsyncResults,
+            Results,
+            c.config.get('useAsyncRequests')
+       )
     };
 
 });

@@ -17,7 +17,6 @@ define([
         // The selector of the element views will be rendered within.
         main: '#cilantro-main',
 
-
         /*
          * Sessions
          *
@@ -84,12 +83,19 @@ define([
          * concept names, operators and values to make filters more readable.
          */
         styleFilters: false,
-        
-        /* 
+
+        /*
         * Automatically refresh count statistics for context when filters
         * change.
         */
         distinctCountAutoRefresh: true,
+
+        /*
+         * When set to true, endpoints that support async requests will be
+         * used in an asynchronous fashion. When false, all endpoints will be
+         * used in their normal forms with blocking requests.
+         */
+        useAsyncRequests: false,
 
         /*
          * Timeouts
