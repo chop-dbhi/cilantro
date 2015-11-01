@@ -78,7 +78,21 @@ define([
         console.log(JSON.stringify(obj, null, 4));
     };
 
+    // Returns the supplied async or sync parameter based on the value
+    // of the supplied `useAsyncRequests` param. When `useAsyncRequests` is
+    // true, the async parameter will be returned. When it is false, the sync
+    // parameter is returned.
+    var chooseByRequestType = function(async, sync, useAsyncRequests) {
+        if (useAsyncRequests) {
+            return async;
+        }
+        else {
+            return sync;
+        }
+    };
+
     mods.unshift({
+        chooseByRequestType: chooseByRequestType,
         pprint: pprint,
         getDotProp: getDotProp,
         getCookie: getCookie,

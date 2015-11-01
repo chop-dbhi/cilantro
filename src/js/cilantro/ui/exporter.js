@@ -5,9 +5,10 @@ define([
     'underscore',
     'backbone',
     'marionette',
+    '../utils',
     './base',
     './core'
-], function($, _, Backbone, Marionette, base, c) {
+], function($, _, Backbone, Marionette, utils, base, c) {
 
     var ExportOption = Marionette.ItemView.extend({
         tagName: 'label',
@@ -399,8 +400,14 @@ define([
         }
     });
 
+    var AsyncExporterDialog = Marionette.Layout.extend({});
+
     return {
-        ExporterDialog: ExporterDialog
+        ExporterDialog: utils.chooseByRequestType(
+            AsyncExporterDialog,
+            ExporterDialog,
+            c.config.get('useAsyncRequests')
+        )
     };
 
 });

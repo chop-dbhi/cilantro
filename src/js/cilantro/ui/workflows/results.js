@@ -4,11 +4,12 @@ define([
     'jquery',
     'underscore',
     'marionette',
+    '../../utils',
     '../core',
     '../paginator',
     '../numbers',
     '../tables'
-], function($, _, Marionette, c, paginator, numbers, tables) {
+], function($, _, Marionette, utils, c, paginator, numbers, tables) {
 
 
     var ResultCount = Marionette.ItemView.extend({
@@ -295,8 +296,13 @@ define([
         }
     });
 
+    var AsyncResultsWorkflow = Marionette.Layout.extend({});
+
     return {
-        ResultCount: ResultCount,
-        ResultsWorkflow: ResultsWorkflow
+        ResultsWorkflow: utils.chooseByRequestType(
+            AsyncResultsWorkflow,
+            ResultsWorkflow,
+            c.config.get('useAsyncRequests')
+        )
     };
 });

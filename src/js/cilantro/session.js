@@ -5,10 +5,9 @@ define([
     'underscore',
     'backbone',
     './models',
-    './utils',
     './router',
     './core'
-], function($, _, Backbone, models, utils, router, c) {
+], function($, _, Backbone, models, router, c) {
 
     var events = {
         SESSION_OPENING: 'session:opening',
@@ -144,13 +143,38 @@ define([
         _parseLinks: function(model, xhr) {
             models.Model.prototype._parseLinks.call(this, model, xhr);
 
-            var Collection;
 
             // Iterate over the available resource links and initialize
             // the corresponding collection with the URL.
             this.data = {};
 
+            var ASYNC_PREFIX = 'async_',
+                Collection;
             _.each(model.links, function(url, name) {
+                if (c.config.get('useAsyncRequests')) {
+                    // If this is an asynchronous endpoint and we are using
+                    // asynchronous requests then we should alter the name to
+                    // match the synchronous name. This will guarantee that we
+                    // are always construction this.data in a consistent format
+                    // regarding naming no matter which request type we
+                    // are using.
+                    if (name.startsWith(ASYNC_PREFIX)) {
+                        name = name.replace(ASYNC_PREFIX, '');
+                    }
+                    // At this point, we know we are dealing with a synchronous
+                    // endpoint and we are using asynchronous requests. If this
+                    // named endpoint also exists in asynchronous form, we
+                    // should ignore it.
+                    else if (ASYNC_PREFIX + name in this.links) {
+                        return;
+                    }
+                }
+                else if (name.startsWith(ASYNC_PREFIX)) {
+                    // If this named endpoint is asynchronous, then we should
+                    // ignore it when using synchronous requests.
+                    return;
+                }
+
                 if ((Collection = collectionLinkMap[name])) {
                     this.data[name] = new Collection();
                     this.data[name].url = url;
