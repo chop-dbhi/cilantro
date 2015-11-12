@@ -40,7 +40,7 @@ define([
             this.$el.append(this.header.el, this.footer.el);
 
             this.listenTo(this.collection, 'reset', function() {
-                if (this.collection.objectCount === 0) {
+                if (this.collection.numPages === 0) {
                     this.$el.hide();
                 }
                 else {

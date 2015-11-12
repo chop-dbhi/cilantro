@@ -13,7 +13,7 @@ define([
     var parseDate = function(str) {
         // Short-circut if the string is empty or if it does not conform to
         // the expected YYYY-MM-DD format.
-        if (!str || str.length != 10) return;
+        if (!str || str.length !== 10) return;
 
         var year = parseInt(str.substr(0, 4));
         var month = parseInt(str.substr(5, 2)) -1;

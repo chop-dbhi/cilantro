@@ -153,7 +153,13 @@ define([
             _.each(model.links, function(url, name) {
                 if ((Collection = collectionLinkMap[name])) {
                     this.data[name] = new Collection();
-                    this.data[name].url = url;
+                    // TODO: There should be a better way to do this, right?
+                    if (name === 'preview') {
+                        this.data[name]._url = url;
+                    }
+                    else {
+                        this.data[name].url = url;
+                    }
                     this.data[name].fetch({reset: true});
                 }
             }, this);
