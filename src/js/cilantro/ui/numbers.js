@@ -10,7 +10,7 @@ define([
     var renderCount = function($el, count, fallback) {
         if (!fallback) fallback = '<em>n/a</em>';
 
-        if (!count) {
+        if (count === null || count === undefined) {
             $el.html(fallback);
         }
         else {

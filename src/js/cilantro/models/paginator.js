@@ -64,20 +64,6 @@ define([
             return (1 <= num && num <= this.numPages);
         },
 
-        // Checks the a _next_ page exists for num (or the current page)
-        hasNextPage: function(num) {
-            if (!num) num = this.currentPageNum;
-
-            return num < this.numPages;
-        },
-
-        // Checks the a _previous_ page exists for num (or the current page)
-        hasPreviousPage: function(num) {
-            if (!num) num = this.currentPageNum;
-
-            return num > 1;
-        },
-
         // Set the current page which triggers the 'change:page' event
         setCurrentPage: function(num) {
             if (num === this.currentPageNum) return;

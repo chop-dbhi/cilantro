@@ -23,22 +23,58 @@ define([
             label: '.count-label'
         },
 
-        modelEvents: {
-            'change:objectcount': 'renderCount'
+        initialize: function() {
+            this.model.stats.on('sync', this.onContextSynced, this);
         },
 
-        onRender: function() {
-            if (this.model.objectCount !== undefined) {
-                this.renderCount(this.model, this.model.objectCount);
-            }
-            else {
-                this.renderCount(this.model, '');
-            }
-        },
-
-        renderCount: function(model, count) {
-            numbers.renderCount(this.ui.count, count);
+        onContextSynced: function() {
+            var count = this.model.stats.get('count');
+            this.collection.setResultCount(count);
+            numbers.renderCount(
+                this.ui.count,
+                count,
+                'all'
+            );
             this.ui.label.text('records');
+        }
+    });
+
+
+    var ResultsPaginator = paginator.Paginator.extend({
+        renderPageCount: function(model, value) {
+            var text = value;
+
+            // If the page count is undefined then we don't know how many
+            // pages there are so we can just claim to be showing all pages
+            // for now until we get an actual value.
+            if (value === undefined) text = 'all';
+
+            // If there are no pages, just lie and claim there is a single page
+            // since the current page will be 1 in this case and showing page
+            // 1 / 0 would be a little confusing to the user.
+            if (value === 0) text = 1;
+
+            this.ui.pageCount.text(text);
+        },
+
+        renderCurrentPage: function(model, value, options) {
+            this.ui.currentPage.text(value);
+            this.ui.first.prop('disabled', !!options.first);
+            this.ui.prev.prop('disabled', !!options.first);
+            this.ui.next.prop('disabled', !!options.next);
+            this.ui.last.prop('disabled', !!options.last);
+
+            // If we have disabled the buttons then we need to force hide the
+            // tooltip to prevent it from being permanently visible.
+            if (!!options.first) {
+                this.ui.first.tooltip('hide');
+                this.ui.prev.tooltip('hide');
+            }
+
+            if (!!options.last) {
+                this.ui.next.tooltip('hide');
+                this.ui.last.tooltip('hide');
+            }
         }
     });
 
@@ -88,6 +124,10 @@ define([
             _.bindAll(this, 'onPageScroll');
 
             this.data = {};
+
+            if (!(this.data.context = this.options.context)) {
+                throw new Error('context model required');
+            }
 
             if (!(this.data.view = this.options.view)) {
                 throw new Error('view model required');
@@ -235,12 +275,13 @@ define([
         onRender: function() {
             $(document).on('scroll', this.onPageScroll);
 
-            this.paginator.show(new paginator.Paginator({
+            this.paginator.show(new ResultsPaginator({
                 model: this.data.results
             }));
 
             this.count.show(new ResultCount({
-                model: this.data.results
+                model: this.data.context,
+                collection: this.data.results
             }));
 
             this.table.show(new tables.Table({

@@ -96,6 +96,7 @@ require({
                 }),
 
                 results: new c.ui.ResultsWorkflow({
+                    context: this.data.contexts.session,
                     view: this.data.views.session,
                     // The differences in these names are noted
                     results: this.data.preview
