@@ -24,10 +24,11 @@ define([
         },
 
         initialize: function() {
-            this.model.stats.on('sync', this.onContextSynced, this);
+            this.model.stats.on('sync', this.updateCount, this);
+            this.on('render', this.updateCount, this)
         },
 
-        onContextSynced: function() {
+        updateCount: function() {
             var count = this.model.stats.get('count');
             this.collection.setResultCount(count);
             numbers.renderCount(
