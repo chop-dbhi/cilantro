@@ -108,13 +108,16 @@ define([
             this.model.distribution(function(resp) {
                 if (_this.isClosed) return;
 
-                // Convert it into the structure the chart renderer expects
+                // Convert it into the structure the chart renderer expects.
+                // Since highcharts has odd behavior when encountering nul`
+                // we replace null values with empty strings to make the
+                // highcharts behavior more predictable.
                 var data = _.map(resp, function(item) {
                     return {
                         count: item.count,
                         values: [{
                             label: item.label,
-                            value: item.value
+                            value: item.value === null ? '' : item.value
                         }]
                     };
                 });
