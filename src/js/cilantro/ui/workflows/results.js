@@ -25,7 +25,7 @@ define([
 
         initialize: function() {
             this.model.stats.on('sync', this.updateCount, this);
-            this.on('render', this.updateCount, this)
+            this.on('render', this.updateCount, this);
         },
 
         updateCount: function() {
