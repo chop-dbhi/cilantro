@@ -103,11 +103,11 @@ define([
             // Update the sub-collections with the specific sets of models
             this.on('add remove reset', function() {
                 this.queryable.reset(this.filter(function(model) {
-                    return !!model.get('queryable') || !!model.get('queryview');
+                    return !!model.get('queryable');
                 }));
 
                 this.viewable.reset(this.filter(function(model) {
-                    return !!model.get('viewable') || !!model.get('formatter_name');
+                    return !!model.get('viewable');
                 }));
             });
         }
