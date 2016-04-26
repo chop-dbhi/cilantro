@@ -12,6 +12,7 @@ define([
     './ui/context',
     './ui/controls',
     './ui/exporter',
+    './ui/api',
     './ui/field',
     './ui/notify',
     './ui/paginator',

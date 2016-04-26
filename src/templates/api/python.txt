@@ -1,0 +1,21 @@
+import requests
+
+# Required headers for the request.
+headers = {
+  'Content-Type': 'application/json',
+  'Api-Token': '<%= data.token %>'
+}
+
+# Body encoded as JSON.
+body = '<%= data.body %>'
+
+# Send the POST request.
+resp = requests.post('<%= data.url %>',
+                     headers=headers,
+                     data=body)
+
+# Raise exception for 4xx or 5xx status codes.
+resp.raise_for_status()
+
+<% if (data.type === 'json') { %># Decode JSON response.
+data = resp.json()<% } %>

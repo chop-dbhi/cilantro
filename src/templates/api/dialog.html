@@ -1,0 +1,39 @@
+<div class=modal-header>
+    <a class=close data-dismiss=modal><i class="icon-remove"></i></a>
+    <h3>API Script</h3>
+</div>
+
+<div class=modal-body>
+    <div class="alert alert-info">
+      <strong>Note:</strong> API access requires a token. Ask the site maintainer to generate one for you. Replace the <code>YOUR-TOKEN-HERE</code> variable with your token.
+    </div>
+
+    <p>Script or program to execute the current query and dump the results as JSON or CSV.</p>
+
+    <form>
+      <label class="radio inline">
+        <input type="radio" name="type" value="json" checked> JSON
+      </label>
+
+      <label class="radio inline">
+        <input type="radio" name="type" value="csv"> CSV
+      </label>
+    </form>
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#api-curl" data-toggle="tab">cURL</a></li>
+      <li><a href="#api-python" data-toggle="tab">Python</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="api-curl">
+        <p>
+        <textarea rows="10"></textarea>
+      </div>
+
+      <div class="tab-pane" id="api-python">
+        <p>This code requires the <a href="http://docs.python-requests.org/" target="_blank">requests</a> library.</p>
+        <textarea rows="10"></textarea>
+      </div>
+    </div>
+</div>
