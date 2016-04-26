@@ -37,6 +37,12 @@ define([
             }
         },
 
+        csrf: {
+            header: 'X-CSRFToken',
+            // Included to support a legacy pattern.
+            token: window.csrfToken || window.csrf_token  // jshint ignore:line
+        },
+
         // Convenience option: URL of the default session
         url: null,
 
@@ -84,8 +90,8 @@ define([
          * concept names, operators and values to make filters more readable.
          */
         styleFilters: false,
-        
-        /* 
+
+        /*
         * Automatically refresh count statistics for context when filters
         * change.
         */
