@@ -14,7 +14,7 @@ define([
 
     var cilantro = {
         // Version of cilantro
-        version: '2.4.1',
+        version: '2.4.2-beta',
 
         // Defines the minimum version and maximum version Serrano that this version
         // of Cilantro is 100% compatible with. While Cilantro will attempt to run
