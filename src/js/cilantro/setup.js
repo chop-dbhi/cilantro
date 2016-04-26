@@ -7,8 +7,9 @@ define([
     'jquery',
     'loglevel',
     './core',
-    './ui'
-], function(_, Backbone, Marionette, $, loglevel, c, ui) {
+    './ui',
+    './csrf',
+], function(_, Backbone, Marionette, $, loglevel, c, ui, csrf) {
 
     // Set configuration options for corresponding APIs
     c.templates.set(c.config.get('templates', {}));
@@ -55,6 +56,12 @@ define([
             withCredentials: true
         };
     });
+
+    // Apply CSRF hooks if enabled.
+    var csrfConfig = c.config.get('csrf');
+    if (csrfConfig && csrfConfig.token) {
+        csrf.apply(csrfConfig.header, csrfConfig.token);
+    }
 
     // Setup debugging facilities
     if (c.config.get('debug')) {
