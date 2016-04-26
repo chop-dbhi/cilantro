@@ -67,7 +67,12 @@ require({
                     collection: this.data.queries
                 }),
 
-                deleteQuery: new c.ui.DeleteQueryDialog()
+                deleteQuery: new c.ui.DeleteQueryDialog(),
+
+                apiScript: new c.ui.ApiScriptDialog({
+                    view: this.data.views.session,
+                    context: this.data.contexts.session
+                })
             };
 
             var elements = [];

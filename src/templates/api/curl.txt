@@ -1,0 +1,4 @@
+curl -L -X POST <%= data.url %> \
+    -H "Content-Type: application/json" \
+    -H "Api-Token: <%= data.token %>" \
+    -d '<%= data.body %>'

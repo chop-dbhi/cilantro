@@ -109,6 +109,7 @@ define([
             'click [data-toggle=columns-dialog]': 'showColumnsDialog',
             'click [data-toggle=exporter-dialog]': 'showExporterDialog',
             'click [data-toggle=query-dialog]': 'showQueryDialog',
+            'click [data-toggle=api-script-dialog]': 'showApiScriptDialog',
             'click [data-toggle=context-panel]': 'toggleContextPanel',
             'click [data-action=cancel-query]': 'handleCancelQuery',
             'click [data-action=retry-query]': 'handleRetryQuery'
@@ -334,6 +335,10 @@ define([
             // Opens the query modal without passing a model which assumes a
             // new one will be created based on the current session.
             c.dialogs.query.open();
+        },
+
+        showApiScriptDialog: function() {
+          c.dialogs.apiScript.open();
         }
     });
 

@@ -4,6 +4,10 @@ define([
     'underscore',
     'loglevel',
 
+    'tpl!templates/api/dialog.html',
+    'tpl!templates/api/curl.txt',
+    'tpl!templates/api/python.txt',
+
     'tpl!templates/count.html',
     'tpl!templates/notification.html',
     'tpl!templates/paginator.html',
@@ -113,7 +117,7 @@ define([
         name = name.replace(/\.\.\//g, '');
 
         // Remove templates prefix, strip extension
-        return name.replace(/templates\//, '').replace(/\.html$/, '');
+        return name.replace(/templates\//, '').replace(/\.\w+$/, '');
     };
 
     // Registers all built-in templates using the augmented _moduleName from
