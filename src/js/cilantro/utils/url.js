@@ -119,7 +119,7 @@ define([
 
             // Per the RFC, the URI-Reference must be the first field or this
             // is invalid.
-            uri = _parseUriReference(linkFields[0]);
+            uri = _parseUriReference($.trim(linkFields[0]));
             parameters = _parseParameters(linkFields.slice(1));
 
             // If a relation type was not specified in the parameters then
