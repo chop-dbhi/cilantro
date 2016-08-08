@@ -64,27 +64,6 @@ define([
             change: 'render'
         },
 
-        // This dictionary maps operators to their simple language representation.
-        // renderDescription creates the language to be displayed as the filter
-        // description. The first value in the array is the simple language
-        // shortening. The second is the value present in the default language.
-        simpleLanguage : {
-            'in': ['is', 'is'],
-            '-in': ['not', 'is not'],
-            'exact': ['is', 'is'],
-            'range': ['between', 'is between'],
-            '-range': ['not between', 'is not between'],
-            'isnull': ['is', 'is'],
-            'gt': ['>', 'is greater'],
-            'gte': ['>=', 'is greater than or equal to'],
-            'lt': ['<', 'is less'],
-            'lte': ['<=', 'is less than or equal to'],
-            'regex': ['matches', 'matches'],
-            'iregex': ['matches', 'matches'],
-            'icontains': ['contains', 'contains the text'],
-            'contains': ['contains', 'contains the text']
-        },
-
         // Navigate to query page when a concept is triggered
         clickShow: function() {
             c.trigger(c.CONCEPT_FOCUS, this.model.get('concept'));
@@ -203,6 +182,8 @@ define([
                 return;
             }
 
+            var lang = c.config.get('filterOperators');
+
            /*
             * The cleanedValue will be used to prettify the language.
             * In the case of some values being represented as ids, cleanedValue
@@ -238,7 +219,7 @@ define([
             text.push('<strong>' + fieldName + '</strong>');
 
             if (operator === 'range' || operator === '-range') {
-                text.push(this.simpleLanguage[operator][0]);
+                text.push(lang[operator][0]);
                 var val1 = value[0];
                 var val2 = value[1];
 
@@ -252,12 +233,12 @@ define([
                           '<span class=filter-value>' + val2 + '</span>');
             }
             else if (operator === 'in' || operator === '-in') {
-                text.push(this.simpleLanguage[operator][0]);
+                text.push(lang[operator][0]);
                 text.push(this.parseValue(cleanedValue, operator));
             }
             // Handles greater than, less than etc.
             else {
-                text.push(this.simpleLanguage[operator][0]);
+                text.push(lang[operator][0]);
                 text.push(this.parseValue(cleanedValue, operator));
             }
 
