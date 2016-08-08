@@ -53,6 +53,8 @@ define([
             this.filters = new filters.Filters(attrs.json,
                 _.defaults({parse: true}, options));
 
+            this.set('optype', attrs.json ? attrs.json.type : 'and');
+
             // Proxy events from individual nodes as they are altered
             this.listenTo(this._filters, {
                 'apply': this.apply,
@@ -64,6 +66,11 @@ define([
                 'change:enabled': function() {
                     this._save();
                 }
+            });
+
+            this.on('change:optype', function(model, value, options) {
+                if (options && options.save === false) return;
+                this._save();
             });
 
             // Watch for changes to the JSON attribute, update filters.
@@ -80,6 +87,10 @@ define([
                     }, options));
                 }
 
+                if (value && value.type) {
+                    this.set('optype', value.type, {save: false});
+                }
+
                 // Add the `required` attribute to filters marked as such
                 this.filters.each(function(model) {
                     if (this.isFilterRequired(model.attributes)) {
@@ -92,7 +103,7 @@ define([
             });
 
             this.on('sync', this.onSync);
-            
+
             if (!c.config.get('distinctCountAutoRefresh')) {
                 this.stats.stopListening(this, 'sync');
             }
@@ -265,11 +276,20 @@ define([
             var attrs = base.Model.prototype.toJSON.call(this),
                 filters = this.filters.toJSON();
 
-            if (filters.length) {
+            var optype = attrs.optype || 'and';
+            delete attrs.optype;
+
+            if (!attrs.json) {
                 attrs.json = {
-                    type: 'and',
+                    type: optype,
                     children: filters
                 };
+
+            }
+
+            if (filters.length) {
+                attrs.json.type = optype;
+                attrs.json.children = filters
             }
             else {
                 attrs.json = null;

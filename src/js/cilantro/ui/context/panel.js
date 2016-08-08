@@ -6,9 +6,10 @@ define([
     '../base',
     '../core',
     './filters',
+    './operator',
     './info',
     './actions'
-], function(_, Marionette, base, c, filters, info, actions) {
+], function(_, Marionette, base, c, filters, operator, info, actions) {
 
 
     var ContextPanel = Marionette.Layout.extend({
@@ -28,12 +29,14 @@ define([
 
         regions: {
             info: '.info-region',
+            operator: '.operator-region',
             filters: '.filters-region',
             actions: '.actions-region'
         },
 
         regionViews: {
             info: info.ContextInfo,
+            operator: operator.ContextOperator,
             filters: filters.ContextFilters,
             actions: actions.ContextActions
         },
@@ -77,9 +80,14 @@ define([
                 collection: this.model.filters
             });
 
+            var operator = new this.regionViews.operator({
+              model: this.model
+            });
+
             this.info.show(info);
             this.actions.show(actions);
             this.filters.show(filters);
+            this.operator.show(operator);
         },
 
         openPanel: function(options) {

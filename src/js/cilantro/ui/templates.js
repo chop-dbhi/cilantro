@@ -51,6 +51,7 @@ define([
     'tpl!templates/context/info.html',
     'tpl!templates/context/empty.html',
     'tpl!templates/context/filter.html',
+    'tpl!templates/context/operator.html',
 
     'tpl!templates/controls/infograph/bar.html',
     'tpl!templates/controls/infograph/layout.html',
