@@ -89,7 +89,7 @@ define([
          * Setting this as true will style the filter display, highlighting
          * concept names, operators and values to make filters more readable.
          */
-        styleFilters: false,
+        styleFilters: true,
 
         /*
         * Automatically refresh count statistics for context when filters

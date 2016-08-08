@@ -78,7 +78,11 @@ define([
             'gt': ['>', 'is greater'],
             'gte': ['>=', 'is greater than or equal to'],
             'lt': ['<', 'is less'],
-            'lte': ['<=', 'is less than or equal to']
+            'lte': ['<=', 'is less than or equal to'],
+            'regex': ['matches', 'matches'],
+            'iregex': ['matches', 'matches'],
+            'icontains': ['contains', 'contains the text'],
+            'contains': ['contains', 'contains the text']
         },
 
         // Navigate to query page when a concept is triggered
@@ -204,7 +208,7 @@ define([
             * In the case of some values being represented as ids, cleanedValue
             * will provide their text representation.
             */
-            var cleanedValue = attrs.cleaned_value; // jshint ignore:line
+            var cleanedValue = attrs.value; // jshint ignore:line
 
             var text = [],
                 value = attrs.value,
@@ -223,9 +227,7 @@ define([
             else {
                 // Splits the language at the operator and retrives the fieldName
                 // which is always to the left of the operator.
-                fieldName =
-                    attrs.language.split(
-                            this.simpleLanguage[operator][1])[0];
+                fieldName = attrs.language.split(this.simpleLanguage[operator][1])[0];
             }
 
             // Remove ? and ! from the end of field names
