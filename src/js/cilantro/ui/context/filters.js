@@ -208,10 +208,9 @@ define([
             * In the case of some values being represented as ids, cleanedValue
             * will provide their text representation.
             */
-            var cleanedValue = attrs.value; // jshint ignore:line
 
             var text = [],
-                value = attrs.value,
+                cleanedValue = attrs.value,
                 operator = attrs.operator,
                 fieldName = '';
 
