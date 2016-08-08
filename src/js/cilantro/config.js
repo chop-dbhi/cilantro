@@ -89,7 +89,28 @@ define([
          * Setting this as true will style the filter display, highlighting
          * concept names, operators and values to make filters more readable.
          */
-        styleFilters: false,
+        styleFilters: true,
+
+        /*
+         * Map of operators to the preferred text for the operator. The second
+         * value is the operator text from the server to match on.
+         */
+        filterOperators: {
+            'in': ['is', 'is'],
+            '-in': ['not', 'is not'],
+            'exact': ['is', 'is'],
+            'range': ['between', 'is between'],
+            '-range': ['not between', 'is not between'],
+            'isnull': ['is', 'is'],
+            'gt': ['>', 'is greater'],
+            'gte': ['>=', 'is greater than or equal to'],
+            'lt': ['<', 'is less'],
+            'lte': ['<=', 'is less than or equal to'],
+            'regex': ['matches', 'matches'],
+            'iregex': ['matches', 'matches'],
+            'icontains': ['contains', 'contains the text'],
+            'contains': ['contains', 'contains the text']
+        },
 
         /*
         * Automatically refresh count statistics for context when filters

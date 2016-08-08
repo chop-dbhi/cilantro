@@ -64,23 +64,6 @@ define([
             change: 'render'
         },
 
-        // This dictionary maps operators to their simple language representation.
-        // renderDescription creates the language to be displayed as the filter
-        // description. The first value in the array is the simple language
-        // shortening. The second is the value present in the default language.
-        simpleLanguage : {
-            'in': ['is', 'is'],
-            '-in': ['not', 'is not'],
-            'exact': ['is', 'is'],
-            'range': ['between', 'is between'],
-            '-range': ['not between', 'is not between'],
-            'isnull': ['is', 'is'],
-            'gt': ['>', 'is greater'],
-            'gte': ['>=', 'is greater than or equal to'],
-            'lt': ['<', 'is less'],
-            'lte': ['<=', 'is less than or equal to']
-        },
-
         // Navigate to query page when a concept is triggered
         clickShow: function() {
             c.trigger(c.CONCEPT_FOCUS, this.model.get('concept'));
@@ -144,12 +127,20 @@ define([
             }
 
             if (value.length < THRESHOLD) {
+                var toks = [];
                 // In the case of more than one values, construct a string in
                 // the form [fieldname] is [value1], [value2] or [value3] etc.
                 for (i = 0; i < value.length - 1; i++) {
-                    text.push('<span class=filter-value>' + value[i] + ',' +
-                              '</span>');
+                    toks.push('<span class=filter-value>' + value[i] + '</span>');
                 }
+
+                var front = toks.join(', ');
+
+                if (toks.length > 1) {
+                    front = front + ',';
+                }
+
+                text.push(front);
 
                 // In case of an exclusion operator, end the list of values with
                 // 'nor'.
@@ -165,8 +156,8 @@ define([
             }
             // In the case # of values exceeds Threshold hide them.
             else {
-                text.push('<span class=filter-value>' + value[0] + ',' + '</span>');
-                text.push('<span class=filter-value>' + value[1] + ',' + '</span>');
+                text.push('<span class=filter-value>' + value[0] + '</span>,');
+                text.push('<span class=filter-value>' + value[1] + '</span>,');
 
                 var tail = value.length - THRESHOLD;
 
@@ -199,21 +190,18 @@ define([
                 return;
             }
 
+            var lang = c.config.get('filterOperators');
+
            /*
             * The cleanedValue will be used to prettify the language.
             * In the case of some values being represented as ids, cleanedValue
             * will provide their text representation.
             */
-            var cleanedValue = attrs.cleaned_value; // jshint ignore:line
 
             var text = [],
-                value = attrs.value,
+                cleanedValue = attrs.value,
                 operator = attrs.operator,
                 fieldName = '';
-
-            if (typeof cleanedValue === 'undefined'){
-                cleanedValue = value;
-            }
 
             // If the fields have been found, get the fieldName from them. Else
             // split the language at the operator to retrive it.
@@ -223,9 +211,8 @@ define([
             else {
                 // Splits the language at the operator and retrives the fieldName
                 // which is always to the left of the operator.
-                fieldName =
-                    attrs.language.split(
-                            this.simpleLanguage[operator][1])[0];
+                var opre = new RegExp('\\b' + lang[operator][1] + '\\b');
+                fieldName = attrs.language.split(opre, 1)[0];
             }
 
             // Remove ? and ! from the end of field names
@@ -236,7 +223,7 @@ define([
             text.push('<strong>' + fieldName + '</strong>');
 
             if (operator === 'range' || operator === '-range') {
-                text.push(this.simpleLanguage[operator][0]);
+                text.push(lang[operator][0]);
                 var val1 = value[0];
                 var val2 = value[1];
 
@@ -250,12 +237,12 @@ define([
                           '<span class=filter-value>' + val2 + '</span>');
             }
             else if (operator === 'in' || operator === '-in') {
-                text.push(this.simpleLanguage[operator][0]);
+                text.push(lang[operator][0]);
                 text.push(this.parseValue(cleanedValue, operator));
             }
             // Handles greater than, less than etc.
             else {
-                text.push(this.simpleLanguage[operator][0]);
+                text.push(lang[operator][0]);
                 text.push(this.parseValue(cleanedValue, operator));
             }
 
