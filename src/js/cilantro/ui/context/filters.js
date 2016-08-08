@@ -195,10 +195,6 @@ define([
                 operator = attrs.operator,
                 fieldName = '';
 
-            if (typeof cleanedValue === 'undefined'){
-                cleanedValue = value;
-            }
-
             // If the fields have been found, get the fieldName from them. Else
             // split the language at the operator to retrive it.
             if (c.data.fields.get(attrs.field)) {
