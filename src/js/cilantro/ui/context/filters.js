@@ -127,12 +127,20 @@ define([
             }
 
             if (value.length < THRESHOLD) {
+                var toks = [];
                 // In the case of more than one values, construct a string in
                 // the form [fieldname] is [value1], [value2] or [value3] etc.
                 for (i = 0; i < value.length - 1; i++) {
-                    text.push('<span class=filter-value>' + value[i] + ',' +
-                              '</span>');
+                    toks.push('<span class=filter-value>' + value[i] + '</span>');
                 }
+
+                var front = toks.join(', ');
+
+                if (toks.length > 1) {
+                    front = front + ',';
+                }
+
+                text.push(front);
 
                 // In case of an exclusion operator, end the list of values with
                 // 'nor'.
@@ -148,8 +156,8 @@ define([
             }
             // In the case # of values exceeds Threshold hide them.
             else {
-                text.push('<span class=filter-value>' + value[0] + ',' + '</span>');
-                text.push('<span class=filter-value>' + value[1] + ',' + '</span>');
+                text.push('<span class=filter-value>' + value[0] + '</span>,');
+                text.push('<span class=filter-value>' + value[1] + '</span>,');
 
                 var tail = value.length - THRESHOLD;
 
