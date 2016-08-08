@@ -227,7 +227,8 @@ define([
             else {
                 // Splits the language at the operator and retrives the fieldName
                 // which is always to the left of the operator.
-                fieldName = attrs.language.split(this.simpleLanguage[operator][1])[0];
+                var opre = new RegExp('\\b' + lang[operator][1] + '\\b');
+                fieldName = attrs.language.split(opre, 1)[0];
             }
 
             // Remove ? and ! from the end of field names
