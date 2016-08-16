@@ -13,12 +13,41 @@
         }
     }
 
-    .operator-region {
+    .adv-region {
         position: absolute;
         top: 40px;
         height: 40px;
-        padding-bottom: 10px;
-        text-align: center;
+    }
+
+    .groups-region {
+        .dropdown-menu {
+          padding: 10px;
+
+          ul {
+            margin-bottom: 0;
+          }
+
+          a {
+            padding-left: 0;
+            text-decoration: none;
+          }
+        }
+
+        h5 {
+          margin-top: 0;
+        }
+
+        hr {
+          margin: 10px 0;
+        }
+
+        .input-append {
+          display: block;
+        }
+
+        input {
+            height: 17px;
+        }
     }
 
     .filters-region {

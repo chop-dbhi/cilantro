@@ -8,6 +8,9 @@ define([
 ], function($, _, Backbone) {
 
     var generateId = function(attrs) {
+        if (attrs.composite !== undefined) {
+          return attrs.composite;
+        }
         var id = '';
         if (attrs.concept) id += 'c' + attrs.concept;
         if (attrs.field) id += 'f' + attrs.field;
@@ -116,7 +119,7 @@ define([
 
                 models = [];
 
-                if (attrs.field) {
+                if (attrs.field || attrs.composite) {
                     var id = this.model.prototype.generateId(attrs);
                     models.push(_.extend({id: id}, attrs));
                 }

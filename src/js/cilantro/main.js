@@ -46,7 +46,8 @@ require({
                 }),
 
                 context: new c.ui.ContextPanel({
-                    model: this.data.contexts.session
+                    model: this.data.contexts.session,
+                    contexts: this.data.contexts
                 })
             };
 

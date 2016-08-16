@@ -6,10 +6,11 @@ define([
     '../base',
     '../core',
     './filters',
+    './groups',
     './operator',
     './info',
     './actions'
-], function(_, Marionette, base, c, filters, operator, info, actions) {
+], function(_, Marionette, base, c, filters, groups, operator, info, actions) {
 
 
     var ContextPanel = Marionette.Layout.extend({
@@ -30,6 +31,7 @@ define([
         regions: {
             info: '.info-region',
             operator: '.operator-region',
+            groups: '.groups-region',
             filters: '.filters-region',
             actions: '.actions-region'
         },
@@ -37,8 +39,17 @@ define([
         regionViews: {
             info: info.ContextInfo,
             operator: operator.ContextOperator,
+            groups: groups.ContextGroups,
             filters: filters.ContextFilters,
             actions: actions.ContextActions
+        },
+
+        initialize: function() {
+            this.data = {};
+
+            if (!(this.data.contexts = this.options.contexts)) {
+                throw new Error('context collection required');
+            }
         },
 
         showLoadView: function() {
@@ -75,6 +86,11 @@ define([
                 collection: this.model.filters
             });
 
+            var groups = new this.regionViews.groups({
+                model: this.model,
+                collection: this.data.contexts
+            });
+
             var filters = new this.regionViews.filters({
                 model: this.model,
                 collection: this.model.filters
@@ -88,6 +104,7 @@ define([
             this.actions.show(actions);
             this.filters.show(filters);
             this.operator.show(operator);
+            this.groups.show(groups);
         },
 
         openPanel: function(options) {

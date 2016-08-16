@@ -178,6 +178,11 @@ define([
         renderDescription: function() {
             var attrs = this.model.toJSON();
 
+            if (attrs.composite !== undefined) {
+              this.ui.description.text(attrs.name);
+              return;
+            }
+
            /*
             * styleFilters is a feature supported by Avocado versions 2.3.5 and above.
             * If this property is not present, then the latest version

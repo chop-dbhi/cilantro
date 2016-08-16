@@ -52,6 +52,9 @@ define([
     'tpl!templates/context/empty.html',
     'tpl!templates/context/filter.html',
     'tpl!templates/context/operator.html',
+    'tpl!templates/context/groups.html',
+    'tpl!templates/context/groups-item.html',
+    'tpl!templates/context/groups-dropdown.html',
 
     'tpl!templates/controls/infograph/bar.html',
     'tpl!templates/controls/infograph/layout.html',
