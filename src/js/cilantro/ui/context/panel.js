@@ -48,7 +48,8 @@ define([
             this.data = {};
 
             if (!(this.data.contexts = this.options.contexts)) {
-                throw new Error('context collection required');
+                this.data.contexts = c.data.contexts;
+                console.warn('Migration required. The ContextPanel now requires the `cilantro.data.contexts` collection to be passed in as the `contexts` option which is initialized in the Cilantro main script.');
             }
         },
 
