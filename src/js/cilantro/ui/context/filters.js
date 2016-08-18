@@ -66,7 +66,7 @@ define([
 
         // Navigate to query page when a concept is triggered
         clickShow: function() {
-            c.trigger(c.CONCEPT_FOCUS, this.model.get('concept'));
+            c.trigger(c.CONCEPT_FOCUS, this.model.get('concept'), this.model);
         },
 
         clickRemove: function(event) {
@@ -179,6 +179,7 @@ define([
             var attrs = this.model.toJSON();
 
             if (attrs.composite !== undefined) {
+              this.$el.addClass('composite');
               this.ui.description.text(attrs.name);
               return;
             }
@@ -197,14 +198,9 @@ define([
 
             var lang = c.config.get('filterOperators');
 
-           /*
-            * The cleanedValue will be used to prettify the language.
-            * In the case of some values being represented as ids, cleanedValue
-            * will provide their text representation.
-            */
-
             var text = [],
-                cleanedValue = attrs.value,
+                value = attrs.value,
+                cleanedValue = attrs.cleanedValue || value,
                 operator = attrs.operator,
                 fieldName = '';
 
