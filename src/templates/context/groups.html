@@ -1,1 +1,15 @@
-<div data-region=dropdown></div>
+<a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+  Filter Groups...
+  <span class="caret"></span>
+</a>
+<div class="dropdown-menu">
+  <h5>Add Filter Group</h5>
+  <p class="muted">Click to add a filter group to your current filters.</p>
+  <ul class="unstyled"></ul>
+  <hr>
+  <h5>Create Filter Group</h5>
+  <div class="input-append">
+    <input type="text" name="group-name" placeholder="Name..." />
+    <button data-action="create-group" class="btn btn-small btn-primary" type="button">Create</button>
+  </div>
+</div>

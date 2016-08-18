@@ -4,28 +4,53 @@ define([
   'underscore',
   'marionette',
   '../../core',
-  './groups-dropdown',
-], function(_, Marionette, c, dropdown) {
+], function(_, Marionette, c) {
 
-    var ContextGroups = Marionette.Layout.extend({
+    var GroupItem = Marionette.ItemView.extend({
+        tagName: 'li',
+
+        template: 'context/groups-item',
+
+        events: {
+          'click a': 'handleAddGroup',
+          'click [data-action=delete-group]': 'handleDeleteGroup'
+        },
+
+        handleAddGroup: function(event) {
+          event.preventDefault();
+          this.trigger('select');
+        },
+
+        handleDeleteGroup: function(event) {
+          event.preventDefault();
+          this.model.destroy();
+        }
+    });
+
+
+    var ContextGroups = Marionette.CompositeView.extend({
         template: 'context/groups',
 
+        className: 'btn-group pull-right',
+
         ui: {
+            list: 'ul',
             input: 'input[name=group-name]',
             button: '[data-action=create-group]'
         },
 
+        itemView: GroupItem,
+
+        itemViewContainer: 'ul',
+
+        itemEvents: {
+            'select': 'handleItemSelect'
+        },
+
         events: {
+            'click @ui.list a': 'handleItemClick',
             'click @ui.input': 'handleFocusInput',
             'click @ui.button': 'handleCreateGroup'
-        },
-
-        regions: {
-            dropdown: '[data-region=dropdown]',
-        },
-
-        regionViews: {
-            dropdown: dropdown.ContextGroupsDropdown,
         },
 
         initialize: function() {
@@ -36,22 +61,26 @@ define([
             }
         },
 
-        onRender: function() {
-            var dropdown = new this.regionViews.dropdown({
-                model: this.model,
-                collection: this.data.contexts
-            });
-
-            this.dropdown.show(dropdown);
-
-            this.bindUIElements();
-        },
-
         handleFocusInput: function(event) {
             this.ui.button.addClass('btn-primary');
             this.ui.button.removeClass('btn-danger');
             this.ui.input.removeClass('error');
             event.stopPropagation();
+        },
+
+        handleItemSelect: function(event, item) {
+            var filter = this.model.define({
+              name: item.model.get('name') || item.model.id,
+              composite: item.model.id
+            });
+
+            filter.apply();
+        },
+
+        // Include only the relevant context items.
+        addItemView: function(model, ItemView, index) {
+            if ((model.get('session') || model.get('template'))) return;
+            Marionette.CompositeView.prototype.addItemView.apply(this, arguments);
         },
 
         handleCreateGroup: function(event) {
