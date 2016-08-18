@@ -86,10 +86,14 @@ define([
                 collection: this.model.filters
             });
 
-            var groups = new this.regionViews.groups({
-                model: this.model,
-                collection: this.data.contexts
-            });
+            if (c.config.get('filterGroups.enabled')) {
+              var groups = new this.regionViews.groups({
+                  model: this.model,
+                  collection: this.data.contexts
+              });
+
+              this.groups.show(groups);
+            }
 
             var filters = new this.regionViews.filters({
                 model: this.model,
@@ -104,7 +108,6 @@ define([
             this.actions.show(actions);
             this.filters.show(filters);
             this.operator.show(operator);
-            this.groups.show(groups);
         },
 
         openPanel: function(options) {

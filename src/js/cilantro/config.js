@@ -118,6 +118,12 @@ define([
         */
         distinctCountAutoRefresh: true,
 
+
+        // Configuration for filter groups.
+        filterGroups: {
+            enabled: false
+        },
+
         /*
          * Timeouts
          *
