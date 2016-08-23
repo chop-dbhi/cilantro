@@ -177,6 +177,13 @@ define([
 
         // Takes attributes and returns a boolean to whether a value is set.
         isEmpty: function(attrs) {
+            if (attrs.children) {
+                for (var i = 0; i < attrs.children.length; i++) {
+                    if (this.isEmpty(attrs.children[i])) return true;
+                }
+                return false;
+            }
+
             if (_.isUndefined(attrs.value) || _.isNull(attrs.value)) {
                 return true;
             }
