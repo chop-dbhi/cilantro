@@ -8,7 +8,7 @@ define([
     '../../utils/numbers'
 ], function(_, Marionette, base, c, numbers) {
 
-    var flattenLanguage = function(attrs, toks, type, wrap) {
+    var flattenLanguage = function(attrs, toks, wrap) {
         if (!attrs) return '';
         if (!toks) toks = [];
         if (wrap !== false) wrap = true;
@@ -16,26 +16,156 @@ define([
         if (wrap) toks.push('<ul>');
 
         if (attrs.language) {
-            toks.push('<li>' + attrs.language + '</li>');
+            var lang;
+
+            if (c.config.get('styleFilters')) {
+                lang = styleLanguage(attrs);
+            } else {
+                lang = attrs.language;
+            }
+
+            toks.push('<li>' + lang + '</li>');
         }
         else if (attrs.type && attrs.children.length) {
-            if (type) {
-                toks.push('<li><small>' + attrs.type.toUpperCase() + '</small><ul>');
-            }
-
-            _.each(attrs.children, function(child) {
-                flattenLanguage(child, toks, type, false);
+            var subtoks = _.map(attrs.children, function(child) {
+                return flattenLanguage(child, null, false);
             });
 
-            if (type) {
-                toks.push('</ul></li>');
-            }
+            toks.push(subtoks.join('<li><em>' + attrs.type.toUpperCase() + '</em></li>'));
         }
 
         if (wrap) toks.push('</ul>');
 
         return toks.join('');
     };
+
+    // Function for handling values which are not from the 'range'
+    // operator. This function creates an appropriate language to represent
+    // the values.
+    var parseValue = function(value, operator) {
+        var i, text = [];
+
+        if (!_.isArray(value)) {
+            if (typeof value.label !== 'undefined') {
+                value = value.label;
+            }
+            return '<span class=filter-value>' + value + '</span>';
+        }
+
+        // If the # of values are greater than this threshold, do not show
+        // them all.
+        var THRESHOLD = c.config.get('maxFilterDisplayValues');
+
+        if (typeof value[0] === 'object') {
+            value = _.pluck(value, 'label');
+        }
+
+        if (value.length === 1) {
+            return '<span class=filter-value>' + value[0] + '</span>';
+        }
+
+        if (value.length < THRESHOLD) {
+            var toks = [];
+            // In the case of more than one values, construct a string in
+            // the form [fieldname] is [value1], [value2] or [value3] etc.
+            for (i = 0; i < value.length - 1; i++) {
+                toks.push('<span class=filter-value>' + value[i] + '</span>');
+            }
+
+            var front = toks.join(', ');
+
+            if (toks.length > 1) {
+                front = front + ',';
+            }
+
+            text.push(front);
+
+            // In case of an exclusion operator, end the list of values with
+            // 'nor'.
+            if (operator.charAt(0) === '-') {
+                text.push('nor');
+            }
+            else {
+                text.push('or');
+            }
+
+            text.push('<span class=filter-value>' + value[value.length - 1] +
+                      '</span>');
+        }
+        // In the case # of values exceeds Threshold hide them.
+        else {
+            text.push('<span class=filter-value>' + value[0] + '</span>,');
+            text.push('<span class=filter-value>' + value[1] + '</span>,');
+
+            var tail = value.length - THRESHOLD;
+
+            if (operator.indexOf('-') < 0) {
+                text.push('...(' + tail + ' more) or');
+            }
+            else {
+                text.push('...(' + tail + ' more) nor');
+            }
+
+            text.push('<span class=filter-value>' + value[value.length - 1] +
+                      '</span>');
+        }
+
+        return text.join(' ');
+    };
+
+
+    var styleLanguage = function(attrs) {
+        var lang = c.config.get('filterOperators');
+
+        var text = [],
+            value = attrs.value,
+            cleanedValue = attrs.cleanedValue || value,
+            operator = attrs.operator,
+            fieldName = '';
+
+        // If the fields have been found, get the fieldName from them. Else
+        // split the language at the operator to retrive it.
+        if (c.data.fields.get(attrs.field)) {
+            fieldName = c.data.fields.get(attrs.field).get('name');
+        }
+        else {
+            // Splits the language at the operator and retrives the fieldName
+            // which is always to the left of the operator.
+            var opre = new RegExp('\\b' + lang[operator][1] + '\\b');
+            fieldName = attrs.language.split(opre, 1)[0];
+        }
+
+        // Remove ? and ! from the end of field names
+        fieldName = fieldName.replace(/[!?]$/g, '');
+
+        text.push('<strong>' + fieldName + '</strong>');
+
+        if (operator === 'range' || operator === '-range') {
+            text.push(lang[operator][0]);
+            var val1 = value[0];
+            var val2 = value[1];
+
+            // Prettify Numbers
+            if (_.isNumber(val1) && _.isNumber(val2)) {
+                val1 = numbers.toDelimitedNumber(val1);
+                val2 = numbers.toDelimitedNumber(val2);
+            }
+
+            text.push('<span class=filter-value>' + val1 + '</span> and ' +
+                      '<span class=filter-value>' + val2 + '</span>');
+        }
+        else if (operator === 'in' || operator === '-in') {
+            text.push(lang[operator][0]);
+            text.push(parseValue(cleanedValue, operator));
+        }
+        // Handles greater than, less than etc.
+        else {
+            text.push(lang[operator][0]);
+            text.push(parseValue(cleanedValue, operator));
+        }
+
+        return text.join(' ');
+    }
 
     var ContextFilter = Marionette.ItemView.extend({
         className: 'context-filter',
@@ -101,154 +231,9 @@ define([
             }
         },
 
-        // Function for handling values which are not from the 'range'
-        // operator. This function creates an appropriate language to represent
-        // the values.
-        parseValue: function(value, operator) {
-            var i, text = [];
-
-            if (!_.isArray(value)) {
-                if (typeof value.label !== 'undefined') {
-                    value = value.label;
-                }
-                return '<span class=filter-value>' + value + '</span>';
-            }
-
-            // If the # of values are greater than this threshold, do not show
-            // them all.
-            var THRESHOLD = c.config.get('maxFilterDisplayValues');
-
-            if (typeof value[0] === 'object') {
-                value = _.pluck(value, 'label');
-            }
-
-            if (value.length === 1) {
-                return '<span class=filter-value>' + value[0] + '</span>';
-            }
-
-            if (value.length < THRESHOLD) {
-                var toks = [];
-                // In the case of more than one values, construct a string in
-                // the form [fieldname] is [value1], [value2] or [value3] etc.
-                for (i = 0; i < value.length - 1; i++) {
-                    toks.push('<span class=filter-value>' + value[i] + '</span>');
-                }
-
-                var front = toks.join(', ');
-
-                if (toks.length > 1) {
-                    front = front + ',';
-                }
-
-                text.push(front);
-
-                // In case of an exclusion operator, end the list of values with
-                // 'nor'.
-                if (operator.charAt(0) === '-') {
-                    text.push('nor');
-                }
-                else {
-                    text.push('or');
-                }
-
-                text.push('<span class=filter-value>' + value[value.length - 1] +
-                          '</span>');
-            }
-            // In the case # of values exceeds Threshold hide them.
-            else {
-                text.push('<span class=filter-value>' + value[0] + '</span>,');
-                text.push('<span class=filter-value>' + value[1] + '</span>,');
-
-                var tail = value.length - THRESHOLD;
-
-                if (operator.indexOf('-') < 0) {
-                    text.push('...(' + tail + ' more) or');
-                }
-                else {
-                    text.push('...(' + tail + ' more) nor');
-                }
-
-                text.push('<span class=filter-value>' + value[value.length - 1] +
-                          '</span>');
-            }
-
-            return text.join(' ');
-        },
-
         renderDescription: function() {
             var attrs = this.model.toJSON();
-
-           /*
-            * styleFilters is a feature supported by Avocado versions 2.3.5 and above.
-            * If this property is not present, then the latest version
-            * is not installed on this app.
-            * In this case, (or in the case of not watching styled filters,
-            * set this setting to false.
-            */
-            if (!c.config.get('styleFilters')) {
-                this.ui.description.html(flattenLanguage(attrs));
-                return;
-            }
-
-            var lang = c.config.get('filterOperators');
-
-           /*
-            * The cleanedValue will be used to prettify the language.
-            * In the case of some values being represented as ids, cleanedValue
-            * will provide their text representation.
-            */
-
-            var text = [],
-                cleanedValue = attrs.value,
-                operator = attrs.operator,
-                fieldName = '';
-
-            // If the fields have been found, get the fieldName from them. Else
-            // split the language at the operator to retrive it.
-            if (c.data.fields.get(attrs.field)) {
-                fieldName = c.data.fields.get(attrs.field).get('name');
-            }
-            else {
-                // Splits the language at the operator and retrives the fieldName
-                // which is always to the left of the operator.
-                var opre = new RegExp('\\b' + lang[operator][1] + '\\b');
-                fieldName = attrs.language.split(opre, 1)[0];
-            }
-
-            // Remove ? and ! from the end of field names
-            fieldName = fieldName.replace(/[!?]$/g, '');
-
-            text.push('<ul><li>');
-
-            text.push('<strong>' + fieldName + '</strong>');
-
-            if (operator === 'range' || operator === '-range') {
-                text.push(lang[operator][0]);
-                var val1 = value[0];
-                var val2 = value[1];
-
-                // Prettify Numbers
-                if (_.isNumber(val1) && _.isNumber(val2)) {
-                    val1 = numbers.toDelimitedNumber(val1);
-                    val2 = numbers.toDelimitedNumber(val2);
-                }
-
-                text.push('<span class=filter-value>' + val1 + '</span> and ' +
-                          '<span class=filter-value>' + val2 + '</span>');
-            }
-            else if (operator === 'in' || operator === '-in') {
-                text.push(lang[operator][0]);
-                text.push(this.parseValue(cleanedValue, operator));
-            }
-            // Handles greater than, less than etc.
-            else {
-                text.push(lang[operator][0]);
-                text.push(this.parseValue(cleanedValue, operator));
-            }
-
-            text.push('</li></ul>');
-
-            this.ui.description.html(text.join(' '));
+            this.ui.description.html(flattenLanguage(attrs));
         },
 
         showLoadView: function() {

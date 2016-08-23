@@ -109,7 +109,11 @@ define([
             'regex': ['matches', 'matches'],
             'iregex': ['matches', 'matches'],
             'icontains': ['contains', 'contains the text'],
-            'contains': ['contains', 'contains the text']
+            'contains': ['contains', 'contains the text'],
+            '-icontains': ['does not contain', 'does not contain the text'],
+            '-contains': ['does not contain', 'does not contain the text'],
+            '-regex': ['matches', 'does not match'],
+            '-iregex': ['matches', 'does not match']
         },
 
         /*
