@@ -626,47 +626,21 @@ define([
                 }
             });
 
-            if (required.length === 1) {
+            _.each(required, function(value) {
                 filter.children.push({
                     field: field,
                     operator: 'icontains',
-                    value: required[0]
+                    value: value
                 });
-            }
-            else if (required.length > 1) {
-                filter.children.push({
-                    field: field,
-                    type: 'and',
-                    children: _.map(required, function(value) {
-                        return {
-                            field: field,
-                            operator: 'icontains',
-                            value: value
-                        };
-                    })
-                });
-            }
+            })
 
-            if (excluded.length === 1) {
+            _.each(excluded, function(value) {
                 filter.children.push({
                     field: field,
                     operator: '-icontains',
-                    value: excluded[0]
+                    value: value
                 });
-            }
-            else if (excluded.length > 1) {
-                filter.children.push({
-                    field: field,
-                    type: 'and',
-                    children: _.map(excluded, function(value) {
-                        return {
-                            field: field,
-                            operator: '-icontains',
-                            value: value
-                        };
-                    })
-                });
-            }
+            });
 
             if (optional.length === 1) {
                 filter.children.push({
