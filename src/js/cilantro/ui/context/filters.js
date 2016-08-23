@@ -19,7 +19,8 @@ define([
             var lang;
 
             if (c.config.get('styleFilters')) {
-                lang = styleLanguage(attrs);
+                var parts = styleLanguage(attrs);
+                lang = [parts.field, parts.operator, parts.value].join(' ');
             } else {
                 lang = attrs.language;
             }
@@ -27,11 +28,65 @@ define([
             toks.push('<li>' + lang + '</li>');
         }
         else if (attrs.type && attrs.children.length) {
-            var subtoks = _.map(attrs.children, function(child) {
-                return flattenLanguage(child, null, false);
-            });
+            if (c.config.get('styleFilters')) {
+                var currentField,
+                    subtoks = [],
+                    preds = [];
 
-            toks.push(subtoks.join('<li><em>' + attrs.type.toUpperCase() + '</em></li>'));
+                _.each(attrs.children, function(child) {
+                    var parts = styleLanguage(child);
+
+                    // Field is not the same, append to output and reset for the next field.
+                    if (child.field !== currentField) {
+                        if (preds.length === 1) {
+                            subtoks.push('<li>' + preds[0] + '</li>');
+                        }
+                        else if (preds.length === 2) {
+                            subtoks.push('<li>' + preds.join(' <em>' + attrs.type.toUpperCase() + '</em> ') + '</li>');
+                        }
+                        else if (preds.length > 2) {
+                            var last = preds.pop();
+                            subtoks.push('<li>' + preds.join(', ') + ', <em>' + attrs.type.toUpperCase() + '</em> ' + last + '</li>');
+                        }
+
+                        currentField = child.field;
+                        preds = [];
+
+                        preds.push([
+                          parts.field,
+                          parts.operator,
+                          parts.value
+                        ].join(' '));
+                    }
+                    else {
+                      preds.push([
+                        parts.operator,
+                        parts.value
+                      ].join(' '));
+                    }
+                });
+
+                // Last iteration.
+                if (preds.length === 1) {
+                    subtoks.push('<li>' + preds[0] + '</li>');
+                }
+                else if (preds.length === 2) {
+                    subtoks.push('<li>' + preds.join(' <em>' + attrs.type.toUpperCase() + '</em> ') + '</li>');
+                }
+                else if (preds.length > 2) {
+                    var last = preds.pop();
+                    subtoks.push('<li>' + preds.join(', ') + ', <em>' + attrs.type.toUpperCase() + '</em> ' + last + '</li>');
+                }
+
+                toks.push(subtoks.join('<li><em>' + attrs.type.toUpperCase() + '</em></li>'));
+            }
+            else {
+              var subtoks = _.map(attrs.children, function(child) {
+                  return flattenLanguage(child, null, false);
+              });
+
+              toks.push(subtoks.join('<li><em>' + attrs.type.toUpperCase() + '</em></li>'));
+            }
         }
 
         if (wrap) toks.push('</ul>');
@@ -117,12 +172,11 @@ define([
     var styleLanguage = function(attrs) {
         var lang = c.config.get('filterOperators');
 
-        var text = [],
-            value = attrs.value,
-            cleanedValue = attrs.cleanedValue || value,
-            operator = attrs.operator,
-            fieldName = '';
+        var styled = {},
+            value = attrs.cleanedValue || attrs.value,
+            operator = attrs.operator;
 
+        var fieldname;
         // If the fields have been found, get the fieldName from them. Else
         // split the language at the operator to retrive it.
         if (c.data.fields.get(attrs.field)) {
@@ -136,12 +190,11 @@ define([
         }
 
         // Remove ? and ! from the end of field names
-        fieldName = fieldName.replace(/[!?]$/g, '');
-
-        text.push('<strong>' + fieldName + '</strong>');
+        styled.field = '<strong>' + fieldName.replace(/[!?]$/g, '') + '</strong>';
 
         if (operator === 'range' || operator === '-range') {
-            text.push(lang[operator][0]);
+            styled.operator = lang[operator][0];
+
             var val1 = value[0];
             var val2 = value[1];
 
@@ -151,20 +204,22 @@ define([
                 val2 = numbers.toDelimitedNumber(val2);
             }
 
-            text.push('<span class=filter-value>' + val1 + '</span> and ' +
-                      '<span class=filter-value>' + val2 + '</span>');
+            styled.value = (
+              '<span class=filter-value>' + val1 + '</span> and ' +
+              '<span class=filter-value>' + val2 + '</span>'
+            );
         }
         else if (operator === 'in' || operator === '-in') {
-            text.push(lang[operator][0]);
-            text.push(parseValue(cleanedValue, operator));
+            styled.operator = lang[operator][0];
+            styled.value = parseValue(value, operator);
         }
         // Handles greater than, less than etc.
         else {
-            text.push(lang[operator][0]);
-            text.push(parseValue(cleanedValue, operator));
+            styled.operator = lang[operator][0];
+            styled.value = parseValue(value, operator);
         }
 
-        return text.join(' ');
+        return styled;
     }
 
     var ContextFilter = Marionette.ItemView.extend({
