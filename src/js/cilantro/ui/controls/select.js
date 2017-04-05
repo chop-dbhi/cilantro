@@ -53,15 +53,36 @@ define([
         itemViewContainer: '.items',
 
         ui: {
-            items: '.items'
+            items: '.items',
+            filterHelp: '.filter-help'
         },
 
         events: {
-            'change .items': 'onSelectionChange'
+            'change .items': 'onSelectionChange',
+            'change': 'showFilterHelp'
         },
 
         collectionEvents: {
             'reset': 'onCollectionSync'
+        },
+
+        showFilterHelp: function() {
+            var attrName = this.model.attributes.name;
+            var language = base.ControlLanguage;
+            var operator = this.getOperator();
+
+            // Get the list of option elements in this item tag.
+            var options = this.ui.items.get(0);
+            var value = parseInt(this.getValue());
+
+            if (value !== 'NaN') {
+                var textVal = options[value - 1].text;
+                this.ui.filterHelp.text(attrName + language[operator] + textVal);
+            }
+            else {
+                value = this.getValue();
+                this.ui.filterHelp.text(attrName + language[operator] + value);
+            }
         },
 
         initialize: function() {

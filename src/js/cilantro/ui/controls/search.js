@@ -134,7 +134,9 @@ define([
 
         events: {
             'click [data-action=clear]': 'clearValues',
-            'change [name=exclude]': 'change'
+            'change [name=exclude]': 'showFilterHelpOnExclude',
+            'click .add-item-button': 'showFilterHelp',
+            'click .remove-item-button': 'showFilterHelp'
         },
 
         regions: {
@@ -152,7 +154,48 @@ define([
         },
 
         ui: {
-            excludeCheckbox: '[name=exclude]'
+            excludeCheckbox: '[name=exclude]',
+            filterHelp: '.filter-help'
+        },
+
+        showFilterHelpOnExclude: function() {
+            this.change();
+            this.showFilterHelp();
+        },
+
+        showFilterHelp: function() {
+            var attrName = this.model.attributes.name;
+            var language = controls.ControlLanguage;
+            var operator = language[this.getOperator()];
+            var values = _.pluck(this.getValue(), 'label');
+
+            var size = values.length;
+            var string = '';
+            var pluralOperator = ' either ',
+                preposition = ' or ';
+
+            if (operator === language['-in']) {
+                pluralOperator = ' neither ';
+                preposition = ' nor ';
+            }
+
+            if (size === 1) {
+                string = attrName + operator + ' ' + values[0];
+            }
+            else if (size === 2) {
+                string = attrName + pluralOperator + values[0] +
+                    preposition + values[1];
+            }
+            else if (size > 2) {
+                string = attrName + pluralOperator + values[0];
+                for (var i=1; i < size - 1; i++) {
+                    string += ',' + values[i];
+                }
+
+                string += preposition + values[size - 1];
+            }
+
+            this.ui.filterHelp.text(string);
         },
 
         initialize: function() {

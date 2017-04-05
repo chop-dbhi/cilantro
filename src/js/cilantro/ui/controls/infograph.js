@@ -396,11 +396,51 @@ define ([
         },
 
         ui: {
-            loading: '[data-target=loading-indicator]'
+            loading: '[data-target=loading-indicator]',
+            filterHelp: '.filter-help'
         },
 
         collectionEvents: {
-            'reset': 'toggleToolbar'
+            'reset': 'toggleToolbar',
+            'change': 'showFilterHelp'
+        },
+
+        showFilterHelp: function() {
+            var attrName = this.model.attributes.name;
+            var language = base.ControlLanguage;
+            var operator = language[this.barsControl.getOperator()];
+            var values = this.barsControl.getValue();
+
+            // Change all "" values to empty
+            for (var i = 0; i < values.length; i++) {
+                if (values[i].length === 0) {
+                    values[i] = 'empty';
+                }
+            }
+
+            var size = values.length;
+            var string = '';
+            var plural = ' either ',
+                preposition = ' or ';
+
+            if (operator === language['-in']) {
+                plural = ' neither ';
+                preposition = ' nor ';
+            }
+
+            if (size === 1) {
+                string = attrName + operator + ' ' + values[0];
+            }
+            else if (size === 2) {
+                string = attrName + plural + values[0] +
+                    preposition + values[1];
+            }
+            else if (size > 2) {
+                values[size - 1] = preposition + values[size - 1];
+                string = attrName + plural + values.join(', ');
+            }
+
+            this.ui.filterHelp.text(string);
         },
 
         initialize: function() {
