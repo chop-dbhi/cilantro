@@ -39,7 +39,7 @@ define ([
                 distinct_count: 'Unique values' // jshint ignore:line
             };
             return '<span class=stat-label>' + (statslabel[data.key] || data.key) +
-                   '</span> <span class=stat-value title="' + data.value + '">' +
+                   ':</span> <span class=stat-value title="' + data.value + '">' +
                    (prettyValue(data.value)) + '</span>';
         }
     });
