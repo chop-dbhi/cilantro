@@ -1,8 +1,9 @@
 /* global define */
 
 define([
+    'jquery',
     'marionette'
-], function(Marionette) {
+], function($, Marionette) {
 
     var Cell = Marionette.View.extend({
         tagName: 'td',
@@ -13,7 +14,18 @@ define([
 
         render: function() {
             this.toggleVisible();
-            this.$el.html(this.model.get('value'));
+            var value = this.model.get('value');
+
+            //false boolean values come back as empty objects
+            if (typeof value === 'object' && $.isEmptyObject(value)) {
+                this.$el.html('False');
+            } else {
+                if (value === true) {
+                    this.$el.html('True');
+                } else {
+                    this.$el.html(value);
+                }
+            }
             return this;
         },
 
