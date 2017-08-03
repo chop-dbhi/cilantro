@@ -15,5 +15,10 @@
             </button>
         </div>
         <div class=values-region></div>
+        <% if (data.showRemoveInvalidButton) { %>
+            <button type=button data-action="remove-invalid" class="btn btn-mini btn-default">
+                Remove invalid values
+            </button>
+        <% } %>
    </div>
 </div>
