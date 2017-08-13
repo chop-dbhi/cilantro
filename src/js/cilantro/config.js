@@ -209,7 +209,11 @@ define([
             },
 
             instances: {}
-        }
+        },
+
+        // Option to show button in the search layout to remove
+        // invalid objects
+        showRemoveInvalidButton: true
     };
 
 

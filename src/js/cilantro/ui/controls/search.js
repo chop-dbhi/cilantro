@@ -9,8 +9,9 @@ define([
     '../../constants',
     '../paginator',
     '../values',
-    '../search'
-], function($, _, Marionette, controls, models, constants, paginator, values, search) {
+    '../search',
+    '../../core'
+], function($, _, Marionette, controls, models, constants, paginator, values, search, c) {
 
     // Single page of values
     var SearchPageModel = models.Page.extend({
@@ -134,6 +135,7 @@ define([
 
         events: {
             'click [data-action=clear]': 'clearValues',
+            'click [data-action="remove-invalid"]': 'removeInvalid',
             'change [name=exclude]': 'change'
         },
 
@@ -178,6 +180,12 @@ define([
             this.valuesPaginator.refresh();
         },
 
+        serializeData: function() {
+            var data = this.model.toJSON();
+            data.showRemoveInvalidButton = c.config.get('showRemoveInvalidButton') || false;
+            return data;
+        },
+
         onRender: function() {
             var searchRegion = new this.regionViews.search({
                 model: this.model,
@@ -214,6 +222,13 @@ define([
 
         clearValues: function() {
             this.collection.reset();
+        },
+
+        removeInvalid: function() {
+            var filteredModel = this.collection.filter(function(model) {
+                return model.get('valid');
+            });
+            this.collection.reset(filteredModel);
         },
 
         getField: function() {
