@@ -213,7 +213,22 @@ define([
 
         // Option to show button in the search layout to remove
         // invalid objects
-        showRemoveInvalidButton: true
+        showRemoveInvalidButton: true,
+
+        /*
+         * Vocab
+         *
+         *  - fieldNameDisplay: define a function to change the format of the
+         *    names displayed. Returns an object containing {single, plural} names
+         */
+        vocab: {
+            fieldNameDisplay: function(names) {
+                return {
+                  single: names.single.toLowerCase() || '',
+                  plural: names.plural.toLowerCase() || ''
+                };
+            }
+        }
     };
 
 
