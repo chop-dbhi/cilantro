@@ -11,8 +11,9 @@ define([
     '../values',
     '../paginator',
     '../../models',
+    '../../core',
 ], function($, _, Backbone, Marionette, controls, searchControl, search, values,
-            paginator, models) {
+            paginator, models, c) {
 
 
     // Collection that listens to another collection for models that match
@@ -156,8 +157,16 @@ define([
     // available operator.
     var BucketList = Marionette.View.extend({
         initialize: function() {
-            var name = this.model.get('alt_name').toLowerCase(),
-                pluralName = this.model.get('alt_plural_name').toLowerCase();
+            var name = this.model.get('alt_name'),
+                pluralName = this.model.get('alt_plural_name'),
+                vocabConfig = c.config.get('vocab');
+
+            if (typeof vocabConfig.fieldNameDisplay === 'function') {
+                var names = {single: name, plural: pluralName},
+                    displayNames = vocabConfig.fieldNameDisplay(names);
+                name = displayNames.single;
+                pluralName  = displayNames.plural;
+            }
 
             this.buckets = [{
                 name: 'At least one ' + name + ' must match',
